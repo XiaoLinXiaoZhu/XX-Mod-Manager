@@ -24,8 +24,6 @@
     font-size: 0.93em;
 }
 
-
-
 .OO-parallelogram {
     transform: skew(-20deg);
     border-radius: 10px;
@@ -473,4 +471,22 @@ p {
     /* background-attachment: fixed; */
     /* 让背景图基于容器大小伸缩 */
     background-size: cover;
+}
+
+
+/* -=======================返回按钮======================= */
+back-btn{
+    position: fixed;
+    top: 2vh;
+    left: 2vh;
+    z-index: 1;
+    background-image: url(../src/backButton.png);
+    background-size: 100% 100%;
+    /* 长宽比为160：97 */
+    width: 10vh;
+    height: 6vh;
+}
+/* 鼠标悬浮高亮 */
+back-btn:hover{
+    filter: brightness(1.2);
 }

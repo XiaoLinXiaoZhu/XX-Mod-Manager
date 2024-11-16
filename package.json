@@ -1,5 +1,5 @@
 {
-  "name": "mods-manager-for-3dmigoto",
+  "name": "xx-mods-manager",
   "version": "1.10.3",
   "description": "这是一个便捷的mod管理工具。该工具会自动加载位于文件夹根目录的 `mods` 文件夹内的插件。通过将插件根据需求移动到 `mods` 文件夹来实现插件的启用和禁用。",
   "main": "main.js",
@@ -28,6 +28,7 @@
   "dependencies": {
     "@tweenjs/tween.js": "^25.0.0",
     "electron-squirrel-startup": "^1.0.1",
+    "electron-store": "^10.0.0",
     "hmc-win32": "^1.4.92",
     "sober": "^0.2.21",
     "three": "^0.170.0"

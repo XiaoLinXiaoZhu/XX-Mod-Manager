@@ -113,7 +113,7 @@ function createMainWindow() {
       // preload: path.join(__dirname, 'pages/index/index-preload.js'),
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: false, // 不推荐使用
+      enableRemoteModule: true, // 不推荐使用
       webSecurity: false, // 允许加载跨域资源，生产环境中应谨慎使用
     },
   });
@@ -222,6 +222,10 @@ function moveDirectory(from, dest) {
 
 // -===================== 对外接口 =====================
 
+//-------------------获取 userData 路径-------------------
+ipcMain.handle('get-user-data-path', async () => {
+  return app.getPath('userData');
+});
 //------------------移动文件夹------------------
 ipcMain.handle('auto-move-mod', async (event) => {
   let ret = '';

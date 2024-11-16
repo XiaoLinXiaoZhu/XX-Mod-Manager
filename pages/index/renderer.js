@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     //-=================检测是否是第一次打开=================
     // 检测是否是第一次打开
     const firstOpen = localStorage.getItem('firstOpen');
-    //  debug
+    // debug
     // console.log(localStorage);
     if (!firstOpen) {
         firstLoad();

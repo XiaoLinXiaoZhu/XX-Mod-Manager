@@ -8,8 +8,6 @@ import { ClassManager, ClassManagerService } from './classManager.js'; // 引入
 
 // 将上述代码 改为 使用 ClassManager 来管理
 
-
-
 const startColor = new Color(0x94ad00);
 const endColor = new Color(0xffd300);
 let currentColor = startColor;
