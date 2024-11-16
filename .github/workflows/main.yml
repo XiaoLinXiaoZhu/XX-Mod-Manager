@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+  
+jobs:
+  release:
+    name: build and release electron app
+    runs-on: ${{ matrix.os.image }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          [
+            { name: 'linux', image: 'ubuntu-latest' },
+            { name: 'windows', image: 'windows-latest' },
+          ]
+
+    steps:
+      - name: Check out git repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Publish Electron App
+        run: npm run publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
