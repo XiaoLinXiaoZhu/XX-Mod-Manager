@@ -84,14 +84,14 @@ function openFirstLoadWindow() {
     width: 1080,
     height: 960,
     webPreferences: {
-      preload: path.join(__dirname, 'firstLoad-preload.js'),
+      preload: path.join(__dirname, 'pages/firstLoad/firstLoad-preload.js'),
       contextIsolation: false, // 启用 contextIsolation
       nodeIntegration: true,
       webSecurity: false,
     },
   });
   firstLoadWindow.setMenuBarVisibility(false);
-  firstLoadWindow.loadFile('firstLoad.html');
+  firstLoadWindow.loadFile('pages/firstLoad/firstLoad.html');
 }
 
 ipcMain.handle('open-first-load-window', async (event) => {
@@ -110,7 +110,7 @@ function createMainWindow() {
     height: 800,
     backgroundColor: '#1d1f1e',
     webPreferences: {
-      preload: path.join(__dirname, 'renderer-preload.js'),
+      // preload: path.join(__dirname, 'pages/index/index-preload.js'),
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: false, // 不推荐使用
@@ -123,7 +123,7 @@ function createMainWindow() {
   // app.on('browser-window-created', (e, window) => {
   //   window.setMenu(null);
   // });
-  newMainWindow.loadFile('index.html');
+  newMainWindow.loadFile('pages/tape/tapePage.html');
 
   //因为需要调整窗口大小，所以需要等待窗口加载完成
   newMainWindow.once('ready-to-show', () => {

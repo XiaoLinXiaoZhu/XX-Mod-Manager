@@ -22,11 +22,14 @@
     "@electron-forge/plugin-fuses": "^7.4.0",
     "@electron-forge/publisher-github": "^7.4.0",
     "@electron/fuses": "^1.8.0",
+    "@types/three": "^0.170.0",
     "electron": "^32.0.1"
   },
   "dependencies": {
+    "@tweenjs/tween.js": "^25.0.0",
     "electron-squirrel-startup": "^1.0.1",
     "hmc-win32": "^1.4.92",
-    "sober": "^0.2.21"
+    "sober": "^0.2.21",
+    "three": "^0.170.0"
   }
 }

@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>First Load Page</title>
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <link rel="stylesheet" type="text/css" href="style_component.css" />
+    <link rel="stylesheet" href="sober-theme.css">
+    <style>
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :not(:defined) {
+            display: none;
+        }
+
+        #control-bar {
+            width: 100%;
+            margin: 10px 0;
+            height: 20px;
+            display: flex;
+            -webkit-app-region: drag;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: nowrap;
+            background-color: var(--s-color-background);
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+    </style>
+
+</head>
+
+
+<body>
+    <s-page id="app" theme="dark"
+        style="display: flex;justify-content: center;flex-direction: column;flex-wrap: nowrap;align-items: center;align-content: center;">
+
+        <div id="control-bar">
+
+            <div id="rectangle" style="width: 73%; height: 8px; background-color:var(--s-color-inverse-surface); border-radius: 10px;align-self: center;
+            "></div>
+        </div>
+
+        <div id="loading" style="width: 100%;align-items: center;">
+            <h1 style="white-space: nowrap; text-align: center;" data-translate-key="ask-waiting">Creating user-config,
+                please wait...</h1>
+            <div
+                style="display:flex;margin: 30px;align-items: center;justify-items: center;flex-direction: column;align-content: center;justify-content: center;">
+                <s-circular-progress indeterminate="true"></s-circular-progress>
+            </div>
+        </div>
+
+        <div id="loaded" style="width: 100%;align-items: center;display: none;">
+            <h1 style="white-space: nowrap; text-align: center;" data-translate-key="finished-loading">User-config
+                created successfully!</h1>
+            <div
+                style="display:flex;margin: 30px;align-items: center;justify-items: center;flex-direction: column;align-content: center;justify-content: center;">
+                <s-icon type="done" style="font-size: 400px;"></s-icon>
+                <s-button type="outlined" id="close-window" data-translate-key="close-window">Close Window</s-button>
+            </div>
+        </div>
+
+        <div id="button">
+            <s-button type="outlined" id="preset-item-add" onclick="document.querySelector('#get-language').show()"
+                data-translate-key="no-response-fix"> <s-icon type="add" slot="start"
+                    style="margin-right: 10px;"></s-icon>get-language </s-button>
+        </div>
+
+
+
+        <s-snackbar></s-snackbar>
+
+        <!-- -询问语言 -->
+        <s-dialog id="get-language" class="s-dialog">
+            <div slot="headline" class="font-hongmeng">
+                <h3 data-translate-key="dialog-ask-for-language"
+                    style="height: fit-content;margin: 10px 30px 5px 30px;font-size: 26px;">
+                    select your language </h3>
+                <div class="OO-box">
+                    <div class="OO-setting-bar">
+                        <h3 data-translate-key="language"> 语言 </h3>
+                        <div id="language-picker">
+                            <input type="radio" name="language" id="zh-cn">
+                            <label for="zh-cn">
+                                <s-chip selectable="true" type="default" selectable="true" id="zh-cn">
+                                    <p data-translate-key="zh-cn">简体中文</p>
+                                </s-chip>
+                            </label>
+                            <input type="radio" name="language" id="en" checked>
+                            <label for="en">
+                                <s-chip selectable="true" type="default" selectable="true" id="en">
+                                    <p data-translate-key="en">English</p>
+                                </s-chip>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <s-button slot="action" type="text" id="language-switcher-cancel" data-translate-key="cancel">取消</s-button>
+            <s-button slot="action" type="text" id="language-switcher-confirm"
+                data-translate-key="confirm">确定</s-button>
+        </s-dialog>
+
+        <!-- -关于这个程序 -->
+        <s-dialog id="dialog" class="s-dialog">
+            <div slot="headline" class="font-hongmeng">
+                <h3 data-translate-key="about-program"> 关于本程序 </h3>
+                <div class="OO-box">
+                    <div class="OO-setting-bar">
+                        <h3 data-translate-key="about-principle-info"> 运行原理 </h3>
+                    </div>
+                    <div class="OO-box OO-shade-box">
+                        <p data-translate-key="dialog-about-principle">
+                            本程序通过代理Mods文件夹的方式来实现mod的加载，通过动态调整mod文件夹内部的文件来实现mod的加载，
+                            所以请不要在mod文件夹内添加任何文件！将你的mod添加到modSource文件夹中即可
+                            （默认为同目录下的modSource文件夹）。
+                        </p>
+                        <img src="src/description.png" alt="description" style="width: 100%;height: auto;">
+                    </div>
+                </div>
+            </div>
+            <s-button slot="action" type="text" id="about-terms-cancel" data-translate-key="cancel">取消</s-button>
+            <s-button slot="action" type="text" id="about-terms-confirm" data-translate-key="confirm">确定</s-button>
+        </s-dialog>
+
+        <!-- -询问 mod 文件夹路径 -->
+        <s-dialog id="dialog" class="s-dialog">
+            <div slot="headline" class="font-hongmeng">
+                <h3 data-translate-key="dialog-ask-for-mod-root-dir">选择你的Mods文件夹</h3>
+                <div class="OO-box">
+                    <div class="OO-setting-bar">
+                        <h3 data-translate-key="mod-root-dir"> Mod文件夹 </h3>
+                        <s-text-field style="display: grid" label="select mod file" id="select-mod-root-dir">
+                            <input type="text" id="select-mod-root-dir-input">
+                        </s-text-field>
+                    </div>
+                    <p data-translate-key="dialog-about-mod-root-dir">
+                        大部分模组管理器通过读取Mods文件夹内的文件来实现mod的加载，请在这里指定你的Mods文件夹，从而让本程序能够正确管理你的mod。对于3dmigoto来说，这个文件夹通常在它的同目录下，名字为Mods。对于XXMI，它位于类似于 XXMI\ZZMI\Mods 的位置。
+                    </p>
+                    <img src="src/description.png" alt="description" style="width: 100%;height: auto;">
+                </div>
+            </div>
+
+            <s-button slot="action" type="text" id="mod-root-dir-cancel" data-translate-key="cancel">取消</s-button>
+            <s-button slot="action" type="text" id="mod-root-dir-confirm" data-translate-key="confirm">确定</s-button>
+        </s-dialog>
+
+        <!-- -询问 modSource 文件夹路径 -->
+        <s-dialog id="dialog" class="s-dialog">
+            <div slot="headline" class="font-hongmeng">
+                <h3 data-translate-key="dialog-ask-for-mod-source-dir"> 选择你的modSource文件夹 </h3>
+                <div class="OO-box">
+                    <div class="OO-setting-bar">
+                        <h3 data-translate-key="mod-source-dir"> modSource文件夹 </h3>
+                        <s-text-field style="display: grid" label="select modSource file" id="select-mod-source-dir">
+                            <input type="text" id="select-mod-source-dir-input">
+                        </s-text-field>
+                    </div>
+                    <p data-translate-key="dialog-about-mod-source-dir">
+                        modSource 文件夹是你应该将mod放入的地方而不是Mods文件夹(默认为Mods同目录下的modSource文件夹)，本程序通过代理Mods文件夹的方式来实现mod的加载，所以请不要在Mods文件夹内添加任何文件！将你的mod添加到modSource文件夹中即可。
+                    </p>
+                    <img src="src/description.png" alt="description" style="width: 100%;height: auto;">
+                </div>
+            </div>
+            <s-button slot="action" type="text" id="mod-source-dir-cancel" data-translate-key="cancel">取消</s-button>
+            <s-button slot="action" type="text" id="mod-source-dir-confirm" data-translate-key="confirm">确定</s-button>
+        </s-dialog>
+
+
+
+        <!-- -展示 modSource 文件夹路径 -->
+        <s-dialog id="dialog" class="s-dialog">
+            <div slot="headline" class="font-hongmeng">
+                <h3 data-translate-key="modSource"> modSource </h3>
+                <div class="OO-box">
+                    <div class="OO-setting-bar">
+                        <h3 data-translate-key="open-modSource"> 点击打开 </h3>
+                        <s-button id="open-modSource" data-translate-key="click-to-open">打开</s-button>
+                    </div>
+                    <p data-translate-key="dialog-about-modfile" class="OO-box OO-shade-box">
+                        本程序通过动态调整mod文件夹内部的文件来实现mod的加载，所以请不要在mod文件夹内添加任何文件！将你的mod添加到同目录下的modSource文件夹中即可。
+                    </p>
+                </div>
+                <div class="OO-box">
+                    <div class="OO-box OO-shade-box">
+                        <p data-translate-key="dialog-ask-if-auto-move"> 是否将当前mod文件夹内的mod移动到modSource文件夹中？</p>
+                        <p style="color: rgb(255, 142, 142);" data-translate-key="manual-move-info">
+                            如果你仍然不清楚 modSource 和 Mods 文件夹之间的关系，请点击 手动移动，并且将你的 mod 手动移动到 modSource文件夹中。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <s-button slot="action" type="text" id="auto-move-mod" data-translate-key="auto-move-mod">自动移动</s-button>
+            <s-button slot="action" type="text" id="manual-move-mod"
+                data-translate-key="manual-move-mod">手动移动</s-button>
+        </s-dialog>
+
+        <!-- -获取 modLoader 路径 和 游戏路径 -->
+        <s-dialog id="dialog" class="s-dialog">
+            <div slot="headline" class="font-hongmeng">
+                <h3 data-translate-key="dialog-ask-for-exe-path"> 选择你的modLoader文件和游戏文件 </h3>
+                <div class="OO-box">
+                    <div class="OO-setting-bar">
+                        <h3 data-translate-key="auto-start-game"> 自动启动游戏 </h3>
+                        <s-switch id="auto-start-game-switch"></s-switch>
+                    </div>
+                    <p data-translate-key="auto-start-game-info">
+                        启动程序的时候也一并启动游戏和modLoader(需要在进阶设置设置游戏目录和modLoader目录)
+                    </p>
+                    <s-divider></s-divider>
+                    <div class="OO-setting-bar">
+                        <h3 data-translate-key="modLoader-dir"> 模组加载器 </h3>
+                        <s-text-field style="display: grid" label="select modLoader file" id="select-mod-loader-dir">
+                            <input type="text" id="select-mod-loader-dir-input">
+                        </s-text-field>
+                    </div>
+                    <p data-translate-key="dialog-about-modLoader-dir">
+                        一般而言，模组加载器常常是叫做3dmigoto.exe
+                        的文件，本程序通过获取这个文件的路径来实现自动打开模组加载器。如果你改变了模组加载器的刷新的快捷方式，程序会尝试通过读取在同目录下的ini文件来获取刷新的快捷方式(暂时未实现，建议保持快捷键为F10)。
+                    </p>
+                    <div class="OO-setting-bar">
+                        <h3 data-translate-key="game-dir"> 游戏文件 </h3>
+                        <s-text-field style="display: grid" label="select game file" id="select-game-dir">
+                            <input type="text" id="select-game-dir-input">
+                        </s-text-field>
+                    </div>
+                    <p data-translate-key="dialog-about-game-dir">
+                        获取游戏路径以便于自动打开游戏，如果你不想使用这个功能，可以选择取消。稍后你可以在设置中重新设置游戏路径。
+                    </p>
+                </div>
+            </div>
+            <s-button slot="action" type="text" id="game-dir-cancel" data-translate-key="cancel">取消</s-button>
+            <s-button slot="action" type="text" id="game-dir-confirm" data-translate-key="confirm">确定</s-button>
+        </s-dialog>
+
+        <!-- -询问自动化设置：auto-start-game,auto-refresh-in-zzz,auto-apply -->
+        <s-dialog id="dialog" class="s-dialog">
+            <div slot="headline" class="font-hongmeng">
+                <h3 data-translate-key="dialog-ask-for-auto-settings"> 选择你的自动化设置 </h3>
+                <div class="OO-box">
+                    <div class="OO-setting-bar">
+                        <h3 data-translate-key="auto-apply"> 自动应用 </h3>
+                        <s-switch id="auto-apply-switch"></s-switch>
+                    </div>
+                    <p data-translate-key="auto-apply-info">
+                        当选择/取消选择mod时自动应用配置(可能带来轻微卡顿)
+                    </p>
+                    <s-divider></s-divider>
+                    <div class="OO-setting-bar">
+                        <h3 data-translate-key="auto-refresh-in-zzz"> 自动刷新 </h3>
+                        <s-switch id="auto-refresh-in-zzz-switch"></s-switch>
+                    </div>
+                    <p data-translate-key="auto-refresh-in-zzz-info">
+                        启用 应用mod时 将会自动在绝区零中激活刷新
+                    </p>
+                    <s-divider></s-divider>
+                </div>
+            </div>
+            <s-button slot="action" type="text" id="auto-settings-cancel" data-translate-key="cancel">取消</s-button>
+            <s-button slot="action" type="text" id="auto-settings-confirm" data-translate-key="confirm">确定</s-button>
+        </s-dialog>
+
+        <!-- -询问是否使用管理员模式 -->
+        <s-dialog id="dialog" class="s-dialog">
+            <div slot="headline" class="font-hongmeng">
+                <h3 data-translate-key="dialog-ask-for-admin"> 选择是否使用管理员权限 </h3>
+                <div class="OO-box">
+                    <div class="OO-setting-bar">
+                        <h3 data-translate-key="use-admin"> 使用管理员权限 </h3>
+                        <s-switch id="use-admin-switch"></s-switch>
+                    </div>
+                    <p data-translate-key="use-admin-info">
+                        启动程序时是否使用管理员权限(需要重启程序生效),这样，在启动游戏和模组加载器时，将不会弹出UAC提示框。
+                    </p>
+                </div>
+            </div>
+            <s-button slot="action" type="text" id="admin-cancel" data-translate-key="cancel">取消</s-button>
+            <s-button slot="action" type="text" id="admin-confirm" data-translate-key="confirm">确定</s-button>
+        </s-dialog>
+
+        <!-- -告知可以在设置页面再次调整你的设置 -->
+        <s-dialog id="dialog" class="s-dialog">
+            <div slot="headline" class="font-hongmeng">
+                <h3 data-translate-key="dialog-about-settings"> 关于设置 </h3>
+                <div class="OO-box">
+                    <div class="OO-setting-bar">
+                        <h3 data-translate-key="about-settings"> 更多设置 </h3>
+                    </div>
+                    <div class="OO-box OO-shade-box">
+                        <p data-translate-key="dialog-about-settings-info">
+                            更多的设置可以在设置页面中找到，你可以在那里重新设置你的Mods文件夹，modSource文件夹，模组加载器，游戏文件，自动化设置，管理员权限等。
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <s-button slot="action" type="text" id="about-settings-cancel" data-translate-key="cancel">取消</s-button>
+            <s-button slot="action" type="text" id="about-settings-confirm" data-translate-key="confirm">确定</s-button>
+        </s-dialog>
+    </s-page>
+
+</body>
+
+
+<script type="module" src="firstLoad.js"></script>
+<script type="module">
+    import './node_modules/sober/dist/sober.min.js';
+</script>
+
+</html>
