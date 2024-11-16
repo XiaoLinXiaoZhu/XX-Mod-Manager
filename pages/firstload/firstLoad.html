@@ -6,8 +6,8 @@
     <title>First Load Page</title>
     <meta name="viewport"
         content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
-    <link rel="stylesheet" type="text/css" href="style_component.css" />
-    <link rel="stylesheet" href="sober-theme.css">
+    <link rel="stylesheet" type="text/css" href="../../css/style_component.css" />
+    <link rel="stylesheet" href="../../css/sober-theme.css" />
     <style>
         html,
         body {
@@ -125,7 +125,7 @@
                             所以请不要在mod文件夹内添加任何文件！将你的mod添加到modSource文件夹中即可
                             （默认为同目录下的modSource文件夹）。
                         </p>
-                        <img src="src/description.png" alt="description" style="width: 100%;height: auto;">
+                        <img src="../../src/description.png" alt="description" style="width: 100%;height: auto;">
                     </div>
                 </div>
             </div>
@@ -147,7 +147,7 @@
                     <p data-translate-key="dialog-about-mod-root-dir">
                         大部分模组管理器通过读取Mods文件夹内的文件来实现mod的加载，请在这里指定你的Mods文件夹，从而让本程序能够正确管理你的mod。对于3dmigoto来说，这个文件夹通常在它的同目录下，名字为Mods。对于XXMI，它位于类似于 XXMI\ZZMI\Mods 的位置。
                     </p>
-                    <img src="src/description.png" alt="description" style="width: 100%;height: auto;">
+                    <img src="../../src/description.png" alt="description" style="width: 100%;height: auto;">
                 </div>
             </div>
 
@@ -169,7 +169,7 @@
                     <p data-translate-key="dialog-about-mod-source-dir">
                         modSource 文件夹是你应该将mod放入的地方而不是Mods文件夹(默认为Mods同目录下的modSource文件夹)，本程序通过代理Mods文件夹的方式来实现mod的加载，所以请不要在Mods文件夹内添加任何文件！将你的mod添加到modSource文件夹中即可。
                     </p>
-                    <img src="src/description.png" alt="description" style="width: 100%;height: auto;">
+                    <img src="../../src/description.png" alt="description" style="width: 100%;height: auto;">
                 </div>
             </div>
             <s-button slot="action" type="text" id="mod-source-dir-cancel" data-translate-key="cancel">取消</s-button>
@@ -314,7 +314,8 @@
 
 <script type="module" src="firstLoad.js"></script>
 <script type="module">
-    import './node_modules/sober/dist/sober.min.js';
-</script>
+    //import 'sober';
+    import '../../node_modules/sober/dist/sober.min.js';
+  </script>
 
 </html>

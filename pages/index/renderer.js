@@ -2070,7 +2070,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         else {
             //将背景图片显示
             sPages.forEach(page => {
-                page.style.backgroundImage = 'url(./src/background.png)';
+                page.style.backgroundImage = 'url(../../src/background.png)';
             }
             );
         }
@@ -2081,7 +2081,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         //获取所有需要翻译的元素
         const elements = document.querySelectorAll('[data-translate-key]');
         //获取翻译文件
-        const translationPath = path.join(__dirname, 'locales', `${lang}.json`);
+        const translationPath = path.join(__dirname, '../../','locales', `${lang}.json`);
         //读取翻译文件
         const translation = JSON.parse(fs.readFileSync(translationPath));
 
@@ -2265,7 +2265,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 fragment.appendChild(modItem);
             }
 
-            modItem.className = 'mod-item';
+
+            modItem.className = 'mod-item OO-color-gradient-img';
+            //modItem.className = 'mod-item';
             modItem.checked = false;
             modItem.clickable = true;
             modItem.inWindow = false;

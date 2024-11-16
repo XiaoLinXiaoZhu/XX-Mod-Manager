@@ -38,7 +38,7 @@ function translatePage(lang) {
     //获取所有需要翻译的元素
     const elements = document.querySelectorAll('[data-translate-key]');
     //获取翻译文件
-    const translationPath = path.join(__dirname, 'locales', `${lang}.json`);
+    const translationPath = path.join(__dirname,"../../",'locales', `${lang}.json`);
     //读取翻译文件
     const translation = JSON.parse(fs.readFileSync(translationPath));
 
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //配置属性
     // modRootDir: mod的根目录, 用于存放 需要应用的mod
     // modLoaderDir: modLoader的路径，用于启动modLoader
-    // modSourceDIr: modBackpack的路径，是mod的备份目录，位于和modRootDir同级目录下
+    // modSourceDir: modBackpack的路径，是mod的备份目录，位于和modRootDir同级目录下
     // gameDir: 游戏的根目录，用于启动游戏
     // lang: 语言设置
 
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lang: localStorage.getItem('lang') || 'en',
         rootdir: localStorage.getItem('rootdir') || '',
         modLoaderDir: localStorage.getItem('modLoaderDir') || '',
-        modSourceDIr: localStorage.getItem('modSourceDIr') || '',
+        modSourceDir: localStorage.getItem('modSourceDir') || '',
         modRootDir: localStorage.getItem('modRootDir') || '',
         gameDir: localStorage.getItem('gameDir') || '',
         ifUseAdmin: localStorage.getItem('ifUseAdmin') || false,
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('lang', userConfig.lang);
                 localStorage.setItem('modRootDir', userConfig.modRootDir);
                 localStorage.setItem('modLoaderDir', userConfig.modLoaderDir);
-                localStorage.setItem('modSourceDIr', userConfig.modSourceDIr);
+                localStorage.setItem('modSourceDir', userConfig.modSourceDir);
                 localStorage.setItem('gameDir', userConfig.gameDir);
                 localStorage.setItem('ifAutoApply', userConfig.ifAutoApply);
                 localStorage.setItem('ifAutoRefreshInZZZ', userConfig.ifAutoRefreshInZZZ);
@@ -200,10 +200,10 @@ document.addEventListener('DOMContentLoaded', () => {
             userConfig.modRootDir = modRootDir;
 
             //创建modSource文件夹
-            const modSourceDIr = path.join(path.dirname(modRootDir), 'modSource');
-            userConfig.modSourceDIr = modSourceDIr;
-            if (!fs.existsSync(modSourceDIr)) {
-                fs.mkdirSync(modSourceDIr);
+            const modSourceDir = path.join(path.dirname(modRootDir), 'modSource');
+            userConfig.modSourceDir = modSourceDir;
+            if (!fs.existsSync(modSourceDir)) {
+                fs.mkdirSync(modSourceDir);
             }
             saveUserConfig();
         }
@@ -218,11 +218,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const openmodSource = document.querySelector('#open-modSource');
     openmodSource?.addEventListener('click', async () => {
         //增加故障处理
-        if (userConfig.modSourceDIr === '' || !fs.existsSync(userConfig.modSourceDIr)) {
+        if (userConfig.modSourceDir === '' || !fs.existsSync(userConfig.modSourceDir)) {
             snack('please select Mods root directory first');
             return;
         }
-        openFolder(userConfig.modSourceDIr);
+        openFolder(userConfig.modSourceDir);
     });
 
     //autoMove按钮的事件监听
@@ -234,9 +234,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //manualMove按钮的事件监听
     manualMove.addEventListener('click', () => {
-        const modSourceDIr = userConfig.modSourceDIr;
-        if (fs.existsSync(modSourceDIr)) {
-            openFolder(modSourceDIr);
+        const modSourceDir = userConfig.modSourceDir;
+        if (fs.existsSync(modSourceDir)) {
+            openFolder(modSourceDir);
         }
     }
     );

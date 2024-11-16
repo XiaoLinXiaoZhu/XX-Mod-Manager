@@ -192,7 +192,7 @@
           <div
             style="position:relative;height: 100%;width: 100%;overflow-x: hidden;overflow-y: hidden;white-space: nowrap;padding-left: 5px;"
             id="mod-filter-scroll">
-            <div id="mod-filter-bg"></div>
+            <div id="mod-filter-bg" class="OO-color-gradient"></div>
             <div id="mod-filter"
               style="display: flex;flex-wrap: nowrap;align-items: center;width: fit-content;height: 100%;">
             </div>
@@ -1271,6 +1271,16 @@
 
 
   </s-page>
+  <script type="importmap">
+		{
+			"imports": {
+                "@tweenjs/tween.js": "../../node_modules/@tweenjs/tween.js/src/Tween.js",
+                "three": "../../node_modules/three/build/three.module.js"
+			}
+		}
+	</script>
+  <script type="module" src="../../js/classManager.js"></script>
+  <script type="module" src="../../js/colorManager.js"></script>
   <script type="module" src="renderer.js"></script>
   <script type="module">
     //import 'sober';
