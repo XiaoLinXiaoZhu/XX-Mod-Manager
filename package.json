@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "concurrently": "^9.1.0",
+    "sober": "^0.6.8",
     "vue": "^3.5.12"
   },
   "devDependencies": {
