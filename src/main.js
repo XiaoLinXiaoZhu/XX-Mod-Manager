@@ -1,8 +1,9 @@
 import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
+import test_caed from './test/test_card.vue'
 
-createApp(App).mount('#app')
+createApp(test_caed).mount('#app')
 
 
 document.addEventListener('DOMContentLoaded', () => {
