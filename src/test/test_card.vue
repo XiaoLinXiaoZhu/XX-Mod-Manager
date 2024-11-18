@@ -1,15 +1,11 @@
 <script setup>
 import modCard from '../components/modCard.vue'
-import { Group } from '@tweenjs/tween.js';
-import { setAnimationGroup } from '../components/modCard.vue';
-
-const AnimationGroup = new Group();
-setAnimationGroup(AnimationGroup);
+import modCardManager from '../components/modCardManager.vue'
 </script>
 
 <template>
   <div>
-    <modCard mod="mod" character="character" description="description" image="../src/assets/default.png" :hotKeys="['a', 'b', 'c']" />
+    <modCardManager />
   </div>
 </template>
 

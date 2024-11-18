@@ -5,6 +5,7 @@ import test_caed from './test/test_card.vue'
 
 createApp(test_caed).mount('#app')
 
+console.log('main.js');
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded');

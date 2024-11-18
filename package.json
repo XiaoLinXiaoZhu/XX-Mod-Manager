@@ -11,7 +11,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "concurrently \"npm run dev\" \"electron .\""
+    "vite": "concurrently \"npm run dev\" \"electron .\"",
+    "start": "electron ."
   },
   "dependencies": {
     "@tweenjs/tween.js": "^25.0.0",

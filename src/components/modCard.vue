@@ -1,7 +1,6 @@
 <script setup>
 import 'sober'
 import { defineProps, ref } from 'vue'
-import { Tween,Easing,Group } from '@tweenjs/tween.js';
 
 const props = defineProps({
     mod: String,
@@ -23,29 +22,6 @@ const click = (event) => {
     const modItem = document.getElementById(props.mod)
     clickModItem(modItem, event, modItem.getBoundingClientRect())
 }
-
-const turnOnTween = new Tween({ x: 0, y: 0, rotateX: 0, rotateY: 0, scale: 1 })
-            .to({ x: -rotateY * 15, y: rotateX * 15, rotateX: rotateX * rotateLevel, rotateY: rotateY * rotateLevel, scale: 1.05 }, 600)
-            .easing(Easing.Cubic.InOut)
-            .onUpdate((object) => {
-                modItem.style.transform = `perspective( 500px ) translate(${object.x}px,${object.y}px) rotateX(${object.rotateX}deg) rotateY(${object.rotateY}deg) scale(${object.scale})`;
-            });
-
-const turnOffTween = new Tween({ x: 0, y: 0, rotateX: 0, rotateY: 0, scale: 1 })
-    .to({ x: -rotateY * 5, y: rotateX * 5, rotateX: rotateX * rotateLevel, rotateY: rotateY * rotateLevel * 0.2, scale: 0.88 }, 800)
-    .easing(Easing.Cubic.InOut)
-    .onUpdate((object) => {
-        modItem.style.transform = `perspective( 500px ) translate(${object.x}px,${object.y}px) rotateX(${object.rotateX}deg) rotateY(${object.rotateY}deg) scale(${object.scale})`;
-    });
-
-// let AnimationGroup = new Group();
-// const setAnimationGroup = (group) => {
-//     AnimationGroup = group;
-
-//     //添加动画
-//     AnimationGroup.add(turnOnTween);
-//     AnimationGroup.add(turnOffTween);
-// }
 
 function clickModItem(modItem, event = null, rect = null) {
         //获取鼠标相对于卡片的位置（百分比）
@@ -80,7 +56,7 @@ function clickModItem(modItem, event = null, rect = null) {
         }
 
 
-        添加动画
+        //添加动画
         if (modItem.checked == true) {
 
             modItem.animate([
