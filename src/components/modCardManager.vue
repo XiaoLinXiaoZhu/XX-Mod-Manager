@@ -1,5 +1,5 @@
 <template>
-    <div id="mod-container">
+    <s-scroll-view id="mod-container"> 
         <mod-card v-for="mod in mods" :key="mod.name" 
             :mod="mod.name" 
             :character="mod.character"
@@ -7,10 +7,14 @@
             :hotKeys="mod.hotKeys"
             :imagePath="mod.preview"
         />
-    </div>
+        <div class="placeholder"></div>
+    </s-scroll-view>
+
 </template>
 
 <script setup>
+import 'sober';
+
 import { ref, onMounted } from 'vue';
 import modCard from './modCard.vue';
 const { ipcRenderer } = require('electron');
@@ -39,6 +43,7 @@ onMounted(() => {
 <style scoped>
 #mod-container {
     width: 100%;
+    height: 100%;
     display: grid;
     grid-column: span 4;
     grid-column-start: span 4;
@@ -49,5 +54,10 @@ onMounted(() => {
     justify-content: start;
     justify-items: center;
     min-height: 500px;
+}
+
+.placeholder {
+    height: 200px;
+    width: 100%;
 }
 </style>
