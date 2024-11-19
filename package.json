@@ -1,5 +1,5 @@
 {
-  "name": "vue3-electron",
+  "name": "xx-mods-manager",
   "private": true,
   "description": "Hello World!",
   "main": "./electron/main.js",

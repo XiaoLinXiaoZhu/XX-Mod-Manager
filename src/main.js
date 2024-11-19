@@ -2,7 +2,9 @@ import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
 import test_caed from './test/test_card.vue'
-
+import 'sober'
+import { Snackbar } from 'sober'
+const { ipcRenderer} = require('electron');
 createApp(test_caed).mount('#app')
 
 console.log('main.js');
@@ -24,4 +26,38 @@ document.addEventListener('DOMContentLoaded', () => {
     // 获取 node.js 的版本信息
     const nodeVersion = process.versions.node;
     console.log(nodeVersion);
+})
+
+
+
+
+
+
+
+
+
+
+ipcRenderer.on('snack', (event, message,type = 'info') => {
+    console.log(`snack:${message} type:${type}`);
+    switch (type) {
+        case 'info':
+            Snackbar.show({
+                text: message,
+                align: 'top'
+            })
+            break;
+        case 'error':
+            Snackbar.show({
+                text: message,
+                align: 'top',
+                type: 'error'
+            })
+            break;
+        default:
+            Snackbar.show({
+                text: message,
+                align: 'top'
+            })
+            break;
+        }
 })

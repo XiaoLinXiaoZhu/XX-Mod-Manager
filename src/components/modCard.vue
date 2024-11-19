@@ -1,12 +1,13 @@
 <script setup>
+const { ipcRenderer } = require('electron');
 import 'sober'
-import { defineProps, ref } from 'vue'
+import { useTemplateRef , computed, defineProps, onMounted, ref } from 'vue'
 
 const props = defineProps({
     mod: String,
     character: String,
     description: String,
-    image: String,
+    imagePath: String,
     hotKeys:{
         type: Array,
         default: () => []
@@ -14,7 +15,7 @@ const props = defineProps({
 })
 
 const checked = ref(false);
-const modItemInfo = ref(null);
+const modItemRef = useTemplateRef('modItemRef')
 const click = (event) => {
     //debug
     console.log('clicked')
@@ -95,6 +96,16 @@ function clickModItem(modItem, event = null, rect = null) {
         // }
     }
 
+    onMounted(() => {
+        ipcRenderer.invoke('get-image', props.imagePath).then((image) => {
+            //debug
+            //console.log(image);
+            //debug
+            console.log(modItemRef);
+            console.log(`modItemRef: ${modItemRef},type: ${typeof modItemRef}`);
+            modItemRef.value.querySelector('img').src = "data:image/png;base64," + image;
+        });
+    })
 
 </script>
 
@@ -102,7 +113,7 @@ function clickModItem(modItem, event = null, rect = null) {
 <template>
     <s-card ref="modItemRef" class="mod-item" :checked="checked" clickable="true" :id="props.mod" inWindow="true" :character="props.character" @click="click">
         <div slot="image" style="height: 200px;">
-            <img :src="props.image" alt="mod image" />
+            <img src="" alt="mod image" />
         </div>
         <div slot="headline" id="mod-item-headline">{{ props.mod }}</div>
         <div slot="subhead" id="mod-item-subhead">{{ props.character }}</div>

@@ -1,6 +1,12 @@
 <template>
     <div>
-        <mod-card v-for="mod in mods" :key="mod.name" :mod="mod" />
+        <mod-card v-for="mod in mods" :key="mod.name" 
+            :mod="mod.name" 
+            :character="mod.character"
+            :description="mod.description"
+            :hotKeys="mod.hotKeys"
+            :imagePath="mod.preview"
+        />
     </div>
 </template>
 
@@ -13,29 +19,15 @@ const { ipcRenderer } = require('electron');
 const mods = ref([]);
 
 // 定义 loadMods 方法
-const loadMods = () => {
-    const config = ipcRenderer.invoke('getConfig');
-    const modResourcePath = config.modResourcePath;
-
-    const files = ipcRenderer.invoke('getFiles', modResourcePath);
-    if (files.state == 0){
-        console.error('Error reading mod resource path:', files.error);
-        return;
-    }
-
-    files.value.forEach(file => {
-        mods.value.push({
-            name: file,
-    // fs.readdir(modResourcePath, (err, files) => {
-    //     if (err) {
-    //         console.error('Error reading mod resource path:', err);
-    //         return;
-    //     }
-    //     mods.value = files.map(file => ({
-    //         name: file,
-    //         path: path.join(modResourcePath, file)
-    //     }));
-    // });
+const loadMods = async () => {
+    const currentConfig = await ipcRenderer.invoke('get-current-config');
+    //debug
+    console.log(currentConfig);
+    const modSourcePath = currentConfig.modSourcePath;
+    console.log(`modSourcePath: ${modSourcePath},type: ${typeof modSourcePath}`);
+    const loadMods = await ipcRenderer.invoke('get-mods', modSourcePath);
+    console.log(loadMods);
+    mods.value = loadMods;
 };
 
 // 在组件挂载时调用 loadMods 方法

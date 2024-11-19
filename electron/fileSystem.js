@@ -2,8 +2,19 @@ const { app, BrowserWindow } = require('electron')
 const path = require('node:path')
 const fs = require('fs')
 const { ipcMain } = require('electron')
-const { preview } = require('vite')
 
+let currentMainWindow = null;
+function setMainWindow(mainWindow) {
+    currentMainWindow = mainWindow;
+}
+
+
+function snack (message,type = 'info') {
+    const mainWindow = currentMainWindow;
+    //console.log(mainWindow);
+    console.log(`snack:${message} type:${type}`);
+    mainWindow.webContents.send('snack', message,type);
+}
 // 这里为渲染进程提供 读取文件的功能。
 
 function readFile(filePath) {
@@ -18,17 +29,22 @@ function readFile(filePath) {
     })
 }
 
-ipcMain.handle('getCurrentConfig', async (event) => {
+ipcMain.handle('get-current-config', async (event) => {
     const dataPath = app.getPath('userData');
     const filePath = path.join(dataPath, 'config.json');
-
+    console.log(`get-current-config:${filePath}`);
     if (fs.existsSync(filePath)) {
-        return await readFile(filePath)
+        const data = await readFile(filePath);
+        //debug
+        console.log(`file exists:${data}`);
+        return JSON.parse(data);
     }
-    else {
+    else{
         fs.writeFileSync(filePath, JSON.stringify({}), 'utf-8');
-        return '{}'
+        console.log(`file not exists:${filePath}`);
+        return {};
     }
+
 });
 
 ipcMain.handle('getFiles', async (event, dirPath) => {
@@ -94,22 +110,25 @@ function tryGetModPreview(modPath,modConfigPreviewName){
     modPreviewPath = imageFiles[0];
     //debug
     //console.log(`modImageName:${modImageName}`);
+    setModInfoFiled(modPath, 'preview', modPreviewPath);
     return {
         previewPath: path.join(modPath, modPreviewPath),
         previewName: modPreviewPath,
         state: 1,
-        snack: ''
+        snack: 'No image file found in mod folder, use first image file instead'
     }
 
 }
 function creatMod(modPath){
     const mod = {
         name: path.basename(modPath),
-        character: '',
+        character: 'Unknown',
         preview : '',
         description: '',
         url: '',
-        hotkeys: []
+        hotkeys: [],
+        state: 1,
+        snack: ''
     }
 
     const modConfigPath = path.join(modPath, 'mod.json');
@@ -120,17 +139,71 @@ function creatMod(modPath){
         mod.description = modConfig.description;
         mod.url = modConfig.url;
         mod.hotkeys = modConfig.hotkeys;
+
+        const modPreview = tryGetModPreview(modPath,modConfig.preview);
+        mod.preview = modPreview.previewPath;
+        mod.state = modPreview.state;
+        mod.snack = modPreview.snack;
     }
-        
+
+    return mod;
 }
 function getMods(modSourcePath) {
+    const mods = [];
+    const modFolders = fs.readdirSync(modSourcePath);
+    modFolders.forEach(modFolder => {
+        const modPath = path.join(modSourcePath, modFolder);
+        if (fs.statSync(modPath).isDirectory()) {
+            mods.push(creatMod(modPath));
+        }
+    });
+    return mods;
 }
 
 
-ipcMain.handle('get-mods', async (modSourcePath) => {
-
+ipcMain.handle('get-mods', async (event, modSourcePath) => {
+    const mods = getMods(modSourcePath);
+    // const mods = [
+    //     {
+    //         name: 'mod1',
+    //         character: 'Unknown',
+    //         preview: '',
+    //         description: '',
+    //         url: '',
+    //         hotkeys: [],
+    //         state: 1,
+    //         snack: ''
+    //     },
+    //     {
+    //         name: 'mod2',
+    //         character: 'Unknown',
+    //         preview: '',
+    //         description: '',
+    //         url: '',
+    //         hotkeys: [],
+    //         state: 1,
+    //         snack: ''
+    //     },
+    //     {
+    //         name: 'mod3',
+    //         character: 'Unknown',
+    //         preview: '',
+    //         description: '',
+    //         url: '',
+    //         hotkeys: [],
+    //         state: 1,
+    //         snack: ''
+    //     }
+    // ]
+    snack('get-mods');
+    return mods;
 });
 
+// 因为 渲染进程 无法获取 本地文件，所以需要通过 主进程 来获取图片文件
+ipcMain.handle('get-image', async (event, imagePath) => {
+    // 传递一个 buffer 对象给渲染进程
+    return fs.readFileSync(imagePath).toString('base64');
+});
 
 //-==========================设置mod信息==========================
 function setModInfoFiled(modPath, field, value) {
@@ -144,3 +217,15 @@ function setModInfoFiled(modPath, field, value) {
 ipcMain.handle('set-mod-info', async (modPath,field,value) => {
     setModInfoFiled(modPath, field, value);
 });
+
+
+
+
+
+
+
+
+//-=============================导出=============================
+module.exports = {
+    setMainWindow
+}

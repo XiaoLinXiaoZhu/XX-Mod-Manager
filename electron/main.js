@@ -1,12 +1,10 @@
 // main.js
-require('fileSystem.js')
-// Modules to control application life and create native browser window
 const { app, BrowserWindow } = require('electron')
 const path = require('node:path')
+require('./fileSystem.js')
+const setMainWindow = require('./fileSystem.js').setMainWindow
 
-// if (require('electron-squirrel-startup')) {
-//     app.quit();
-//   }
+let currentMainWindow;
 
 const createWindow = () => {
   // Create the browser window.
@@ -24,14 +22,17 @@ const createWindow = () => {
   // 所以可以直接使用 node.js 的模块
   // 也就不需要 preload.js 了
 
-
+  currentMainWindow = mainWindow;
+  setMainWindow(mainWindow);
   // 加载 index.html(这里不管是什么路径，都是相对于你的项目根目录的路径)
   //mainWindow.loadFile('./electron/index.html')
   // 因为现在是 使用 vite + vue3 开发的，所以这里加载的是 vite 启动的地址
   mainWindow.loadURL('http://localhost:3000/')
-
+  mainWindow.webContents.send('snack', 'hello from main.js')
   // 打开开发工具
   mainWindow.webContents.openDevTools()
+
+  
 }
 
 // 这段程序将会在 Electron 结束初始化
@@ -56,3 +57,22 @@ app.on('window-all-closed', () => {
 
 // 在当前文件中你可以引入所有的主进程代码
 // 也可以拆分成几个文件，然后用 require 导入。
+
+
+
+
+
+
+
+
+
+
+
+
+
+module.exports = {
+  currentMainWindow,
+  getMainWindow: () => {
+    return currentMainWindow
+  }
+}
