@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="mod-container">
         <mod-card v-for="mod in mods" :key="mod.name" 
             :mod="mod.name" 
             :character="mod.character"
@@ -37,5 +37,17 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Add your styles here */
+#mod-container {
+    width: 100%;
+    display: grid;
+    grid-column: span 4;
+    grid-column-start: span 4;
+    grid-column-end: auto;
+    grid-template-columns: repeat(auto-fill, 250px);
+    gap: 12px;
+    /* align-items: center; */
+    justify-content: start;
+    justify-items: center;
+    min-height: 500px;
+}
 </style>

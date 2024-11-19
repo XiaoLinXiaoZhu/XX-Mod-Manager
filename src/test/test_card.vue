@@ -4,9 +4,7 @@ import modCardManager from '../components/modCardManager.vue'
 </script>
 
 <template>
-  <div>
     <modCardManager />
-  </div>
 </template>
 
 <style scoped>
