@@ -1,0 +1,127 @@
+<template>
+    <div class="filter-container" @wheel="onWheel" @mousedown="onMouseDown" @mouseup="onMouseUp" @mousemove="onMouseMove" ref="containerRef">
+      <chip-button
+        v-for="(item, index) in computedFilterItems"
+        :key="item.text"
+        :text="item.text"
+        :checked="item.checked"
+        @click="selectItem(item, index)"
+      >
+        {{ item }}
+      </chip-button>
+      <div class="slider" :style="sliderStyle"></div>
+    </div>
+  </template>
+  
+  <script setup>
+  import { useTemplateRef,ref, reactive, onMounted, watch, computed } from 'vue';
+  import chipButton from './chipButton.vue';
+  
+  const filterItems = ref(['全部', '已选择', '选项1', '选项2', '选项3', '选项4']);
+  const currentCharacter = ref('全部');
+  const computedFilterItems = computed(() => {
+  return filterItems.value.map((item) => {
+    return {
+      text: item,
+      checked: item === currentCharacter.value
+    };
+  });
+});
+
+  const sliderStyle = reactive({
+    width: '0px',
+    left: '0px'
+  });
+  const containerRef = useTemplateRef('containerRef');
+  const isDragging = ref(false);
+  const startX = ref(0);
+  const scrollLeft = ref(0);
+  
+  const selectItem = (item, index) => {
+    //debug
+    console.log(`selected ${item}`)
+    currentCharacter.value = item.text;
+    updateSlider(index);
+    emitCurrentCharacter();
+  };
+  
+  const updateSlider = (index) => {
+    //debug
+    console.log(containerRef.value)
+    const chipButtons = containerRef.value.querySelectorAll('s-chip');
+    const selectedChip = chipButtons[index];
+    //debug
+    console.log(`updateSlider: ${selectedChip}`)
+    sliderStyle.width = `${selectedChip.offsetWidth}px`;
+    sliderStyle.left = `${selectedChip.offsetLeft}px`;
+  };
+  
+  const emitCurrentCharacter = () => {
+    // Emit the currentCharacter to the parent component
+    // You can use emit or any other method to pass the value to the parent
+  };
+  
+  const onWheel = (event) => {
+    const container = containerRef.value;
+    container.scrollLeft += event.deltaY;
+  };
+  
+  const onMouseDown = (event) => {
+    isDragging.value = true;
+    startX.value = event.pageX - containerRef.value.offsetLeft;
+    scrollLeft.value = containerRef.value.scrollLeft;
+  };
+  
+  const onMouseUp = () => {
+    isDragging.value = false;
+  };
+  
+  const onMouseMove = (event) => {
+    if (!isDragging.value) return;
+    event.preventDefault();
+    const x = event.pageX - containerRef.value.offsetLeft;
+    const walk = (x - startX.value) * 2; // Scroll-fast
+    containerRef.value.scrollLeft = scrollLeft.value - walk;
+  };
+  
+  onMounted(() => {
+    updateSlider(0); // Initialize the slider position
+  });
+  
+  watch(currentCharacter, (newVal, oldVal) => {
+    const index = filterItems.value.indexOf(newVal);
+    updateSlider(index);
+  });
+  </script>
+  
+  <style scoped>
+  .filter-container {
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    position: relative;
+
+    >* {
+    margin-right: 5px;
+  }
+
+  }
+  
+  .slider {
+    /* height: 35px; */
+    transform: skew(-20deg);
+    z-index: 0;
+    padding: 0px 16px;
+    box-sizing: border-box;
+    border: 1px solid #00000000;
+    border-radius: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    position: absolute;
+    height: 35px;
+    transform: skew(-20deg);
+    background-color: var(--s-color-primary);
+    transition: left 0.3s, width 0.3s;
+  }
+
+  </style>

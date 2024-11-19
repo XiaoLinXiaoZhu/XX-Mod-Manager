@@ -101,7 +101,7 @@ function clickModItem(modItem, event = null, rect = null) {
             //debug
             //console.log(image);
             //debug
-            console.log(modItemRef);
+            //console.log(modItemRef);
             console.log(`modItemRef: ${modItemRef},type: ${typeof modItemRef}`);
             modItemRef.value.querySelector('img').src = "data:image/png;base64," + image;
         });
