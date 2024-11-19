@@ -1,5 +1,5 @@
 // main.js
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('node:path')
 require('./fileSystem.js')
 const setMainWindow = require('./fileSystem.js').setMainWindow
@@ -60,7 +60,24 @@ app.on('window-all-closed', () => {
 
 
 
+// ipcRenderer.send('open-new-window', 'tapePage');
+ipcMain.on('open-new-window', (event, arg) => {
+  console.log('open-new-window', arg);
 
+  const newWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      sandbox: false,
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  })
+
+  newWindow.loadURL('http://localhost:3000/' + arg)
+
+  newWindow.webContents.openDevTools()
+})
 
 
 

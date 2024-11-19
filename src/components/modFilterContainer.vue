@@ -56,11 +56,6 @@
     sliderStyle.left = `${selectedChip.offsetLeft}px`;
   };
   
-  const emitCurrentCharacter = () => {
-    // Emit the currentCharacter to the parent component
-    // You can use emit or any other method to pass the value to the parent
-  };
-  
   const onWheel = (event) => {
     const container = containerRef.value;
     container.scrollLeft += event.deltaY;
@@ -92,6 +87,25 @@
     const index = filterItems.value.indexOf(newVal);
     updateSlider(index);
   });
+
+
+  //-============对外的接口================
+  const emit = defineEmits(['currentCharacter']);
+    const props = defineProps({
+        currentCharacter: String
+    });
+    const emitCurrentCharacter = () => {
+        emit('currentCharacter', currentCharacter.value);
+    };
+
+    const setCurrentCharacter = (character) => {
+        currentCharacter.value = character;
+    };
+
+    const setFilterItems = (items) => {
+        filterItems.value = items;
+    };
+    
   </script>
   
   <style scoped>
@@ -99,7 +113,10 @@
     display: flex;
     align-items: center;
     overflow-x: auto;
+    overflow-y: hidden;
     position: relative;
+    height: fit-content;
+    padding: 3px 10px;
 
     >* {
     margin-right: 5px;

@@ -1,4 +1,5 @@
 <template>
+    <mod-filter-container />
     <s-scroll-view id="mod-container"> 
         <mod-card v-for="mod in mods" :key="mod.name" 
             :mod="mod.name" 
@@ -9,7 +10,6 @@
         />
         <div class="placeholder"></div>
     </s-scroll-view>
-
 </template>
 
 <script setup>
@@ -18,6 +18,8 @@ import 'sober';
 import { ref, onMounted } from 'vue';
 import modCard from './modCard.vue';
 const { ipcRenderer } = require('electron');
+import modFilterContainer from '../components/modFilterContainer.vue';
+
 
 // 定义 mods 变量
 const mods = ref([]);
