@@ -3,6 +3,7 @@ import modCard from '../components/modCard.vue'
 import modCardManager from '../components/modCardManager.vue'
 import chipButton from '../components/chipButton.vue';
 import backButton from '../components/backButton.vue';
+import sectionSelector from '../components/sectionSelector.vue';
 const { ipcRenderer } = require('electron');
 
 function handleClick() {
@@ -21,7 +22,7 @@ function handleBackButtonClicked() {
     <!-- <div id="mod-card-manager">
         <modCardManager />
     </div> -->
-    
+    <sectionSelector :section="['section1', 'section2', 'section3']" v-model:currentSection="currentSection" />
     <button @click="handleClick">Click me</button>
 
     <backButton @backButtonClicked="handleBackButtonClicked" />
