@@ -8,6 +8,7 @@
             @click="selectTab(tab)"
         >
             <p> {{ tab }}</p>
+            <s-ripple attached="true"></s-ripple>
         </div>
         
     </div>
@@ -53,9 +54,11 @@ watch(() => props.tabs, (newTabs) => {
     flex-direction: column;
     position: relative;
     width: 200px;
+    height: calc(100% - 20px)
 }
 
 .tab {
+    position: relative;
     padding: 10px;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -82,5 +85,10 @@ watch(() => props.tabs, (newTabs) => {
     background-color: var(--s-color-primary);
     border-radius: 10px;
     transition: transform 0.3s;
+}
+
+s-ripple {
+    /* --ripple-color: var(--s-color-primary); */
+    border-radius: 10px;
 }
 </style>

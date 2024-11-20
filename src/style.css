@@ -30,6 +30,8 @@ img {
 p {
   height: fit-content;
   width: fit-content;
+  margin: 0;
+  line-height: 1.4;
 }
 
 ::-webkit-scrollbar {
@@ -74,7 +76,164 @@ body {
 .OO-box {
   border-radius: 20px;
   border: 3px solid var(--s-color-outline-variant);
-  background-color: var(--s-color-surface-container-high);
-
+  background-color: var(--s-color-surface-container);
+  backdrop-filter: blur(5px);
   padding: 10px;
+}
+
+.OO-button-box {
+  align-items: center;
+  align-content: center;
+  margin: 10px 0;
+  width: calc(100% - 40px);
+  height: 50px;
+  position: relative;
+  background-color: var(--s-color-surface-container-low);
+  color: var(--s-color-on-surface);
+  border-radius: 28px;
+  padding: 0 20px;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.OO-center-bg{
+  /* 背景图垂直、水平均居中 */
+  background-position: center center;
+  /* 背景图不平铺 */
+  background-repeat: no-repeat;
+  /* 当内容高度大于图片高度时，背景图像的位置相对于viewport固定 */
+  /* background-attachment: fixed; */
+  /* 让背景图基于容器大小伸缩 */
+  background-size: cover;
+}
+
+/* -=========================setting-bar */
+
+.OO-setting-bar {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+  margin: 10px 0;
+  width: calc(100% - 40px);
+  height: 50px;
+  position: relative;
+  background-color: var(--s-color-surface-container-low);
+  color: var(--s-color-on-surface);
+  border-radius: 28px;
+  padding: 0 20px;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2);
+  text-overflow: ellipsis;
+}
+
+.OO-setting-bar h3 {
+  margin: 0;
+  line-height: 1;
+  font-weight: bold;
+  font-size: 1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
+  padding:5px 0;
+}
+
+.OO-setting-bar s-text-field {
+  position: absolute;
+  --text-field-border-radius: 24px;
+  --text-field-padding: 24px;
+  --border-radius: 24px;
+  border-radius: 24px;
+  background-color: var(--s-color-background);
+
+  box-shadow: inset 2px 2px 10px var(--s-color-surface-container-high);
+  --border-color: var(--s-color-outline-variant);
+  --border-width: 2px;
+  right: 5px;
+  height: calc(100% - 10px);
+  min-height: 0px;
+  min-width: 155px;
+  width: calc(30% + 5px);
+  max-width: 305px;
+}
+
+.OO-setting-bar input[type='radio'] {
+  display: none;
+}
+
+.OO-setting-bar input[type='radio']:checked+label>s-chip {
+  background-color: var(--s-color-primary);
+  color: var(--s-color-on-primary);
+}
+
+.OO-setting-bar s-switch {
+  position: absolute;
+  right: 10px;
+  width: 50px;
+  height: calc(100% - 20px);
+  min-height: 0px;
+}
+
+.OO-setting-bar s-button {
+  position: absolute;
+  right: 10px;
+  min-width: 58px;
+  height: calc(100% - 20px);
+  min-height: 0px;
+  font-size: 0.97em;
+  font-weight: 500;
+  min-width: 150px;
+  width: 30%;
+  max-width: 300px;
+}
+
+.OO-setting-bar s-picker{
+  position: absolute;
+  color: var(--s-color-on-surface);
+  --border-radius: 24px;
+  border-radius: 24px;
+  background-color: var(--s-color-background);
+
+  box-shadow: inset 2px 2px 10px var(--s-color-surface-container-high);
+  --border-color: var(--s-color-outline-variant);
+  --border-width: 2px;
+  right: 5px;
+  --height: 41px;
+  --padding: 72px;
+  height: calc(100% - 10px);
+  min-height: 0px;
+  min-width: 155px;
+  width: calc(30% + 5px);
+  max-width: 305px;
+}
+
+.OO-setting-bar s-button:not([type='text']) {
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2);
+  border-color: var(--s-color-outline-variant);
+  border-width: 2px;
+  background-color: var(--s-color-surface-container-lowest);
+  color: var(--s-color-on-surface);
+}
+
+.OO-setting-bar s-tooltip * {
+  text-overflow: initial;
+  overflow: visible;
+}
+
+
+
+/* -=========================shade box */
+
+.OO-shade-box {
+  box-shadow: inset 2px 2px 10px var(--s-color-surface-container-high);
+  border-color: var(--s-color-outline-variant);
+  border-width: 2px;
+  background-color: var(--s-color-background);
+  color: var(--s-color-on-surface);
+
+  --border-color: var(--s-color-outline-variant);
+  --border-width: 2px;
+  --border-radius: 20px;
 }

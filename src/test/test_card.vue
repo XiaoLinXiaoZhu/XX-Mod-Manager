@@ -29,7 +29,7 @@ function handleBackButtonClicked() {
 
     <leftMenu :tabs="['tab1', 'tab2', 'tab3']" @tabChange="handleTabChange" />
         <modCardManager id="mod-card-manager" />
-    <modInfo modName="modName" modImage="modImage" modRole="modRole" modDescription="modDescription" modUrl="modUrl" @clickEditButton="handleClickEditButton" />
+    <modInfo modName="modName" modImagePath="D:\Desktop\mask.png" modCharacter="111" modDescription="modDescription" modUrl="modUrl" @clickEditButton="handleClickEditButton" :modHotkeys="[{key: 'key1', description: 'description1'}, {key: 'key2', description: 'description2'}]" />
     <svg width="0" height="0">
     <defs>
         <clipPath id="svgCircle">
