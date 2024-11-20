@@ -1,6 +1,8 @@
 <template>
     <div class="left-menu OO-box">
-        <div class="slider OO-color-gradient" :style="sliderStyle"></div>
+        <div class="OO-button-box" id="up-button"></div>
+        <div>
+            <div class="slider OO-color-gradient" :style="sliderStyle"></div>
         <div 
             v-for="(tab, index) in tabs" 
             :key="index" 
@@ -10,6 +12,8 @@
             <p> {{ tab }}</p>
             <s-ripple attached="true"></s-ripple>
         </div>
+        </div>
+    <div class="OO-button-box" id="down-button"></div>
         
     </div>
 </template>
@@ -90,5 +94,14 @@ watch(() => props.tabs, (newTabs) => {
 s-ripple {
     /* --ripple-color: var(--s-color-primary); */
     border-radius: 10px;
+}
+
+.OO-button-box{
+    position: relative;
+    height: 40px;
+    margin: 0;
+    width: calc(100% - 28px);
+    left: -6px;
+    top: -10px;
 }
 </style>

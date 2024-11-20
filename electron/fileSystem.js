@@ -29,7 +29,7 @@ function readFile(filePath) {
     })
 }
 
-ipcMain.handle('get-current-config', async (event) => {
+async function getCurrentConfig() {
     const dataPath = app.getPath('userData');
     const filePath = path.join(dataPath, 'config.json');
     console.log(`get-current-config:${filePath}`);
@@ -44,7 +44,10 @@ ipcMain.handle('get-current-config', async (event) => {
         console.log(`file not exists:${filePath}`);
         return {};
     }
+}
 
+ipcMain.handle('get-current-config', async (event) => {
+    return await getCurrentConfig();
 });
 
 ipcMain.handle('getFiles', async (event, dirPath) => {
@@ -119,6 +122,7 @@ function tryGetModPreview(modPath,modConfigPreviewName){
     }
 
 }
+
 function creatMod(modPath){
     const mod = {
         name: path.basename(modPath),
@@ -132,6 +136,7 @@ function creatMod(modPath){
     }
 
     const modConfigPath = path.join(modPath, 'mod.json');
+
     if (fs.existsSync(modConfigPath)) {
         const modConfig = JSON.parse(fs.readFileSync(modConfigPath, 'utf-8'));
         mod.character = modConfig.character;
@@ -163,38 +168,6 @@ function getMods(modSourcePath) {
 
 ipcMain.handle('get-mods', async (event, modSourcePath) => {
     const mods = getMods(modSourcePath);
-    // const mods = [
-    //     {
-    //         name: 'mod1',
-    //         character: 'Unknown',
-    //         preview: '',
-    //         description: '',
-    //         url: '',
-    //         hotkeys: [],
-    //         state: 1,
-    //         snack: ''
-    //     },
-    //     {
-    //         name: 'mod2',
-    //         character: 'Unknown',
-    //         preview: '',
-    //         description: '',
-    //         url: '',
-    //         hotkeys: [],
-    //         state: 1,
-    //         snack: ''
-    //     },
-    //     {
-    //         name: 'mod3',
-    //         character: 'Unknown',
-    //         preview: '',
-    //         description: '',
-    //         url: '',
-    //         hotkeys: [],
-    //         state: 1,
-    //         snack: ''
-    //     }
-    // ]
     snack('get-mods');
     return mods;
 });
@@ -204,6 +177,22 @@ ipcMain.handle('get-image', async (event, imagePath) => {
     // 传递一个 buffer 对象给渲染进程
     return fs.readFileSync(imagePath).toString('base64');
 });
+
+// 这里应该解构设计，渲染进程不再需要操心 当前的配置，mod的img等等
+ipcMain.handle('get-mods-from-current-config', async (event) => {
+    const currentConfig = await getCurrentConfig();
+    const modSourcePath = currentConfig.modSourcePath;
+    
+    return fs.existsSync(modSourcePath) ? getMods(modSourcePath) : [];
+});
+
+ipcMain.handle('get-mod-info', async (event, modName) => {
+    const currentConfig = await getCurrentConfig();
+    const modSourcePath = currentConfig.modSourcePath;
+    const modPath = path.join(modSourcePath, modName);
+    return fs.existsSync(modPath) ? creatMod(modPath) : null;
+});
+
 
 //-==========================设置mod信息==========================
 function setModInfoFiled(modPath, field, value) {

@@ -1,3 +1,23 @@
+<template>
+
+
+    <!-- <sectionSelector :section="['section1', 'section2', 'section3']" v-model:currentSection="currentSection" />
+    <button @click="handleClick">Click me</button>
+
+    <backButton @backButtonClicked="handleBackButtonClicked" /> -->
+
+    <leftMenu :tabs="['tab1', 'tab2', 'tab3']" @tabChange="handleTabChange" />
+        <modCardManager id="mod-card-manager" @click="handleModCardClick" />
+    <modInfo :mod="lastClickedMod" />
+    <svg width="0" height="0">
+    <defs>
+        <clipPath id="svgCircle">
+        <circle cx="100" cy="100" r="100" />
+        </clipPath>
+    </defs>
+    </svg>
+</template>
+
 <script setup>
 import modCard from '../components/modCard.vue'
 import modCardManager from '../components/modCardManager.vue'
@@ -14,30 +34,30 @@ function handleClick() {
     ipcRenderer.send('open-new-window', 'tapePage/');
 }
 
+import { ref, watch } from 'vue';
+import { mod } from 'three/webgpu';
+
+const lastClickedMod = ref(null);
+
+watch(() => lastClickedMod.value, (newVal) => {
+    //debug
+    console.log('lastClickedMod changed to', newVal);
+});
+
+function handleTabChange(tab) {
+    console.log('tab changed to', tab);
+}
+
+function handleModCardClick(mod) {
+    console.log('mod card clicked', mod);
+}
+
+
 function handleBackButtonClicked() {
     console.log('back button clicked');
 }
 </script>
 
-<template>
-
-
-    <!-- <sectionSelector :section="['section1', 'section2', 'section3']" v-model:currentSection="currentSection" />
-    <button @click="handleClick">Click me</button>
-
-    <backButton @backButtonClicked="handleBackButtonClicked" /> -->
-
-    <leftMenu :tabs="['tab1', 'tab2', 'tab3']" @tabChange="handleTabChange" />
-        <modCardManager id="mod-card-manager" />
-    <modInfo modName="modName" modImagePath="D:\Desktop\mask.png" modCharacter="111" modDescription="modDescription" modUrl="modUrl" @clickEditButton="handleClickEditButton" :modHotkeys="[{key: 'key1', description: 'description1'}, {key: 'key2', description: 'description2'}]" />
-    <svg width="0" height="0">
-    <defs>
-        <clipPath id="svgCircle">
-        <circle cx="100" cy="100" r="100" />
-        </clipPath>
-    </defs>
-    </svg>
-</template>
 
 <style scoped>
 

@@ -1,6 +1,24 @@
+<template>
+    <s-card ref="modItemRef" class="mod-item" :checked="checked" clickable="true" :id="props.mod" inWindow="true" :character="props.character" @click="click">
+        <div slot="image" style="height: 200px;">
+            <img src="" alt="mod image" />
+        </div>
+        <div slot="headline" id="mod-item-headline">{{ props.mod }}</div>
+        <div slot="subhead" id="mod-item-subhead">{{ props.character }}</div>
+        <div slot="text" id="mod-item-text">
+            <s-scroll-view>
+                <p id="mod-hotkeys">Hotkeys: {{ props.hotKeys.join(', ') }}</p>
+                <p id="mod-item-description">{{ props.description }}</p>
+                <div class="placeholder"></div>
+            </s-scroll-view>
+        </div>
+    </s-card>
+</template>
+
 <script setup>
 const { ipcRenderer } = require('electron');
 import 'sober'
+import { mod } from 'three/webgpu';
 import { useTemplateRef , computed, defineProps, onMounted, ref } from 'vue'
 
 const props = defineProps({
@@ -15,13 +33,15 @@ const props = defineProps({
 })
 
 const checked = ref(false);
-const modItemRef = useTemplateRef('modItemRef')
+const modItemRef = useTemplateRef('modItemRef');
+const emit = defineEmits(['click'])
 const click = (event) => {
     //debug
-    console.log('clicked')
-    checked.value = !checked.value
-    const modItem = document.getElementById(props.mod)
-    clickModItem(modItem, event, modItem.getBoundingClientRect())
+    console.log('clicked');
+    checked.value = !checked.value;
+    const modItem = document.getElementById(props.mod);
+    clickModItem(modItem, event, modItem.getBoundingClientRect());
+    emit('click', props.mod);
 }
 
 function clickModItem(modItem, event = null, rect = null) {
@@ -108,25 +128,6 @@ function clickModItem(modItem, event = null, rect = null) {
     })
 
 </script>
-
-
-<template>
-    <s-card ref="modItemRef" class="mod-item" :checked="checked" clickable="true" :id="props.mod" inWindow="true" :character="props.character" @click="click">
-        <div slot="image" style="height: 200px;">
-            <img src="" alt="mod image" />
-        </div>
-        <div slot="headline" id="mod-item-headline">{{ props.mod }}</div>
-        <div slot="subhead" id="mod-item-subhead">{{ props.character }}</div>
-        <div slot="text" id="mod-item-text">
-            <s-scroll-view>
-                <p id="mod-hotkeys">Hotkeys: {{ props.hotKeys.join(', ') }}</p>
-                <p id="mod-item-description">{{ props.description }}</p>
-                <div class="placeholder"></div>
-            </s-scroll-view>
-        </div>
-    </s-card>
-</template>
-
 
 <style scoped>
 

@@ -1,14 +1,17 @@
 <template>
-    <div id="mod-card-manager" class="OO-box">
+    <div id="mod-card-manager" class="OO-box" :lastClickedMod="lastClickedMod">
         <mod-filter-container />
-        <s-scroll-view id="mod-container"> 
+        <s-scroll-view> 
+            <div id="mod-container">
             <mod-card v-for="mod in mods" :key="mod.name" 
                 :mod="mod.name" 
                 :character="mod.character"
                 :description="mod.description"
                 :hotKeys="mod.hotKeys"
                 :imagePath="mod.preview"
+                @click="click"
             />
+            </div>
             <div class="placeholder"></div>
         </s-scroll-view>
     </div>
@@ -21,7 +24,6 @@ import { ref, onMounted } from 'vue';
 import modCard from './modCard.vue';
 const { ipcRenderer } = require('electron');
 import modFilterContainer from '../components/modFilterContainer.vue';
-
 
 // 定义 mods 变量
 const mods = ref([]);
@@ -38,6 +40,16 @@ const loadMods = async () => {
     mods.value = loadMods;
 };
 
+// 定义 lastClickedMod 变量
+const lastClickedMod = ref(null);
+
+const emit = defineEmits(['click']);
+// 定义 click 方法
+const click = (mod) => {
+    lastClickedMod.value = mod;
+    emit('click', mod);
+};
+
 // 在组件挂载时调用 loadMods 方法
 onMounted(() => {
     loadMods();
@@ -47,19 +59,20 @@ onMounted(() => {
 <style scoped>
 #mod-container {
     width: 100%;
-    height: 100%;
+    height: fit-content;
     display: grid;
-    grid-column: span 4;
-    grid-column-start: span 4;
+    /* grid-column: span 4;
+    grid-column-start: span 4; */
     grid-column-end: auto;
     grid-template-columns: repeat(auto-fill, 250px);
+    grid-row-end: auto;
+    grid-auto-rows: 350px;
     gap: 12px;
     /* align-items: center; */
     justify-content: start;
     justify-items: center;
     min-height: 500px;
 }
-
 #mod-card-manager {
     margin: 0 10px;
     display: flex;
@@ -73,7 +86,7 @@ onMounted(() => {
 
 
 .placeholder {
-    height: 200px;
+    height: 300px;
     width: 100%;
 }
 </style>

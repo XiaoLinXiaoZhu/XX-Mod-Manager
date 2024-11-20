@@ -61,17 +61,14 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, useTemplateRef, onMounted, h } from 'vue';
+import { defineProps, defineEmits, useTemplateRef, onMounted,ref,watch} from 'vue';
 const { ipcRenderer } = require('electron');
 
 const props = defineProps({
-    modName: String,
-    modImagePath: String,
-    modCharacter: String,
-    modHotkeys: Array,
-    modDescription: String,
-    modUrl: String
+    mod: String
 });
+
+const modInfo = ref(null);
 
 const emit = defineEmits(['clickEditButton']);
 
@@ -85,10 +82,27 @@ const openModUrl = () => {
 
 const modInfoRef = useTemplateRef("modInfoRef");
 
+const setDisplayMod = async (mod) => {
+    console.log(`set mod: ${mod}`);
+    //modInfo.value = await ipcRenderer.invoke('get-mod-info', mod);
+    //debug
+    //console.log(`set mod image: ${modInfo.value.preview}`);
+
+    //const img = await ipcRenderer.invoke('get-image', modInfo.value.preview);
+    
+    //modInfoRef.value.querySelector('.mod-image').style.backgroundImage = `url(${img})`;
+};
+
+watch(() => props.mod, (newMod) => {
+    //debug
+    console.log(`mod changed to: ${newMod}`);
+    setDisplayMod(newMod);
+});
+
 onMounted(() => {
-    ipcRenderer.invoke('get-image', props.modImagePath).then((image) => {
-        modInfoRef.value.querySelector('.mod-image').style.backgroundImage = `url(data:image/png;base64,${image})`;
-    });
+    if (modInfoRef.value) {
+        setDisplayMod(props.mod);
+    }
 
     //debug 打印 hotkeys
     console.log(props.modHotkeys);

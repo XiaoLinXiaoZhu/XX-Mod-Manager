@@ -118,6 +118,7 @@
     height: fit-content;
     padding: 3px 10px;
     width: 100%;
+    min-height: 35px;
     >* {
     margin-right: 5px;
   }
