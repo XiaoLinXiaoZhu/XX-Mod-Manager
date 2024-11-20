@@ -1,15 +1,17 @@
 <template>
-    <mod-filter-container />
-    <s-scroll-view id="mod-container"> 
-        <mod-card v-for="mod in mods" :key="mod.name" 
-            :mod="mod.name" 
-            :character="mod.character"
-            :description="mod.description"
-            :hotKeys="mod.hotKeys"
-            :imagePath="mod.preview"
-        />
-        <div class="placeholder"></div>
-    </s-scroll-view>
+    <div id="mod-card-manager" class="OO-box">
+        <mod-filter-container />
+        <s-scroll-view id="mod-container"> 
+            <mod-card v-for="mod in mods" :key="mod.name" 
+                :mod="mod.name" 
+                :character="mod.character"
+                :description="mod.description"
+                :hotKeys="mod.hotKeys"
+                :imagePath="mod.preview"
+            />
+            <div class="placeholder"></div>
+        </s-scroll-view>
+    </div>
 </template>
 
 <script setup>
@@ -57,6 +59,18 @@ onMounted(() => {
     justify-items: center;
     min-height: 500px;
 }
+
+#mod-card-manager {
+    margin: 0 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: calc(100% - 20px);
+    height: 100%;
+    flex-wrap: nowrap;
+}
+
+
 
 .placeholder {
     height: 200px;

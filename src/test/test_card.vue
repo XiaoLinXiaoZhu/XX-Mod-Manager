@@ -4,6 +4,8 @@ import modCardManager from '../components/modCardManager.vue'
 import chipButton from '../components/chipButton.vue';
 import backButton from '../components/backButton.vue';
 import sectionSelector from '../components/sectionSelector.vue';
+import leftMenu from '../components/leftMenu.vue';
+import modInfo from '../components/modInfo.vue';
 const { ipcRenderer } = require('electron');
 
 function handleClick() {
@@ -19,14 +21,15 @@ function handleBackButtonClicked() {
 
 <template>
 
-    <!-- <div id="mod-card-manager">
-        <modCardManager />
-    </div> -->
-    <sectionSelector :section="['section1', 'section2', 'section3']" v-model:currentSection="currentSection" />
+
+    <!-- <sectionSelector :section="['section1', 'section2', 'section3']" v-model:currentSection="currentSection" />
     <button @click="handleClick">Click me</button>
 
-    <backButton @backButtonClicked="handleBackButtonClicked" />
+    <backButton @backButtonClicked="handleBackButtonClicked" /> -->
 
+    <leftMenu :tabs="['tab1', 'tab2', 'tab3']" @tabChange="handleTabChange" />
+        <modCardManager id="mod-card-manager" />
+    <modInfo modName="modName" modImage="modImage" modRole="modRole" modDescription="modDescription" modUrl="modUrl" @clickEditButton="handleClickEditButton" />
     <svg width="0" height="0">
     <defs>
         <clipPath id="svgCircle">
@@ -37,14 +40,6 @@ function handleBackButtonClicked() {
 </template>
 
 <style scoped>
-#mod-card-manager[data-v-05fe059d] {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    width: 100%;
-    height: 100%;
-    flex-wrap: nowrap;
-}
 
 .svg-circle {
     clip-path: path(
@@ -53,6 +48,10 @@ function handleBackButtonClicked() {
     width: 512px;
     height: 512px;
     z-index: 10;
+}
+
+#mod-card-manager {
+    height: calc(100% - 20px);
 }
 
 #test {

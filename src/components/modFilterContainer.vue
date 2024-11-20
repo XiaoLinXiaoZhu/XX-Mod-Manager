@@ -117,7 +117,7 @@
     position: relative;
     height: fit-content;
     padding: 3px 10px;
-
+    width: 100%;
     >* {
     margin-right: 5px;
   }
