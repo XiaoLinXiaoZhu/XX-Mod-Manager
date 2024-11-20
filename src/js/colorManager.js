@@ -98,3 +98,40 @@ caperingManager.init = function (element) { }
 caperingManager.destroy = function (element) { }
 
 console.log('colorManager', colorManager);
+
+//-========================= OO-pumping ========================
+// 高度和宽度在一定范围内波动的效果
+const pumpingTween = new Tween({ scale: 1 });
+pumpingTween.to({ scale: 1.1 }, 500)
+    .onUpdate((object) => {
+        pumpingManager.items.forEach(item => {
+            
+            const originalX = item.getAttribute('original-x');
+            const originalY = item.getAttribute('original-y');
+            //通过设置shadow来实现放大效果
+            //debug
+            //console.log(`pumping update, scale:${object.scale}`);
+            item.style.boxShadow = `0 0 10 ${100}px ${item.style.backgroundColor}`;
+        });
+        //debug
+        //console.log(`pumping update, scale:${object.scale}`);
+    })
+    .easing(Easing.Quadratic.InOut)
+    .yoyo(true)
+    .repeat(Infinity)
+    .repeatDelay(200)
+    .start();
+const pumpingManager = new ClassManager('OO-pumping');
+pumpingManager.onUpdate = function () {
+    pumpingTween.update();
+}
+pumpingManager.needRefresh = true;
+pumpingManager.onPageInit = function () {}
+pumpingManager.init = function (element) {
+    element.setAttribute('original-x', element.offsetWidth);
+    element.setAttribute('original-y', element.offsetHeight);
+}
+pumpingManager.destroy = function (element) { }
+
+
+console.log('pumpingManager', pumpingManager);

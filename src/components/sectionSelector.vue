@@ -1,6 +1,6 @@
 <template>
-    <div class="slider-container">
-        <div class="slider" :style="sliderStyle"></div>
+    <div class="slider-container ">
+        <div class="slider OO-color-gradient OO-pumping" :style="sliderStyle"></div>
         <div class="section-selector">
             <div 
                 v-for="(sec, index) in section" 
@@ -58,9 +58,10 @@ watch(() => props.section, (newSection) => {
     display: flex;
     align-items:center;
     position: relative;
-    background-color: var(--s-color-dark-on-primary);
-    border: 5px solid var(--s-color-dark-outline-variant);
+    background-color: var(--s-color-on-primary);
+    border: 5px solid var(--s-color-outline-variant);
     border-radius: 20px;
+    box-shadow: 0 0 0px 3px var(--s-color-surface-container-high),inset 1px 1px 1px rgba(255, 255, 255, 0.2);
     box-sizing: border-box;
     overflow: hidden;
     height: 40px;
@@ -68,7 +69,7 @@ watch(() => props.section, (newSection) => {
 
 .section-item {
     flex: 1;
-    padding: 10px 30px;
+    padding: 10px 40px;
     text-align: center;
     cursor: pointer;
     transition: background-color 0.3s;

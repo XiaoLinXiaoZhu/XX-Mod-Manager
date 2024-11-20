@@ -10,7 +10,7 @@ import { defineProps, defineEmits, ref, computed } from 'vue';
 const emit = defineEmits(['backButtonClicked']);
 
 const isFlashing = ref(false);
-const flashingSpeed = 140;
+const flashingSpeed = 100;
 const handleClick = () => {
     isFlashing.value = true;
     setTimeout(() => {
