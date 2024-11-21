@@ -99,14 +99,13 @@ function tryGetModPreview(modPath,modConfigPreviewName){
 
     // 如果都没有的话，尝试寻找mod文件夹下的第一个图片文件
     const files = fs.readdirSync(path.join(modPath));
-    const imageFiles = files.filter(file => file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg'));
+    const imageFiles = files.filter(file => file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg') || file.endsWith('.webp'));
     //如果没有图片文件，则使用默认图片,之后直接跳出程序
     if (imageFiles.length <= 0) {
+        snack('No image file found in mod folder, use default image instead');
         return {
-            previewPath: path.join(__dirname, '../assets/default.jpg'),
+            previewPath: path.join(__dirname, './src/assets/default.jpg'),
             previewName: 'default.jpg',
-            state: 0,
-            snack: 'No image file found in mod folder, use default image instead'
         }
     }
 

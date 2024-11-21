@@ -120,11 +120,11 @@ const observer = new IntersectionObserver((entries) => {
         // 如果元素在视口内，则使其inWindow属性为true
         modItem.inWindow = entry.isIntersecting;
         //debug
-        console.log(`modItem ${modItem.id} inWindow:${modItem.inWindow}`);
+        //console.log(`modItem ${modItem.id} inWindow:${modItem.inWindow}`);
     });
     }, {
         root: null, // 使用视口作为根
-        rootMargin: '200px 50px', // 扩展视口边界
+        rootMargin: '600px 50px', // 扩展视口边界
         threshold: 0 // 只要元素进入视口就触发回调
 });
 
@@ -159,7 +159,6 @@ onMounted(() => {
     grid-row-end: auto;
     grid-auto-rows: 350px;
     gap: 12px;
-    /* align-items: center; */
     justify-content: start;
     justify-items: center;
     min-height: 500px;

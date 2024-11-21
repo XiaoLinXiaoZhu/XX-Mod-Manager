@@ -13,7 +13,8 @@
             </s-tooltip>
         </div>
         <div class="bottom-right">
-            <s-button @click="handleAppButtonClicked" />
+            <!-- <s-button @click="handleAppButtonClicked" /> -->
+             <s-button @click="handleClick" />
         </div>
     </div>
 
@@ -62,63 +63,46 @@ function handleAppButtonClicked() {
 }
 
 const compactMode = ref(false);
-function handleCompactButtonClicked() {
-    console.log('compact button clicked');
-    compactMode.value = !compactMode.value;
-    //切换compactMode
+const enterCompactMode = (item) => {
+    item.animate([
+        { height: '350px' },
+        { height: '150px' }
+    ], {
+        duration: 300,
+        easing: 'ease-in-out',
+        iterations: 1
+    });
 
-    const modItems = document.querySelectorAll('.mod-item');
-    if (compactMode.value) {
-        //添加折叠动画，modContainer的子物体modItem的高度从350px变为150px
-        //动画只对窗口内的modItem进行动画
-        modItems.forEach(item => {
-            if (!item.inWindow) {
-                return;
-            }
-            item.animate([
-                { height: '350px' },
-                { height: '150px' }
+    //item下的slot=headline，slot=text，slot=subhead的div元素会缓缓上移
+    //获取这些元素
+    //遍历子元素，匹配slot属性
+    item.childNodes.forEach(child => {
+        if (child.slot == 'headline' || child.slot == 'subhead' || child.slot == 'text') {
+            child.animate([
+                { transform: 'translateY(200px)' },
+                { transform: 'translateY(0px)' }
             ], {
                 duration: 300,
                 easing: 'ease-in-out',
                 iterations: 1
             });
-
-            //item下的slot=headline，slot=text，slot=subhead的div元素会缓缓上移
-            //获取这些元素
-            //遍历子元素，匹配slot属性
-            item.childNodes.forEach(child => {
-                if (child.slot == 'headline' || child.slot == 'subhead' || child.slot == 'text') {
-                    child.animate([
-                        { transform: 'translateY(200px)' },
-                        { transform: 'translateY(0px)' }
-                    ], {
-                        duration: 300,
-                        easing: 'ease-in-out',
-                        iterations: 1
-                    });
-                }
-                if (child.slot == 'image') {
-                    //获取slot下的img元素
-                    const img = child.querySelector('img');
-                    img.animate([
-                        { opacity: 1, filter: 'blur(0px)' },
-                        { opacity: 0.2, filter: 'blur(5px)' }
-                    ], {
-                        duration: 300,
-                        easing: 'ease-in-out',
-                        iterations: 1
-                    });
-                }
+        }
+        if (child.slot == 'image') {
+            //获取slot下的img元素
+            const img = child.querySelector('img');
+            img.animate([
+                { opacity: 1, filter: 'blur(0px)' },
+                { opacity: 0.2, filter: 'blur(5px)' }
+            ], {
+                duration: 300,
+                easing: 'ease-in-out',
+                iterations: 1
             });
-        });
-    }
-    else {
-        modItems.forEach(item => {
-            if (!item.inWindow) {
-                return;
-            }
-            item.animate([
+        }
+    });
+};
+const exitCompactMod = (item) => {
+    item.animate([
                 { height: '150px' },
                 { height: '350px' }
             ], {
@@ -154,9 +138,49 @@ function handleCompactButtonClicked() {
                     });
                 }
             });
+}
+function handleCompactButtonClicked() {
+    console.log('compact button clicked');
+    compactMode.value = !compactMode.value;
+    //切换compactMode
 
+    let modItems = Array.from(document.querySelectorAll('.mod-item')).map(item => {
+        return {
+            item: item,
+            animated: false
+        };
+    });
+
+    console.log(modItems);
+
+    const compact = (Items) => {
+        Items.forEach(item => {
+            if (!item.item.inWindow) {
+                return;
+            }
+            if (!item.animated) {
+                if (compactMode.value) {
+                    enterCompactMode(item.item);
+                }
+                else {
+                    exitCompactMod(item.item);
+                }
+                item.animated = true;
+            }
         });
+    };
+
+    compact(modItems);
+    // 在之后的0.4s内，每0.1s 重新调用compact函数
+    const maxTime = 200;
+    const dertaTime = 10;
+    let currentTime = 0;
+    for (let i = 0; i < maxTime; i += dertaTime) {
+        setTimeout(() => {
+            compact(modItems);
+        }, i);
     }
+
 }
 
 
