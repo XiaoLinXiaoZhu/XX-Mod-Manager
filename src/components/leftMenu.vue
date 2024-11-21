@@ -13,6 +13,7 @@
             <s-ripple attached="true"></s-ripple>
         </div>
         </div>
+        <div class="placeholder"></div>
     <div class="OO-button-box" id="down-button"></div>
         
     </div>
@@ -101,7 +102,20 @@ s-ripple {
     height: 40px;
     margin: 0;
     width: calc(100% - 28px);
+
+}
+
+#up-button{
     left: -6px;
-    top: -10px;
+    top: -8px;
+}
+
+.placeholder{
+    flex: 1;
+}
+
+#down-button{
+    left: -6px;
+    bottom: -8px;
 }
 </style>

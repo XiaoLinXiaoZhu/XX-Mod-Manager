@@ -1,13 +1,13 @@
 import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
-import test_caed from './test/test_card.vue'
+import test_app from './test/test_app.vue'
 import 'sober'
 //npm
 import 'sober/style/scroll-view.css'
 import { Snackbar } from 'sober'
 const { ipcRenderer} = require('electron');
-createApp(test_caed).mount('#app')
+createApp(test_app).mount('#app')
 
 console.log('main.js');
 

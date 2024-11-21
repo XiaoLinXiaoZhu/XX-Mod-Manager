@@ -17,15 +17,20 @@
   import { useTemplateRef,ref, reactive, onMounted, watch, computed } from 'vue';
   import chipButton from './chipButton.vue';
   
-  const filterItems = ref(['全部', '已选择', '选项1', '选项2', '选项3', '选项4']);
+  
+  const props = defineProps({
+      filterItems: Array,
+      currentCharacter: String
+  });
+
   const currentCharacter = ref('全部');
   const computedFilterItems = computed(() => {
-  return filterItems.value.map((item) => {
-    return {
-      text: item,
-      checked: item === currentCharacter.value
-    };
-  });
+    return getFilterItems().map((item) => {
+      return {
+        text: item,
+        checked: item === currentCharacter.value
+      };
+    });
 });
 
   const sliderStyle = reactive({
@@ -47,11 +52,11 @@
   
   const updateSlider = (index) => {
     //debug
-    console.log(containerRef.value)
+    //console.log(containerRef.value)
     const chipButtons = containerRef.value.querySelectorAll('s-chip');
     const selectedChip = chipButtons[index];
     //debug
-    console.log(`updateSlider: ${selectedChip}`)
+    //console.log(`updateSlider: ${selectedChip}`)
     sliderStyle.width = `${selectedChip.offsetWidth}px`;
     sliderStyle.left = `${selectedChip.offsetLeft}px`;
   };
@@ -84,26 +89,25 @@
   });
   
   watch(currentCharacter, (newVal, oldVal) => {
-    const index = filterItems.value.indexOf(newVal);
+    const filterItems = getFilterItems();
+    //debug
+    //console.log(`watch: ${filterItems}`)
+    const index = filterItems.findIndex((item) => item === newVal);
     updateSlider(index);
   });
 
+  function getFilterItems() {
+    if (!props.filterItems) {
+      props.filterItems = ['全部', '已选择', '1'];
+    }
+    return props.filterItems;
+  }
+
 
   //-============对外的接口================
-  const emit = defineEmits(['currentCharacter']);
-    const props = defineProps({
-        currentCharacter: String
-    });
-    const emitCurrentCharacter = () => {
-        emit('currentCharacter', currentCharacter.value);
-    };
-
-    const setCurrentCharacter = (character) => {
-        currentCharacter.value = character;
-    };
-
-    const setFilterItems = (items) => {
-        filterItems.value = items;
+  const emit = defineEmits(['changeFilter']);
+  const emitCurrentCharacter = () => {
+        emit('changeFilter', currentCharacter.value);
     };
     
   </script>

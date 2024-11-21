@@ -1,10 +1,10 @@
 <template>
     <div class="mod-info-card OO-box" ref="modInfoRef">
 
-        <div class="mod-title">
-        <h2>{{ modInfo ? modInfo.name : 'Click mod card to see detail' }}</h2>
+        <div class="mod-title">{{ modInfo ? modInfo.name : 'Click mod card to see detail' }}</div>
+        <div class="mod-character">
+            <p> {{ modInfo ? modInfo.character : 'no character' }} </p>
         </div>
-        <p class="mod-character">{{ modInfo ? modInfo.character : 'no character' }}</p>
         <div class="mod-image"></div>
         
         <s-scroll-view>
@@ -129,17 +129,41 @@ s-scroll-view{
 
 
 .mod-info-card {
-    width: 500px;
+    width: 250px;
     margin-right: 10px;
     height: calc(100% - 20px);
     text-align: center;
 }
 
 .mod-title {
-    font-size: 15px;
+    font-size: 25px;
     font-weight: bold;
+    padding: 10px 0;
+    text-align: left;
+    word-break:break-all;
+    width:250px;
+   white-space:nowrap;
+   overflow:hidden;
+   text-overflow:ellipsis;
+}
+
+.mod-character {
+    font-size: 15px;
+    font-weight: 500;
+    margin-top: 10px;
     margin-bottom: 16px;
     text-align: left;
+
+    position: relative;
+    z-index: 10;
+    width: fit-content;
+    padding: 2px 10px;
+    background-color: var(--s-color-primary);
+    opacity: 0.8;
+    backdrop-filter: blur(10px);
+    color: var(--s-color-on-primary);
+    border-radius: 30px;
+    
 }
 
 .mod-image {
