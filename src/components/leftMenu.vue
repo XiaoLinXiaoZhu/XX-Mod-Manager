@@ -3,15 +3,15 @@
         <div class="OO-button-box" id="up-button"></div>
         <div>
             <div class="slider OO-color-gradient" :style="sliderStyle"></div>
-        <div 
-            v-for="(tab, index) in tabs" 
-            :key="index" 
-            :class="['tab', { active: currentTab === tab }]" 
-            @click="selectTab(tab)"
-        >
-            <p> {{ tab }}</p>
-            <s-ripple attached="true"></s-ripple>
-        </div>
+                <div 
+                    v-for="(tab, index) in tabs" 
+                    :key="index" 
+                    :class="['tab', { active: currentTab === tab }]" 
+                    @click="selectTab(tab)"
+                >
+                    <p> {{ tab }}</p>
+                    <s-ripple attached="true"></s-ripple>
+                </div>
         </div>
         <div class="placeholder"></div>
     <div class="OO-button-box" id="down-button"></div>
@@ -69,6 +69,7 @@ watch(() => props.tabs, (newTabs) => {
     transition: background-color 0.3s;
     text-align: center;
     z-index: 10;
+    height: 20px;
 }
 
 .tab p {

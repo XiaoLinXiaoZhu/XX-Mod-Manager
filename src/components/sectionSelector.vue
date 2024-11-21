@@ -3,7 +3,7 @@
         <div class="slider OO-color-gradient OO-pumping" :style="sliderStyle"></div>
         <div class="section-selector">
             <div 
-                v-for="(sec, index) in section" 
+                v-for="(sec, index) in sections" 
                 :key="index" 
                 class="section-item" 
                 :class="{ active: sec === currentSection }" 
@@ -21,7 +21,7 @@
 import { ref, computed, watch } from 'vue';
 
 const props = defineProps({
-    section: {
+    sections: {
         type: Array,
         required: true
     }
@@ -29,7 +29,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:currentSection']);
 
-const currentSection = ref(props.section[0]);
+const currentSection = ref(props.sections[0]);
 
 const selectSection = (sec) => {
     //debug
@@ -39,14 +39,14 @@ const selectSection = (sec) => {
 };
 
 const sliderStyle = computed(() => {
-    const index = props.section.indexOf(currentSection.value);
+    const index = props.sections.indexOf(currentSection.value);
     return {
-        width: `${100 / props.section.length}%`,
+        width: `${100 / props.sections.length}%`,
         transform: `translateX(${index * 95 - 22}%) skew(-20deg)`
     };
 });
 
-watch(() => props.section, (newSection) => {
+watch(() => props.sections, (newSection) => {
     if (!newSection.includes(currentSection.value)) {
         currentSection.value = newSection[0];
     }

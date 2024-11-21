@@ -9,7 +9,7 @@
       >
         {{ item }}
       </chip-button>
-      <div class="slider" :style="sliderStyle"></div>
+      <div class="slider OO-color-gradient" :style="sliderStyle"></div>
     </div>
   </template>
   

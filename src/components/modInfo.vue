@@ -2,7 +2,7 @@
     <div class="mod-info-card OO-box" ref="modInfoRef">
 
         <div class="mod-title">{{ modInfo ? modInfo.name : 'Click mod card to see detail' }}</div>
-        <div class="mod-character">
+        <div class="mod-character OO-color-gradient">
             <p> {{ modInfo ? modInfo.character : 'no character' }} </p>
         </div>
         <div class="mod-image"></div>
@@ -31,7 +31,7 @@
 
         <div class="buttons">
             <s-tooltip>
-                <s-button slot="trigger" @click="editMod" class="edit-button">
+                <s-button slot="trigger" @click="editMod" class="edit-button OO-color-gradient">
                     <s-icon>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
                         <path
@@ -44,7 +44,7 @@
             </s-tooltip>
 
             <s-tooltip>
-                <s-button slot="trigger" @click="openModUrl" class="open-url-button">
+                <s-button slot="trigger" @click="openModUrl" class="open-url-button OO-color-gradient">
                     <s-icon slot="start">
                 <svg viewBox="0 0 960 960">
                   <path
