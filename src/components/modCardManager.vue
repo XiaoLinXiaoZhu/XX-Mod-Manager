@@ -7,7 +7,7 @@
                 :mod="mod.name" 
                 :character="mod.character"
                 :description="mod.description"
-                :hotKeys="mod.hotKeys"
+                :hotKeys="mod.hotkeys"
                 :imagePath="mod.preview"
                 @click="click"
             />
@@ -40,14 +40,15 @@ const loadMods = async () => {
     mods.value = loadMods;
 };
 
+
+const emit = defineEmits(['click']);
 // 定义 lastClickedMod 变量
 const lastClickedMod = ref(null);
 
-const emit = defineEmits(['click']);
 // 定义 click 方法
 const click = (mod) => {
     lastClickedMod.value = mod;
-    emit('click', mod);
+    emit('click', lastClickedMod.value);
 };
 
 // 在组件挂载时调用 loadMods 方法

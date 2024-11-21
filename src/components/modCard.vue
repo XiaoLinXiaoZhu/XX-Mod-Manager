@@ -7,7 +7,7 @@
         <div slot="subhead" id="mod-item-subhead">{{ props.character }}</div>
         <div slot="text" id="mod-item-text">
             <s-scroll-view>
-                <p id="mod-hotkeys">Hotkeys: {{ props.hotKeys.join(', ') }}</p>
+                <p id="mod-hotkeys">Hotkeys: {{ displayHotKeys }}</p>
                 <p id="mod-item-description">{{ props.description }}</p>
                 <div class="placeholder"></div>
             </s-scroll-view>
@@ -30,6 +30,12 @@ const props = defineProps({
         type: Array,
         default: () => []
     }
+})
+const displayHotKeys = computed(() => {
+    // hotKeys: [{key: 'Ctrl', description: 'description'}]
+    return props.hotKeys.map((hotKey) => {
+        return `${hotKey.key}: ${hotKey.description}`;
+    }).join(', ');
 })
 
 const checked = ref(false);
@@ -125,6 +131,8 @@ function clickModItem(modItem, event = null, rect = null) {
             console.log(`modItemRef: ${modItemRef},type: ${typeof modItemRef}`);
             modItemRef.value.querySelector('img').src = "data:image/png;base64," + image;
         });
+
+        console.log(props.hotKeys);
     })
 
 </script>

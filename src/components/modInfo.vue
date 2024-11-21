@@ -2,16 +2,16 @@
     <div class="mod-info-card OO-box" ref="modInfoRef">
 
         <div class="mod-title">
-        <h2>{{ modName }}</h2>
+        <h2>{{ modInfo ? modInfo.name : 'Click mod card to see detail' }}</h2>
         </div>
-        <p class="mod-character">{{ modCharacter }}</p>
+        <p class="mod-character">{{ modInfo ? modInfo.character : 'no character' }}</p>
         <div class="mod-image"></div>
         
         <s-scroll-view>
             <h4>Hotkeys</h4>
         <div id="hotkey-container" class="OO-colunm-center">
             <div
-                v-for="hotkey in modHotkeys"
+                v-for="hotkey in modInfo ? modInfo.hotkeys : []"
                 class="hotkey OO-setting-bar OO-shade-box">
                 <h3>{{ hotkey.description }}</h3>
                 <h3>{{ hotkey.key }}</h3>
@@ -23,7 +23,7 @@
           <div class="OO-box OO-shade-box" id="mod-info-description">
 
               <p id="mod-description" style="white-space: normal;">
-                {{ modDescription }}
+                {{ modInfo ? modInfo.description : 'no description' }}
                 </p>
          </div>
          <div class="placeholder"></div>
@@ -70,6 +70,7 @@ const props = defineProps({
 
 const modInfo = ref(null);
 
+
 const emit = defineEmits(['clickEditButton']);
 
 const editMod = () => {
@@ -84,28 +85,28 @@ const modInfoRef = useTemplateRef("modInfoRef");
 
 const setDisplayMod = async (mod) => {
     console.log(`set mod: ${mod}`);
-    //modInfo.value = await ipcRenderer.invoke('get-mod-info', mod);
+    modInfo.value = await ipcRenderer.invoke('get-mod-info', mod);
     //debug
-    //console.log(`set mod image: ${modInfo.value.preview}`);
+    console.log(`set mod info: ${modInfo.value}`);
+    console.log(modInfo.value);
+    console.log(modInfo.value.hotkeys);
 
-    //const img = await ipcRenderer.invoke('get-image', modInfo.value.preview);
-    
-    //modInfoRef.value.querySelector('.mod-image').style.backgroundImage = `url(${img})`;
+    //获取图片 base64
+    const img = await ipcRenderer.invoke('get-image', modInfo.value.preview);
+    // modItemRef.value.querySelector('img').src = "data:image/png;base64," + image;
+    modInfoRef.value.querySelector('.mod-image').style.backgroundImage = `url(data:image/png;base64,${img})`;
 };
 
 watch(() => props.mod, (newMod) => {
-    //debug
-    console.log(`mod changed to: ${newMod}`);
     setDisplayMod(newMod);
 });
 
 onMounted(() => {
-    if (modInfoRef.value) {
+    //debug
+    console.log('modInfo mounted: ' + props.mod);
+    if (modInfoRef.value != null && props.mod != null) {
         setDisplayMod(props.mod);
     }
-
-    //debug 打印 hotkeys
-    console.log(props.modHotkeys);
 });
 </script>
 

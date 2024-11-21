@@ -37,19 +37,15 @@ function handleClick() {
 import { ref, watch } from 'vue';
 import { mod } from 'three/webgpu';
 
-const lastClickedMod = ref(null);
-
-watch(() => lastClickedMod.value, (newVal) => {
-    //debug
-    console.log('lastClickedMod changed to', newVal);
-});
 
 function handleTabChange(tab) {
     console.log('tab changed to', tab);
 }
 
+const lastClickedMod = ref(null);
 function handleModCardClick(mod) {
     console.log('mod card clicked', mod);
+    lastClickedMod.value = mod;
 }
 
 
