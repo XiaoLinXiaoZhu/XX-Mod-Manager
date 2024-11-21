@@ -1,14 +1,23 @@
 <template>
+    <div class="main-container">
+        <leftMenu :tabs="['tab1', 'tab2', 'tab3']" @tabChange="handleTabChange" />
+        <modCardManager id="mod-card-manager" @click="handleModCardClick" :compactMode="compactMode" />
+        <modInfo :mod="lastClickedMod" />
+    </div>
+
+    <div class="bottom">
+        <div class="bottom-left">
+            <s-tooltip>
+                <s-switch v-model="compactMode" @change="handleCompactButtonClicked" slot="trigger" />
+                <p> Compact Mode </p>
+            </s-tooltip>
+        </div>
+        <div class="bottom-right">
+            <s-button @click="handleAppButtonClicked" />
+        </div>
+    </div>
 
 
-    <!-- <sectionSelector :section="['section1', 'section2', 'section3']" v-model:currentSection="currentSection" />
-    <button @click="handleClick">Click me</button>
-
-    <backButton @backButtonClicked="handleBackButtonClicked" /> -->
-
-    <leftMenu :tabs="['tab1', 'tab2', 'tab3']" @tabChange="handleTabChange" />
-        <modCardManager id="mod-card-manager" @click="handleModCardClick" />
-    <modInfo :mod="lastClickedMod" />
     <svg width="0" height="0">
     <defs>
         <clipPath id="svgCircle">
@@ -48,23 +57,115 @@ function handleModCardClick(mod) {
     lastClickedMod.value = mod;
 }
 
-
-function handleBackButtonClicked() {
-    console.log('back button clicked');
+function handleAppButtonClicked() {
+    console.log('app button clicked');
 }
+
+const compactMode = ref(false);
+function handleCompactButtonClicked() {
+    console.log('compact button clicked');
+    compactMode.value = !compactMode.value;
+    //切换compactMode
+
+    const modItems = document.querySelectorAll('.mod-item');
+    if (compactMode.value) {
+        //添加折叠动画，modContainer的子物体modItem的高度从350px变为150px
+        //动画只对窗口内的modItem进行动画
+        modItems.forEach(item => {
+            if (!item.inWindow) {
+                return;
+            }
+            item.animate([
+                { height: '350px' },
+                { height: '150px' }
+            ], {
+                duration: 300,
+                easing: 'ease-in-out',
+                iterations: 1
+            });
+
+            //item下的slot=headline，slot=text，slot=subhead的div元素会缓缓上移
+            //获取这些元素
+            //遍历子元素，匹配slot属性
+            item.childNodes.forEach(child => {
+                if (child.slot == 'headline' || child.slot == 'subhead' || child.slot == 'text') {
+                    child.animate([
+                        { transform: 'translateY(200px)' },
+                        { transform: 'translateY(0px)' }
+                    ], {
+                        duration: 300,
+                        easing: 'ease-in-out',
+                        iterations: 1
+                    });
+                }
+                if (child.slot == 'image') {
+                    //获取slot下的img元素
+                    const img = child.querySelector('img');
+                    img.animate([
+                        { opacity: 1, filter: 'blur(0px)' },
+                        { opacity: 0.2, filter: 'blur(5px)' }
+                    ], {
+                        duration: 300,
+                        easing: 'ease-in-out',
+                        iterations: 1
+                    });
+                }
+            });
+        });
+    }
+    else {
+        modItems.forEach(item => {
+            if (!item.inWindow) {
+                return;
+            }
+            item.animate([
+                { height: '150px' },
+                { height: '350px' }
+            ], {
+                duration: 300,
+                easing: 'ease-in-out',
+                iterations: 1
+            });
+
+            //item下的slot=headline，slot=text，slot=subhead的div元素会缓缓下移
+            //获取这些元素
+            //遍历子元素，匹配slot属性
+            item.childNodes.forEach(child => {
+                if (child.slot == 'headline' || child.slot == 'subhead' || child.slot == 'text') {
+                    child.animate([
+                        { transform: 'translateY(-200px)' },
+                        { transform: 'translateY(0px)' }
+                    ], {
+                        duration: 300,
+                        easing: 'ease-in-out',
+                        iterations: 1
+                    });
+                }
+                if (child.slot == 'image') {
+                    //获取slot下的img元素
+                    const img = child.querySelector('img');
+                    img.animate([
+                        { opacity: 0.2, filter: 'blur(5px)' },
+                        { opacity: 1, filter: 'blur(0px)' }
+                    ], {
+                        duration: 300,
+                        easing: 'ease-in-out',
+                        iterations: 1
+                    });
+                }
+            });
+
+        });
+    }
+}
+
+
+
+
 </script>
 
 
 <style scoped>
-
-.svg-circle {
-    clip-path: path(
-    "m137.66676,9.16668l-108.16543,0a19.08802,19.08802 0 0 0 -16.53659,28.63203l36.73171,63.62672c5.09014,5.72641 17.81548,8.90774 30.54083,8.90774l57.42948,0a31.81336,31.81336 0 0 0 0,-101.16649z"
-  );
-    width: 512px;
-    height: 512px;
-    z-index: 10;
-}
 
 #mod-card-manager {
     height: calc(100% - 20px);
@@ -77,4 +178,26 @@ function handleBackButtonClicked() {
     /* border-radius: 0 80px 20px 0px;
     transform: skew(-20deg); */
 }
+
+.main-container {
+    position: relative;
+    display: flex;
+    height: calc(100% - 60px);
+    width: 100%;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+.bottom {
+    position: absolute;
+    height: 60px;
+    width: 100%;
+    bottom: 0px;
+    /* background-color: var(--s-color-primary); */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 </style>

@@ -48,15 +48,14 @@ const currentSection = ref('Mod');
 .section-container {
     position: absolute;
     display: flex;
+    flex-direction: column;
     flex: 1;
     overflow: hidden;
     width: calc(100% - 20px);
+    height: calc(100% - 70px);
     padding: 10px;
     bottom: 50px;
     top: 50px;
     overflow:visible;
 }
-
-
-
 </style>

@@ -8,7 +8,7 @@ import { ClassManager, ClassManagerService } from './classManager.js'; // 引入
 
 // 将上述代码 改为 使用 ClassManager 来管理
 
-console.log('colorManager', colorManager);
+
 
 const startColor = new Color(0x94ad00);
 const endColor = new Color(0xffd300);
@@ -37,7 +37,7 @@ function getColor() {
 //-======================== OO-color-gradient ========================
 // 定义 classManager
 const colorManager = new ClassManager('OO-color-gradient');
-
+console.log('colorManager', colorManager);
 colorManager.onUpdate = function () {
     //debug
     group.update();

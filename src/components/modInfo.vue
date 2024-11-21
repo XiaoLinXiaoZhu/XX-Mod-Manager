@@ -87,9 +87,9 @@ const setDisplayMod = async (mod) => {
     console.log(`set mod: ${mod}`);
     modInfo.value = await ipcRenderer.invoke('get-mod-info', mod);
     //debug
-    console.log(`set mod info: ${modInfo.value}`);
-    console.log(modInfo.value);
-    console.log(modInfo.value.hotkeys);
+    //console.log(`set mod info: ${modInfo.value}`);
+    //console.log(modInfo.value);
+    //console.log(modInfo.value.hotkeys);
 
     //获取图片 base64
     const img = await ipcRenderer.invoke('get-image', modInfo.value.preview);

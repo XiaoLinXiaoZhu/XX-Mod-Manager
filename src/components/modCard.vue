@@ -1,5 +1,15 @@
 <template>
-    <s-card ref="modItemRef" class="mod-item" :checked="checked" clickable="true" :id="props.mod" inWindow="true" :character="props.character" @click="click">
+    <s-card ref="modItemRef" 
+        class="mod-item" 
+        :checked="checked" 
+        clickable="true" 
+        :id="props.mod" 
+        inWindow="true" 
+        :character="props.character"
+        :class="{compact: props.compactMode}"
+        @click="click">
+
+
         <div slot="image" style="height: 200px;">
             <img src="" alt="mod image" />
         </div>
@@ -26,6 +36,7 @@ const props = defineProps({
     character: String,
     description: String,
     imagePath: String,
+    compactMode: Boolean,
     hotKeys:{
         type: Array,
         default: () => []
@@ -69,9 +80,7 @@ function clickModItem(modItem, event = null, rect = null) {
         rotateX = 2 * (y - 0.5);
         rotateY = -2 * (x - 0.5);
 
-        //反转卡片状态
-        modItem.checked = !modItem.checked;
-        modItem.setAttribute('checked', modItem.checked ? 'true' : 'false');
+        
         if (modItem.inWindow == undefined) {
             //如果modItem.inWindow未定义，则设置为true
             modItem.inWindow = true;
@@ -82,6 +91,21 @@ function clickModItem(modItem, event = null, rect = null) {
             return;
         }
 
+        //反转卡片状态
+        modItem.checked = !modItem.checked;
+        modItem.setAttribute('checked', modItem.checked ? 'true' : 'false');
+
+
+        if (modItem.inWindow == undefined) {
+            //如果modItem.inWindow未定义，则设置为true
+            modItem.inWindow = true;
+        }
+
+        if (modItem.inWindow == false) {
+            //如果modItem不在视窗内，则不进行动画
+            console.log(`${modItem.id} is not in window: prop inWindow is ${modItem.inWindow}`);
+            return;
+        }
 
         //添加动画
         if (modItem.checked == true) {
@@ -170,6 +194,7 @@ function clickModItem(modItem, event = null, rect = null) {
     will-change: transform;
     transition: x, y 0.5s cubic-bezier(.36, -0.64, .34, 1.76);
 
+
     >div[slot="image"] {
         width: 250px;
         height: 200px;
@@ -215,5 +240,22 @@ function clickModItem(modItem, event = null, rect = null) {
     height: 30px;
     border: 0;
 }
+
+.mod-item.compact img {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+        position: absolute;
+        filter: blur(5px);
+        opacity: 0.2;
+}
+
+.mod-item.compact div[slot="image"] {
+    position: absolute;
+    z-index: -1;
+}
+
 
 </style>

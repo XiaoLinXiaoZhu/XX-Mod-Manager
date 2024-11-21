@@ -2,14 +2,16 @@
     <div id="mod-card-manager" class="OO-box" :lastClickedMod="lastClickedMod">
         <mod-filter-container @changeFilter="handleFilterChange" :filterItems="characters" />
         <s-scroll-view> 
-            <div id="mod-container">
-            <mod-card v-for="mod in mods" :key="mod.name" 
+            <div class="refresh-placeholder" ref="refreshPlaceholderRef"></div>
+            <div id="mod-container" :compact="compactMode" ref="modContainerRef">
+            <modCard v-for="mod in mods" :key="mod.name" 
                 :mod="mod.name" 
                 :character="mod.character"
                 :description="mod.description"
                 :hotKeys="mod.hotkeys"
                 :imagePath="mod.preview"
                 @click="click"
+                :compactMode="compactMode"
             />
             </div>
             <div class="placeholder"></div>
@@ -20,11 +22,16 @@
 <script setup>
 import 'sober';
 
-import { ref, onMounted,computed } from 'vue';
+import { ref, onMounted,computed,useTemplateRef,watch } from 'vue';
 import modCard from './modCard.vue';
 const { ipcRenderer } = require('electron');
 import modFilterContainer from '../components/modFilterContainer.vue';
+import { Tween,Group } from '@tweenjs/tween.js';
 
+// 接受参数
+const props = defineProps({
+    compactMode: Boolean
+});
 // 定义 mods 变量
 const mods = ref([]);
 const characters = ref(['全部', '已选择']);
@@ -63,14 +70,6 @@ const click = (mod) => {
 
 // 定义 handleFilterChange 方法
 const handleFilterChange = (character) => {
-    // console.log(character);
-    // //debug
-    // console.log(mods.value);
-    // if (character === '全部') {
-    //     mods.value = mods.value;
-    // } else {
-    //     mods.value = mods.value.filter((mod) => mod.character === character);
-    // }
     currentCharacter.value = character;
     //debug
     console.log(currentCharacter.value);
@@ -103,10 +102,49 @@ const handleFilterChange = (character) => {
     
 };
 
-// 在组件挂载时调用 loadMods 方法
-onMounted(() => {
-    loadMods();
+const modContainerRef = useTemplateRef('modContainerRef');
+// 监控 compactMode 变量，为其的 grid-auto-rows 添加过渡效果
+watch(() => props.compactMode, (newVal) => {
+    if (newVal) {
+        modContainerRef.value.style.gridAutoRows = '150px';
+    } else {
+        modContainerRef.value.style.gridAutoRows = '350px';
+    }
 });
+
+
+// 定义 observer 变量
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        const modItem = entry.target;
+        // 如果元素在视口内，则使其inWindow属性为true
+        modItem.inWindow = entry.isIntersecting;
+        //debug
+        console.log(`modItem ${modItem.id} inWindow:${modItem.inWindow}`);
+    });
+    }, {
+        root: null, // 使用视口作为根
+        rootMargin: '200px 50px', // 扩展视口边界
+        threshold: 0 // 只要元素进入视口就触发回调
+});
+
+// 在 loadMods 方法中为每个 mod-item 添加 observer
+const observeMods = () => {
+    document.querySelectorAll('.mod-item').forEach(item => {
+        observer.observe(item);
+    });
+};
+
+const refreshPlaceholderRef = useTemplateRef('refreshPlaceholderRef');
+
+// 在组件挂载时调用 observeMods 方法
+onMounted(() => {
+    loadMods().then(() => {
+        observeMods();
+        refreshPlaceholderRef.value.style.height = '0px';
+    });
+});
+
 </script>
 
 <style scoped>
@@ -125,7 +163,10 @@ onMounted(() => {
     justify-content: start;
     justify-items: center;
     min-height: 500px;
+
+    transition: all 0.5s;
 }
+
 #mod-card-manager {
     margin: 0 10px;
     display: flex;
@@ -141,5 +182,31 @@ onMounted(() => {
 .placeholder {
     height: 300px;
     width: 100%;
+}
+
+
+.refresh-placeholder {
+    height: 100%;
+    width: 100%;
+    transition: height 0.5s;
+}
+
+#mod-container[compact="true"] {
+    display: grid;
+    grid-column: span 4;
+    grid-column-start: span 4;
+    grid-column-end: auto;
+    grid-auto-rows: 150px;
+    grid-template-columns: repeat(auto-fill, 250px);
+    gap: 12px;
+    justify-content: start;
+    justify-items: center;
+
+    transition: all 0.5s;
+
+    .mod-item {
+        width: 250px;
+        height: 150px;
+    }
 }
 </style>
