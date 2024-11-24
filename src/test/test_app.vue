@@ -2,17 +2,17 @@
     <div class="main-container">
         <div class="head">
             <backbutton></backbutton>
-            <sectionSelector :sections="sections" v-model:currentSection="currentSection"></sectionSelector>
+            <sectionSelector :sections="sections" @update:currentSection="handleSectionChange"></sectionSelector>
         </div>
 
         <div class="section-container">
-            <modCardSection></modCardSection>
+            <modCardSection v-if="currentSection === 'Mod'" />
         </div>
     </div>
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, onMounted, computed } from 'vue';
+import { defineProps, defineEmits, ref, onMounted, computed ,watch} from 'vue';
 const { ipcRenderer } = require('electron');
 
 import modCardSection from '../section/modCardSection.vue';
@@ -21,8 +21,14 @@ import sectionSelector from '../components/sectionSelector.vue';
 import modCardManager from '../components/modCardManager.vue';
 
 
-const sections = ref(['Mod', 'Character', 'Tag']);
+const sections = ref(['Mod', 'Help', 'Settings']);
 const currentSection = ref('Mod');
+
+const handleSectionChange = (section) => {
+    currentSection.value = section;
+    //debug
+    console.log('handleSectionChange', section);
+};
 
 </script>
 

@@ -1,7 +1,28 @@
 <template>
     <div class="main-container">
-        <leftMenu :tabs="['tab1', 'tab2', 'tab3']" @tabChange="handleTabChange" />
-        <modCardManager id="mod-card-manager" @click="handleModCardClick" :compactMode="compactMode" />
+        <leftMenu :tabs="presets" @tabChange="handleTabChange" >
+            <template #up-button>
+                <s-icon type="arrow_drop_up"></s-icon>
+            </template>
+            <template #down-button>
+                <s-tooltip style="margin-right: calc(100% - 40px);">
+                    <s-icon-button  slot="trigger">
+                        <s-icon type="menu" ></s-icon>
+                    </s-icon-button>
+                    
+                    <p> manage presets </p>
+                </s-tooltip>
+
+                <s-tooltip>
+                    <s-icon-button slot="trigger">
+                        <s-icon type="add" ></s-icon>
+                    </s-icon-button>
+                    <p> add preset </p>
+                </s-tooltip>
+            </template>
+        </leftMenu>
+        <modCardManager id="mod-card-manager" @click="handleModCardClick" :compactMode="compactMode">
+        </modCardManager>
         <modInfo :mod="lastClickedMod" />
     </div>
 
@@ -36,32 +57,32 @@ import backButton from '../components/backButton.vue';
 import sectionSelector from '../components/sectionSelector.vue';
 import leftMenu from '../components/leftMenu.vue';
 import modInfo from '../components/modInfo.vue';
+import { ref, watch,onMounted,useTemplateRef } from 'vue';
 const { ipcRenderer } = require('electron');
 
+//-============================== 事件处理 ==============================
 function handleClick() {
     //打开新的页面
     console.log('click');
     ipcRenderer.send('open-new-window', 'tapePage/');
 }
 
-import { ref, watch } from 'vue';
-import { mod } from 'three/webgpu';
 
-
-function handleTabChange(tab) {
-    console.log('tab changed to', tab);
-}
 
 const lastClickedMod = ref(null);
 function handleModCardClick(mod) {
     console.log('mod card clicked', mod);
     lastClickedMod.value = mod;
+
+    savePreset();
 }
 
 function handleAppButtonClicked() {
     console.log('app button clicked');
 }
 
+
+//-============================== Compact Mode ==============================
 const compactMode = ref(false);
 const enterCompactMode = (item) => {
     item.animate([
@@ -183,9 +204,68 @@ function handleCompactButtonClicked() {
 
 }
 
+//-============================= presets ==============================
+const presets = ref([]);
+const currentPreset = ref('default');
+function loadPresetList() {
+    return ipcRenderer.invoke('get-preset-list').then((list) => {
+        // list 的最前面 添加一个 default 的选项，它不会被保存，在每次加载时重置
+        list.unshift('default');
+        //debug
+        console.log('load presets', list);
+        presets.value = list;
+    });
+}
+
+function loadPreset(preset) {
+    return ipcRenderer.invoke('load-preset', preset).then((mods) => {
+        console.log('preset loaded', mods);
+        // 根据返回的mods，设置mod-card-manager的mods，如果mods中的mod在当前的mods中存在，则设置checked为true
+        const modItems = Array.from(document.querySelectorAll('.mod-item'));
+        modItems.forEach(item => {
+            if (mods.includes(item.id)) {
+                item.checked = true;
+            }
+            else {
+                item.checked = false;
+            }
+        });
+    });
+}
+
+function handleTabChange(tab) {
+    currentPreset.value = tab;
+    console.log('tab changed to', tab);
+    if (tab == 'default') {
+        // 重置
+        //debug
+        console.log('reset');
+        const modItems = document.querySelectorAll('.mod-item')
+        modItems.forEach(item => {
+            //debug
+            console.log(item);
+        });
+    } else {
+        loadPreset(tab);
+    }
+}
+
+function savePreset() {
+    if (currentPreset.value == 'default') return;
+    const selectedMods = Array.from(document.querySelectorAll('.mod-item')).filter(item => item.checked).map(input => input.id);
+    ipcRenderer.invoke('save-preset', currentPreset.value, selectedMods).then(() => {
+        console.log('preset saved');
+        //loadPresets();
+    });
+}
 
 
 
+
+
+onMounted(() => {
+    loadPresetList();
+});
 </script>
 
 

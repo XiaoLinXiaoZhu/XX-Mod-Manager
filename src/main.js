@@ -7,8 +7,14 @@ import 'sober'
 import 'sober/style/scroll-view.css'
 import { Snackbar } from 'sober'
 const { ipcRenderer} = require('electron');
+
+//-====================入口文件====================-//
 createApp(test_app).mount('#app')
 
+
+
+
+//-=====================事件监听====================-//
 console.log('main.js');
 
 document.addEventListener('DOMContentLoaded', () => {

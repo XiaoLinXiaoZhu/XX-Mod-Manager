@@ -1,6 +1,10 @@
 <template>
     <div class="left-menu OO-box">
-        <div class="OO-button-box" id="up-button"></div>
+        <div class="OO-button-box" id="up-button">
+            <slot name="up-button">
+                <s-icon type="arrow_drop_up"></s-icon>
+            </slot>
+        </div>
         <div>
             <div class="slider OO-color-gradient" :style="sliderStyle"></div>
                 <div 
@@ -14,7 +18,11 @@
                 </div>
         </div>
         <div class="placeholder"></div>
-    <div class="OO-button-box" id="down-button"></div>
+    <div class="OO-button-box" id="down-button">
+        <slot name="down-button">
+            <s-icon type="arrow_drop_down"></s-icon>
+        </slot>
+    </div>
         
     </div>
 </template>
@@ -59,6 +67,8 @@ watch(() => props.tabs, (newTabs) => {
     flex-direction: column;
     position: relative;
     width: 200px;
+    min-width: 100px;
+    max-width: 200px;
     height: calc(100% - 20px)
 }
 
@@ -103,7 +113,9 @@ s-ripple {
     height: 40px;
     margin: 0;
     width: calc(100% - 28px);
-
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #up-button{

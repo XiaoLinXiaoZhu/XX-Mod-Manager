@@ -121,7 +121,7 @@
     position: relative;
     height: fit-content;
     padding: 3px 10px;
-    width: 100%;
+    width: calc(100% - 20px);
     min-height: 35px;
     >* {
     margin-right: 5px;

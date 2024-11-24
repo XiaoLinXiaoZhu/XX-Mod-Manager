@@ -28,7 +28,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:currentSection']);
-
 const currentSection = ref(props.sections[0]);
 
 const selectSection = (sec) => {

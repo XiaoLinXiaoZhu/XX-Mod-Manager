@@ -4,15 +4,15 @@
         <s-scroll-view> 
             <div class="refresh-placeholder" ref="refreshPlaceholderRef"></div>
             <div id="mod-container" :compact="compactMode" ref="modContainerRef">
-            <modCard v-for="mod in mods" :key="mod.name" 
-                :mod="mod.name" 
-                :character="mod.character"
-                :description="mod.description"
-                :hotKeys="mod.hotkeys"
-                :imagePath="mod.preview"
-                @click="click"
-                :compactMode="compactMode"
-            />
+                <modCard v-for="mod in mods" :key="mod.name" 
+                    :mod="mod.name" 
+                    :character="mod.character"
+                    :description="mod.description"
+                    :hotKeys="mod.hotkeys"
+                    :imagePath="mod.preview"
+                    @click="click"
+                    :compactMode="compactMode"
+                />
             </div>
             <div class="placeholder"></div>
         </s-scroll-view>
@@ -171,7 +171,8 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    width: calc(100% - 20px);
+    min-width: 250px;
+    flex: 2;
     height: 100%;
     flex-wrap: nowrap;
 }

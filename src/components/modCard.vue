@@ -156,7 +156,7 @@ function clickModItem(modItem, event = null, rect = null) {
             modItemRef.value.querySelector('img').src = "data:image/png;base64," + image;
         });
 
-        console.log(props.hotKeys);
+        //console.log(props.hotKeys);
     })
 
 </script>

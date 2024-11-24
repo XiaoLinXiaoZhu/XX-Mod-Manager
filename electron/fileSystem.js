@@ -207,6 +207,75 @@ ipcMain.handle('set-mod-info', async (modPath,field,value) => {
 });
 
 
+//-===========================预设===========================
+function getPresetList(presetPath) {
+    const presets = [];
+    // preset 以单个json文件存储，里面包含了该 preset 所启用的 mod
+    // 这个函数只需要返回 preset 的名称即可
+    const presetFiles = fs.readdirSync(presetPath);
+    presetFiles.forEach(presetFile => {
+        const presetFilePath = path.join(presetPath, presetFile);
+        if (fs.statSync(presetFilePath).isFile() && presetFile.endsWith('.json')) {
+            // 这里的名称不需要后缀
+            presets.push(presetFile.slice(0, -5));
+        }
+    });
+    return presets;
+}
+
+function loadPreset(presetPath, presetName) {
+    const presetFilePath = path.join(presetPath, `${presetName}.json`);
+    if (fs.existsSync(presetFilePath)) {
+        return JSON.parse(fs.readFileSync(presetFilePath, 'utf-8'));
+    }
+    snack(`Preset ${presetName} not found`);
+    return null;
+}
+
+// ipcMain.handle('save-preset', async (event, presetName, mods) => {
+//     const presetDir = path.join(modRootDir, '..', 'presets');
+//     if (!fs.existsSync(presetDir)) {
+//       fs.mkdirSync(presetDir);
+//     }
+//     fs.writeFileSync(path.join(presetDir, `${presetName}.json`), JSON.stringify(mods));
+//   });
+async function savePreset(presetPath, presetName, mods) {
+    const presetFilePath = path.join(presetPath, `${presetName}.json`);
+    if (!fs.existsSync(presetPath)) {
+        fs.mkdirSync(presetPath);
+    }
+    fs.writeFileSync(presetFilePath, JSON.stringify(mods));
+    snack(`Preset ${presetName} saved`); 
+}
+
+ipcMain.handle('get-preset-list', async (event) => {
+    const modConfig = await getCurrentConfig();
+    const presetPath = modConfig.presetPath;
+
+    // 增加 排障代码
+    if (presetPath == undefined) {
+        snack('presetPath is undefined');
+        return [];
+    }
+    if (!fs.existsSync(presetPath)) {
+        snack('presetPath not exists');
+        return [];
+    }
+    return getPresetList(presetPath);
+});
+
+ipcMain.handle('load-preset', async (event, presetName) => {
+    const modConfig = await getCurrentConfig();
+    const presetPath = modConfig.presetPath;
+    return loadPreset(presetPath, presetName);
+});
+
+ipcMain.handle('save-preset', async (event, presetName, mods) => {
+    const modConfig = await getCurrentConfig();
+    const presetPath = modConfig.presetPath;
+    savePreset(presetPath, presetName, mods);
+});
+
 
 
 
