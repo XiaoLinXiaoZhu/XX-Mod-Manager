@@ -12,6 +12,8 @@
                     :imagePath="mod.preview"
                     @click="click"
                     :compactMode="compactMode"
+                    :invokeClickChange=false
+                    :ref="setModCardRef(mod.name)"
                 />
             </div>
             <div class="placeholder"></div>
@@ -57,6 +59,11 @@ const loadMods = async () => {
     console.log(characters.value);
 };
 
+const modCardRefs = ref({});
+// 定义 setModCardRef 方法
+const setModCardRef = (name) => (el) => {
+    modCardRefs.value[name] = el;
+};
 
 const emit = defineEmits(['click']);
 // 定义 lastClickedMod 变量
@@ -83,7 +90,7 @@ const handleFilterChange = (character) => {
     } else if (character === '已选择') {
         mods.value.forEach((mod) => {
             const modItem = document.getElementById(mod.name);
-            if (modItem.checked) {
+            if (modItem.clicked) {
                 modItem.style.display = 'block';
             } else {
                 modItem.style.display = 'none';
@@ -99,7 +106,22 @@ const handleFilterChange = (character) => {
             }
         });
     }
-    
+};
+
+function loadPreset(mods){
+    //遍历modCardRefs，如果 满足 mods.includes(mod.name) ^ mod.clicked 则调用click
+    for (const [key, value] of Object.entries(modCardRefs.value)) {
+        //debug
+        //console.log(`LoadPreset: in mod ${key},mods.includes:${mods.includes(key)},clicked:${clicked}`);
+        const clicked = value.$el.getAttribute('clicked') == 'true';
+        if (mods.includes(key) ^ clicked) {
+            value.click();
+        }
+    }
+        
+    //debug
+    console.log('loadPreset',mods);
+    //handleFilterChange('已选择');
 };
 
 const modContainerRef = useTemplateRef('modContainerRef');
@@ -142,9 +164,18 @@ onMounted(() => {
     loadMods().then(() => {
         observeMods();
         refreshPlaceholderRef.value.style.height = '0px';
+
+        //debug
+        console.log('mod-card-manager mounted');
+        console.log(modCardRefs.value);
     });
 });
 
+
+
+defineExpose({
+    loadPreset
+});
 </script>
 
 <style scoped>

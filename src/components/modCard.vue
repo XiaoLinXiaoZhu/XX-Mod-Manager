@@ -1,7 +1,7 @@
 <template>
     <s-card ref="modItemRef" 
         class="mod-item" 
-        :checked="checked" 
+        :clicked=clicked
         clickable="true" 
         :id="props.mod" 
         inWindow="true" 
@@ -28,8 +28,8 @@
 <script setup>
 const { ipcRenderer } = require('electron');
 import 'sober'
-import { mod } from 'three/webgpu';
-import { useTemplateRef , computed, defineProps, onMounted, ref } from 'vue'
+import { int, mod } from 'three/webgpu';
+import { useTemplateRef , computed, defineProps, onMounted, ref,watch } from 'vue'
 
 const props = defineProps({
     mod: String,
@@ -37,11 +37,13 @@ const props = defineProps({
     description: String,
     imagePath: String,
     compactMode: Boolean,
+    invokeClickChange: Boolean,
     hotKeys:{
         type: Array,
         default: () => []
     }
 })
+
 const displayHotKeys = computed(() => {
     // hotKeys: [{key: 'Ctrl', description: 'description'}]
     return props.hotKeys.map((hotKey) => {
@@ -49,52 +51,54 @@ const displayHotKeys = computed(() => {
     }).join(', ');
 })
 
-const checked = ref(false);
+const clicked = ref(false);
 const modItemRef = useTemplateRef('modItemRef');
 const emit = defineEmits(['click'])
+
 const click = (event) => {
-    //debug
-    console.log('clicked');
-    checked.value = !checked.value;
-    const modItem = document.getElementById(props.mod);
-    clickModItem(modItem, event, modItem.getBoundingClientRect());
-    emit('click', props.mod);
+    const clickedAttr = modItemRef.value.getAttribute('clicked');
+    clicked.value = clickedAttr == 'true' ? false : true;
+    modItemRef.value.setAttribute('clicked', clicked.value);
+    if (event != null) {
+        playClickAnim(modItemRef.value, event, modItemRef.value.getBoundingClientRect());
+        //debug
+        console.log(`click: ${props.mod},current clicked: ${clicked.value},attribute: ${modItemRef.value.getAttribute('clicked')}`);    
+        emit('click', props.mod);
+    }
+    else {
+        playClickAnim(modItemRef.value);
+    }
 }
 
-function clickModItem(modItem, event = null, rect = null) {
+function playClickAnim(modItem, event = null, rect = null) {
         //获取鼠标相对于卡片的位置（百分比）
         let x, y, rotateX, rotateY;
         let rotateLevel = -20;
-        if (event != null) {
+        const clicked = modItem.getAttribute('clicked') == 'true';
+        if (event != null && rect != null) {
             //如果传入了event，则使用event的位置
             //获取鼠标相对于卡片的位置（百分比）
             x = (event.clientX - rect.left) / rect.width;
             y = (event.clientY - rect.top) / rect.height;
         }
         else {
-            //如果没有传入event，且modItem.checked为true，则设置为0，0.7，否则设置为0.7，0 偏移0.2*random
-            x = modItem.checked ? 0 : Math.random() / 5 + 0.7;
-            y = modItem.checked ? 0.7 : Math.random() / 5;
+            //如果没有传入event，且modItem.clicked为true，则设置为0，0.7，否则设置为0.7，0 偏移0.2*random
+            x = !modItem.clicked ? 0 : Math.random() / 5 + 0.7;
+            y = !modItem.clicked ? 0.7 : Math.random() / 5;
         }
         //根据鼠标相对于卡片的位置设置反转程度
         rotateX = 2 * (y - 0.5);
         rotateY = -2 * (x - 0.5);
-
         
         if (modItem.inWindow == undefined) {
             //如果modItem.inWindow未定义，则设置为true
-            modItem.inWindow = true;
+            modItem.inWindow = true;z``
         }
         if (!modItem.inWindow) {
             //如果modItem不在视窗内，则不进行动画
             console.log(`${modItem.id} is not in window: prop inWindow is ${modItem.inWindow}`);
             return;
         }
-
-        //反转卡片状态
-        modItem.checked = !modItem.checked;
-        modItem.setAttribute('checked', modItem.checked ? 'true' : 'false');
-
 
         if (modItem.inWindow == undefined) {
             //如果modItem.inWindow未定义，则设置为true
@@ -108,7 +112,7 @@ function clickModItem(modItem, event = null, rect = null) {
         }
 
         //添加动画
-        if (modItem.checked == true) {
+        if (clicked) {
 
             modItem.animate([
                 { transform: `perspective( 500px ) rotate3d(1,1,0,0deg)` },
@@ -138,13 +142,18 @@ function clickModItem(modItem, event = null, rect = null) {
         }
         
         //todo: 使用tween.js
-        // if (modItem.checked == true) {
-        //     turnOnTween.start();
-        // }
-        // else {
-        //     turnOffTween.start();
-        // }
     }
+
+    // 通过监控invokeClickChange变量，实现从外部调用click方法
+    watch(() => props.invokeClickChange, (newVal) => {
+        if (newVal) {
+            click();
+        }
+        //debug
+        console.log(`invokeClickChange: ${newVal}`);
+        //这是一个trigger
+        props.invokeClickChange = false;
+    });
 
     onMounted(() => {
         ipcRenderer.invoke('get-image', props.imagePath).then((image) => {
@@ -159,13 +168,18 @@ function clickModItem(modItem, event = null, rect = null) {
         //console.log(props.hotKeys);
     })
 
+
+defineExpose({
+    click,
+    playClickAnim
+})
 </script>
 
 <style scoped>
 
 
 
-.mod-item[checked="true"] {
+.mod-item[clicked="true"] {
     perspective: 500px;
     background-color: var(--s-color-surface-container-low);
     border: 5px solid transparent;
@@ -177,7 +191,7 @@ function clickModItem(modItem, event = null, rect = null) {
     border-radius: 0px 32px 0px 32px;
 }
 
-.mod-item[checked="false"] {
+.mod-item[clicked="false"] {
     perspective: 500px;
     background-color: var(--s-color-surface-container-low);
     border: 1px solid transparent;

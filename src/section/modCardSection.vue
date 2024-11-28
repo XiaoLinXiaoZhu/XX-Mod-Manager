@@ -21,7 +21,7 @@
                 </s-tooltip>
             </template>
         </leftMenu>
-        <modCardManager id="mod-card-manager" @click="handleModCardClick" :compactMode="compactMode">
+        <modCardManager id="mod-card-manager" @click="handleModCardClick" :compactMode="compactMode" ref="modCardManagerRef">
         </modCardManager>
         <modInfo :mod="lastClickedMod" />
     </div>
@@ -205,6 +205,7 @@ function handleCompactButtonClicked() {
 }
 
 //-============================= presets ==============================
+const modCardManagerRef = useTemplateRef('modCardManagerRef');
 const presets = ref([]);
 const currentPreset = ref('default');
 function loadPresetList() {
@@ -219,17 +220,7 @@ function loadPresetList() {
 
 function loadPreset(preset) {
     return ipcRenderer.invoke('load-preset', preset).then((mods) => {
-        console.log('preset loaded', mods);
-        // 根据返回的mods，设置mod-card-manager的mods，如果mods中的mod在当前的mods中存在，则设置checked为true
-        const modItems = Array.from(document.querySelectorAll('.mod-item'));
-        modItems.forEach(item => {
-            if (mods.includes(item.id)) {
-                item.checked = true;
-            }
-            else {
-                item.checked = false;
-            }
-        });
+        modCardManagerRef.value.loadPreset(mods);
     });
 }
 
@@ -237,14 +228,7 @@ function handleTabChange(tab) {
     currentPreset.value = tab;
     console.log('tab changed to', tab);
     if (tab == 'default') {
-        // 重置
-        //debug
-        console.log('reset');
-        const modItems = document.querySelectorAll('.mod-item')
-        modItems.forEach(item => {
-            //debug
-            console.log(item);
-        });
+        modCardManagerRef.value.loadPreset([]);
     } else {
         loadPreset(tab);
     }
@@ -252,11 +236,11 @@ function handleTabChange(tab) {
 
 function savePreset() {
     if (currentPreset.value == 'default') return;
-    const selectedMods = Array.from(document.querySelectorAll('.mod-item')).filter(item => item.checked).map(input => input.id);
-    ipcRenderer.invoke('save-preset', currentPreset.value, selectedMods).then(() => {
-        console.log('preset saved');
-        //loadPresets();
-    });
+    const selectedMods = Array.from(document.querySelectorAll('.mod-item')).filter(item => item.clicked).map(input => input.id);
+    // ipcRenderer.invoke('save-preset', currentPreset.value, selectedMods).then(() => {
+    //     console.log('preset saved');
+    //     //loadPresets();
+    // });
 }
 
 
