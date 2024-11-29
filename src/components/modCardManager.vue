@@ -38,23 +38,18 @@ const props = defineProps({
 });
 
 // 定义 mods 变量
-const mods = ref([]);
+const mods = ref(iManager.data.modList);
 const characters = ref(['全部', '已选择']);
 const currentCharacter = ref('全部');
 
 // 定义 loadMods 方法
 const loadMods = async () => {
     const loadMods = iManager.data.modList;
-    console.log(loadMods);
     mods.value = loadMods;
+    characters.value = ['全部', '已选择', ...iManager.data.characterList];
 
-    // 加载 character
-    loadMods.forEach((mod) => {
-        if (!characters.value.includes(mod.character)) {
-            characters.value.push(mod.character);
-        }
-    });
     //debug
+    console.log(mods.value);
     console.log(characters.value);
 };
 
@@ -89,7 +84,7 @@ const handleFilterChange = (character) => {
     } else if (character === '已选择') {
         mods.value.forEach((mod) => {
             const modItem = document.getElementById(mod.name);
-            if (modItem.clicked) {
+            if (modItem.getAttribute('clicked') === 'true') {
                 modItem.style.display = 'block';
             } else {
                 modItem.style.display = 'none';

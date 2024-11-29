@@ -99,7 +99,7 @@ class IManager {
     data = {
         modList: [], // mod列表
         presetList: [], // 预设列表
-        characters: [], // 角色列表
+        characterList: [], // 角色列表
     };
 
 
@@ -133,6 +133,9 @@ class IManager {
     async loadMods() {
         const modSourcePath = this.config.modSourcePath;
         const loadMods = await ipcRenderer.invoke('get-mods', modSourcePath);
+        
+        // 加载 character
+        this.data.characterList = new Set(loadMods.map((mod) => mod.character));
         this.data.modList = loadMods;
     }
 
@@ -143,6 +146,11 @@ class IManager {
 
     async loadPreset(presetName) {
         const data = await ipcRenderer.invoke('load-preset', presetName);
+        return data;
+    }
+
+    async getModInfo(modName) {
+        const data = await ipcRenderer.invoke('get-mod-info', modName);
         return data;
     }
 
