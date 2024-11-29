@@ -12,7 +12,7 @@ const { app } = require('electron');
 const path = require('path');
 
 // 导入fs
-const fs = require('fs').promises;
+const fs = require('fs');
 
 // // thenBase 是一个语法糖，实现then方法的链式调用
 // class thenBase {
@@ -70,6 +70,8 @@ class IManager {
     // };
 
     config = {
+        language: 'zh-cn', // 语言
+        theme: 'dark', // 主题
         modSourcePath: null, // mod的源路径
         modTargetPath: null, // mod的目标路径
         presetPath: null // 预设路径
@@ -125,8 +127,13 @@ class IManager {
     }
 
     async loadPreset(presetName) {
-        const data = await ipcRenderer.invoke('load-preset', presetName);
-        return data;
+        const presetPath = this.config.presetPath;
+        const presetFilePath = path.join(presetPath, `${presetName}.json`);
+        if (fs.existsSync(presetFilePath)) {
+            return JSON.parse(fs.readFileSync(presetFilePath, 'utf-8'));
+        }
+        snack(`Preset ${presetName} not found`);
+        return null;
     }
 
     async getModInfo(modName) {
@@ -183,6 +190,9 @@ class IManager {
         await fs.writeFile(newPresetPath, JSON.stringify({}));
     }
 
+    async saveConfig(){
+        await ipcRenderer.invoke('set-current-config', this.config);
+    }
     //-==================== 插件管理 ====================
     // 注册插件
     registerPlugin(plugin) {

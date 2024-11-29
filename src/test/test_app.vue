@@ -7,6 +7,7 @@
 
         <div class="section-container">
             <modCardSection v-if="currentSection === 'Mod'" />
+            <settingSection v-if="currentSection === 'Settings'" />
         </div>
     </div>
 
@@ -22,6 +23,7 @@ import backbutton from '../components/backButton.vue';
 import sectionSelector from '../components/sectionSelector.vue';
 import modCardManager from '../components/modCardManager.vue';
 import dialogAddPreset from '../dialogs/dialogAddPreset.vue';
+import settingSection from '../section/settingSection.vue';
 
 const sections = ref(['Mod', 'Help', 'Settings']);
 const currentSection = ref('Mod');

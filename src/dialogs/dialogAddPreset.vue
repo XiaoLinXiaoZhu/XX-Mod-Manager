@@ -1,7 +1,7 @@
 <template>
-    <s-dialog id="add-preset-dialog" class="font-hongmeng">
-      <div slot="headline">
-        <p class="font-hongmeng" data-translate-key="ask-preset-name">请输入预设名称</p>
+    <s-dialog id="add-preset-dialog">
+      <div slot="headline" class="font-hongmeng">
+        <p data-translate-key="ask-preset-name">请输入预设名称</p>
         <div class="OO-setting-bar">
             <h3>预设名称</h3>
             <s-text-field v-model="presetName" placeholder="请输入预设名称" id="preset-name">

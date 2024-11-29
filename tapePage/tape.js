@@ -1,6 +1,7 @@
 import * as THREE from 'three';
-import { Tween, Easing } from '@tweenjs/tween.js'; // 引入Tween.js库
+import { Tween, Easing, Group } from '@tweenjs/tween.js';
 
+const fs = require('fs');
 
 const textureLoader = new THREE.TextureLoader();
 
@@ -38,14 +39,14 @@ class Tape {
     //--------------audio----------------
     static bookAudio = new Audio('./src/book.ogg');
     static clickedAudio = new Audio('./src/display.ogg');
-    static defaultVolume = 0.1;
+    static defaultVolume = 0.07;
 
     static playAudio(audio, volume = Tape.defaultVolume) {
         if (audio.paused) {
             audio.volume = volume;
             audio.play();
         }else{
-            audio.currentTime = 0.05;
+            audio.currentTime = 0.5;
         }
     }
 
@@ -86,14 +87,30 @@ class Tape {
         this.spineTexture = spineTexture
     }
 
+    SetTapeMaterialFromUrl(urls) {
+        // 从 路径 加载纹理，如果加载失败则使用默认纹理
+        // const frontTexture = fs.existsSync(urls.tape_front) ? textureLoader.load(urls.tape_front) : Tape.defaultfrontTexture;
+        // const sideTexture = fs.existsSync(urls.tape_side) ? textureLoader.load(urls.tape_side) : Tape.defaultsideTexture;
+        // const backTexture = fs.existsSync(urls.tape_back) ? textureLoader.load(urls.tape_back) : Tape.defaultbackTexture;
+        // const spineTexture = fs.existsSync(urls.tape_spine) ? textureLoader.load(urls.tape_spine) : Tape.defaultspineTexture;
+
+        // 先全部使用默认纹理
+        this.SetTapeMaterial(Tape.defaultfrontTexture, Tape.defaultsideTexture, Tape.defaultbackTexture, Tape.defaultspineTexture);
+
+        //this.SetTapeMaterial(frontTexture, sideTexture, backTexture, spineTexture);
+    }
+
     //--------------geometry----------------
-    tapeGeometry = new THREE.BoxGeometry(0.5, 5, 2.5); // 磁带盒的尺寸
+    tapeGeometry = new THREE.BoxGeometry(0.5, 4.096, 2.544); // 磁带盒的尺寸
 
     SetTapeGeometry(geometry) {
         this.tapeGeometry = geometry
     }
 
-
+    //---------------info----------------
+    name = 'Tape';
+    description = 'This is a tape.';
+    
     //--------------instance----------------
     GetTape() {
         if (this.instance === null) {
@@ -422,6 +439,11 @@ class TapeManager {
         const y = 0.5 * Math.PI / 15 * virtualIndex;
         const z = -0.5 * Math.PI / 15 * virtualIndex;
         return { x, y, z };
+    }
+
+    GetCurrentTapeInfo() {
+        const tape = this.tapes[this.currentIndex];
+        return { name: tape.name, description: tape.description };
     }
 }
 

@@ -65,8 +65,19 @@ async function getCurrentConfig() {
     }
 }
 
+ipcMain.handle('get-user-data-path', async (event) => {
+    return app.getPath('userData');
+}
+);
+
 ipcMain.handle('get-current-config', async (event) => {
     return await getCurrentConfig();
+});
+
+ipcMain.handle('set-current-config', async (event, config) => {
+    const dataPath = app.getPath('userData');
+    const filePath = path.join(dataPath, 'config.json');
+    fs.writeFileSync(filePath, JSON.stringify(config), 'utf-8');
 });
 
 ipcMain.handle('getFiles', async (event, dirPath) => {
@@ -251,13 +262,6 @@ function loadPreset(presetPath, presetName) {
     return null;
 }
 
-// ipcMain.handle('save-preset', async (event, presetName, mods) => {
-//     const presetDir = path.join(modRootDir, '..', 'presets');
-//     if (!fs.existsSync(presetDir)) {
-//       fs.mkdirSync(presetDir);
-//     }
-//     fs.writeFileSync(path.join(presetDir, `${presetName}.json`), JSON.stringify(mods));
-//   });
 async function savePreset(presetPath, presetName, mods) {
     const presetFilePath = path.join(presetPath, `${presetName}.json`);
     if (!fs.existsSync(presetPath)) {

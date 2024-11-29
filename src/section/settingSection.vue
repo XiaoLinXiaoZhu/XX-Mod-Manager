@@ -1,0 +1,266 @@
+<template>
+    <div class="setting-container">
+        <leftMenu :tabs="tabs" @tabChange="handleTabChange">
+        </leftMenu>
+
+        <div class="setting-content OO-box">
+            <!-- -=========== 常规设置 =========== -->
+            <div v-if="currentTab === '常规设置'">
+                <div class="OO-setting-bar" id="setting-get-language">
+                    <h3 data-translate-key="language"> 语言 </h3>
+                    <div id="language-picker">
+                        <input type="radio" name="language" id="zh-cn" checked value="zh-cn" v-model="language">
+                        <label for="zh-cn"> 
+                            <s-chip selectable="true" type="default" id="zh-cn">
+                                <p data-translate-key="zh-cn">简体中文</p>
+                            </s-chip> 
+                        </label>
+                        <input type="radio" name="language" id="en" value="en" v-model="language">
+                        <label for="en"> 
+                            <s-chip selectable="true" type="default" id="en">
+                                <p data-translate-key="en">English</p>
+                            </s-chip> 
+                        </label>
+                    </div>
+                </div>
+                <s-divider></s-divider>
+                <div class="OO-setting-bar" id="setting-get-theme">
+                    <h3 data-translate-key="theme"> 主题 {{ theme }}</h3>
+                    <div id="theme-picker">
+                        <input type="radio" name="theme" id="auto" checked value="auto" v-model="theme">
+                        <label for="auto"> <s-chip selectable="true" type="default" id="auto">
+                                <p data-translate-key="auto">自动</p>
+                            </s-chip> </label>
+                        <input type="radio" name="theme" id="dark" value="dark" v-model="theme">
+                        <label for="dark"> <s-chip selectable="true" type="default" id="dark">
+                                <p data-translate-key="dark">暗色</p>
+                            </s-chip> </label>
+                        <input type="radio" name="theme" id="light" value="light" v-model="theme">
+                        <label for="light"> <s-chip selectable="true" type="default" id="light">
+                                <p data-translate-key="light">亮色</p>
+                            </s-chip> </label>
+                    </div>
+                </div>
+                <s-divider></s-divider>
+                <div id="auto-apply" class="OO-setting-bar">
+                    <h3 data-translate-key="auto-apply"> 自动应用 </h3>
+                    <s-switch id="auto-apply-switch"></s-switch>
+                </div>
+                <p data-translate-key="auto-apply-info">当选择/取消选择mod时自动应用配置(可能带来轻微卡顿)</p>
+                <div id="auto-refresh-function" class="OO-setting-bar">
+                    <h3 data-translate-key="auto-refresh-in-zzz"> 自动刷新 </h3>
+                    <s-switch id="auto-refresh-in-zzz" data-platform="win32"></s-switch>
+                </div>
+                <p data-translate-key="auto-refresh-in-zzz-info">启用 应用mod时 将会自动在绝区零中激活刷新</p>
+                <s-divider></s-divider>
+
+                <!-- 启动程序的时候也一并启动游戏和modLoader -->
+                <div id="auto-start-game" class="OO-setting-bar">
+                    <h3 data-translate-key="auto-start-game"> 自动启动游戏 </h3>
+                    <s-switch id="auto-start-game-switch"></s-switch>
+                </div>
+                <p data-translate-key="auto-start-game-info">启动程序的时候也一并启动游戏和modLoader(需要在进阶设置设置游戏目录和modLoader目录)</p>
+                <s-divider></s-divider>
+                <div id="use-admin" class="OO-setting-bar">
+                    <h3 data-translate-key="use-admin"> 使用管理员权限 </h3>
+                    <s-switch id="use-admin-switch" data-platform="win32"></s-switch>
+                </div>
+                <p data-translate-key="use-admin-info">启动程序时是否使用管理员权限(需要重启程序生效)</p>
+            </div>
+            <!-- -高级设置 -->
+            <!-- -在这里可以设定 modRootDir，modSourceDir，modLoaderDir，gameDir -->
+            <div v-if="currentTab === '高级设置'">
+                <div class="OO-setting-bar">
+                    <h3 data-translate-key="modRootDir"> mod根目录 </h3>
+                    <s-text-field>
+                        <input type="text" id="set-modRootDir-input">
+                    </s-text-field>
+                </div>
+                <p data-translate-key="modRootDir-info"> Mod根目录为modLoader读取mod的位置，一般为Mods文件夹 </p>
+                <s-divider></s-divider>
+
+                <div class="OO-setting-bar">
+                    <h3 data-translate-key="modSourceDir"> mod背包目录 </h3>
+                    <s-text-field>
+                        <input type="text" id="set-modSourceDir-input">
+                    </s-text-field>
+                </div>
+                <p data-translate-key="modSourceDir-info"> mod背包目录为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod根目录 </p>
+                <s-divider></s-divider>
+
+                <div class="OO-setting-bar">
+                    <h3 data-translate-key="modLoaderDir"> mod加载器目录 </h3>
+                    <s-text-field>
+                        <input type="text" id="set-modLoaderDir-input">
+                    </s-text-field>
+                </div>
+                <p data-translate-key="modLoaderDir-info"> Mod加载器目录为modLoader程序的位置，用于在管理器中打开modLoader </p>
+                <s-divider></s-divider>
+
+                <div class="OO-setting-bar">
+                    <h3 data-translate-key="gameDir"> 游戏目录 </h3>
+                    <s-text-field>
+                        <input type="text" id="set-gameDir-input">
+                    </s-text-field>
+                </div>
+                <p data-translate-key="gameDir-info"> 游戏目录为游戏程序的位置，用于在管理器中打开游戏 </p>
+                <s-divider></s-divider>
+                <div class="OO-setting-bar">
+                    <h3 data-translate-key="refresh-mod-info-swapkey"> 刷新mod信息中的快捷键 </h3>
+                    <s-button id="refresh-mod-info-swapkey-button" data-translate-key="refresh">
+                        刷新
+                    </s-button>
+                </div>
+                <s-divider></s-divider>
+                <div class="OO-setting-bar" id="settings-init-config">
+                    <h3 data-translate-key="init-config"> 初始化配置 </h3>
+                    <s-button id="init-config-button" data-translate-key="init">
+                        初始化所有配置
+                    </s-button>
+                </div>
+
+            </div>
+            <!-- -切换配置 -->
+            <!-- -在这里你可以选择开启在开始的时候选择配置文件的功能，并且设置配置文件保存位置 -->
+            <div v-if="currentTab === '切换配置'">
+                <div class="OO-setting-bar">
+                    <h3 data-translate-key="if-ask-switch-config"> 是否询问切换配置 </h3>
+                    <s-switch id="if-ask-switch-config-switch"></s-switch>
+                </div>
+                <p data-translate-key="if-ask-switch-config-info">
+                    启动程序时是否询问切换配置文件（需要先在下面指定文件夹），以在不同游戏中使用，否则将使用缓存中的配置文件</p>
+                <s-divider></s-divider>
+                <div class="OO-setting-bar">
+                    <h3 data-translate-key="config-dir"> 配置文件夹 </h3>
+                    <s-text-field>
+                        <input type="text" id="set-configRootDir-input">
+                    </s-text-field>
+                </div>
+                <p data-translate-key="config-dir-info">
+                    配置文件夹为存储配置文件的位置，程序将在这里寻找配置文件，配置文件以文件夹形式存储，内部的config.json为配置文件
+                </p>
+                <s-divider></s-divider>
+                <div class="OO-setting-bar">
+                    <h3 data-translate-key="switch-config"> 切换配置 </h3>
+                    <s-button id="switch-config-button" data-translate-key="switch"
+                        onclick="document.getElementById('switch-config-dialog').show()">
+                        切换配置
+                    </s-button>
+                </div>
+                <s-divider></s-divider>
+                <div class="OO-setting-bar">
+                    <h3 data-translate-key="save-config"> 保存配置 </h3>
+                    <s-button id="save-config-button" data-translate-key="save">
+                        保存配置
+                    </s-button>
+                </div>
+                <p data-translate-key="save-config-info"> 保存当前配置到配置文件夹 </p>
+            </div>
+
+
+
+            <!-- -about page -->
+            <div v-if="currentTab === '关于'">
+                <div class="OO-setting-bar" style="height: fit-content;">
+                    <p data-translate-key="about-content"> 本程序由 XLXZ 开发,开源免费,遵循GNU General Public License
+                        v3.0。用于管理基于3dmigoto的mod
+                        ,理论上来说也可以管理其他游戏的mod(只要是基于3dmigoto的) </p>
+                </div>
+                <div class="OO-setting-bar">
+                    <p data-translate-key="about-version"> 最新版本在gamebanana上发布，如果你有任何问题或者建议，欢迎在github上提出 </p>
+                </div>
+                <div class="OO-setting-bar">
+                    <p data-translate-key="about-author"> 作者：XLXZ </p>
+                </div>
+                <s-divider></s-divider>
+                <div class="OO-setting-bar" style="height: 100px;">
+                    <h3 data-translate-key="about-thanks"> 感谢 soliddanii <br>提供的帮助 </h3>
+                    <s-button class="link-button" type="text" link="https://github.com/soliddanii"
+                        data-translate-key="click-to-jump"> 点击跳转 </s-button>
+                </div>
+                <div class="OO-setting-bar">
+                    <h3> Github </h3>
+                    <s-button class="link-button" type="text"
+                        link="https://github.com/XiaoLinXiaoZhu/Mods-Manager-for-3Dmigoto/"
+                        data-translate-key="click-to-jump"> 点击跳转 </s-button>
+                </div>
+                <div class="OO-setting-bar">
+                    <h3> Gamebanana </h3>
+                    <s-button class="link-button" type="text" link='https://gamebanana.com/tools/17889'
+                        data-translate-key="click-to-jump"> 点击跳转 </s-button>
+                </div>
+                <div class="OO-setting-bar">
+                    <h3> Caimogu </h3>
+                    <s-button class="link-button" type="text" link='https://www.caimogu.cc/post/1408504.html'
+                        data-translate-key="click-to-jump"> 点击跳转 </s-button>
+                </div>
+
+                <s-divider></s-divider>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import leftMenu from '../components/leftMenu.vue';
+import chipButton from '../components/chipButton.vue';
+import { onMounted, ref, watch} from 'vue';
+import IManager from '../../electron/IManager';
+const iManager = new IManager();
+
+const tabs = ref(['常规设置', '高级设置', '切换配置', '关于']);
+
+const currentTab = ref('常规设置');
+
+const handleTabChange = (tab) => {
+    currentTab.value = tab;
+    //debug
+    console.log('handleTabChange', tab);
+};
+
+const language = ref('zh-cn');
+const theme = ref('auto');
+
+watch(language, (newVal) => {
+    iManager.config.language = newVal;
+    iManager.saveConfig();
+});
+watch(theme, (newVal) => {
+    iManager.config.theme = newVal;
+    iManager.saveConfig();
+});
+
+onMounted(async () => {
+    //debug
+    console.log('settingSection mounted');
+    await iManager.waitInit();
+    //初始化语言
+    language.value = iManager.config.language;
+    //初始化主题
+    theme.value = iManager.config.theme;
+    //初始化tab
+    currentTab.value = tabs.value[0];
+});
+</script>
+
+
+<style scoped>
+.setting-container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+}
+
+.setting-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 200px);
+    flex: 1;
+    margin: 0 10px;
+}
+</style>

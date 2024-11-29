@@ -155,7 +155,7 @@ s-scroll-view{
     text-align: left;
 
     position: relative;
-    z-index: 10;
+    z-index: 1;
     width: fit-content;
     padding: 2px 10px;
     background-color: var(--s-color-primary);

@@ -1,6 +1,8 @@
+import { Tween, Easing, Group } from '@tweenjs/tween.js';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { Tween, Easing, Group } from '@tweenjs/tween.js'; // 引入Tween.js库
+// 不知道为什么 import * 的写法会报错，只能将 THREE的组件一个一个引入
+
+// import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Tape, TapeManager } from './tape.js';
 import { createBulbLight } from './bulbLight.js';
 
@@ -43,13 +45,17 @@ import { TexturePass } from 'three/addons/postprocessing/TexturePass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { pixelationPass } from 'three/examples/jsm/tsl/display/PixelationPassNode.js';
 
+const fs = require('fs');
+const path = require('path');
+const { app, BrowserWindow, ipcMain, dialog, screen, ipcRenderer } = require('electron');
 
+console.log('hello tapePage.js');
 let scene, camera, renderer, shelf = null;
 let composer = null;
 const sceneContainer = document.getElementById('scene-container');
 
 //-=========================init=========================
-let tweens = [];
+const defaultTweenGroup = new Group();
 let tapeManager = null;
 
 function initLight(scene) {
@@ -75,7 +81,7 @@ function initLight(scene) {
     const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.02);
     scene.add(ambientLight);
 
-    const bulbLight = createBulbLight(0xffbb99, 20, 100, 1.5);
+    const bulbLight = createBulbLight(0xffbb99, 0, 100, 1.5);
     bulbLight.position.set(-1, 5, 2);
     scene.add(bulbLight);
 
@@ -87,6 +93,29 @@ function initLight(scene) {
     bulbLight3.position.set(0, 0, 9);
     scene.add(bulbLight3);
 
+
+    //5s 后 bulbLight 闪烁一下之后渐亮
+    setTimeout(() => {
+        const bulbTween = new Tween({ intensity: 0 }).to({ intensity: 20 }, 10)
+            .yoyo(true)
+            .delay(90)
+            .repeat(6)
+            .onUpdate((object) => {
+                bulbLight.intensity = object.intensity;
+                //debug
+                //console.log(`bulbLight intensity: ${bulbLight.intensity}`);
+            }).start();
+        defaultTweenGroup.add(bulbTween);
+    }, 3500);
+
+    setTimeout(() => {
+        const bulbTween = new Tween({ intensity: 0 }).to({ intensity: 20 }, 1000).easing(Easing.Quadratic.InOut).onUpdate((object) => {
+            bulbLight.intensity = object.intensity;
+            //debug
+            //console.log(`bulbLight intensity: ${bulbLight.intensity}`);
+        }).start();
+        defaultTweenGroup.add(bulbTween);
+    }, 4000);
 }
 
 
@@ -94,27 +123,45 @@ function initScene(scene) {
     // 创建书架背景
     const shelfGeometry = new THREE.BoxGeometry(81.92 / 2, 25.76 / 2, 30); // 书架的深度、宽度、高度
     const textureLoader = new THREE.TextureLoader();
-    const shelfTexture = textureLoader.load('src/television.jpg');
+    const shelfTexture = textureLoader.load('./src/television.jpg');
     const shelfMaterial = new THREE.MeshLambertMaterial({ map: shelfTexture });
     shelf = new THREE.Mesh(shelfGeometry, shelfMaterial);
     shelf.position.set(0, 1, -30); // 位置靠近相机后方
     scene.add(shelf);
     shelf.receiveShadow = true;
 
-    // 创建磁带盒
-    tapeManager = new TapeManager(scene);
-    for (let i = 0; i < 15; i++) {
-        const tape = new Tape(tapeManager);
-        tape.SetTapeGeometry(new THREE.BoxGeometry(0.5, 4.096, 2.544));
-        tape.SetTapeMaterial(Tape.defaultfrontTexture, Tape.defaultsideTexture, Tape.defaultbackTexture, Tape.defaultspineTexture);
-
-        // debug
-        console.log(`[${new Date().toLocaleTimeString()}] create tape ${i}`);
-        const tapeInstance = tape.GetTape();
-        tapeManager.RollTape(0);
-    }
+    initTapes(scene);
 }
 
+async function initTapes(scene) {
+    // 创建磁带管理器
+    tapeManager = new TapeManager(scene);
+
+    const configs =await loadConfigs();
+    if (configs.length === 0) {
+        console.error('No config files found');
+        return
+    }
+    let tapeCount = 0;
+    while (tapeCount < 15) {
+        configs.forEach(config => {
+            tapeCount++;
+            const tape = new Tape(tapeManager);
+            tape.SetTapeGeometry(new THREE.BoxGeometry(0.5, 4.096, 2.544));
+            tape.SetTapeMaterialFromUrl(config);
+            tape.name = config.title;
+            tape.description = config.description;
+
+            // debug
+            console.log(`[${new Date().toLocaleTimeString()}] create tape ${tapeCount} with title: ${config.title}`);
+            const tapeInstance = tape.GetTape();
+        });
+    }
+    tapeManager.RollTape(0);
+}
+
+
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 2, 0.5, 0.4);
 function initPostProcessing(scene, camera, renderer) {
     // 后期处理
     composer = new EffectComposer(renderer);
@@ -136,7 +183,6 @@ function initPostProcessing(scene, camera, renderer) {
     });
     //composer.addPass(dof2);
 
-    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 2, 0.5, 0.4);
 
 
 
@@ -155,7 +201,7 @@ function initPostProcessing(scene, camera, renderer) {
         composer.addPass(bloomPass);
         const effect3 = new OutputPass();
         composer.addPass(effect3);
-    }, 3500);
+    }, 3900);
 }
 
 
@@ -165,8 +211,10 @@ function showLogo() {
     isShowingLogo = true;
     // 将 scene-container 的 index 设置为 1，使得 logo 在最上层
     sceneContainer.style.zIndex = 99;
+    // 将 scene-mask  的 index 设置为 0，使得 logo 在最上层
+    document.getElementById('scene-mask').style.zIndex = -1;
 
-    const logoTexture = new THREE.TextureLoader().load('src/icon.png');
+    const logoTexture = new THREE.TextureLoader().load('./src/icon.png');
     const logoMaterial = new THREE.MeshBasicMaterial({ map: logoTexture });
     const logoGeometry = new THREE.PlaneGeometry(1, 1);
     const logo = new THREE.Mesh(logoGeometry, logoMaterial);
@@ -210,6 +258,7 @@ function showLogo() {
         camera.position.z = 10;
         isShowingLogo = false;
         sceneContainer.style.zIndex = -1;
+        document.getElementById('scene-mask').style.zIndex = 1;
     }, 3500);
 }
 
@@ -253,7 +302,7 @@ function animate() {
     requestAnimationFrame(animate);
 
     // 更新所有的动画
-    tweens.forEach(t => t.update());
+    defaultTweenGroup.update();
 
     //renderer.render(scene, camera);
     composer.render();
@@ -285,11 +334,21 @@ function onClick() {
 function nextTape() {
     console.log(`click next, currentIndex: ${tapeManager.currentIndex} of ${tapeManager.tapes.length}`);
     tapeManager.RollTape(1);
+    refreshTapeInfo();
 }
 
 function prevTape() {
     console.log(`click prev, currentIndex: ${tapeManager.currentIndex} of ${tapeManager.tapes.length}`);
     tapeManager.RollTape(-1);
+    refreshTapeInfo();
+}
+
+function refreshTapeInfo() {
+    const tapeInfo = tapeManager.GetCurrentTapeInfo();
+    //debug
+    console.log(`refresh tape info: ${tapeInfo.name}`);
+    document.getElementById('tape-title').innerHTML = tapeInfo.name;
+    document.getElementById('tape-description').innerHTML = tapeInfo.description;
 }
 
 // 按钮点击事件
@@ -348,7 +407,7 @@ document.querySelectorAll(".button-svg").forEach((btn) => {
     </g>
 </svg>`;
 
-{/* <svg fill="#000000" height="100%" width="100%" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+    {/* <svg fill="#000000" height="100%" width="100%" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
 	 viewBox="0 0 512 512" xml:space="preserve">
         <g fill="white">
             		<path d="M441.749,240.917L207.082,6.251C203.093,2.24,197.674,0,191.999,0H85.333c-8.619,0-16.427,5.184-19.712,13.163
@@ -389,8 +448,75 @@ document.querySelectorAll(".button-svg").forEach((btn) => {
     });
 });
 
+const closeBtn = document.getElementById('close-btn');
+closeBtn.addEventListener('click', (e) => {
+    console.log('click close button');
+    //播放logo动画
+    // 卸载scene
+    scene = new THREE.Scene();
+    document.getElementById('scene-container').removeChild(renderer.domElement);
 
+    init();
+
+    //3.5s后关闭窗口
+    setTimeout(() => {
+        window.close();
+    }, 3000);
+});
 
 //-==============================程序入口==============================
 init();
 
+// todo: 初始化的时候一定要获取到配置文件的路径，否则无法加载配置文件
+
+// 从 localStorage 中读取数据
+async function loadConfigs() {
+    let result = [];
+    const userDatePath = await ipcRenderer.invoke('get-user-data-path');
+    const configRootDir = path.join(userDatePath, 'config');
+    //debug
+    console.log(`configRootDir: ${configRootDir}`);
+
+    if (!fs.existsSync(configRootDir)) {
+        console.error('configRootDir not exist');
+        fs.mkdirSync(configRootDir);
+    }
+    const configDirs = fs.readdirSync(configRootDir).filter(file => fs.statSync(path.join(configRootDir, file)).isDirectory());
+
+    if (configDirs.length === 0) {
+        console.error('No config files found');
+        return result;
+    }
+    configDirs.forEach(dir => {
+        //检查description.txt是否存在，如果不存在则不显示
+        const title = dir;
+        const descriptionPath = path.join(configRootDir, dir, 'description.txt');
+        const tape_front = ['jpg', 'jpeg', 'png', 'gif'].map(ext => path.join(configRootDir, dir, `front.${ext}`)).find(fs.existsSync);
+        const tape_side = ['jpg', 'jpeg', 'png', 'gif'].map(ext => path.join(configRootDir, dir, `side.${ext}`)).find(fs.existsSync);
+        const tape_back = ['jpg', 'jpeg', 'png', 'gif'].map(ext => path.join(configRootDir, dir, `back.${ext}`)).find(fs.existsSync);
+        const tape_spine = ['jpg', 'jpeg', 'png', 'gif'].map(ext => path.join(configRootDir, dir, `spine.${ext}`)).find(fs.existsSync);
+
+        //debug
+        console.log(`title: ${title}, descriptionPath: ${descriptionPath}, tape_front: ${tape_front}, tape_side: ${tape_side}, tape_back: ${tape_back}, tape_spine: ${tape_spine}`);
+        
+        let description = '';
+        if (fs.existsSync(descriptionPath)) {
+            description = fs.readFileSync(descriptionPath, 'utf8');
+        }
+        else {
+            description = 'No description';
+        }
+
+        result.push({
+            title: title,
+            description: description,
+            tape_front: tape_front,
+            tape_side: tape_side,
+            tape_back: tape_back,
+            tape_spine: tape_spine
+        });
+    }
+    );
+
+    return result;
+}

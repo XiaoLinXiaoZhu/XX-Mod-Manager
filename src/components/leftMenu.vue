@@ -79,7 +79,7 @@ watch(() => props.tabs, (newTabs) => {
     cursor: pointer;
     transition: background-color 0.3s;
     text-align: center;
-    z-index: 10;
+    z-index: 1;
     height: 20px;
 }
 
