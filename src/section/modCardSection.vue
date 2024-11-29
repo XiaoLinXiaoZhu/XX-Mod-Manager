@@ -6,7 +6,7 @@
             </template>
             <template #down-button>
                 <s-tooltip style="margin-right: calc(100% - 40px);">
-                    <s-icon-button  slot="trigger">
+                    <s-icon-button  slot="trigger" @click="handlePresetManageButtonClicked">
                         <s-icon type="menu" ></s-icon>
                     </s-icon-button>
                     
@@ -14,7 +14,7 @@
                 </s-tooltip>
 
                 <s-tooltip>
-                    <s-icon-button slot="trigger">
+                    <s-icon-button slot="trigger" @click="handlePresetAddButtonClicked">
                         <s-icon type="add" ></s-icon>
                     </s-icon-button>
                     <p> add preset </p>
@@ -37,6 +37,9 @@
             <!-- <s-button @click="handleApplyButtonClicked" /> -->
              <s-button @click="handleApplyButtonClicked" id="apply-button" class="OO-color-gradient font-hongmeng">
                 Apply
+            </s-button>
+            <s-button @click="handleClick" id="apply-button" class="OO-color-gradient font-hongmeng">
+                Open Tape Page
             </s-button>
         </div>
     </div>
@@ -61,8 +64,9 @@ import leftMenu from '../components/leftMenu.vue';
 import modInfo from '../components/modInfo.vue';
 import { ref, watch,onMounted,useTemplateRef } from 'vue';
 import IManager from '../../electron/IManager';
-
+import fsProxy from '../../electron/fsProxy';
 const iManager = new IManager();
+const fs = new fsProxy();
 
 //-============================== 事件处理 ==============================
 function handleClick() {
@@ -81,6 +85,16 @@ function handleModCardClick(mod) {
     savePreset();
 }
 
+function handlePresetManageButtonClicked() {
+    console.log('preset manage button clicked');
+    fs.openDir(iManager.config.presetPath);
+}
+
+function handlePresetAddButtonClicked() {
+    console.log('preset add button clicked');
+    const addPresetDialog = document.getElementById('add-preset-dialog');
+    addPresetDialog.show();
+}
 
 //-============================== Compact Mode ==============================
 const compactMode = ref(false);

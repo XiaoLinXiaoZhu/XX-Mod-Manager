@@ -2,18 +2,19 @@ const { app, BrowserWindow } = require('electron')
 const path = require('node:path')
 const fs = require('fs')
 const { ipcMain } = require('electron')
-const window = require('electron').BrowserWindow
+
+
 let currentMainWindow = null;
 function setMainWindow(mainWindow) {
     currentMainWindow = mainWindow;
 }
 
 
-function snack (message,type = 'info') {
+function snack(message, type = 'info') {
     const mainWindow = currentMainWindow;
     //console.log(mainWindow);
     console.log(`snack:${message} type:${type}`);
-    mainWindow.webContents.send('snack', message,type);
+    mainWindow.webContents.send('snack', message, type);
 }
 // 这里为渲染进程提供 读取文件的功能。
 
@@ -30,7 +31,7 @@ ipcMain.handle('set-imanager', async (event, iManager) => {
     console.log('===============set-imanager success');
     console.log(iManager);
 });
-    
+
 
 
 
@@ -57,7 +58,7 @@ async function getCurrentConfig() {
         console.log(`file exists:${data}`);
         return JSON.parse(data);
     }
-    else{
+    else {
         fs.writeFileSync(filePath, JSON.stringify({}), 'utf-8');
         console.log(`file not exists:${filePath}`);
         return {};
@@ -82,7 +83,7 @@ ipcMain.handle('getFiles', async (event, dirPath) => {
     };
 });
 
-function tryGetModPreview(modPath,modConfigPreviewName){
+function tryGetModPreview(modPath, modConfigPreviewName) {
     //图片优先使用modInfo.preview，如果没有则尝试使用 mod文件夹下的preview.png或者preview.jpg或者preview.jpeg，如果没有则使用默认图片
     var modPreviewName = '';
     if (modConfigPreviewName && fs.existsSync(path.join(modPath, modConfigPreviewName))) {
@@ -106,7 +107,7 @@ function tryGetModPreview(modPath,modConfigPreviewName){
         setModInfoFiled(modPath, 'preview', modPreviewName);
         // 使用snack提示用户自动保存了图片
         // snack(`Original image is ${modPreviewName},but not found, find ${modPreviewPath} instead, auto saved to mod.json`);
-        
+
         return {
             previewPath: path.join(modPath, modPreviewName),
             previewName: modPreviewName,
@@ -140,11 +141,11 @@ function tryGetModPreview(modPath,modConfigPreviewName){
 
 }
 
-function creatMod(modPath){
+function creatMod(modPath) {
     const mod = {
         name: path.basename(modPath),
         character: 'Unknown',
-        preview : '',
+        preview: '',
         description: '',
         url: '',
         hotkeys: [],
@@ -162,7 +163,7 @@ function creatMod(modPath){
         mod.url = modConfig.url;
         mod.hotkeys = modConfig.hotkeys;
 
-        const modPreview = tryGetModPreview(modPath,modConfig.preview);
+        const modPreview = tryGetModPreview(modPath, modConfig.preview);
         mod.preview = modPreview.previewPath;
         mod.state = modPreview.state;
         mod.snack = modPreview.snack;
@@ -199,7 +200,7 @@ ipcMain.handle('get-image', async (event, imagePath) => {
 ipcMain.handle('get-mods-from-current-config', async (event) => {
     const currentConfig = await getCurrentConfig();
     const modSourcePath = currentConfig.modSourcePath;
-    
+
     return fs.existsSync(modSourcePath) ? getMods(modSourcePath) : [];
 });
 
@@ -220,7 +221,7 @@ function setModInfoFiled(modPath, field, value) {
         fs.writeFileSync(modConfigPath, JSON.stringify(modConfig), 'utf-8');
     }
 }
-ipcMain.handle('set-mod-info', async (modPath,field,value) => {
+ipcMain.handle('set-mod-info', async (modPath, field, value) => {
     setModInfoFiled(modPath, field, value);
 });
 
@@ -263,7 +264,7 @@ async function savePreset(presetPath, presetName, mods) {
         fs.mkdirSync(presetPath);
     }
     fs.writeFileSync(presetFilePath, JSON.stringify(mods));
-    snack(`Preset ${presetName} saved`); 
+    snack(`Preset ${presetName} saved`);
 }
 
 ipcMain.handle('get-preset-list', async (event) => {
@@ -311,7 +312,7 @@ ipcMain.handle('save-preset', async (event, presetName, mods) => {
 //         //fs.rmSync(path.join(modsDir, file), { recursive: true, force: true });
 //       }
 //     });
-  
+
 //     // 复制选中的mod
 //     mods.forEach(mod => {
 //       const src = path.join(modSourceDIr, mod);
@@ -370,12 +371,20 @@ ipcMain.handle('apply-mods', async (event, mods, modSourcePath, modTargetPath) =
 //         return await ipcRenderer.invoke('fs-write-file', path, data);
 //     }
 
+//     async createFile(path) {
+//         return await ipcRenderer.invoke('fs-create-file', path);
+//     }
+
 //     async readDir(path) {
 //         return await ipcRenderer.invoke('fs-read-dir', path);
 //     }
 
 //     async isDir(path) {
 //         return await ipcRenderer.invoke('fs-is-dir', path);
+//     }
+
+//     async openDir(path) {
+//         return await ipcRenderer.invoke('fs-open-dir', path);
 //     }
 // }
 
@@ -388,12 +397,24 @@ ipcMain.handle('fs-write-file', async (event, path, data) => {
     fs.writeFileSync(path, data, 'utf-8');
 }
 );
+ipcMain.handle('fs-create-file', async (event, path) => {
+    fs.writeFileSync(path, '', 'utf-8');
+}
+);
 ipcMain.handle('fs-read-dir', async (event, path) => {
     return fs.readdirSync(path);
 }
 );
 ipcMain.handle('fs-is-dir', async (event, path) => {
     return fs.statSync(path).isDirectory();
+}
+);
+// 打开文件夹路径
+ipcMain.handle('fs-open-dir', async (event, path) => {
+    //debug
+    console.log(`fs-open-dir:${path}`);
+    const { shell } = require('electron');
+    shell.openPath(path);
 }
 );
 

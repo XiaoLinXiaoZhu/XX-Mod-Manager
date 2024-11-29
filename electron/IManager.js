@@ -6,6 +6,14 @@
 // 这个类应该 被划分到 渲染进程底下，但是 主进程也应该能够访问到这个类
 const { ipcRenderer, ipcMain } = require('electron');
 const { app } = require('electron');
+// import fsProxy from './fsProxy';
+// const fs = new fsProxy();
+
+const path = require('path');
+
+// 导入fs
+const fs = require('fs').promises;
+
 // // thenBase 是一个语法糖，实现then方法的链式调用
 // class thenBase {
 //     constructor() {
@@ -23,34 +31,6 @@ const { app } = require('electron');
 //         });
 //     }
 // }
-
-// 因为 渲染进程 无法使用 fs 模块，所以这里需要通过 主进程 来获取数据
-// 但是那样很麻烦，这里 写一个 代理 的 fs 模块，通过 ipcRenderer 来获取数据
-class fsProxy {
-    static instance = null;
-    constructor() {
-        if (fsProxy.instance) {
-            return fsProxy.instance;
-        }
-        fsProxy.instance = this;
-    }
-
-    async readFile(path) {
-        return await ipcRenderer.invoke('fs-read-file', path);
-    }
-
-    async writeFile(path, data) {
-        return await ipcRenderer.invoke('fs-write-file', path, data);
-    }
-
-    async readDir(path) {
-        return await ipcRenderer.invoke('fs-read-dir', path);
-    }
-
-    async isDir(path) {
-        return await ipcRenderer.invoke('fs-is-dir', path);
-    }
-}
 
 
 class IManager {
@@ -183,7 +163,7 @@ class IManager {
 
     //-==================== 对外接口 ====================
     async openNewWindow(windowPath) {
-        await ipcRenderer.invoke('open-new-window', windowPath);
+        await ipcRenderer.send('open-new-window', windowPath);
     }
 
     async savePreset(presetName, data) {
@@ -197,7 +177,11 @@ class IManager {
         ipcRenderer.send('snack', '应用成功');
     }
 
-
+    async addPreset(presetName) {
+        // const newPresetPath = this.config.presetPath + '/' + presetName;
+        const newPresetPath = path.join(this.config.presetPath, presetName + '.json');
+        await fs.writeFile(newPresetPath, JSON.stringify({}));
+    }
 
     //-==================== 插件管理 ====================
     // 注册插件

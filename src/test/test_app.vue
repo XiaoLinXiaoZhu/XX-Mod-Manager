@@ -9,16 +9,19 @@
             <modCardSection v-if="currentSection === 'Mod'" />
         </div>
     </div>
+
+    <dialogAddPreset></dialogAddPreset>
 </template>
 
 <script setup>
+const fs = require('fs').promises;
 import { defineProps, defineEmits, ref, onMounted, computed ,watch} from 'vue';
 
 import modCardSection from '../section/modCardSection.vue';
 import backbutton from '../components/backButton.vue';
 import sectionSelector from '../components/sectionSelector.vue';
 import modCardManager from '../components/modCardManager.vue';
-
+import dialogAddPreset from '../dialogs/dialogAddPreset.vue';
 
 const sections = ref(['Mod', 'Help', 'Settings']);
 const currentSection = ref('Mod');
@@ -28,7 +31,6 @@ const handleSectionChange = (section) => {
     //debug
     console.log('handleSectionChange', section);
 };
-
 </script>
 
 
