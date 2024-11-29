@@ -2,7 +2,7 @@ const { app, BrowserWindow } = require('electron')
 const path = require('node:path')
 const fs = require('fs')
 const { ipcMain } = require('electron')
-
+const window = require('electron').BrowserWindow
 let currentMainWindow = null;
 function setMainWindow(mainWindow) {
     currentMainWindow = mainWindow;
@@ -16,6 +16,24 @@ function snack (message,type = 'info') {
     mainWindow.webContents.send('snack', message,type);
 }
 // 这里为渲染进程提供 读取文件的功能。
+
+// 核心数据
+// 接受 send 的消息，设置 iManager
+let iManager = null;
+// ipcRenderer.send('set-imanager', this.waitInit());
+ipcMain.handle('set-imanager', async (event, iManager) => {
+    //debug
+    console.log('===============set-imanager');
+    console.log(iManager);
+    await iManager.waitInit();
+    //debug
+    console.log('===============set-imanager success');
+    console.log(iManager);
+});
+    
+
+
+
 
 function readFile(filePath) {
     return new Promise((resolve, reject) => {
@@ -277,9 +295,107 @@ ipcMain.handle('save-preset', async (event, presetName, mods) => {
 });
 
 
+//-=========================== apply ===========================
+
+// ipcMain.handle('apply-mods', async (event, mods) => {
+//     // 删除 未选中的mod 且 存在在modSource文件夹中的mod
+//     fs.readdirSync(modRootDir).forEach(file => {
+//       if (!mods.includes(file) && fs.existsSync(path.join(modSourceDIr, file))) {
+//         // 删除文件夹,包括文件夹内的文件，使用异步方法
+//         fs.rm(path.join(modRootDir, file), { recursive: true, force: true }, (err) => {
+//           if (err) {
+//             //console.log(`failed to delete ${file}: ${err}`);
+//           }
+//         }
+//         );
+//         //fs.rmSync(path.join(modsDir, file), { recursive: true, force: true });
+//       }
+//     });
+  
+//     // 复制选中的mod
+//     mods.forEach(mod => {
+//       const src = path.join(modSourceDIr, mod);
+//       const dest = path.join(modRootDir, mod);
+//       if (!fs.existsSync(dest)) {
+//         fs.symlinkSync(src, dest, 'junction', (err) => {
+//           if (err) console.log(err);
+//         });
+//       }
+//     });
+//   });
+
+ipcMain.handle('apply-mods', async (event, mods, modSourcePath, modTargetPath) => {
+    fs.readdirSync(modTargetPath).forEach(file => {
+        if (!mods.includes(file) && fs.existsSync(path.join(modSourcePath, file))) {
+            // 删除文件夹,包括文件夹内的文件，使用异步方法
+            fs.rm(path.join(modTargetPath, file), { recursive: true, force: true }, (err) => {
+                if (err) {
+                    console.log(`failed to delete ${file}: ${err}`);
+                    snack(`failed to delete ${file}: ${err}`);
+                }
+            }
+            );
+        }
+    });
+
+    // 复制选中的mod
+    mods.forEach(mod => {
+        const src = path.join(modSourcePath, mod);
+        const dest = path.join(modTargetPath, mod);
+        if (!fs.existsSync(dest)) {
+            fs.symlinkSync(src, dest, 'junction', (err) => {
+                if (err) console.log(err);
+            });
+        }
+    });
+});
 
 
+//-========================== fsProxy ==========================
+// fsProxy 用于渲染进程调用主进程的文件系统功能
+// class fsProxy {
+//     static instance = null;
+//     constructor() {
+//         if (fsProxy.instance) {
+//             return fsProxy.instance;
+//         }
+//         fsProxy.instance = this;
+//     }
 
+//     async readFile(path) {
+//         return await ipcRenderer.invoke('fs-read-file', path);
+//     }
+
+//     async writeFile(path, data) {
+//         return await ipcRenderer.invoke('fs-write-file', path, data);
+//     }
+
+//     async readDir(path) {
+//         return await ipcRenderer.invoke('fs-read-dir', path);
+//     }
+
+//     async isDir(path) {
+//         return await ipcRenderer.invoke('fs-is-dir', path);
+//     }
+// }
+
+// 这里需要实现 fsProxy 的功能
+ipcMain.handle('fs-read-file', async (event, path) => {
+    return fs.readFileSync(path, 'utf-8');
+}
+);
+ipcMain.handle('fs-write-file', async (event, path, data) => {
+    fs.writeFileSync(path, data, 'utf-8');
+}
+);
+ipcMain.handle('fs-read-dir', async (event, path) => {
+    return fs.readdirSync(path);
+}
+);
+ipcMain.handle('fs-is-dir', async (event, path) => {
+    return fs.statSync(path).isDirectory();
+}
+);
 
 
 //-=============================导出=============================

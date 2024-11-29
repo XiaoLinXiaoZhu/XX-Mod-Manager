@@ -28,7 +28,6 @@
 <script setup>
 const { ipcRenderer } = require('electron');
 import 'sober'
-import { int, mod } from 'three/webgpu';
 import { useTemplateRef , computed, defineProps, onMounted, ref,watch } from 'vue'
 
 const props = defineProps({

@@ -13,7 +13,6 @@
 
 <script setup>
 import { defineProps, defineEmits, ref, onMounted, computed ,watch} from 'vue';
-const { ipcRenderer } = require('electron');
 
 import modCardSection from '../section/modCardSection.vue';
 import backbutton from '../components/backButton.vue';

@@ -34,8 +34,10 @@
             </s-tooltip>
         </div>
         <div class="bottom-right">
-            <!-- <s-button @click="handleAppButtonClicked" /> -->
-             <s-button @click="handleClick" />
+            <!-- <s-button @click="handleApplyButtonClicked" /> -->
+             <s-button @click="handleApplyButtonClicked" id="apply-button" class="OO-color-gradient font-hongmeng">
+                Apply
+            </s-button>
         </div>
     </div>
 
@@ -58,27 +60,25 @@ import sectionSelector from '../components/sectionSelector.vue';
 import leftMenu from '../components/leftMenu.vue';
 import modInfo from '../components/modInfo.vue';
 import { ref, watch,onMounted,useTemplateRef } from 'vue';
-const { ipcRenderer } = require('electron');
+import IManager from '../../electron/IManager';
+
+const iManager = new IManager();
 
 //-============================== 事件处理 ==============================
 function handleClick() {
     //打开新的页面
     console.log('click');
-    ipcRenderer.send('open-new-window', 'tapePage/');
+    iManager.openNewWindow('tapePage/');
 }
 
 
-
 const lastClickedMod = ref(null);
+
 function handleModCardClick(mod) {
     console.log('mod card clicked', mod);
     lastClickedMod.value = mod;
 
     savePreset();
-}
-
-function handleAppButtonClicked() {
-    console.log('app button clicked');
 }
 
 
@@ -208,18 +208,18 @@ function handleCompactButtonClicked() {
 const modCardManagerRef = useTemplateRef('modCardManagerRef');
 const presets = ref([]);
 const currentPreset = ref('default');
+
 function loadPresetList() {
-    return ipcRenderer.invoke('get-preset-list').then((list) => {
-        // list 的最前面 添加一个 default 的选项，它不会被保存，在每次加载时重置
-        list.unshift('default');
-        //debug
-        console.log('load presets', list);
-        presets.value = list;
-    });
+    console.log('-===== loadPresetList ======');
+    let list = iManager.data.presetList;
+    list.unshift('default');
+    presets.value = list;
 }
 
 function loadPreset(preset) {
-    return ipcRenderer.invoke('load-preset', preset).then((mods) => {
+    iManager.loadPreset(preset).then((mods) => {
+        //debug
+        console.log('loadPreset', mods);
         modCardManagerRef.value.loadPreset(mods);
     });
 }
@@ -234,21 +234,27 @@ function handleTabChange(tab) {
     }
 }
 
+const selectedMods = () => Array.from(document.querySelectorAll('.mod-item')).filter(item => item.getAttribute('clicked') == 'true').map(item => item.id);
+
 function savePreset() {
     if (currentPreset.value == 'default') return;
-    const selectedMods = Array.from(document.querySelectorAll('.mod-item')).filter(item => item.clicked).map(input => input.id);
-    // ipcRenderer.invoke('save-preset', currentPreset.value, selectedMods).then(() => {
-    //     console.log('preset saved');
-    //     //loadPresets();
-    // });
+    iManager.savePreset(currentPreset.value, selectedMods());
 }
 
-
-
-
+//-=========================== apply button ============================
+function handleApplyButtonClicked() {
+    //debug
+    const mods = Array.from(document.querySelectorAll('.mod-item'));
+    iManager.applyMods(selectedMods()).then(() => {
+        console.log('apply success');
+        
+    });
+}
 
 onMounted(() => {
-    loadPresetList();
+    iManager.waitInit().then(() => {
+        loadPresetList();
+    });
 });
 </script>
 
@@ -286,6 +292,11 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+#apply-button {
+    padding: 0 40px;
+    margin: 0 40px;
 }
 
 </style>

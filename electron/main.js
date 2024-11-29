@@ -1,5 +1,5 @@
 // main.js
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, ipcRenderer } = require('electron')
 const path = require('node:path')
 require('./fileSystem.js')
 const setMainWindow = require('./fileSystem.js').setMainWindow
@@ -80,7 +80,9 @@ ipcMain.on('open-new-window', (event, arg) => {
 })
 
 
-
+ipcMain.on('snack', (event, message, type = 'info') => {
+  currentMainWindow.webContents.send('snack', message, type)
+})
 
 
 

@@ -26,26 +26,25 @@ import 'sober';
 
 import { ref, onMounted,computed,useTemplateRef,watch } from 'vue';
 import modCard from './modCard.vue';
-const { ipcRenderer } = require('electron');
 import modFilterContainer from '../components/modFilterContainer.vue';
 import { Tween,Group } from '@tweenjs/tween.js';
+import IManager from '../../electron/IManager';
+
+const iManager = new IManager();
 
 // 接受参数
 const props = defineProps({
     compactMode: Boolean
 });
+
 // 定义 mods 变量
 const mods = ref([]);
 const characters = ref(['全部', '已选择']);
 const currentCharacter = ref('全部');
+
 // 定义 loadMods 方法
 const loadMods = async () => {
-    const currentConfig = await ipcRenderer.invoke('get-current-config');
-    //debug
-    console.log(currentConfig);
-    const modSourcePath = currentConfig.modSourcePath;
-    console.log(`modSourcePath: ${modSourcePath},type: ${typeof modSourcePath}`);
-    const loadMods = await ipcRenderer.invoke('get-mods', modSourcePath);
+    const loadMods = iManager.data.modList;
     console.log(loadMods);
     mods.value = loadMods;
 
@@ -160,15 +159,15 @@ const observeMods = () => {
 const refreshPlaceholderRef = useTemplateRef('refreshPlaceholderRef');
 
 // 在组件挂载时调用 observeMods 方法
-onMounted(() => {
-    loadMods().then(() => {
-        observeMods();
-        refreshPlaceholderRef.value.style.height = '0px';
+onMounted(async () => {
+    await iManager.waitInit();
+    await loadMods();
+    observeMods();
+    refreshPlaceholderRef.value.style.height = '0px';
 
-        //debug
-        console.log('mod-card-manager mounted');
-        console.log(modCardRefs.value);
-    });
+    //debug
+    console.log('mod-card-manager mounted');
+    console.log(modCardRefs.value);
 });
 
 

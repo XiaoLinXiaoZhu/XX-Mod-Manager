@@ -42,8 +42,9 @@ const emit = defineEmits(['tabChange']);
 const currentTab = ref(props.tabs[0]);
 
 const selectTab = (tab) => {
-    currentTab.value = tab;
+    if (tab === currentTab.value) return;
     emit('tabChange', tab);
+    currentTab.value = tab;
 };
 
 const sliderStyle = computed(() => {
