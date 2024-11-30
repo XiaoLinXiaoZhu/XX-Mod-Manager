@@ -391,7 +391,7 @@ p {
   padding: 5px 0;
 }
 
-.OO-setting-bar s-text-field {
+.OO-setting-bar .OO-s-text-field-container{
   position: absolute;
   --text-field-border-radius: 24px;
   --text-field-padding: 24px;
@@ -401,12 +401,52 @@ p {
 
   box-shadow: inset 2px 2px 10px var(--s-color-surface-container-high);
   --border-color: var(--s-color-outline-variant);
-  --border-width: 2px;
   right: 5px;
   height: calc(100% - 10px);
   min-height: 0px;
   min-width: 155px;
   width: calc(30% + 5px);
+  max-width: 305px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.OO-setting-bar s-text-field {
+  position: absolute;
+  --text-field-border-radius: 24px;
+  --text-field-padding: 24px;
+  border-radius: 24px;
+  background-color: var(--s-color-background);
+
+  box-shadow: inset 2px 2px 10px var(--s-color-surface-container-high);
+  --text-field-border-color: var(--s-color-outline-variant);
+  right: 5px;
+  height: calc(100% - 10px);
+  min-height: 0px;
+  min-width: 155px;
+  width: calc(30% + 5px);
+  max-width: 305px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.OO-setting-bar .OO-s-text-field-container>s-text-field {
+  position: absolute;
+  --text-field-border-radius: 29px;
+  --text-field-padding: 15px;
+  --border-radius: 29px;
+  border-radius: 29px;
+  background-color: var(--s-color-background);
+
+  box-shadow: inset 2px 2px 10px var(--s-color-surface-container-high);
+  --border-color: var(--s-color-outline-variant);
+  height: calc(100%);
+  right: 0;
+  min-height: 0px;
+  min-width: 155px;
+  width: calc(100% - 40px);
   max-width: 305px;
 
   display: flex;
@@ -512,4 +552,17 @@ p {
   /* background-attachment: fixed; */
   /* 让背景图基于容器大小伸缩 */
   background-size: cover;
+}
+
+
+.OO-icon-button {
+  align-items: center;
+  align-content: center;
+  margin: 10px 0;
+  position: relative;
+  background-color: var(--s-color-surface-container-low);
+  color: var(--s-color-on-surface);
+  border-radius: 28px;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2);
+  transform: scale(0.83);
 }

@@ -1,0 +1,20 @@
+{
+  "message": {
+    "hello": "Hello, World"
+  },
+  "element": {
+    "filter": {
+      "all": "All",
+      "selected": "Selected"
+    }
+  },
+  "setting": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System",
+    "reset": "Reset"
+  }
+}

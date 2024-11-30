@@ -1,0 +1,32 @@
+{
+  "message": {
+    "hello": "你好，世界"
+  },
+  "element": {
+    "section": {
+      "mod": "模组",
+      "help": "帮助",
+      "settings": "设置"
+    },
+    "filter": {
+      "all": "全部",
+      "selected": "已选择"
+    }
+  },
+  "setting": {
+    "title": "设置",
+    "language": "语言",
+    "theme": "主题",
+    "dark": "深色",
+    "light": "浅色",
+    "system": "系统",
+    "reset": "重置"
+  },
+  "modInfo": {
+    "emptyTitle": "点击mod卡片以查看详细信息",
+    "emptyCharacter": "无角色",
+    "emptyDescription": "无描述",
+    "hotkeys": "快捷键",
+    "description": "描述"
+  }
+}

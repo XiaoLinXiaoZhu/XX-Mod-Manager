@@ -6,6 +6,7 @@
 // 这个类应该 被划分到 渲染进程底下，但是 主进程也应该能够访问到这个类
 const { ipcRenderer, ipcMain } = require('electron');
 const { app } = require('electron');
+
 // import fsProxy from './fsProxy';
 // const fs = new fsProxy();
 
@@ -70,7 +71,7 @@ class IManager {
     // };
 
     config = {
-        language: 'zh-cn', // 语言
+        language: 'zh_cn', // 语言
         theme: 'dark', // 主题
         modSourcePath: null, // mod的源路径
         modTargetPath: null, // mod的目标路径
@@ -115,7 +116,7 @@ class IManager {
     async loadMods() {
         const modSourcePath = this.config.modSourcePath;
         const loadMods = await ipcRenderer.invoke('get-mods', modSourcePath);
-        
+
         // 加载 character
         this.data.characterList = new Set(loadMods.map((mod) => mod.character));
         this.data.modList = loadMods;
@@ -141,12 +142,17 @@ class IManager {
         return data;
     }
 
+
+    async changeLanguage(lang) {
+        // 检查 
+    }
+
     //-==================== 生命周期 ====================
     // 初始化
     async init() {
         // 将 imanage 的 实例 传递给 主进程
-        
-        
+
+
         //debug
         console.log('init IManager');
         // 加载配置
@@ -156,7 +162,9 @@ class IManager {
         // 加载预设
         await this.loadPresets();
 
-        
+        // 切换语言
+        await this.changeLanguage(this.config.language);
+
         //debug
         console.log('init IManager done');
         this.inited = true;
@@ -190,9 +198,51 @@ class IManager {
         await fs.writeFile(newPresetPath, JSON.stringify({}));
     }
 
-    async saveConfig(){
+    async saveConfig() {
         await ipcRenderer.invoke('set-current-config', this.config);
     }
+
+    async getFilePath(fileName, fileType) {
+        const filePath = await ipcRenderer.invoke('get-file-path', fileName, fileType);
+        //debug
+        console.log('=================================');
+        console.log(filePath);
+        if (filePath) {
+            return filePath;
+        }
+        else {
+            snack('文件不存在');
+            return '';
+        }
+    }
+
+    async setConfig(key, value) {
+        this.config[key] = value;
+    }
+
+    async setConfigFromDialog(key, fileType) {
+        const filePath = await this.getFilePath(key, fileType);
+        if (!this.config[key]) {
+            snack('未知属性，请检查');
+            return '';
+        }
+        if (filePath && filePath.length > 0) {
+            this.config[key] = filePath;
+            this.saveConfig();
+            return filePath;
+        }
+        else {
+            snack('未选择文件');
+            return '';
+        }
+    }
+
+    async setLanguage(language) {
+        this.config.language = language;
+        this.saveConfig();
+    }
+
+
     //-==================== 插件管理 ====================
     // 注册插件
     registerPlugin(plugin) {

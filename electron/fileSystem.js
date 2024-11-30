@@ -1,7 +1,6 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron');
 const path = require('node:path')
 const fs = require('fs')
-const { ipcMain } = require('electron')
 
 
 let currentMainWindow = null;
@@ -298,6 +297,43 @@ ipcMain.handle('save-preset', async (event, presetName, mods) => {
     const presetPath = modConfig.presetPath;
     savePreset(presetPath, presetName, mods);
 });
+
+ipcMain.handle('get-file-path', async (event, fileName, fileType) => {
+    //通过文件选择对话框选择文件
+    let result;
+    if (fileType == 'directory') {
+      result = await dialog.showOpenDialog({
+        title: 'Select ' + fileName,
+        properties: ['openDirectory']
+      });
+    }
+    else if (fileType == 'image') {
+      result = await dialog.showOpenDialog({
+        title: 'Select ' + fileName,
+        properties: ['openFile'],
+        filters: [
+          { name: fileName, extensions: ['jpg', 'png', 'jpeg', 'gif', 'bmp', 'webp', 'svg', 'ico', 'tiff'] }
+        ]
+      });
+    }
+    else {
+      result = await dialog.showOpenDialog({
+        title: 'Select ' + fileName,
+        properties: ['openFile'],
+        filters: [
+          { name: fileName, extensions: [fileType] }
+        ]
+      });
+    }
+  
+    if (!result.canceled) {
+        //debug
+        console.log(`get-file-path:${result.filePaths[0]}`);
+      return result.filePaths[0];
+    }
+    return '';
+  }
+  );
 
 
 //-=========================== apply ===========================

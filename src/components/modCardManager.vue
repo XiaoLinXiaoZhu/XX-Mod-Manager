@@ -39,14 +39,14 @@ const props = defineProps({
 
 // 定义 mods 变量
 const mods = ref(iManager.data.modList);
-const characters = ref(['全部', '已选择']);
-const currentCharacter = ref('全部');
+const characters = ref(['all', 'selected']);
+const currentCharacter = ref('all');
 
 // 定义 loadMods 方法
 const loadMods = async () => {
     const loadMods = iManager.data.modList;
     mods.value = loadMods;
-    characters.value = ['全部', '已选择', ...iManager.data.characterList];
+    characters.value = ['all', 'selected', ...iManager.data.characterList];
 
     //debug
     console.log(mods.value);
@@ -76,12 +76,12 @@ const handleFilterChange = (character) => {
     console.log(currentCharacter.value);
 
     // 通过设置 card 的 display 属性来实现筛选
-    if (character === '全部') {
+    if (character === 'all') {
         mods.value.forEach((mod) => {
             const modItem = document.getElementById(mod.name);
             modItem.style.display = 'block';
         });
-    } else if (character === '已选择') {
+    } else if (character === 'selected') {
         mods.value.forEach((mod) => {
             const modItem = document.getElementById(mod.name);
             if (modItem.getAttribute('clicked') === 'true') {

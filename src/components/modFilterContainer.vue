@@ -1,14 +1,13 @@
 <template>
     <div class="filter-container" @wheel="onWheel" @mousedown="onMouseDown" @mouseup="onMouseUp" @mousemove="onMouseMove" ref="containerRef">
-      <chip-button
+      <chipButton
         v-for="(item, index) in computedFilterItems"
         :key="item.text"
-        :text="item.text"
+        :text="item.transLatedText"
         :checked="item.checked"
         @click="selectItem(item, index)"
       >
-        {{ item }}
-      </chip-button>
+      </chipButton>
       <div class="slider OO-color-gradient" :style="sliderStyle"></div>
     </div>
   </template>
@@ -16,18 +15,21 @@
   <script setup>
   import { useTemplateRef,ref, reactive, onMounted, watch, computed } from 'vue';
   import chipButton from './chipButton.vue';
-  
-  
+  import { useI18n } from 'vue-i18n'
+  const { t } = useI18n()
+
   const props = defineProps({
       filterItems: Array,
       currentCharacter: String
   });
 
-  const currentCharacter = ref('全部');
+  const currentCharacter = ref('all');
   const computedFilterItems = computed(() => {
     return getFilterItems().map((item) => {
+      const transLatedText = (item === 'all' || item === 'selected') ? t(`element.filter.${item}`) : item;
       return {
         text: item,
+        transLatedText: transLatedText,
         checked: item === currentCharacter.value
       };
     });

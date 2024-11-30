@@ -6,20 +6,23 @@
         <div class="setting-content OO-box">
             <!-- -=========== 常规设置 =========== -->
             <div v-if="currentTab === '常规设置'">
+                <h3>
+                    下面的功能暂未实现
+                </h3>
                 <div class="OO-setting-bar" id="setting-get-language">
                     <h3 data-translate-key="language"> 语言 </h3>
                     <div id="language-picker">
-                        <input type="radio" name="language" id="zh-cn" checked value="zh-cn" v-model="language">
-                        <label for="zh-cn"> 
-                            <s-chip selectable="true" type="default" id="zh-cn">
-                                <p data-translate-key="zh-cn">简体中文</p>
-                            </s-chip> 
+                        <input type="radio" name="language" id="zh_cn" checked value="zh_cn" v-model="language">
+                        <label for="zh_cn">
+                            <s-chip selectable="true" type="default" id="zh_cn">
+                                <p data-translate-key="zh_cn">简体中文</p>
+                            </s-chip>
                         </label>
                         <input type="radio" name="language" id="en" value="en" v-model="language">
-                        <label for="en"> 
+                        <label for="en">
                             <s-chip selectable="true" type="default" id="en">
                                 <p data-translate-key="en">English</p>
-                            </s-chip> 
+                            </s-chip>
                         </label>
                     </div>
                 </div>
@@ -70,7 +73,7 @@
             <!-- -高级设置 -->
             <!-- -在这里可以设定 modRootDir，modSourceDir，modLoaderDir，gameDir -->
             <div v-if="currentTab === '高级设置'">
-                <div class="OO-setting-bar">
+                <!-- <div class="OO-setting-bar">
                     <h3 data-translate-key="modRootDir"> mod根目录 </h3>
                     <s-text-field>
                         <input type="text" id="set-modRootDir-input">
@@ -86,8 +89,44 @@
                     </s-text-field>
                 </div>
                 <p data-translate-key="modSourceDir-info"> mod背包目录为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod根目录 </p>
+                <s-divider></s-divider> -->
+
+                <div class="OO-setting-bar">
+                    <h3 data-translate-key="modTargetPath"> mod目标目录 </h3>
+                    <div class="OO-s-text-field-container">
+                        <s-text-field :value="modTargetPath" @input="modTargetPath = $event.target.value">
+                        </s-text-field>
+                        <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                            @click="iManager.setConfigFromDialog('modTargetPath', 'directory').then((res) => { modTargetPath = res })">
+                            <s-icon type="add"></s-icon>
+                        </s-icon-button>
+                    </div>
+
+                </div>
+                <p data-translate-key="modTargetPath-info"> mod目标目录为modLoader读取mod的位置，一般为Mods文件夹<br>当前目录为: {{
+                    modTargetPath }}</p>
+
                 <s-divider></s-divider>
 
+                <div class="OO-setting-bar">
+                    <h3 data-translate-key="modSourcePath"> mod来源目录 </h3>
+                    <div class="OO-s-text-field-container">
+                        <s-text-field :value="modSourcePath" @input="modSourcePath = $event.target.value">
+                        </s-text-field>
+                        <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                            @click="iManager.setConfigFromDialog('modSourcePath', 'directory').then((res) => { modSourcePath = res })">
+                            <s-icon type="add"></s-icon>
+                        </s-icon-button>
+                    </div>
+                </div>
+                <p data-translate-key="modSourcePath-info"> mod来源目录为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod目标目录 <br>当前目录为: {{
+                    modSourcePath }}</p>
+
+
+
+                <h3>
+                    下面的功能暂未实现
+                </h3>
                 <div class="OO-setting-bar">
                     <h3 data-translate-key="modLoaderDir"> mod加载器目录 </h3>
                     <s-text-field>
@@ -96,6 +135,7 @@
                 </div>
                 <p data-translate-key="modLoaderDir-info"> Mod加载器目录为modLoader程序的位置，用于在管理器中打开modLoader </p>
                 <s-divider></s-divider>
+
 
                 <div class="OO-setting-bar">
                     <h3 data-translate-key="gameDir"> 游戏目录 </h3>
@@ -123,6 +163,9 @@
             <!-- -切换配置 -->
             <!-- -在这里你可以选择开启在开始的时候选择配置文件的功能，并且设置配置文件保存位置 -->
             <div v-if="currentTab === '切换配置'">
+                <h3>
+                    下面的功能暂未实现
+                </h3>
                 <div class="OO-setting-bar">
                     <h3 data-translate-key="if-ask-switch-config"> 是否询问切换配置 </h3>
                     <s-switch id="if-ask-switch-config-switch"></s-switch>
@@ -204,9 +247,14 @@
 <script setup>
 import leftMenu from '../components/leftMenu.vue';
 import chipButton from '../components/chipButton.vue';
-import { onMounted, ref, watch} from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import IManager from '../../electron/IManager';
 const iManager = new IManager();
+
+
+import {useI18n} from 'vue-i18n'
+import { Switch } from 'sober';
+const { t, locale } = useI18n()
 
 const tabs = ref(['常规设置', '高级设置', '切换配置', '关于']);
 
@@ -218,15 +266,28 @@ const handleTabChange = (tab) => {
     console.log('handleTabChange', tab);
 };
 
-const language = ref('zh-cn');
+const language = ref('zh_cn');
 const theme = ref('auto');
+const modTargetPath = ref('');
+const modSourcePath = ref('');
 
 watch(language, (newVal) => {
     iManager.config.language = newVal;
+    //变量命名不能包含-，所以这里需要转换
+    console.log('language change', newVal);
+    locale.value = newVal;
     iManager.saveConfig();
 });
 watch(theme, (newVal) => {
     iManager.config.theme = newVal;
+    iManager.saveConfig();
+});
+watch(modTargetPath, (newVal) => {
+    iManager.config.modTargetPath = newVal;
+    iManager.saveConfig();
+});
+watch(modSourcePath, (newVal) => {
+    iManager.config.modSourcePath = newVal;
     iManager.saveConfig();
 });
 
@@ -238,6 +299,8 @@ onMounted(async () => {
     language.value = iManager.config.language;
     //初始化主题
     theme.value = iManager.config.theme;
+    //初始化modTargetPath
+    modTargetPath.value = iManager.config.modTargetPath;
     //初始化tab
     currentTab.value = tabs.value[0];
 });
@@ -262,5 +325,9 @@ onMounted(async () => {
     width: calc(100% - 200px);
     flex: 1;
     margin: 0 10px;
+}
+
+.setting-content>div {
+    overflow-y: auto;
 }
 </style>

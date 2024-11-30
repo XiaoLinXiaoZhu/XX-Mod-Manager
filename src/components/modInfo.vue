@@ -1,14 +1,14 @@
 <template>
-    <div class="mod-info-card OO-box" ref="modInfoRef">
+    <div class="mod-info-card OO-box font-hongmeng" ref="modInfoRef">
 
-        <div class="mod-title">{{ modInfo ? modInfo.name : 'Click mod card to see detail' }}</div>
+        <div class="mod-title">{{ modInfo ? modInfo.name : $t('modInfo.emptyTitle') }}</div>
         <div class="mod-character OO-color-gradient">
-            <p> {{ modInfo ? modInfo.character : 'no character' }} </p>
+            <p> {{ modInfo ? modInfo.character : $t('modInfo.emptyCharacter') }}</p>
         </div>
         <div class="mod-image"></div>
         
         <s-scroll-view>
-            <h4>Hotkeys</h4>
+            <h4> {{ $t('modInfo.hotkeys') }}</h4>
         <div id="hotkey-container" class="OO-colunm-center">
             <div
                 v-for="hotkey in modInfo ? modInfo.hotkeys : []"
@@ -18,12 +18,12 @@
             </div>
         </div>
 
-        <h4>Description</h4>
+        <h4> {{ $t('modInfo.description') }}</h4>
 
           <div class="OO-box OO-shade-box" id="mod-info-description">
 
               <p id="mod-description" style="white-space: normal;">
-                {{ modInfo ? modInfo.description : 'no description' }}
+                {{ modInfo ? modInfo.description : $t('modInfo.emptyDescription') }}
                 </p>
          </div>
          <div class="placeholder"></div>

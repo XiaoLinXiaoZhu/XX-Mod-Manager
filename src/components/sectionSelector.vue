@@ -9,7 +9,7 @@
                 :class="{ active: sec === currentSection }" 
                 @click="selectSection(sec)"
             >
-                <p> {{ sec }}</p>
+                <p> {{ $t('element.section.' + sec) }} </p>
             </div>
     
         </div>

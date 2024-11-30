@@ -1,13 +1,13 @@
 <template>
     <div class="main-container">
         <div class="head">
-            <backbutton></backbutton>
+            <backbutton @click="closeApp" />
             <sectionSelector :sections="sections" @update:currentSection="handleSectionChange"></sectionSelector>
         </div>
 
         <div class="section-container">
-            <modCardSection v-if="currentSection === 'Mod'" />
-            <settingSection v-if="currentSection === 'Settings'" />
+            <modCardSection v-if="currentSection === 'mod'" />
+            <settingSection v-if="currentSection === 'settings'" />
         </div>
     </div>
 
@@ -25,13 +25,18 @@ import modCardManager from '../components/modCardManager.vue';
 import dialogAddPreset from '../dialogs/dialogAddPreset.vue';
 import settingSection from '../section/settingSection.vue';
 
-const sections = ref(['Mod', 'Help', 'Settings']);
-const currentSection = ref('Mod');
+const sections = ref(['mod', 'help', 'settings']);
+const currentSection = ref('mod');
 
 const handleSectionChange = (section) => {
     currentSection.value = section;
     //debug
     console.log('handleSectionChange', section);
+};
+
+const closeApp = () => {
+    //关闭当前窗口
+    window.close();
 };
 </script>
 

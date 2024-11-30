@@ -7,11 +7,42 @@ import 'sober'
 import 'sober/style/scroll-view.css'
 import { Snackbar } from 'sober'
 const { ipcRenderer} = require('electron');
+import IManager from '../electron/IManager'
+const iManager = new IManager();
 
 //-====================入口文件====================-//
-createApp(test_app).mount('#app')
+const vue_app = createApp(test_app);
 
+//-====================国际化====================-//
+import { createI18n } from 'vue-i18n';
 
+// 导入语言包
+import en from './locales/en.json';
+import zh_cn from './locales/zh-cn.json';
+
+// 创建i18n实例
+const i18n = createI18n({
+  locale: 'en', // 设置默认语言
+  fallbackLocale: 'zh_cn', // 设置回退语言
+  legacy: false,
+  messages: {
+    en,
+    zh_cn,
+  },
+});
+
+// 使用i18n插件
+vue_app.use(i18n);
+
+//-==================== 挂载 ====================-//
+
+vue_app.mount('#app');
+iManager.waitInit().then((iManager) => {
+    // 将语言设置为 imanager 中的语言
+    vue_app.config.globalProperties.$i18n.locale = iManager.config.language;
+    //debug
+    console.log('set language:', iManager.config.language);
+})
 
 
 //-=====================事件监听====================-//
@@ -35,13 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const nodeVersion = process.versions.node;
     console.log(nodeVersion);
 })
-
-
-
-
-
-
-
 
 
 
