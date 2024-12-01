@@ -1,0 +1,27 @@
+{
+    "productName": "xx-mod-manager",
+    "appId": "com.xlxz.xx-mod-manager",
+    "win": {
+        "icon": "src/assets/icon.ico",
+        "target": [
+            {
+                "target": "nsis",
+                "arch": [
+                    "x64"
+                ]
+            }
+        ]
+    },
+    "nsis": {
+        "oneClick": false,
+        "perMachine": true,
+        "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+        "dist",
+        "dist-electron"
+    ],
+    "directories": {
+        "output": "build"
+    }
+}
