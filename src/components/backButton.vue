@@ -1,12 +1,13 @@
 <template>
     <button @click="handleClick">
-        <div id="backButtonImage"></div>
+        <div id="backButtonImage" :style="{ backgroundImage: `url(${backButtonImage})` }"></div>
         <div class="flash OO-color-gradient" :isFlashing="isFlashing"></div>
     </button>
 </template>
 
 <script setup>
 import { defineProps, defineEmits, ref, computed } from 'vue';
+import backButtonImage from '../assets/backButton.png';
 const emit = defineEmits(['backButtonClicked']);
 
 const isFlashing = ref(false);
@@ -70,7 +71,6 @@ button {
     position: relative;
     width: 100%;
     height: 100%;
-    background-image: url(./src/assets/backButton.png);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;

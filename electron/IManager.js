@@ -44,6 +44,7 @@ class IManager {
         IManager.instance = this;
         this.data = {};
         this.plugins = {};
+        this.eventList = {};
 
         // 初始化
         this.init();
@@ -270,6 +271,26 @@ class IManager {
             this.plugins[key].trigger(eventName, data);
         }
     }
+
+    //-==================== 事件管理 ====================
+    // 注册事件
+    on(eventName, callback) {
+        if (!this.eventList[eventName]) {
+            this.eventList[eventName] = [];
+        }
+        this.eventList[eventName].push(callback);
+    }
+
+    // 触发事件
+    trigger(eventName, data) {
+        if (this.eventList[eventName]) {
+            this.eventList[eventName].forEach((callback) => {
+                callback(data);
+            });
+        }
+    }
+
+
 }
 
 export default IManager;

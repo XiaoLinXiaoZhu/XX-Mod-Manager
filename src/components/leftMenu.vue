@@ -13,7 +13,7 @@
                     :class="['tab', { active: currentTab === tab }]" 
                     @click="selectTab(tab)"
                 >
-                    <p> {{ tab }}</p>
+                    <p> {{ translatedTabs[index] || tab }} </p>
                     <s-ripple attached="true"></s-ripple>
                 </div>
         </div>
@@ -34,6 +34,11 @@ const props = defineProps({
     tabs: {
         type: Array,
         required: true
+    },
+    translatedTabs: {
+        type: Array,
+        required: false,
+        default: () => []
     }
 });
 

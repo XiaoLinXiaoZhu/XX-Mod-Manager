@@ -38,9 +38,9 @@
              <s-button @click="handleApplyButtonClicked" id="apply-button" class="OO-color-gradient font-hongmeng">
                 Apply
             </s-button>
-            <s-button @click="handleClick" id="apply-button" class="OO-color-gradient font-hongmeng">
+            <!-- <s-button @click="handleClick" id="apply-button" class="OO-color-gradient font-hongmeng">
                 Open Tape Page
-            </s-button>
+            </s-button> -->
         </div>
     </div>
 

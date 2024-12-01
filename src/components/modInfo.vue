@@ -122,13 +122,14 @@ h4{
 }
 
 s-scroll-view{
-    height: calc(100% - 195px);
+    height: calc(100% - 240px);
     overflow-y: auto;
     overflow-x: hidden;
 }
 
 
 .mod-info-card {
+    position: relative;
     width: 250px;
     margin-right: 10px;
     height: calc(100% - 20px);
@@ -199,12 +200,14 @@ s-scroll-view{
 }
 
 .buttons {
+    position: absolute;
     display: flex;
     justify-content: space-between;
     margin-top: 16px;
-    position: absolute;
+    
     bottom: 0;
-    width: calc(100% - 20px);   
+    left: 5px;
+    right: 5px;  
     margin-bottom: 10px;
     background-color: black;
 }

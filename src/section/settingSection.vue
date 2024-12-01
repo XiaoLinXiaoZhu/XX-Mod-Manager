@@ -1,16 +1,14 @@
 <template>
     <div class="setting-container">
-        <leftMenu :tabs="tabs" @tabChange="handleTabChange">
+        <leftMenu :tabs="tabs" :translatedTabs="translatedTabs" @tabChange="handleTabChange">
         </leftMenu>
 
         <div class="setting-content OO-box">
             <!-- -=========== 常规设置 =========== -->
-            <div v-if="currentTab === '常规设置'">
-                <h3>
-                    下面的功能暂未实现
-                </h3>
+            <div v-if="currentTab === 'normal'">
+
                 <div class="OO-setting-bar" id="setting-get-language">
-                    <h3 data-translate-key="language"> 语言 </h3>
+                    <h3 data-translate-key="language"> {{ $t('setting.language') }} </h3>
                     <div id="language-picker">
                         <input type="radio" name="language" id="zh_cn" checked value="zh_cn" v-model="language">
                         <label for="zh_cn">
@@ -28,23 +26,26 @@
                 </div>
                 <s-divider></s-divider>
                 <div class="OO-setting-bar" id="setting-get-theme">
-                    <h3 data-translate-key="theme"> 主题 {{ theme }}</h3>
+                    <h3 data-translate-key="theme"> {{ $t('setting.theme') + ": " + theme }} </h3>
                     <div id="theme-picker">
                         <input type="radio" name="theme" id="auto" checked value="auto" v-model="theme">
                         <label for="auto"> <s-chip selectable="true" type="default" id="auto">
-                                <p data-translate-key="auto">自动</p>
+                                <p data-translate-key="auto"> {{ $t('setting.auto') }} </p>
                             </s-chip> </label>
                         <input type="radio" name="theme" id="dark" value="dark" v-model="theme">
                         <label for="dark"> <s-chip selectable="true" type="default" id="dark">
-                                <p data-translate-key="dark">暗色</p>
+                                <p data-translate-key="dark"> {{ $t('setting.dark') }} </p>
                             </s-chip> </label>
                         <input type="radio" name="theme" id="light" value="light" v-model="theme">
                         <label for="light"> <s-chip selectable="true" type="default" id="light">
-                                <p data-translate-key="light">亮色</p>
+                                <p data-translate-key="light"> {{ $t('setting.light') }} </p>
                             </s-chip> </label>
                     </div>
                 </div>
                 <s-divider></s-divider>
+                <h3>
+                    {{ $t('setting.unavailable') }}
+                </h3>
                 <div id="auto-apply" class="OO-setting-bar">
                     <h3 data-translate-key="auto-apply"> 自动应用 </h3>
                     <s-switch id="auto-apply-switch"></s-switch>
@@ -72,27 +73,9 @@
             </div>
             <!-- -高级设置 -->
             <!-- -在这里可以设定 modRootDir，modSourceDir，modLoaderDir，gameDir -->
-            <div v-if="currentTab === '高级设置'">
-                <!-- <div class="OO-setting-bar">
-                    <h3 data-translate-key="modRootDir"> mod根目录 </h3>
-                    <s-text-field>
-                        <input type="text" id="set-modRootDir-input">
-                    </s-text-field>
-                </div>
-                <p data-translate-key="modRootDir-info"> Mod根目录为modLoader读取mod的位置，一般为Mods文件夹 </p>
-                <s-divider></s-divider>
-
+            <div v-if="currentTab === 'advanced'">
                 <div class="OO-setting-bar">
-                    <h3 data-translate-key="modSourceDir"> mod背包目录 </h3>
-                    <s-text-field>
-                        <input type="text" id="set-modSourceDir-input">
-                    </s-text-field>
-                </div>
-                <p data-translate-key="modSourceDir-info"> mod背包目录为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod根目录 </p>
-                <s-divider></s-divider> -->
-
-                <div class="OO-setting-bar">
-                    <h3 data-translate-key="modTargetPath"> mod目标目录 </h3>
+                    <h3 data-translate-key="modTargetPath"> {{ $t('setting.modTargetPath') }} </h3>
                     <div class="OO-s-text-field-container">
                         <s-text-field :value="modTargetPath" @input="modTargetPath = $event.target.value">
                         </s-text-field>
@@ -103,13 +86,13 @@
                     </div>
 
                 </div>
-                <p data-translate-key="modTargetPath-info"> mod目标目录为modLoader读取mod的位置，一般为Mods文件夹<br>当前目录为: {{
+                <p> {{ $t('setting.modTargetPath-info') }} <br>当前目录为: {{
                     modTargetPath }}</p>
 
                 <s-divider></s-divider>
 
                 <div class="OO-setting-bar">
-                    <h3 data-translate-key="modSourcePath"> mod来源目录 </h3>
+                    <h3 data-translate-key="modSourcePath"> {{ $t('setting.modSourcePath') }} </h3>
                     <div class="OO-s-text-field-container">
                         <s-text-field :value="modSourcePath" @input="modSourcePath = $event.target.value">
                         </s-text-field>
@@ -119,13 +102,14 @@
                         </s-icon-button>
                     </div>
                 </div>
-                <p data-translate-key="modSourcePath-info"> mod来源目录为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod目标目录 <br>当前目录为: {{
+                <p data-translate-key="modSourcePath-info">  {{ $t('setting.modSourcePath-info') }}
+                    <br>当前目录为: {{
                     modSourcePath }}</p>
 
 
 
                 <h3>
-                    下面的功能暂未实现
+                    {{ $t('setting.unavailable') }}
                 </h3>
                 <div class="OO-setting-bar">
                     <h3 data-translate-key="modLoaderDir"> mod加载器目录 </h3>
@@ -162,9 +146,9 @@
             </div>
             <!-- -切换配置 -->
             <!-- -在这里你可以选择开启在开始的时候选择配置文件的功能，并且设置配置文件保存位置 -->
-            <div v-if="currentTab === '切换配置'">
+            <div v-if="currentTab === 'switch-config'">
                 <h3>
-                    下面的功能暂未实现
+                    {{ $t('setting.unavailable') }}
                 </h3>
                 <div class="OO-setting-bar">
                     <h3 data-translate-key="if-ask-switch-config"> 是否询问切换配置 </h3>
@@ -203,7 +187,7 @@
 
 
             <!-- -about page -->
-            <div v-if="currentTab === '关于'">
+            <div v-if="currentTab === 'about'">
                 <div class="OO-setting-bar" style="height: fit-content;">
                     <p data-translate-key="about-content"> 本程序由 XLXZ 开发,开源免费,遵循GNU General Public License
                         v3.0。用于管理基于3dmigoto的mod
@@ -247,16 +231,24 @@
 <script setup>
 import leftMenu from '../components/leftMenu.vue';
 import chipButton from '../components/chipButton.vue';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import IManager from '../../electron/IManager';
 const iManager = new IManager();
 
 
-import {useI18n} from 'vue-i18n'
+import { useI18n } from 'vue-i18n'
 import { Switch } from 'sober';
 const { t, locale } = useI18n()
 
-const tabs = ref(['常规设置', '高级设置', '切换配置', '关于']);
+const tabs = ref(['normal', 'advanced', 'switch-config', 'about']);
+const translatedTabs = computed(() => {
+    const tTab = tabs.value.map((tab) => {
+        return t(`setting-tab.${tab}`)
+    });
+    //debug
+    console.log('translatedTabs', tTab);
+    return tTab;
+});
 
 const currentTab = ref('常规设置');
 
@@ -280,6 +272,9 @@ watch(language, (newVal) => {
 });
 watch(theme, (newVal) => {
     iManager.config.theme = newVal;
+    //现在暂时是手动调用 事件 激活
+    iManager.trigger('theme-change', newVal);
+
     iManager.saveConfig();
 });
 watch(modTargetPath, (newVal) => {
@@ -301,6 +296,8 @@ onMounted(async () => {
     theme.value = iManager.config.theme;
     //初始化modTargetPath
     modTargetPath.value = iManager.config.modTargetPath;
+    //初始化modSourcePath
+    modSourcePath.value = iManager.config.modSourcePath;
     //初始化tab
     currentTab.value = tabs.value[0];
 });

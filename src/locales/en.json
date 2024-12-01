@@ -3,18 +3,43 @@
     "hello": "Hello, World"
   },
   "element": {
+    "section": {
+      "mod": "Mod",
+      "help": "Help",
+      "settings": "Settings"
+    },
     "filter": {
       "all": "All",
       "selected": "Selected"
     }
   },
+  "setting-tab": {
+    "normal": "General Settings",
+    "advanced": "Advanced Settings",
+    "switch-config": "Switch Configuration",
+    "about": "About"
+  },
   "setting": {
     "title": "Settings",
     "language": "Language",
     "theme": "Theme",
+    "auto": "Auto",
     "dark": "Dark",
     "light": "Light",
     "system": "System",
-    "reset": "Reset"
+    "reset": "Reset",
+    "unavailable": "In development, the following features are temporarily unavailable",
+    "auto-apply": "Auto Apply",
+    "modTargetPath": "Mod Target Path",
+    "modTargetPath-info": "The mod target directory is where modLoader reads mods, usually the Mods folder",
+    "modSourcePath": "Mod Source Path",
+    "modSourcePath-info": "The mod source directory is where the program stores mods. When a mod is enabled, a link will be created from here to the mod target directory"
+  },
+  "modInfo": {
+    "emptyTitle": "Click on a mod card to view detailed information",
+    "emptyCharacter": "No Character",
+    "emptyDescription": "No Description",
+    "hotkeys": "Hotkeys",
+    "description": "Description"
   }
 }

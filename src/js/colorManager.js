@@ -1,6 +1,8 @@
 import { Tween, Easing, Group } from '@tweenjs/tween.js'; // 引入Tween.js库
 import { Color } from 'three';
 import { ClassManager, ClassManagerService } from './classManager.js'; // 引入ClassManager类和ClassManagerService类
+import IManager from '../../electron/IManager.js';
+const iManager = new IManager();
 // 这个js的功能是能够在任意时刻获取当前颜色。
 // 当前颜色 是一个 从 荧光绿 94ad00 到 荧光黄 ffd300 的渐变色。
 // 通过调用getColor()方法，可以获取当前颜色。
@@ -10,11 +12,37 @@ import { ClassManager, ClassManagerService } from './classManager.js'; // 引入
 
 
 
-const startColor = new Color(0x94ad00);
-const endColor = new Color(0xffd300);
+let startColor = new Color(0x94ad00);
+let endColor = new Color(0xffd300);
 let currentColor = startColor;
 
-const ColorTween = new Tween({ color: startColor }) // 创建一个tween对象
+// 根据 theme 的变化，改变颜色
+iManager.on('theme-change', (theme) => {
+    if (theme === 'dark') {
+        startColor = new Color(0x94ad00);
+        endColor = new Color(0xffd300);
+    } else {
+        startColor = new Color(0x63828E);
+        endColor = new Color(0x0E4F3C);
+    }
+    
+    // 重新创建一个tween对象
+    ColorTween = new Tween({ color: startColor });
+    ColorTween.to({ color: endColor }, 2000)
+        .easing(Easing.Quadratic.InOut)
+        .onUpdate((object) => {
+            currentColor = currentColor.lerp(object.color, 0.01);
+        })
+        .yoyo(true)
+        .repeat(Infinity)
+        .repeatDelay(500)
+        .start();
+    //清空group
+    group.removeAll();
+    group.add(ColorTween);
+});
+
+let ColorTween = new Tween({ color: startColor }) // 创建一个tween对象
 
 
 //tween 在这两个颜色之间使用 pingPong 模式 ， easing函数为 Easing.Quadratic.InOut

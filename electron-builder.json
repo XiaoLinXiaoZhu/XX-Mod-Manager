@@ -2,7 +2,7 @@
     "productName": "xx-mod-manager",
     "appId": "com.xlxz.xx-mod-manager",
     "win": {
-        "icon": "src/assets/icon.ico",
+        "icon": "./src/assets/icon.ico",
         "target": [
             {
                 "target": "nsis",
@@ -19,7 +19,9 @@
     },
     "files": [
         "dist",
-        "dist-electron"
+        "dist-electron",
+        "electron",
+        "src/assets"
     ],
     "directories": {
         "output": "build"

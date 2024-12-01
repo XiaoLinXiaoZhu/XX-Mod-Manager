@@ -9,6 +9,7 @@ let currentMainWindow;
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
+    frame: false,
     width: 800,
     height: 600,
     webPreferences: {
@@ -24,22 +25,26 @@ const createWindow = () => {
 
   currentMainWindow = mainWindow;
   setMainWindow(mainWindow);
-  // 加载 index.html(这里不管是什么路径，都是相对于你的项目根目录的路径)
-  //mainWindow.loadFile('./electron/index.html')
-  // 因为现在是 使用 vite + vue3 开发的，所以这里加载的是 vite 启动的地址
-  // mainWindow.loadURL('http://localhost:3000/')
+  
 
   if (process.env['VITE_DEV_SERVER_URL']) {
-    mainWindow.loadURL(process.env['VITE_DEV_SERVER_URL'])
+    mainWindow.loadURL('http://localhost:3000/')
   } else {
     mainWindow.loadFile('dist/index.html')
     //mainWindow.loadFile(path.resolve(__dirname,"../dist/index.html"))
   }
 
+  // 加载 index.html(这里不管是什么路径，都是相对于你的项目根目录的路径)
+  //mainWindow.loadFile('./electron/index.html')
+  // 因为现在是 使用 vite + vue3 开发的，所以这里加载的是 vite 启动的地址
+  
+
+
   mainWindow.webContents.send('snack', 'hello from main.js')
   // 打开开发工具
   //mainWindow.webContents.openDevTools()
-
+  // 隐藏菜单栏
+  mainWindow.setMenuBarVisibility(false)
 
 }
 

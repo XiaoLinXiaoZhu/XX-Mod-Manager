@@ -13,14 +13,27 @@
       "selected": "已选择"
     }
   },
+  "setting-tab": {
+    "normal": "常规设置",
+    "advanced": "高级设置",
+    "switch-config": "切换配置",
+    "about": "关于"
+  },
   "setting": {
     "title": "设置",
     "language": "语言",
     "theme": "主题",
+    "auto": "自动",
     "dark": "深色",
     "light": "浅色",
     "system": "系统",
-    "reset": "重置"
+    "reset": "重置",
+    "unavailable": "开发中，下面的功能暂时不可用",
+    "auto-apply": "自动应用",
+    "modTargetPath": "模组目标路径",
+    "modTargetPath-info": "mod目标目录为modLoader读取mod的位置，一般为Mods文件夹",
+    "modSourcePath": "模组源路径",
+    "modSourcePath-info": "mod来源目录为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod目标目录"
   },
   "modInfo": {
     "emptyTitle": "点击mod卡片以查看详细信息",

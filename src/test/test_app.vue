@@ -2,6 +2,7 @@
     <div class="main-container">
         <div class="head">
             <backbutton @click="closeApp" />
+            <div id="drag-bar" style="flex: 1;height: 100%;app-region: drag;"></div>
             <sectionSelector :sections="sections" @update:currentSection="handleSectionChange"></sectionSelector>
         </div>
 
@@ -10,7 +11,7 @@
             <settingSection v-if="currentSection === 'settings'" />
         </div>
     </div>
-
+    <CssProxy />
     <dialogAddPreset></dialogAddPreset>
 </template>
 
@@ -23,7 +24,8 @@ import backbutton from '../components/backButton.vue';
 import sectionSelector from '../components/sectionSelector.vue';
 import modCardManager from '../components/modCardManager.vue';
 import dialogAddPreset from '../dialogs/dialogAddPreset.vue';
-import settingSection from '../section/settingSection.vue';
+import settingSection from '../section/settingSection.vue'; 
+import CssProxy from '../components/cssProxy.vue';
 
 const sections = ref(['mod', 'help', 'settings']);
 const currentSection = ref('mod');
