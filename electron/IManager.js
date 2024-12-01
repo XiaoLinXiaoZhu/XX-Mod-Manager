@@ -33,6 +33,11 @@ const fs = require('fs');
 //     }
 // }
 
+function snack(message,type='info') {
+    ipcRenderer.send('snack', message, type);
+}
+
+
 
 class IManager {
     //-==================== 单例 ====================
@@ -54,11 +59,11 @@ class IManager {
     async waitInit() {
         while (!this.inited) {
             //debug
-            console.log('==================waitInit wait');
+            console.log('===== waitInit wait =====');
             await new Promise(resolve => setTimeout(resolve, 10));
         }
         //debug
-        console.log('==================waitInit success');
+        console.log('===== waitInit success =====');
         return this;
     }
 
@@ -111,13 +116,32 @@ class IManager {
     // };
     async loadConfig() {
         const currentConfig = await ipcRenderer.invoke('get-current-config');
+        
+        console.log(currentConfig);
+        if (currentConfig == {} || currentConfig == null) {
+            snack('配置文件不存在');
+            this.saveConfig();
+            return;
+        }
+        //如果为空，则使用默认配置
+
         this.config = currentConfig;
+        //debug
+        if (fs.existsSync(this.config.presetPath) === false) {
+            //fs.mkdirSync(this.config.presetPath);
+        }
+
+        this.saveConfig();
     }
 
     async loadMods() {
         const modSourcePath = this.config.modSourcePath;
         const loadMods = await ipcRenderer.invoke('get-mods', modSourcePath);
 
+        if (loadMods == []) {
+            snack('mod路径不存在');
+            return;
+        }
         // 加载 character
         this.data.characterList = new Set(loadMods.map((mod) => mod.character));
         this.data.modList = loadMods;
@@ -143,11 +167,6 @@ class IManager {
         return data;
     }
 
-
-    async changeLanguage(lang) {
-        // 检查 
-    }
-
     //-==================== 生命周期 ====================
     // 初始化
     async init() {
@@ -158,13 +177,13 @@ class IManager {
         console.log('init IManager');
         // 加载配置
         await this.loadConfig();
+        console.log('>>>>>>>> loadConfig done');
         // 加载mod
         await this.loadMods();
+        console.log('>>>>>>>> loadMods done');
         // 加载预设
         await this.loadPresets();
-
-        // 切换语言
-        await this.changeLanguage(this.config.language);
+        console.log('>>>>>>>> loadPresets done');
 
         //debug
         console.log('init IManager done');

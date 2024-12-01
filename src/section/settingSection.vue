@@ -103,9 +103,25 @@
                     </div>
                 </div>
                 <p data-translate-key="modSourcePath-info">  {{ $t('setting.modSourcePath-info') }}
-                    <br>当前目录为: {{
-                    modSourcePath }}</p>
+                    <br>当前目录为: {{modSourcePath }}</p>
+                
+                <s-divider></s-divider>
 
+                <div class="OO-setting-bar">
+                    <h3> {{ $t('setting.presetPath') }} </h3>
+                    <div class="OO-s-text-field-container">
+                        <s-text-field :value="presetPath" @input="presetPath = $event.target.value">
+                        </s-text-field>
+                        <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                            @click="iManager.setConfigFromDialog('presetPath', 'directory').then((res) => { presetPath = res })">
+                            <s-icon type="add"></s-icon>
+                        </s-icon-button>
+                    </div>
+                </div>
+                <p data-translate-key="presetPath-info"> {{ $t('setting.presetPath-info') }} <br>当前目录为: {{
+                    presetPath }}</p>
+
+                <s-divider></s-divider>
 
 
                 <h3>
@@ -262,6 +278,8 @@ const language = ref('zh_cn');
 const theme = ref('auto');
 const modTargetPath = ref('');
 const modSourcePath = ref('');
+const presetPath = ref('');
+
 
 watch(language, (newVal) => {
     iManager.config.language = newVal;
@@ -285,6 +303,10 @@ watch(modSourcePath, (newVal) => {
     iManager.config.modSourcePath = newVal;
     iManager.saveConfig();
 });
+watch(presetPath, (newVal) => {
+    iManager.config.presetPath = newVal;
+    iManager.saveConfig();
+});
 
 onMounted(async () => {
     //debug
@@ -298,6 +320,8 @@ onMounted(async () => {
     modTargetPath.value = iManager.config.modTargetPath;
     //初始化modSourcePath
     modSourcePath.value = iManager.config.modSourcePath;
+    //初始化presetPath
+    presetPath.value = iManager.config.presetPath;
     //初始化tab
     currentTab.value = tabs.value[0];
 });

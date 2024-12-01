@@ -26,13 +26,20 @@ const createWindow = () => {
   currentMainWindow = mainWindow;
   setMainWindow(mainWindow);
   
+  //debug
+  console.log('===== createWindow =====');
+  let devMode = false;
+  console.log('process.argv', process.argv);
+  
+  devMode = process.argv.includes('--dev');
 
-  if (process.env['VITE_DEV_SERVER_URL']) {
+  if(devMode){
     mainWindow.loadURL('http://localhost:3000/')
-  } else {
-    mainWindow.loadFile('dist/index.html')
-    //mainWindow.loadFile(path.resolve(__dirname,"../dist/index.html"))
   }
+  else{
+    mainWindow.loadFile('dist/index.html')
+  }
+    //mainWindow.loadFile(path.resolve(__dirname,"../dist/index.html"))
 
   // 加载 index.html(这里不管是什么路径，都是相对于你的项目根目录的路径)
   //mainWindow.loadFile('./electron/index.html')

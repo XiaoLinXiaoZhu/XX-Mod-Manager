@@ -20,7 +20,6 @@ iManager.waitInit().then(() => {
     });
 
     iManager.trigger('theme-change', iManager.config.theme);
-    
 
     
 });

@@ -58,9 +58,16 @@ async function getCurrentConfig() {
         return JSON.parse(data);
     }
     else {
-        fs.writeFileSync(filePath, JSON.stringify({}), 'utf-8');
+        const defaultConfig = {
+            language: 'zh_cn', // 语言
+            theme: 'dark', // 主题
+            modSourcePath: null, // mod的源路径
+            modTargetPath: null, // mod的目标路径
+            presetPath: null // 预设路径
+        }
+        fs.writeFileSync(filePath, JSON.stringify(defaultConfig), 'utf-8');
         console.log(`file not exists:${filePath}`);
-        return {};
+        return null;
     }
 }
 
@@ -183,6 +190,9 @@ function creatMod(modPath) {
 }
 function getMods(modSourcePath) {
     const mods = [];
+    if (!fs.existsSync(modSourcePath)) {
+        return mods;
+    }
     const modFolders = fs.readdirSync(modSourcePath);
     modFolders.forEach(modFolder => {
         const modPath = path.join(modSourcePath, modFolder);
@@ -302,38 +312,38 @@ ipcMain.handle('get-file-path', async (event, fileName, fileType) => {
     //通过文件选择对话框选择文件
     let result;
     if (fileType == 'directory') {
-      result = await dialog.showOpenDialog({
-        title: 'Select ' + fileName,
-        properties: ['openDirectory']
-      });
+        result = await dialog.showOpenDialog({
+            title: 'Select ' + fileName,
+            properties: ['openDirectory']
+        });
     }
     else if (fileType == 'image') {
-      result = await dialog.showOpenDialog({
-        title: 'Select ' + fileName,
-        properties: ['openFile'],
-        filters: [
-          { name: fileName, extensions: ['jpg', 'png', 'jpeg', 'gif', 'bmp', 'webp', 'svg', 'ico', 'tiff'] }
-        ]
-      });
+        result = await dialog.showOpenDialog({
+            title: 'Select ' + fileName,
+            properties: ['openFile'],
+            filters: [
+                { name: fileName, extensions: ['jpg', 'png', 'jpeg', 'gif', 'bmp', 'webp', 'svg', 'ico', 'tiff'] }
+            ]
+        });
     }
     else {
-      result = await dialog.showOpenDialog({
-        title: 'Select ' + fileName,
-        properties: ['openFile'],
-        filters: [
-          { name: fileName, extensions: [fileType] }
-        ]
-      });
+        result = await dialog.showOpenDialog({
+            title: 'Select ' + fileName,
+            properties: ['openFile'],
+            filters: [
+                { name: fileName, extensions: [fileType] }
+            ]
+        });
     }
-  
+
     if (!result.canceled) {
         //debug
         console.log(`get-file-path:${result.filePaths[0]}`);
-      return result.filePaths[0];
+        return result.filePaths[0];
     }
     return '';
-  }
-  );
+}
+);
 
 
 //-=========================== apply ===========================

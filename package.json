@@ -11,7 +11,7 @@
     "dev": "vite",
     "build": "vite build && electron-builder --dir",
     "preview": "vite preview",
-    "vite": "concurrently \"npm run dev\" \"electron .\"",
+    "vite": "concurrently \"npm run dev\" \"electron . --dev\"",
     "start": "electron ."
   },
   "dependencies": {

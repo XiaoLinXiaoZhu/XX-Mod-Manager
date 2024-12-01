@@ -33,7 +33,9 @@
     "modTargetPath": "模组目标路径",
     "modTargetPath-info": "mod目标目录为modLoader读取mod的位置，一般为Mods文件夹",
     "modSourcePath": "模组源路径",
-    "modSourcePath-info": "mod来源目录为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod目标目录"
+    "modSourcePath-info": "mod来源目录为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod目标目录",
+    "presetPath": "预设路径",
+    "presetPath-info": "预设路径为存储预设的位置，预设是一组mod的集合，可以通过预设一键启用多个mod"
   },
   "modInfo": {
     "emptyTitle": "点击mod卡片以查看详细信息",
