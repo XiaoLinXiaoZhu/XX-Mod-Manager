@@ -41,5 +41,21 @@
     "emptyDescription": "No Description",
     "hotkeys": "Hotkeys",
     "description": "Description"
+  },
+  "editDialog":{
+    "edit-mod-info": "Edit MOD Info",
+    "mod-info-name-tip": "The Mod name is the folder name, click the button to go to the folder to modify",
+    "mod-info-character-tip": "The character name is the character name in the mod, the program classifies and displays according to this name, of course, it is not necessarily the character name, it can also be other classification names, such as 'tools', 'mise', etc.",
+    "mod-info-image-tip": "The MOD cover is used to display the mod, click the button to select the cover image",
+    "mod-info-url-tip": "Used to record the source address of the mod, convenient for tracking updates and sharing",
+    "mod-info-description-tip": "The MOD description is used to describe the mod, which can be used to record the author, version, etc.",
+    "mod-info-name": "MOD Name",
+    "mod-info-character": "Character",
+    "mod-info-image": "MOD Cover",
+    "mod-info-url": "MOD Source URL",
+    "mod-info-description": "MOD Description",
+    "edit-mod-image-preview": "Select MOD Cover",
+    "save": "Save",
+    "cancle": "Cancle"
   }
 }

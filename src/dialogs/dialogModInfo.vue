@@ -1,8 +1,8 @@
 <template>
   <s-dialog id="edit-mod-dialog" ref="edit-mod-dialog">
     <div slot="headline" class="font-hongmeng">
-      <h3 data-translate-key="edit-mod-info" style="height: fit-content;margin: 10px 30px 5px 30px;font-size: 26px;">
-        编辑mod信息
+      <h3 style="height: fit-content;margin: 10px 30px 5px 30px;font-size: 26px;">
+        {{$t('editDialog.edit-mod-info')}}
       </h3>
 
       <div id="edit-mod-info-dialog-container" style="display: flex;flex-direction: column;align-items: center;">
@@ -31,9 +31,9 @@
           <div style="height: 100%;margin-left: 1%;flex: 1;" id="edit-mod-info-content" class="OO-box">
             <div class="OO-setting-bar">
               <s-tooltip>
-                <h3 slot="trigger" data-translate-key="mod-info-name"> mod名称 </h3>
-                <p style="line-height: 1.2; word-wrap: break-word; max-width: 120px; overflow-wrap: break-word; white-space: normal;"
-                  data-translate-key="mod-info-name-tip"> Mod名称就是文件夹名称，点击下方按钮前往文件夹处修改 </p>
+                <h3 slot="trigger"> {{$t('editDialog.mod-info-name')}} </h3>
+                <p style="line-height: 1.2; word-wrap: break-word; max-width: 120px; overflow-wrap: break-word; white-space: normal;">
+                  {{$t('editDialog.mod-info-name-tip')}} </p>
               </s-tooltip>
 
               <s-button>
@@ -43,9 +43,9 @@
 
             <div class="OO-setting-bar">
               <s-tooltip>
-                <h3 slot="trigger" data-translate-key="mod-info-character"> 角色 </h3>
-                <p style="line-height: 1.2;" data-translate-key="mod-info-character-tip">
-                  角色是mod所属的角色当然你也可以将其归为unknow、tools或者mise，它会作为分类的依据 </p>
+                <h3 slot="trigger"> {{$t('editDialog.mod-info-character')}} </h3>
+                <p style="line-height: 1.2;">
+                  {{$t('editDialog.mod-info-character-tip')}} </p>
               </s-tooltip>
               <s-text-field :value="modInfo.character" @input="modInfo.character = $event.target.value"/>
             </div>
@@ -53,33 +53,28 @@
 
             <div class="OO-setting-bar">
               <s-tooltip>
-                <h3 slot="trigger" data-translate-key="mod-info-image"> mod图片 </h3>
-                <p style="line-height: 1.2;" data-translate-key="mod-info-image-tip">
-                  mod图片是mod的展示图片(比例为3:2)，点击按钮选择图片
-                </p>
+                <h3 slot="trigger"> {{$t('editDialog.mod-info-image')}} </h3>
+                <p style="line-height: 1.2;">
+                  {{$t('editDialog.mod-info-image-tip')}} </p>
               </s-tooltip>
-              <s-button type="outlined" id="edit-mod-image-select"
-                data-translate-key="edit-mod-image-preview">选择图片</s-button>
+              <s-button type="outlined" id="edit-mod-image-select">
+                {{$t('editDialog.edit-mod-image-preview')}}</s-button>
             </div>
 
 
             <div class="OO-setting-bar">
               <s-tooltip>
-                <h3 slot="trigger" data-translate-key="mod-info-url"> mod链接 </h3>
-                <p style="line-height: 1.2;" data-translate-key="mod-info-url-tip">
-                  mod链接是mod的来源，可以是gamebanana、caimogu等 </p>
+                <h3 slot="trigger"> {{$t('editDialog.mod-info-url')}} </h3>
+                <p style="line-height: 1.2;">
+                  {{$t('editDialog.mod-info-url-tip')}} </p>
               </s-tooltip>
               <s-text-field :value="modInfo.url" @input="modInfo.url = $event.target.value"/>
             </div>
-            <div class="OO-setting-bar" style="
-                          display: flex;
-                          flex-direction: column;
-                          align-items: flex-start;
-                          justify-content: space-between;height:150px;">
+            <div class="OO-setting-bar" style="display: flex;flex-direction: column;align-items: flex-start;justify-content: space-between;height:150px;">
               <s-tooltip style="padding:15px 0;">
-                <h3 slot="trigger" data-translate-key="mod-info-description"> mod描述 </h3>
-                <p style="line-height: 1.2;" data-translate-key="mod-info-description-tip">
-                  mod描述是对mod的简单描述，可以是作者、mod功能等 </p>
+                <h3 slot="trigger"> {{$t('editDialog.mod-info-description')}} </h3>
+                <p style="line-height: 1.2;">
+                  {{$t('editDialog.mod-info-description-tip')}} </p>
               </s-tooltip>
               <s-text-field class="OO-shade-box"
               style="min-height: calc(100% - 50px);height: 0px;border-radius: 20px;bottom: 5px;top: 45px;left: 5px;right: 5px;max-width: calc(100% - 10px);width: calc(100% - 10px);" multiLine="true" :value="modInfo.description"
@@ -87,8 +82,8 @@
             </div>
 
             <div>
-              <s-button type="text" id="edit-mod-info-cancel" data-translate-key="cancel">取消</s-button>
-              <s-button type="text" id="edit-mod-info-save" data-translate-key="save">保存</s-button>
+              <s-button type="text" id="edit-mod-info-cancle"> {{$t('editDialog.cancle')}} </s-button>
+              <s-button type="text" id="edit-mod-info-save"> {{$t('editDialog.save')}} </s-button>
             </div>
           </div>
 

@@ -43,5 +43,21 @@
     "emptyDescription": "无描述",
     "hotkeys": "快捷键",
     "description": "描述"
+  },
+  "editDialog":{
+    "edit-mod-info": "编辑MOD信息",
+    "mod-info-name-tip": "Mod名称为文件夹名称，点击按钮即可前往文件夹进行修改",
+    "mod-info-character-tip": "角色名称为mod中的角色名称，程序依照此名称进行分类显示，当然它不一定是角色名称，也可以是其他的分类名称，比如'tools'、'mise'等",
+    "mod-info-image-tip": "用于显示mod的预览图片，方便识别和管理,比例为5:4",
+    "mod-info-url-tip": "用于记录mod的来源地址，方便追踪更新和分享",
+    "mod-info-description-tip": "用于记录mod的描述，方便了解mod的功能和特点",
+    "mod-info-name": "MOD名称",
+    "mod-info-character": "角色名称",
+    "mod-info-image": "MOD预览图片",
+    "mod-info-url": "MOD来源URL",
+    "mod-info-description": "MOD描述",
+    "edit-mod-image-preview": "选择MOD预览图片",
+    "save": "保存",
+    "cancle": "取消"
   }
 }
