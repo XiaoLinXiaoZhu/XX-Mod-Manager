@@ -282,10 +282,15 @@ const presetPath = ref('');
 
 
 watch(language, (newVal) => {
-    iManager.config.language = newVal;
+    // iManager.config.language = newVal;
     //变量命名不能包含-，所以这里需要转换
     console.log('language change', newVal);
-    locale.value = newVal;
+
+    // // 通过 i18n 的 locale 来切换语言
+    // locale.value = newVal;
+
+    // 改为通过 iManager 来切换语言
+    iManager.setLanguage(newVal);
     iManager.saveConfig();
 });
 watch(theme, (newVal) => {

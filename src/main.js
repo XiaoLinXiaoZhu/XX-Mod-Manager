@@ -38,10 +38,14 @@ vue_app.use(i18n);
 
 vue_app.mount('#app');
 iManager.waitInit().then((iManager) => {
-    // 将语言设置为 imanager 中的语言
-    vue_app.config.globalProperties.$i18n.locale = iManager.config.language;
-    //debug
-    console.log('set language:', iManager.config.language);
+    iManager.on('languageChange', (language) => {
+        // 将语言设置为 imanager 中的语言
+        vue_app.config.globalProperties.$i18n.locale = language;
+        //debug
+        console.log('set language:', language);
+    });
+
+    iManager.trigger('languageChange', iManager.config.language);
 })
 
 

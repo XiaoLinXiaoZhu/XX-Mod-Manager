@@ -299,7 +299,20 @@ class IManager {
     }
 
     async setLanguage(language) {
+        //debug
+        console.log(`iManager current language: ${this.config.language}, set language: ${language}`);
+        if (language !== 'zh_cn' && language !== 'en') {
+            snack('不支持的语言');
+            return;
+        }
+        if (this.config.language === language) {
+            return;
+        }
+
         this.config.language = language;
+        this.trigger('languageChange', language);
+        //debug eventList
+        console.log(this.eventList);
         this.saveConfig();
     }
 
