@@ -166,8 +166,6 @@ function creatMod(modPath) {
         description: '',
         url: '',
         hotkeys: [],
-        state: 1,
-        snack: ''
     }
 
     const modConfigPath = path.join(modPath, 'mod.json');
@@ -213,6 +211,8 @@ ipcMain.handle('get-mods', async (event, modSourcePath) => {
 // 因为 渲染进程 无法获取 本地文件，所以需要通过 主进程 来获取图片文件
 ipcMain.handle('get-image', async (event, imagePath) => {
     // 传递一个 buffer 对象给渲染进程
+    //debug
+    console.log(`get-image:${imagePath}`);
     return fs.readFileSync(imagePath).toString('base64');
 });
 
@@ -224,9 +224,11 @@ ipcMain.handle('get-mods-from-current-config', async (event) => {
     return fs.existsSync(modSourcePath) ? getMods(modSourcePath) : [];
 });
 
-ipcMain.handle('get-mod-info', async (event, modName) => {
-    const currentConfig = await getCurrentConfig();
-    const modSourcePath = currentConfig.modSourcePath;
+ipcMain.handle('get-mod-info', async (event, modSourcePath, modName) => {
+    if(!modSourcePath){
+        const currentConfig = await getCurrentConfig();
+        modSourcePath = currentConfig.modSourcePath;
+    }
     const modPath = path.join(modSourcePath, modName);
     return fs.existsSync(modPath) ? creatMod(modPath) : null;
 });

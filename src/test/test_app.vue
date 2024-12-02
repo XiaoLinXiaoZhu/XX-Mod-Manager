@@ -13,6 +13,7 @@
     </div>
     <CssProxy />
     <dialogAddPreset></dialogAddPreset>
+    <dialogModInfo :mod="lastClickedMod" />
 </template>
 
 <script setup>
@@ -26,10 +27,15 @@ import modCardManager from '../components/modCardManager.vue';
 import dialogAddPreset from '../dialogs/dialogAddPreset.vue';
 import settingSection from '../section/settingSection.vue'; 
 import CssProxy from '../components/cssProxy.vue';
+import dialogModInfo from '../dialogs/dialogModInfo.vue';
+import { mod } from 'three/webgpu';
+
+import IManager from '../../electron/IManager';
+const iManager = new IManager();
 
 const sections = ref(['mod', 'help', 'settings']);
 const currentSection = ref('mod');
-
+const lastClickedMod = ref(null);
 const handleSectionChange = (section) => {
     currentSection.value = section;
     //debug
@@ -40,6 +46,12 @@ const closeApp = () => {
     //关闭当前窗口
     window.close();
 };
+
+iManager.waitInit().then(() => {
+    iManager.on('lastClickedModChanged', (mod) => {
+        lastClickedMod.value = mod;
+    });
+});
 </script>
 
 

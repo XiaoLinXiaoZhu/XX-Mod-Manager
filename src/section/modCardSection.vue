@@ -23,7 +23,7 @@
         </leftMenu>
         <modCardManager id="mod-card-manager" @click="handleModCardClick" :compactMode="compactMode" ref="modCardManagerRef">
         </modCardManager>
-        <modInfo :mod="lastClickedMod" />
+        <modInfo :mod="lastClickedMod"></modInfo>
     </div>
 
     <div class="bottom">
@@ -74,7 +74,6 @@ function handleClick() {
     console.log('click');
     iManager.openNewWindow('tapePage/');
 }
-
 
 const lastClickedMod = ref(null);
 
@@ -271,6 +270,12 @@ function handleApplyButtonClicked() {
 onMounted(() => {
     iManager.waitInit().then(() => {
         loadPresetList();
+        iManager.on("lastClickedModChanged", (mod) => {
+            lastClickedMod.value = mod;
+            //debug
+            console.log('set mod info display to', mod.name);
+            savePreset();
+        });
     });
 });
 </script>

@@ -29,6 +29,8 @@
 const { ipcRenderer } = require('electron');
 import 'sober'
 import { useTemplateRef , computed, defineProps, onMounted, ref,watch } from 'vue'
+import IManager from '../../electron/IManager';
+const iManager = new IManager();
 
 const props = defineProps({
     mod: String,
@@ -62,7 +64,8 @@ const click = (event) => {
         playClickAnim(modItemRef.value, event, modItemRef.value.getBoundingClientRect());
         //debug
         console.log(`click: ${props.mod},current clicked: ${clicked.value},attribute: ${modItemRef.value.getAttribute('clicked')}`);    
-        emit('click', props.mod);
+        //emit('click', props.mod);
+        iManager.setLastClickedModByName(props.mod);
     }
     else {
         playClickAnim(modItemRef.value);

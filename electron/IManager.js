@@ -90,6 +90,9 @@ class IManager {
         presetList: [], // 预设列表
         characterList: [], // 角色列表
     };
+    temp = {
+        lastClickedMod: null, // 最后点击的mod，用于显示详情
+    };
 
 
 
@@ -163,8 +166,40 @@ class IManager {
     }
 
     async getModInfo(modName) {
-        const data = await ipcRenderer.invoke('get-mod-info', modName);
+        // const data = await ipcRenderer.invoke('get-mod-info', this.config.modSourcePath, modName);
+        // 改为直接从 data 中获取
+        const data = this.data.modList.find((mod) => mod.name === modName);
         return data;
+    }
+    //- mod的格式
+    // const mod = {
+    //     name: path.basename(modPath),
+    //     character: 'Unknown',
+    //     preview: '',
+    //     description: '',
+    //     url: '',
+    //     hotkeys: [],
+    // }
+
+    async getImageBase64(imagePath) {
+        //debug
+        console.log(`get-image: ${imagePath}`);
+        const data = await ipcRenderer.invoke('get-image', imagePath);
+        return data;
+    }
+
+    async showDialog(dialogID) {
+        const dialog = document.getElementById(dialogID);
+        if (!dialog) {
+            console.log(`dialog ${dialogID} not found`);
+            return;
+        }
+        dialog.show();
+    }
+
+    async setLastClickedModByName(modName) {
+        this.data.lastClickedMod = await this.getModInfo(modName);
+        this.trigger('lastClickedModChanged', this.data.lastClickedMod);
     }
 
     //-==================== 生命周期 ====================
@@ -181,6 +216,12 @@ class IManager {
         // 加载mod
         await this.loadMods();
         console.log('>>>>>>>> loadMods done');
+
+        // lastClickedMod 默认是 第一个mod
+        if (this.data.modList.length > 0) {
+            this.data.lastClickedMod = this.data.modList[0];
+        }
+
         // 加载预设
         await this.loadPresets();
         console.log('>>>>>>>> loadPresets done');

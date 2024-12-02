@@ -1,6 +1,5 @@
 <template>
     <div class="mod-info-card OO-box font-hongmeng" ref="modInfoRef">
-
         <div class="mod-title">{{ modInfo ? modInfo.name : $t('modInfo.emptyTitle') }}</div>
         <div class="mod-character OO-color-gradient">
             <p> {{ modInfo ? modInfo.character : $t('modInfo.emptyCharacter') }}</p>
@@ -62,10 +61,14 @@
 
 <script setup>
 import { defineProps, defineEmits, useTemplateRef, onMounted,ref,watch} from 'vue';
+import IManager from '../../electron/IManager';
+const iManager = new IManager();
+
+
 const { ipcRenderer } = require('electron');
 
 const props = defineProps({
-    mod: String
+    mod: Object,
 });
 
 const modInfo = ref(null);
@@ -74,26 +77,37 @@ const modInfo = ref(null);
 const emit = defineEmits(['clickEditButton']);
 
 const editMod = () => {
-    emit('clickEditButton');
+    if (props.mod == null) {
+        ipcRenderer.send('snack', 'No mod selected','error');
+        return;
+    }
+
+    iManager.showDialog('edit-mod-dialog');
+    //emit('clickEditButton');
 };
 
 const openModUrl = () => {
-    ipcRenderer.send('open-url', props.modUrl);
+    //ipcRenderer.send('open-url', props.mod?.url);
+
+
 };
 
 const modInfoRef = useTemplateRef("modInfoRef");
 
 const setDisplayMod = async (mod) => {
-    console.log(`set mod: ${mod}`);
-    modInfo.value = await ipcRenderer.invoke('get-mod-info', mod);
+    console.log(`set mod: ${mod.name}`);
+    //modInfo.value = await iManager.getModInfo(mod);
+    modInfo.value = mod;
     //debug
-    //console.log(`set mod info: ${modInfo.value}`);
-    //console.log(modInfo.value);
-    //console.log(modInfo.value.hotkeys);
+    console.log(`set mod info: ${modInfo.value}`);
+    console.log(modInfo.value);
+    console.log(modInfo.value.hotkeys);
 
     //获取图片 base64
-    const img = await ipcRenderer.invoke('get-image', modInfo.value.preview);
+    // const img = await ipcRenderer.invoke('get-image', modInfo.value.preview);
+    const img = await iManager.getImageBase64(modInfo.value.preview);
     // modItemRef.value.querySelector('img').src = "data:image/png;base64," + image;
+
     modInfoRef.value.querySelector('.mod-image').style.backgroundImage = `url(data:image/png;base64,${img})`;
 };
 
