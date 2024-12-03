@@ -3,32 +3,31 @@
     "productName": "XX Mod Manager",
     "icon": "./src/assets/icon.ico",
     "directories": {
-      "output": "build"
+        "output": "build"
     },
     "files": [
         "dist",
         "electron"
     ],
     "publish": [
-      {
-        "provider": "github",
-        "owner": "your-github-username",
-        "repo": "XX-Mod-Manager",
-        "releaseType": "draft"
-      }
+        {
+            "provider": "github",
+            "owner": "XiaoLinXiaoZhu",
+            "repo": "XX-Mod-Manager",
+            "releaseType": "draft"
+        }
     ],
     "win": {
-      "target": [
-        "nsis",
-        "zip"
-      ],
-      "icon": "./src/assets/icon.ico"
+        "target": [
+            "nsis",
+            "zip"
+        ],
+        "icon": "./src/assets/icon.ico"
     },
     "linux": {
-      "target": [
-        "tar.xz"
-      ],
-      "icon": "./src/assets/icon.ico"
+        "target": [
+            "tar.xz"
+        ],
+        "icon": "./src/assets/icon.ico"
     }
-  }
-  
+}

@@ -30,11 +30,9 @@ jobs:
         run: npm install
 
       - name: Build Electron App
-        run: npm run build
+        run: npm run build  # 运行 electron-builder 打包
 
       - name: Publish Electron App to GitHub
-        uses: electron-userland/action-electron-builder@v2
-        with:
-          publish: "github"
+        run: npm run publish  # 发布到 GitHub Releases
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}  # GitHub token 用于发布
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}  # 需要配置 GitHub Token

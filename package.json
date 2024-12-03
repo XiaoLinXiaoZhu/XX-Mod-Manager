@@ -12,7 +12,8 @@
     "build": "vite build && electron-builder --win --linux",
     "preview": "vite preview",
     "vite": "concurrently \"npm run dev\" \"electron . --dev\"",
-    "start": "electron ."
+    "start": "electron .",
+    "publish": "electron-builder --publish always"
   },
   "dependencies": {
     "@tweenjs/tween.js": "^25.0.0",
