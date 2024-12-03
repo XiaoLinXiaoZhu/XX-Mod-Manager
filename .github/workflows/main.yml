@@ -2,37 +2,52 @@ name: Build
 
 on:
   push:
+    branches:
+      - main  # 选择你希望触发构建的分支，通常是 `main`
     tags:
       - 'v*'
   workflow_dispatch:
-  
-jobs:
-  release:
-    name: build and release electron app
-    runs-on: ${{ matrix.os.image }}
 
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          [
-            { name: 'linux', image: 'ubuntu-latest' },
-            { name: 'windows', image: 'windows-latest' },
-          ]
+jobs:
+  build:
+    runs-on: ubuntu-latest  # 使用 Ubuntu 作为构建环境
 
     steps:
-      - name: Check out git repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: "20"
+          node-version: '16'  # 使用 Node.js 16.x（或你项目中需要的版本）
 
-      - name: Install Dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: |
+          npm install
+          npm install -g electron-builder  # 全局安装 electron-builder
 
-      - name: Publish Electron App
-        run: npm run publish
+      - name: Build the application
+        run: |
+          npm run build  # 运行你的构建命令（在 package.json 中定义的）
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: electron-build
+          path: build/  # 上传构建产物目录（这里假设你把构建产物保存在 build 目录下）
+
+  # 如果你需要将构建结果发布到 GitHub Releases，可以添加以下步骤
+  release:
+    needs: build  # 依赖于 build job 完成
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Upload release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/*.exe  # 指定你希望发布的构建文件
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 用于发布 release 的 token
