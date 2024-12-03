@@ -70,6 +70,7 @@
                     <s-switch id="use-admin-switch" data-platform="win32"></s-switch>
                 </div>
                 <p data-translate-key="use-admin-info">启动程序时是否使用管理员权限(需要重启程序生效)</p>
+                <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
             <!-- -高级设置 -->
             <!-- -在这里可以设定 modRootDir，modSourceDir，modLoaderDir，gameDir -->
@@ -158,7 +159,7 @@
                         初始化所有配置
                     </s-button>
                 </div>
-
+                <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
             <!-- -切换配置 -->
             <!-- -在这里你可以选择开启在开始的时候选择配置文件的功能，并且设置配置文件保存位置 -->
@@ -198,6 +199,7 @@
                     </s-button>
                 </div>
                 <p data-translate-key="save-config-info"> 保存当前配置到配置文件夹 </p>
+                <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
 
 
@@ -238,7 +240,7 @@
                         data-translate-key="click-to-jump"> 点击跳转 </s-button>
                 </div>
 
-                <s-divider></s-divider>
+                <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
         </div>
     </div>
@@ -336,7 +338,7 @@ onMounted(async () => {
 <style scoped>
 .setting-container {
     display: flex;
-    height: 100%;
+    height: calc(100% - 60px);
     width: 100%;
     flex-direction: row;
     align-items: stretch;
@@ -349,6 +351,7 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     width: calc(100% - 200px);
+    height: calc(100% - 20px);
     flex: 1;
     margin: 0 10px;
 }

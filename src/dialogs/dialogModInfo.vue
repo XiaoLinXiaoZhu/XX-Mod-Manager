@@ -2,7 +2,7 @@
   <s-dialog id="edit-mod-dialog" ref="edit-mod-dialog">
     <div slot="headline" class="font-hongmeng">
       <h3 style="height: fit-content;margin: 10px 30px 5px 30px;font-size: 26px;">
-        {{$t('editDialog.edit-mod-info')}}
+        {{ $t('editDialog.edit-mod-info') }}
       </h3>
 
       <div id="edit-mod-info-dialog-container" style="display: flex;flex-direction: column;align-items: center;">
@@ -24,16 +24,37 @@
               <img id="editDialog-mod-info-image"
                 style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" alt="Mod Image"
                 :src="img" />
+            </div>
 
+            <div class="OO-setting-bar">
+              <s-tooltip>
+                <h3 slot="trigger"> {{ $t('editDialog.mod-info-image') }} </h3>
+                <p style="line-height: 1.2;">
+                  {{ $t('editDialog.mod-info-image-tip') }} </p>
+              </s-tooltip>
+              <!-- <s-button type="outlined" id="edit-mod-image-select">
+                {{ $t('editDialog.edit-mod-image-preview') }}</s-button> -->
+              <s-tooltip>
+                <s-icon-button icon="image" @click="handleSelectImage" class="OO-icon-button"
+                  style="border: 5px solid #0c0c0c;transform: scale(1);" slot="trigger">
+                  <s-icon type="add"></s-icon>
+                </s-icon-button>
+
+                <p style="line-height: 1.2;">
+                  {{ $t('editDialog.edit-mod-image-preview') }} </p>
+              </s-tooltip>
             </div>
           </div>
 
           <div style="height: 100%;margin-left: 1%;flex: 1;" id="edit-mod-info-content" class="OO-box">
+
+            <!-- -mod名称 -->
             <div class="OO-setting-bar">
               <s-tooltip>
-                <h3 slot="trigger"> {{$t('editDialog.mod-info-name')}} </h3>
-                <p style="line-height: 1.2; word-wrap: break-word; max-width: 120px; overflow-wrap: break-word; white-space: normal;">
-                  {{$t('editDialog.mod-info-name-tip')}} </p>
+                <h3 slot="trigger"> {{ $t('editDialog.mod-info-name') }} </h3>
+                <p
+                  style="line-height: 1.2; word-wrap: break-word; max-width: 120px; overflow-wrap: break-word; white-space: normal;">
+                  {{ $t('editDialog.mod-info-name-tip') }} </p>
               </s-tooltip>
 
               <s-button>
@@ -41,49 +62,91 @@
               </s-button>
             </div>
 
+            <!-- -mod角色 -->
             <div class="OO-setting-bar">
               <s-tooltip>
-                <h3 slot="trigger"> {{$t('editDialog.mod-info-character')}} </h3>
+                <h3 slot="trigger"> {{ $t('editDialog.mod-info-character') }} </h3>
                 <p style="line-height: 1.2;">
-                  {{$t('editDialog.mod-info-character-tip')}} </p>
+                  {{ $t('editDialog.mod-info-character-tip') }} </p>
               </s-tooltip>
-              <s-text-field :value="modInfo.character" @input="modInfo.character = $event.target.value"/>
+              <s-text-field :value="modInfo.character" @input="modInfo.character = $event.target.value" />
             </div>
 
-
+            <!-- -mod链接 -->
             <div class="OO-setting-bar">
               <s-tooltip>
-                <h3 slot="trigger"> {{$t('editDialog.mod-info-image')}} </h3>
+                <h3 slot="trigger"> {{ $t('editDialog.mod-info-url') }} </h3>
                 <p style="line-height: 1.2;">
-                  {{$t('editDialog.mod-info-image-tip')}} </p>
+                  {{ $t('editDialog.mod-info-url-tip') }} </p>
               </s-tooltip>
-              <s-button type="outlined" id="edit-mod-image-select">
-                {{$t('editDialog.edit-mod-image-preview')}}</s-button>
+              <s-text-field :value="modInfo.url" @input="modInfo.url = $event.target.value" />
             </div>
 
-
+            <!-- -mod快捷键 -->
             <div class="OO-setting-bar">
               <s-tooltip>
-                <h3 slot="trigger"> {{$t('editDialog.mod-info-url')}} </h3>
+                <h3 slot="trigger"> {{ $t('editDialog.mod-info-hotkeys') }} </h3>
                 <p style="line-height: 1.2;">
-                  {{$t('editDialog.mod-info-url-tip')}} </p>
+                  {{ $t('editDialog.mod-info-hotkeys-tip') }} </p>
               </s-tooltip>
-              <s-text-field :value="modInfo.url" @input="modInfo.url = $event.target.value"/>
+
+              <div style="display: flex;flex-direction: row;align-items: center;justify-content: space-between;">
+                <div v-for="(hotkey, index) in modInfo.hotkeys" :key="index">
+                  <s-tooltip>
+                    <s-chip style="margin: 0px 1px;height: 35px;" slot="trigger">
+                      {{ hotkey.key }}
+                    </s-chip>
+
+                    <p style="line-height: 1.2;">
+                      {{ hotkey.description }} </p>
+                  </s-tooltip>
+                </div>
+                <s-popup align="left">
+                  <s-tooltip slot="trigger" style="position: relative;left: 15px;">
+                    <s-icon-button icon="image" @click="handleSelectImage" class="OO-icon-button"
+                      style="border: 5px solid #0c0c0c;transform: scale(1);" slot="trigger">
+                      <s-icon type="chevron_down"></s-icon>
+                    </s-icon-button>
+
+                    <p style="line-height: 1.2;">
+                      {{ $t('editDialog.edit-mod-image-preview') }} </p>
+                  </s-tooltip>
+
+                  <div class="OO-box OO-shade-box" style="width: 70vb;height: fit-content;overflow: hidden;">
+                    <div v-for="(hotkey, index) in modInfo.hotkeys" :key="index" class="hotkey-item OO-setting-bar">
+                      <s-text-field :value="hotkey.description" @input="hotkey.description = $event.target.value"
+                        style="left: 5px;" />
+                        <s-text-field :value="hotkey.key" @change="handleHotkeyInput(hotkey, $event.target.value)" />
+                    </div>
+                    <div class="hotkey-item OO-setting-bar">
+                      
+                      <s-text-field @change="(event) => { addNewHotkeyByDescription(event.target.value); event.target.value = ''; }" style="left: 5px;" :placeholder="$t('editDialog.mod-info-hotkeys-description')" />
+                      <s-text-field @change="(event) => { addNewHotkeyByHotkey(event.target.value); event.target.value = ''; }" :placeholder="$t('editDialog.mod-info-hotkeys-hotkey')" />
+                    </div>
+                  </div>
+
+                </s-popup>
+              </div>
             </div>
-            <div class="OO-setting-bar" style="display: flex;flex-direction: column;align-items: flex-start;justify-content: space-between;height:150px;">
+
+            <!-- -mod描述 -->
+            <div class="OO-setting-bar"
+              style="display: flex;flex-direction: column;align-items: flex-start;justify-content: space-between;height:150px;">
               <s-tooltip style="padding:15px 0;">
-                <h3 slot="trigger"> {{$t('editDialog.mod-info-description')}} </h3>
+                <h3 slot="trigger"> {{ $t('editDialog.mod-info-description') }} </h3>
                 <p style="line-height: 1.2;">
-                  {{$t('editDialog.mod-info-description-tip')}} </p>
+                  {{ $t('editDialog.mod-info-description-tip') }} </p>
               </s-tooltip>
               <s-text-field class="OO-shade-box"
-              style="min-height: calc(100% - 50px);height: 0px;border-radius: 20px;bottom: 5px;top: 45px;left: 5px;right: 5px;max-width: calc(100% - 10px);width: calc(100% - 10px);" multiLine="true" :value="modInfo.description"
-                @input="modInfo.description = $event.target.value" id="edit-mod-description"></s-text-field>
+                style="min-height: calc(100% - 50px);height: 0px;border-radius: 20px;bottom: 5px;top: 45px;left: 5px;right: 5px;max-width: calc(100% - 10px);width: calc(100% - 10px);"
+                multiLine="true" :value="modInfo.description" @input="modInfo.description = $event.target.value"
+                id="edit-mod-description"></s-text-field>
             </div>
 
             <div>
-              <s-button type="text" id="edit-mod-info-cancle"> {{$t('editDialog.cancle')}} </s-button>
-              <s-button type="text" id="edit-mod-info-save"> {{$t('editDialog.save')}} </s-button>
+              <s-button type="text" id="edit-mod-info-cancel" @click="handleCancel"> {{ $t('editDialog.cancel') }}
+              </s-button>
+              <s-button type="text" id="edit-mod-info-save" @click="handleSave"> {{ $t('editDialog.save') }} </s-button>
             </div>
           </div>
 
@@ -96,7 +159,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { defineProps, defineEmits, onMounted, computed, watch,useTemplateRef } from 'vue';
+import { defineProps, defineEmits, onMounted, computed, watch, useTemplateRef } from 'vue';
 import IManager from '../../electron/IManager';
 import { mod } from 'three/webgpu';
 const iManager = new IManager();
@@ -131,6 +194,44 @@ const modImage = computed(() => {
   return iManager.getImageBase64(modInfo.value.preview);
 });
 
+// const handleSelectImage = async () => {
+//   const imgPath = await iManager.selectImage();
+//   if (imgPath) {
+//     const imgBase64 = await iManager.getImageBase64(imgPath);
+//     img.value = "data:image/png;base64," + imgBase64;
+//     modInfo.value.preview = imgPath;
+//   }
+// };
+
+const handleHotkeyInput  = (hotkey, value) => {
+  if (value === '') {
+    // 删除快捷键
+    const index = modInfo.value.hotkeys.indexOf(hotkey);
+    modInfo.value.hotkeys.splice(index, 1);
+    return;
+  }
+  hotkey.key = value;
+}
+
+const addNewHotkeyByDescription = (description) => {
+  if (description === '') {
+    return;
+  }
+  modInfo.value.hotkeys.push({
+    key: '',
+    description: description
+  });
+}
+
+const addNewHotkeyByHotkey = (key) => {
+  if (key === '') {
+    return;
+  }
+  modInfo.value.hotkeys.push({
+    key: key,
+    description: ''
+  });
+}
 
 onMounted(() => {
   const editModInfoDialogStyle = document.createElement('style');
@@ -156,4 +257,8 @@ onMounted(() => {
   editModInfoDialog.value.shadowRoot.appendChild(editModInfoDialogStyle);
 });
 
+
 </script>
+
+
+<style scoped></style>

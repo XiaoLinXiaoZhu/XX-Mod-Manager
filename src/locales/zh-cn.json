@@ -50,14 +50,18 @@
     "mod-info-character-tip": "角色名称为mod中的角色名称，程序依照此名称进行分类显示，当然它不一定是角色名称，也可以是其他的分类名称，比如'tools'、'mise'等",
     "mod-info-image-tip": "用于显示mod的预览图片，方便识别和管理,比例为5:4",
     "mod-info-url-tip": "用于记录mod的来源地址，方便追踪更新和分享",
+    "mod-info-hotkeys-tip": "mod支持的快捷键，用于切换mod的状态",
     "mod-info-description-tip": "用于记录mod的描述，方便了解mod的功能和特点",
     "mod-info-name": "MOD名称",
     "mod-info-character": "角色名称",
     "mod-info-image": "MOD预览图片",
     "mod-info-url": "MOD来源URL",
+    "mod-info-hotkeys": "快捷键",
     "mod-info-description": "MOD描述",
     "edit-mod-image-preview": "选择MOD预览图片",
+    "mod-info-hotkeys-hotkey": "快捷键",
+    "mod-info-hotkeys-description": "快捷键描述",
     "save": "保存",
-    "cancle": "取消"
+    "cancel": "取消"
   }
 }
