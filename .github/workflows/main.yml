@@ -2,8 +2,6 @@ name: Build
 
 on:
   push:
-    branches:
-      - main  # 选择你希望触发构建的分支，通常是 `main`
     tags:
       - 'v*'
   workflow_dispatch:
