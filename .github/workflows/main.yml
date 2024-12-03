@@ -10,27 +10,22 @@ on:
 jobs:
   build:
     runs-on: windows-latest  # 使用 Windows 环境进行构建
-
+    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '22'
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install dependencies
+        run: npm install
 
-    - name: Run build
-      run: npm run build
-
-    - name: Build Electron app
-      run: |
-        # 使用 Windows 本地构建
-        npx electron-builder --win --x64 --config electron-builder.json
-
+      - name: Run build
+        run: npm run build
+          
   release:
     runs-on: windows-latest  # 使用 Windows 环境发布
     needs: build  # 确保在 build 完成后才运行 release
@@ -44,7 +39,7 @@ jobs:
       with:
         files: build/XX-Mod-Manager-win-x64.zip  # 发布 .zip 文件
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        
     - name: Clean up
       run: rm -rf build/
