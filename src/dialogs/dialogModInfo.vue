@@ -33,7 +33,7 @@
                   {{ $t('editDialog.mod-info-image-tip') }} </p>
               </s-tooltip>
 
-              <s-tooltip>
+              <s-tooltip style="position: relative; left: 15px;">
                 <s-icon-button icon="image" @click="handleSelectImage" class="OO-icon-button"
                   style="border: 5px solid #0c0c0c;transform: scale(1);" slot="trigger">
                   <s-icon type="add"></s-icon>
@@ -108,7 +108,7 @@
                     </s-icon-button>
 
                     <p style="line-height: 1.2;">
-                      {{ $t('editDialog.edit-mod-image-preview') }} </p>
+                      {{ $t('editDialog.edit-mod-hotkeys') }} </p>
                   </s-tooltip>
 
                   <div class="OO-box OO-shade-box" style="width: 70vb;height: fit-content;overflow: hidden;">

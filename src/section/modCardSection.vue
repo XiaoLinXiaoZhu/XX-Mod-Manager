@@ -223,7 +223,7 @@ const presets = ref([]);
 const currentPreset = ref('default');
 
 function loadPresetList() {
-    console.log('-===== loadPresetList ======');
+    //console.log('-===== loadPresetList ======');
     let list = [...iManager.data.presetList];
     //debug
     console.log('loadPresetList', iManager.data.presetList);

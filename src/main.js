@@ -53,11 +53,6 @@ iManager.waitInit().then((iManager) => {
 console.log('main.js');
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded');
-
-    // // 获取 preload.js 暴露的 electronAPI 对象
-    // const electronAPI = window.electronAPI;
-    // console.log(electronAPI.version);
     
 
     // 开启 了 nodeIntegration: true, contextIsolation: false
@@ -68,7 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 获取 node.js 的版本信息
     const nodeVersion = process.versions.node;
-    console.log(nodeVersion);
+
+    console.log('DOMContentLoaded' + nodeVersion);
 })
 
 

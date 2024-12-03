@@ -113,13 +113,6 @@ watch(() => props.mod, (newMod) => {
     setDisplayMod(newMod);
 });
 
-onMounted(() => {
-    //debug
-    console.log('modInfo mounted: ' + props.mod);
-    if (modInfoRef.value != null && props.mod != null) {
-        setDisplayMod(props.mod);
-    }
-});
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
 <template>
-    <div id="mod-card-manager" class="OO-box" :lastClickedMod="lastClickedMod">
+    <div id="mod-card-manager" class="OO-box">
         <mod-filter-container @changeFilter="handleFilterChange" :filterItems="characters" />
         <s-scroll-view> 
             <div class="refresh-placeholder" ref="refreshPlaceholderRef"></div>
@@ -49,8 +49,7 @@ const loadMods = async () => {
     characters.value = ['all', 'selected', ...iManager.data.characterList];
 
     //debug
-    console.log(mods.value);
-    console.log(characters.value);
+    console.log(`success load mods, mod count: ${mods.value.length}, character count: ${characters.value.length}`);
 };
 
 const modCardRefs = ref({});
@@ -64,10 +63,7 @@ const emit = defineEmits(['click']);
 const lastClickedMod = ref(null);
 
 // 定义 click 方法
-const click = (mod) => {
-    lastClickedMod.value = mod;
-    emit('click', lastClickedMod.value);
-};
+const click = (mod) => {};
 
 // 定义 handleFilterChange 方法
 const handleFilterChange = (character) => {
@@ -160,10 +156,6 @@ onMounted(async () => {
     observeMods();
     refreshPlaceholderRef.value.style.height = '0px';
 
-    //debug
-    console.log('mod-card-manager mounted');
-    console.log(modCardRefs.value);
-
     iManager.on('modInfoChanged', () => {
         //debug
         console.log('get modInfoChanged');
@@ -172,6 +164,10 @@ onMounted(async () => {
             loadMods();
             observeMods();
         }, 1);
+    });
+
+    iManager.on('lastClickedModChanged', (mod) => {
+        lastClickedMod.value = mod;
     });
 });
 

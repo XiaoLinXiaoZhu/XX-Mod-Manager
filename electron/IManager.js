@@ -33,7 +33,7 @@ const fs = require('fs');
 //     }
 // }
 
-function snack(message,type='info') {
+function snack(message, type = 'info') {
     ipcRenderer.send('snack', message, type);
 }
 
@@ -56,14 +56,18 @@ class IManager {
     }
     inited = false;
 
+    anouncedFinishInit = false;
     async waitInit() {
         while (!this.inited) {
             //debug
-            console.log('===== waitInit wait =====');
+            //console.log('===== waitInit wait =====');
             await new Promise(resolve => setTimeout(resolve, 10));
         }
         //debug
-        console.log('===== waitInit success =====');
+        if (!this.anouncedFinishInit) {
+            console.log('✅====== waitInit done ======');
+            this.anouncedFinishInit = true;
+        }
         return this;
     }
 
@@ -119,7 +123,7 @@ class IManager {
     // };
     async loadConfig() {
         const currentConfig = await ipcRenderer.invoke('get-current-config');
-        
+
         console.log(currentConfig);
         if (currentConfig == {} || currentConfig == null) {
             snack('配置文件不存在');
@@ -148,6 +152,10 @@ class IManager {
         // 加载 character
         this.data.characterList = new Set(loadMods.map((mod) => mod.character));
         this.data.modList = loadMods;
+
+        //debug
+        console.log(loadMods);
+        console.log(this.data.characterList);
     }
 
     async loadPresets() {
@@ -198,8 +206,11 @@ class IManager {
     }
 
     async setLastClickedModByName(modName) {
-        this.data.lastClickedMod = await this.getModInfo(modName);
-        this.trigger('lastClickedModChanged', this.data.lastClickedMod);
+
+        this.temp.lastClickedMod = await this.getModInfo(modName);
+        //debug
+        console.log(`setLastClickedModByName: ${modName}`, this.temp.lastClickedMod);
+        this.trigger('lastClickedModChanged', this.temp.lastClickedMod);
     }
 
     //-==================== 生命周期 ====================
@@ -209,30 +220,43 @@ class IManager {
 
 
         //debug
-        console.log('init IManager');
+        console.log('✅>> init IManager');
         // 加载配置
         await this.loadConfig();
-        console.log('>>>>>>>> loadConfig done');
+        console.log('✅>> loadConfig done');
         // 加载mod
         await this.loadMods();
-        console.log('>>>>>>>> loadMods done');
-
-        // lastClickedMod 默认是 第一个mod
-        if (this.data.modList.length > 0) {
-            this.data.lastClickedMod = this.data.modList[0];
-        }
+        console.log('✅>> loadMods done');
 
         // 加载预设
         await this.loadPresets();
-        console.log('>>>>>>>> loadPresets done');
+        console.log('✅>> loadPresets done');
 
         //debug
-        console.log('init IManager done');
+        console.log('✅>> init IManager done');
         this.inited = true;
 
         //ipcRenderer.invoke('set-imanager', this);
         // 这样 传递的数据 会被序列化，导致 无法传递 函数
         // 并且 不能够 同步，因为实际上传递的是复制的数据，而不是引用
+
+
+        //调用 start 方法
+        setTimeout(() => {
+            this.start();
+        }, 100);
+    }
+
+    // start 在 init 之后调用，在各个其他页面 绑定好事件之后调用
+    async start() {
+        // lastClickedMod 默认是 第一个mod
+        if (this.data.modList.length > 0) {
+            //debug
+            this.temp.lastClickedMod = this.data.modList[0];
+            console.log('✅>> lastClickedMod init', this.temp.lastClickedMod);
+
+            this.trigger('lastClickedModChanged', this.temp.lastClickedMod);
+        }
     }
 
 
@@ -261,7 +285,7 @@ class IManager {
 
     async changePreview(modName, previewPath) {
         // 将 previewPath 的 文件 复制到 modSourcePath 的 preview 文件夹下，并且将 mod 的 preview 属性设置为 previewPath，然后保存
-        
+
         // 从 data 中获取 mod
         const mod = this.data.modList.find((mod) => mod.name === modName);
         if (!mod) {
@@ -270,7 +294,7 @@ class IManager {
         }
 
         const previewFileName = path.basename(previewPath);
-        const newPreviewPath = path.join(this.config.modSourcePath,modName,previewFileName);
+        const newPreviewPath = path.join(this.config.modSourcePath, modName, previewFileName);
         //debug
         console.log(`copy ${previewPath} to ${newPreviewPath}`);
         fs.copyFileSync(previewPath, newPreviewPath);

@@ -125,7 +125,7 @@ caperingManager.onPageInit = function () {}
 caperingManager.init = function (element) { }
 caperingManager.destroy = function (element) { }
 
-console.log('colorManager', colorManager);
+// console.log('colorManager', colorManager);
 
 //-========================= OO-pumping ========================
 // 高度和宽度在一定范围内波动的效果
@@ -162,4 +162,4 @@ pumpingManager.init = function (element) {
 pumpingManager.destroy = function (element) { }
 
 
-console.log('pumpingManager', pumpingManager);
+// console.log('pumpingManager', pumpingManager);

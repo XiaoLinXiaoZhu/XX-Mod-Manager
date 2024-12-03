@@ -1,3 +1,7 @@
+<template>
+    <div class="css-proxy" style="display: none;"></div>
+</template>
+
 <script setup>
 import backButtonImage from '../assets/backButton.png';
 import backgroundImage from '../assets/background.png';
