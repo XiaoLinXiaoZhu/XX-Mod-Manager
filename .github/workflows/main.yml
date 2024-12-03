@@ -6,46 +6,46 @@ on:
       - 'v*'
   workflow_dispatch:
 
+
 jobs:
   build:
-    runs-on: ubuntu-latest  # 使用 Ubuntu 作为构建环境
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'  # 使用 Node.js 16.x（或你项目中需要的版本）
-
-      - name: Install dependencies
-        run: |
-          npm install
-          npm install -g electron-builder  # 全局安装 electron-builder
-
-      - name: Build the application
-        run: |
-          npm run build  # 运行你的构建命令（在 package.json 中定义的）
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: electron-build
-          path: build/  # 上传构建产物目录（这里假设你把构建产物保存在 build 目录下）
-
-  # 如果你需要将构建结果发布到 GitHub Releases，可以添加以下步骤
-  release:
-    needs: build  # 依赖于 build job 完成
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Upload release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: build/*.exe  # 指定你希望发布的构建文件
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 用于发布 release 的 token
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'  # 使用最新的 Node.js 版本
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run build
+      run: npm run build  # 执行打包命令
+
+    - name: Build Electron app
+      run: |
+        npm run build
+        # 在这里指定你希望的构建格式为 zip 格式
+        npx electron-builder --win --x64 --config electron-builder.json
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build  # 确保在 build 完成后才运行 release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Upload the release package to GitHub
+      uses: softprops/action-gh-release@v1
+      with:
+        files: build/XX-Mod-Manager-win-x64.zip  # 发布 .zip 文件
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Clean up
+      run: rm -rf build/
