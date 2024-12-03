@@ -1,16 +1,14 @@
-name: Build and Release
+name: Build and Publish Electron App
 
 on:
   push:
     tags:
-      - 'v*.*.*'
-  workflow_dispatch:
-  
-  
+      - 'v*'  # 触发标签推送，例如：v0.0.6
+
 jobs:
   build:
-    runs-on: windows-latest  # 使用 Windows 环境进行构建
-    
+    runs-on: windows-latest  # 或者你可以选择使用 linux-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -18,28 +16,25 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '22'
+          node-version: '18'
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run build
+      - name: Build Electron App
         run: npm run build
-          
-  release:
-    runs-on: windows-latest  # 使用 Windows 环境发布
-    needs: build  # 确保在 build 完成后才运行 release
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Upload the release package to GitHub
-      uses: softprops/action-gh-release@v1
-      with:
-        files: build/XX-Mod-Manager-win-x64.zip  # 发布 .zip 文件
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        
-    - name: Clean up
-      run: rm -rf build/
+      - name: Publish Electron App to GitHub
+        uses: electron-userland/action-electron-builder@v2
+        with:
+          publish: "github"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}  # GitHub token 用于发布
