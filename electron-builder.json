@@ -1,6 +1,7 @@
 {
     "productName": "xx-mod-manager",
     "appId": "com.xlxz.xx-mod-manager",
+    "icon": "./src/assets/icon.ico",
     "win": {
         "icon": "./src/assets/icon.ico",
         "target": [
