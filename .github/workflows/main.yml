@@ -1,15 +1,15 @@
-name: Build
+name: Build and Release
 
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
   workflow_dispatch:
-
-
+  
+  
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest  # 使用 Windows 环境进行构建
 
     steps:
     - name: Checkout code
@@ -18,22 +18,21 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18'  # 使用最新的 Node.js 版本
+        node-version: '22'
 
     - name: Install dependencies
       run: npm install
 
     - name: Run build
-      run: npm run build  # 执行打包命令
+      run: npm run build
 
     - name: Build Electron app
       run: |
-        npm run build
-        # 在这里指定你希望的构建格式为 zip 格式
+        # 使用 Windows 本地构建
         npx electron-builder --win --x64 --config electron-builder.json
 
   release:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest  # 使用 Windows 环境发布
     needs: build  # 确保在 build 完成后才运行 release
 
     steps:
