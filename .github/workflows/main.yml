@@ -17,7 +17,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # 使用 Node.js 16.x（或你项目中需要的版本）
+          node-version: '22'  # 使用 Node.js 16.x（或你项目中需要的版本）
 
       - name: Install dependencies
         run: |
