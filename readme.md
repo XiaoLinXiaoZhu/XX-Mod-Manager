@@ -8,4 +8,6 @@ XX-Mod-Manager 是一个用于管理游戏模组的工具。
 
 ```
 npm version major|minor|patch
+
+git push --follow-tags
 ```
