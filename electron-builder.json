@@ -1,28 +1,34 @@
 {
-    "productName": "xx-mod-manager",
     "appId": "com.xlxz.xx-mod-manager",
+    "productName": "XX Mod Manager",
     "icon": "./src/assets/icon.ico",
-    "win": {
-        "icon": "./src/assets/icon.ico",
-        "target": [
-            {
-                "target": "nsis",
-                "arch": [
-                    "x64"
-                ]
-            }
-        ]
-    },
-    "nsis": {
-        "oneClick": false,
-        "perMachine": true,
-        "allowToChangeInstallationDirectory": true
+    "directories": {
+      "output": "build"
     },
     "files": [
         "dist",
         "electron"
     ],
-    "directories": {
-        "output": "build"
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "your-github-username",
+        "repo": "XX-Mod-Manager",
+        "releaseType": "draft"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "./src/assets/icon.ico"
+    },
+    "linux": {
+      "target": [
+        "tar.xz"
+      ],
+      "icon": "./src/assets/icon.ico"
     }
-}
+  }
+  

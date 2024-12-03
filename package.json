@@ -9,7 +9,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && electron-builder --dir",
+    "build": "vite build && electron-builder --win --linux",
     "preview": "vite preview",
     "vite": "concurrently \"npm run dev\" \"electron . --dev\"",
     "start": "electron ."
