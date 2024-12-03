@@ -183,7 +183,7 @@ class IManager {
 
     async getImageBase64(imagePath) {
         //debug
-        console.log(`get-image: ${imagePath}`);
+        // console.log(`get-image: ${imagePath}`);
         const data = await ipcRenderer.invoke('get-image', imagePath);
         return data;
     }
@@ -259,6 +259,27 @@ class IManager {
         await fs.writeFile(newPresetPath, JSON.stringify({}));
     }
 
+    async changePreview(modName, previewPath) {
+        // 将 previewPath 的 文件 复制到 modSourcePath 的 preview 文件夹下，并且将 mod 的 preview 属性设置为 previewPath，然后保存
+        
+        // 从 data 中获取 mod
+        const mod = this.data.modList.find((mod) => mod.name === modName);
+        if (!mod) {
+            snack(`Mod ${modName} not found`);
+            return;
+        }
+
+        const previewFileName = path.basename(previewPath);
+        const newPreviewPath = path.join(this.config.modSourcePath,modName,previewFileName);
+        //debug
+        console.log(`copy ${previewPath} to ${newPreviewPath}`);
+        fs.copyFileSync(previewPath, newPreviewPath);
+        mod.preview = newPreviewPath;
+
+        // 保存
+        this.saveModInfo(mod);
+    }
+
     async saveConfig() {
         await ipcRenderer.invoke('set-current-config', this.config);
     }
@@ -314,6 +335,42 @@ class IManager {
         //debug eventList
         console.log(this.eventList);
         this.saveConfig();
+    }
+
+    async saveModInfo(modInfo) {
+        //这里的 modInfo 是一个对象，不能直接传递给主进程
+        //所以需要将 modInfo 转化为 json
+        this.printModInfo(modInfo);
+        console.log(modInfo);
+
+        // iManager 保存    
+        // 根据 modInfo 的 name 找到对应的 mod，然后替换
+        const index = this.data.modList.findIndex((mod) => mod.name === modInfo.name);
+        if (index === -1) {
+            snack(`Mod ${modInfo.name} not found`);
+            return;
+        }
+        this.data.modList[index] = modInfo;
+
+        // 本地保存
+        const jsonModInfo = JSON.stringify(modInfo);
+        await ipcRenderer.invoke('save-mod-info', this.config.modSourcePath, jsonModInfo);
+        this.trigger('modInfoChanged', modInfo);
+    }
+
+    printModInfo(modInfo) {
+        console.log('save-mod-info:');
+        for (const key in modInfo) {
+            console.log(`${key}:${modInfo[key]}`);
+        }
+        // hotkeys 为 [{},{}],将其 每个键值对打印出来
+        console.log('hotkeys:');
+        modInfo.hotkeys.forEach((hotkey, index) => {
+            console.log(`hotkey${index}:`);
+            for (const key in hotkey) {
+                console.log(`${key}:${hotkey[key]}`);
+            }
+        });
     }
 
 

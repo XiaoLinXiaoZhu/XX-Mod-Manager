@@ -32,8 +32,7 @@
                 <p style="line-height: 1.2;">
                   {{ $t('editDialog.mod-info-image-tip') }} </p>
               </s-tooltip>
-              <!-- <s-button type="outlined" id="edit-mod-image-select">
-                {{ $t('editDialog.edit-mod-image-preview') }}</s-button> -->
+
               <s-tooltip>
                 <s-icon-button icon="image" @click="handleSelectImage" class="OO-icon-button"
                   style="border: 5px solid #0c0c0c;transform: scale(1);" slot="trigger">
@@ -103,7 +102,7 @@
                 </div>
                 <s-popup align="left">
                   <s-tooltip slot="trigger" style="position: relative;left: 15px;">
-                    <s-icon-button icon="image" @click="handleSelectImage" class="OO-icon-button"
+                    <s-icon-button icon="image" class="OO-icon-button"
                       style="border: 5px solid #0c0c0c;transform: scale(1);" slot="trigger">
                       <s-icon type="chevron_down"></s-icon>
                     </s-icon-button>
@@ -116,12 +115,16 @@
                     <div v-for="(hotkey, index) in modInfo.hotkeys" :key="index" class="hotkey-item OO-setting-bar">
                       <s-text-field :value="hotkey.description" @input="hotkey.description = $event.target.value"
                         style="left: 5px;" />
-                        <s-text-field :value="hotkey.key" @change="handleHotkeyInput(hotkey, $event.target.value)" />
+                      <s-text-field :value="hotkey.key" @change="handleHotkeyInput(hotkey, $event.target.value)" />
                     </div>
                     <div class="hotkey-item OO-setting-bar">
-                      
-                      <s-text-field @change="(event) => { addNewHotkeyByDescription(event.target.value); event.target.value = ''; }" style="left: 5px;" :placeholder="$t('editDialog.mod-info-hotkeys-description')" />
-                      <s-text-field @change="(event) => { addNewHotkeyByHotkey(event.target.value); event.target.value = ''; }" :placeholder="$t('editDialog.mod-info-hotkeys-hotkey')" />
+
+                      <s-text-field
+                        @change="(event) => { addNewHotkeyByDescription(event.target.value); event.target.value = ''; }"
+                        style="left: 5px;" :placeholder="$t('editDialog.mod-info-hotkeys-description')" />
+                      <s-text-field
+                        @change="(event) => { addNewHotkeyByHotkey(event.target.value); event.target.value = ''; }"
+                        :placeholder="$t('editDialog.mod-info-hotkeys-hotkey')" />
                     </div>
                   </div>
 
@@ -155,6 +158,17 @@
     </div>
 
   </s-dialog>
+
+  <!-- -取消时再次询问是否保存 -->
+  <!-- -提示是否保存更改 -->
+  <s-dialog id="save-change-dialog">
+    <div slot="headline" data-translate-key="save-change"> 检测到未保存的更改 </div>
+    <div slot="text">
+      <p data-translate-key="dialog-ask-for-save-change"> 是否保存更改？ </p>
+    </div>
+    <s-button slot="action" type="text" id="save-change-ignore" @click="handleCancel"> {{ $t('editDialog.ignore') }} </s-button>
+    <s-button slot="action" type="text" id="save-change-confirm" @click="handleSave"> {{ $t('editDialog.save') }} </s-button>
+  </s-dialog>
 </template>
 
 <script setup>
@@ -183,15 +197,11 @@ watch(() => props.mod, async (newVal) => {
   console.log('mod changed', newVal);
   if (newVal) {
     const imgBase64 = await iManager.getImageBase64(newVal.preview);
-    modInfo.value = newVal;
+    // modInfo.value = newVal;
+    // 将其转化为 json 再 转化为对象，防止引用传递
+    modInfo.value = JSON.parse(JSON.stringify(newVal));
     img.value = "data:image/png;base64," + imgBase64;
   }
-});
-
-const modImage = computed(() => {
-  //debug
-  console.log('modInfo.value.preview', modInfo.value.preview);
-  return iManager.getImageBase64(modInfo.value.preview);
 });
 
 // const handleSelectImage = async () => {
@@ -203,7 +213,7 @@ const modImage = computed(() => {
 //   }
 // };
 
-const handleHotkeyInput  = (hotkey, value) => {
+const handleHotkeyInput = (hotkey, value) => {
   if (value === '') {
     // 删除快捷键
     const index = modInfo.value.hotkeys.indexOf(hotkey);
@@ -233,6 +243,48 @@ const addNewHotkeyByHotkey = (key) => {
   });
 }
 
+const handleSelectImage = async () => {
+  const imgPath = await iManager.getFilePath('preview', 'image');
+  if (imgPath) {
+    const imgBase64 = await iManager.getImageBase64(imgPath);
+    img.value = "data:image/png;base64," + imgBase64;
+    modInfo.value.preview = imgPath;
+  }
+}
+
+const handleCancel = async () => {
+  modInfo.value = JSON.parse(JSON.stringify(props.mod));
+  const imgBase64 = await iManager.getImageBase64(modInfo.value.preview);
+
+  img.value = "data:image/png;base64," + imgBase64;
+  editModInfoDialog.value.dismiss();
+}
+
+
+
+
+const handleSave = () => {
+  //debug
+  console.log('modInfo.value', modInfo.value);
+  // 保存修改的 mod 信息
+
+  if (props.mod == modInfo.value) {
+    editModInfoDialog.value.dismiss();
+    return;
+  }
+
+  // 处理 图片 更改
+  if (props.mod.preview !== modInfo.value.preview) {
+    // 当图片更改时，将新图片保存到本地 对应的文件夹下，并且将新的路径保存到 modInfo 中
+    //debug
+    console.log(`change preview of ${modInfo.value.name} to ${modInfo.value.preview}`);
+    iManager.changePreview(modInfo.value.name, modInfo.value.preview);
+  }
+  props.mod = modInfo.value;
+  iManager.saveModInfo(modInfo.value);
+  editModInfoDialog.value.dismiss();
+}
+
 onMounted(() => {
   const editModInfoDialogStyle = document.createElement('style');
   editModInfoDialogStyle.innerHTML = `
@@ -255,6 +307,13 @@ onMounted(() => {
         `;
   // editModInfoDialog.shadowRoot.appendChild(editModInfoDialogStyle);
   editModInfoDialog.value.shadowRoot.appendChild(editModInfoDialogStyle);
+
+  editModInfoDialog.value.addEventListener('dismiss', async () => {
+  // 如果 modInfo 与 props.mod 不同，则询问是否保存
+  if (JSON.stringify(modInfo.value) !== JSON.stringify(props.mod)) {
+    iManager.showDialog('save-change-dialog');
+  }
+});
 });
 
 

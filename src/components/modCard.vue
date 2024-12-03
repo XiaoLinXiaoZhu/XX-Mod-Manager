@@ -7,11 +7,14 @@
         inWindow="true" 
         :character="props.character"
         :class="{compact: props.compactMode}"
-        @click="click">
+        @click="click"
+        @contextmenu.prevent.stop="openEditModDialog">
 
 
         <div slot="image" style="height: 200px;">
-            <img src="" alt="mod image" />
+            <img id="editDialog-mod-info-image"
+                style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" alt="Mod Image"
+                :src="img" />
         </div>
         <div slot="headline" id="mod-item-headline">{{ props.mod }}</div>
         <div slot="subhead" id="mod-item-subhead">{{ props.character }}</div>
@@ -52,6 +55,8 @@ const displayHotKeys = computed(() => {
     }).join(', ');
 })
 
+const img = ref(null);
+
 const clicked = ref(false);
 const modItemRef = useTemplateRef('modItemRef');
 const emit = defineEmits(['click'])
@@ -70,6 +75,11 @@ const click = (event) => {
     else {
         playClickAnim(modItemRef.value);
     }
+}
+
+const openEditModDialog = () => {
+    iManager.setLastClickedModByName(props.mod);
+    iManager.showDialog('edit-mod-dialog');
 }
 
 function playClickAnim(modItem, event = null, rect = null) {
@@ -158,16 +168,11 @@ function playClickAnim(modItem, event = null, rect = null) {
     });
 
     onMounted(() => {
-        ipcRenderer.invoke('get-image', props.imagePath).then((image) => {
-            //debug
-            //console.log(image);
-            //debug
-            //console.log(modItemRef);
-            console.log(`modItemRef: ${modItemRef},type: ${typeof modItemRef}`);
-            modItemRef.value.querySelector('img').src = "data:image/png;base64," + image;
+        iManager.waitInit().then(() => {
+            iManager.getImageBase64(props.imagePath).then((imageBase64) => {
+                img.value = "data:image/png;base64," + imageBase64;
+            });
         });
-
-        //console.log(props.hotKeys);
     })
 
 

@@ -62,6 +62,7 @@
     "mod-info-hotkeys-hotkey": "快捷键",
     "mod-info-hotkeys-description": "快捷键描述",
     "save": "保存",
-    "cancel": "取消"
+    "cancel": "取消",
+    "ignore": "忽略"
   }
 }

@@ -38,7 +38,7 @@ const props = defineProps({
 });
 
 // 定义 mods 变量
-const mods = ref(iManager.data.modList);
+const mods = ref(null);
 const characters = ref(['all', 'selected']);
 const currentCharacter = ref('all');
 
@@ -163,6 +163,16 @@ onMounted(async () => {
     //debug
     console.log('mod-card-manager mounted');
     console.log(modCardRefs.value);
+
+    iManager.on('modInfoChanged', () => {
+        //debug
+        console.log('get modInfoChanged');
+        mods.value =  null;
+        setTimeout(() => {
+            loadMods();
+            observeMods();
+        }, 1);
+    });
 });
 
 

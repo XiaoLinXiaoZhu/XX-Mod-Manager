@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron');
 const path = require('node:path')
-const fs = require('fs')
+const fs = require('fs');
 
 
 let currentMainWindow = null;
@@ -176,7 +176,11 @@ function creatMod(modPath) {
         mod.preview = modConfig.preview;
         mod.description = modConfig.description;
         mod.url = modConfig.url;
-        mod.hotkeys = modConfig.hotkeys;
+
+        // mod.hotkeys = modConfig.hotkeys;
+        if  (modConfig.hotkeys != undefined) {
+            mod.hotkeys = modConfig.hotkeys;
+        }
 
         const modPreview = tryGetModPreview(modPath, modConfig.preview);
         mod.preview = modPreview.previewPath;
@@ -402,6 +406,61 @@ ipcMain.handle('apply-mods', async (event, mods, modSourcePath, modTargetPath) =
         }
     });
 });
+
+ipcMain.handle('save-mod-info', async (event, modSourcePath, jsonModInfo) => {
+    //- mod的格式
+    // const mod = {
+    //     name: path.basename(modPath),
+    //     character: 'Unknown',
+    //     preview: '',
+    //     description: '',
+    //     url: '',
+    //     hotkeys: [],
+    // }
+    
+    // 需要保存为：
+    // const saveInfo = {
+    //     character: mod.character,
+    //     preview: mod.preview为图片路径,这里只需要截取文件名,
+    //     description: mod.description,
+    //     url: mod.url,
+    //     hotkeys: mod.hotkeys,
+    // }
+
+    const modInfo = JSON.parse(jsonModInfo);
+
+    const saveInfo = {
+        character: modInfo.character,
+        preview: path.basename(modInfo.preview),
+        description: modInfo.description,
+        url: modInfo.url,
+        hotkeys: modInfo.hotkeys,
+    }
+
+    //debug
+    // 打印所有的属性
+    printModInfo(saveInfo);
+
+    //debug
+    console.log(modSourcePath);
+    const modConfigPath = path.join(modSourcePath,modInfo.name,'mod.json');
+    fs.writeFileSync(modConfigPath, JSON.stringify(saveInfo), 'utf-8');
+});
+
+function printModInfo(modInfo) {
+    console.log('save-mod-info:');
+    for (const key in modInfo) {
+        console.log(`${key}:${modInfo[key]}`);
+    }
+    // hotkeys 为 [{},{}],将其 每个键值对打印出来
+    console.log('hotkeys:');
+    modInfo.hotkeys.forEach((hotkey, index) => {
+        console.log(`hotkey${index}:`);
+        for (const key in hotkey) {
+            console.log(`${key}:${hotkey[key]}`);
+        }
+    });
+}
 
 
 //-========================== fsProxy ==========================
