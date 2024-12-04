@@ -55,7 +55,7 @@ iManager.waitInit().then((iManager) => {
     if (iManager.config.firstLoad) {
         // debug 
         console.log('ℹ️ first load');
-        iManager.openNewWindow('firstLoad/');
+        iManager.openNewWindow('firstLoad');
     }
 })
 

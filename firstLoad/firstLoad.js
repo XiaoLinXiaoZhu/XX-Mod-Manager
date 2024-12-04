@@ -82,6 +82,11 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded' + nodeVersion);
 })
 
+window.addEventListener('beforeunload', () => {
+    iManager.config.firstLoad = false;
+    iManager.saveConfig();
+    ipcRenderer.send('refresh-main-window');
+});
 
 //-======================== snackbar ========================-//
 ipcRenderer.on('snack', (event, message,type = 'info') => {

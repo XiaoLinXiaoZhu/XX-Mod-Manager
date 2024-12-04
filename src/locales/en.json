@@ -6,7 +6,12 @@
     "section": {
       "mod": "Mod",
       "help": "Help",
-      "settings": "Settings"
+      "settings": "Settings",
+      "intro": "Intro",
+      "basic": "Basic",
+      "advanced": "Advanced",
+      "auto": "Auto",
+      "more": "More"
     },
     "filter": {
       "all": "All",

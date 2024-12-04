@@ -98,16 +98,22 @@ ipcMain.on('open-new-window', (event, arg) => {
 
   // newWindow.loadURL('http://localhost:3000/' + arg)
   if (devMode) {
-    newWindow.loadURL('http://localhost:3000/' + arg)
+    newWindow.loadURL('http://localhost:3000/' + arg + '/index.html')
   }
   else{
     const path = require('path');
-    const filePath = path.join(__dirname, `../dist/${arg}.html`);
+    const filePath = path.join(__dirname, `../dist/${arg}/index.html`);
     console.log('filePath', filePath);
+
+    newWindow.loadFile(filePath)
   }
 
   //newWindow.webContents.openDevTools()
 })
+
+ipcMain.on('refresh-main-window', (event) => {
+  currentMainWindow.reload()
+});
 
 
 ipcMain.on('snack', (event, message, type = 'info') => {
