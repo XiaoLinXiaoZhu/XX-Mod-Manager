@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Cache node modules
         uses: actions/cache@v3
@@ -31,6 +31,8 @@ jobs:
 
       - name: Build Electron App
         run: npm run build  # 运行 electron-builder 打包
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}  # 需要配置 GitHub Token
 
       - name: Publish Electron App to GitHub
         run: npm run publish  # 发布到 GitHub Releases
