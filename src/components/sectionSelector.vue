@@ -45,10 +45,31 @@ const sliderStyle = computed(() => {
     };
 });
 
+const nextSection = () => {
+    const index = props.sections.indexOf(currentSection.value);
+    if (index < props.sections.length - 1) {
+        currentSection.value = props.sections[index + 1];
+        emit('update:currentSection', currentSection.value);
+    }
+};
+
+const prevSection = () => {
+    const index = props.sections.indexOf(currentSection.value);
+    if (index > 0) {
+        currentSection.value = props.sections[index - 1];
+        emit('update:currentSection', currentSection.value);
+    }
+};
+
 watch(() => props.sections, (newSection) => {
     if (!newSection.includes(currentSection.value)) {
         currentSection.value = newSection[0];
     }
+});
+
+defineExpose({
+    nextSection,
+    prevSection
 });
 </script>
 

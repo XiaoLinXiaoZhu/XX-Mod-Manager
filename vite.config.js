@@ -20,7 +20,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: 'index.html',
-        tapePage: 'tapePage/index.html'
+        tapePage: 'tapePage/index.html',
+        firstLoad: 'firstLoad/index.html',
       }
     }
   },

@@ -81,6 +81,7 @@ class IManager {
     // };
 
     config = {
+        firstLoad: true, // 是否第一次加载
         language: 'zh_cn', // 语言
         theme: 'dark', // 主题
         modSourcePath: null, // mod的源路径
@@ -328,7 +329,9 @@ class IManager {
 
     async setConfigFromDialog(key, fileType) {
         const filePath = await this.getFilePath(key, fileType);
-        if (!this.config[key]) {
+        if (this.config[key] === undefined) {
+            //debug
+            console.log('未知属性，请检查', key, this.config);
             snack('未知属性，请检查');
             return '';
         }
@@ -395,6 +398,10 @@ class IManager {
                 console.log(`${key}:${hotkey[key]}`);
             }
         });
+    }
+
+    async moveAllFiles(sourcePath, targetPath) {
+        await ipcRenderer.invoke('move-all-files', sourcePath, targetPath);
     }
 
 

@@ -6,6 +6,10 @@ const setMainWindow = require('./fileSystem.js').setMainWindow
 
 let currentMainWindow;
 
+let devMode = false;
+devMode = process.argv.includes('--dev');
+console.log('process.argv', process.argv);
+
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -25,20 +29,18 @@ const createWindow = () => {
 
   currentMainWindow = mainWindow;
   setMainWindow(mainWindow);
+
+
   
   //debug
   console.log('===== createWindow =====');
-  let devMode = false;
-  console.log('process.argv', process.argv);
-  
-  devMode = process.argv.includes('--dev');
-
   if(devMode){
     mainWindow.loadURL('http://localhost:3000/')
   }
   else{
     mainWindow.loadFile('dist/index.html')
   }
+
     //mainWindow.loadFile(path.resolve(__dirname,"../dist/index.html"))
 
   // 加载 index.html(这里不管是什么路径，都是相对于你的项目根目录的路径)
@@ -94,9 +96,17 @@ ipcMain.on('open-new-window', (event, arg) => {
     }
   })
 
-  newWindow.loadURL('http://localhost:3000/' + arg)
+  // newWindow.loadURL('http://localhost:3000/' + arg)
+  if (devMode) {
+    newWindow.loadURL('http://localhost:3000/' + arg)
+  }
+  else{
+    const path = require('path');
+    const filePath = path.join(__dirname, `../dist/${arg}.html`);
+    console.log('filePath', filePath);
+  }
 
-  newWindow.webContents.openDevTools()
+  //newWindow.webContents.openDevTools()
 })
 
 

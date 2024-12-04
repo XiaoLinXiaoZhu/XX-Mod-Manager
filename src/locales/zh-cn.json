@@ -6,7 +6,11 @@
     "section": {
       "mod": "模组",
       "help": "帮助",
-      "settings": "设置"
+      "settings": "设置",
+      "basic": "基础",
+      "advanced": "管理",
+      "auto": "自动",
+      "more": "更多"
     },
     "filter": {
       "all": "全部",

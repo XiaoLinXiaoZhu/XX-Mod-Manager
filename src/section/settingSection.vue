@@ -13,13 +13,13 @@
                         <input type="radio" name="language" id="zh_cn" checked value="zh_cn" v-model="language">
                         <label for="zh_cn">
                             <s-chip selectable="true" type="default" id="zh_cn">
-                                <p data-translate-key="zh_cn">简体中文</p>
+                                <p>简体中文</p>
                             </s-chip>
                         </label>
                         <input type="radio" name="language" id="en" value="en" v-model="language">
                         <label for="en">
                             <s-chip selectable="true" type="default" id="en">
-                                <p data-translate-key="en">English</p>
+                                <p>English</p>
                             </s-chip>
                         </label>
                     </div>

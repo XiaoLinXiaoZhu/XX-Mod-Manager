@@ -1,24 +1,31 @@
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
-import test_app from './test/test_app.vue'
 import 'sober'
-//npm
 import 'sober/style/scroll-view.css'
 import { Snackbar } from 'sober'
+
+import '../src/style.css'
+
+import { createApp } from 'vue'
+import firstLoadPage from './firstLoadPage.vue'
+
 const { ipcRenderer} = require('electron');
+
 import IManager from '../electron/IManager'
 const iManager = new IManager();
 
+//-=================== 旧的导入 ===================-//
+const path = require('path');
+const fs = require('fs');
+const { shell } = require("electron");
+
 //-====================入口文件====================-//
-const vue_app = createApp(test_app);
+const vue_app = createApp(firstLoadPage);
 
 //-====================国际化====================-//
 import { createI18n } from 'vue-i18n';
 
 // 导入语言包
-import en from './locales/en.json';
-import zh_cn from './locales/zh-cn.json';
+import en from '../src/locales/en.json';
+import zh_cn from '../src/locales/zh-cn.json';
 
 // 创建i18n实例
 const i18n = createI18n({
@@ -36,7 +43,7 @@ vue_app.use(i18n);
 
 //-==================== 挂载 ====================-//
 
-vue_app.mount('#app');
+vue_app.mount('#app-container');
 iManager.waitInit().then((iManager) => {
 
     // ------------------ 语言切换 ------------------ //
@@ -52,11 +59,8 @@ iManager.waitInit().then((iManager) => {
 
     // ------------------ first load ------------------ //
     // 首次打开时打开 初始化窗口
-    if (iManager.config.firstLoad) {
-        // debug 
-        console.log('ℹ️ first load');
-        iManager.openNewWindow('firstLoad/');
-    }
+    // 已经初始化了
+    iManager.config.firstLoad = false;
 })
 
 
@@ -81,6 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 //-======================== snackbar ========================-//
 ipcRenderer.on('snack', (event, message,type = 'info') => {
+    snack(message,type);
+})
+
+function snack(message, type = 'info') {
     console.log(`snack:${message} type:${type}`);
     switch (type) {
         case 'info':
@@ -102,5 +110,5 @@ ipcRenderer.on('snack', (event, message,type = 'info') => {
                 align: 'top'
             })
             break;
-        }
-})
+    }
+}

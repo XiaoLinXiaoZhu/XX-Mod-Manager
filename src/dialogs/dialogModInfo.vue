@@ -35,7 +35,7 @@
 
               <s-tooltip style="position: relative; left: 15px;">
                 <s-icon-button icon="image" @click="handleSelectImage" class="OO-icon-button"
-                  style="border: 5px solid #0c0c0c;transform: scale(1);" slot="trigger">
+                  style="border: 5px solid var(--s-color-surface-container-high);transform: scale(1);" slot="trigger">
                   <s-icon type="add"></s-icon>
                 </s-icon-button>
 

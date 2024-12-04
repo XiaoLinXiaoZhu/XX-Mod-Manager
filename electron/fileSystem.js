@@ -463,6 +463,25 @@ function printModInfo(modInfo) {
 }
 
 
+function moveAllFiles(srcDir, destDir) {
+    // 将 srcDir 下的所有文件移动到 destDir
+    if (!fs.existsSync(destDir)) {
+        fs.mkdirSync(destDir, { recursive: true });
+    }
+
+    const files = fs.readdirSync(srcDir);
+    files.forEach(file => {
+        const srcFile = path.join(srcDir, file);
+        const destFile = path.join(destDir, file);
+        fs.copyFileSync(srcFile, destFile);
+        fs.unlinkSync(srcFile);
+    });
+}
+
+ipcMain.handle('move-all-files', async (event, srcDir, destDir) => {
+    moveAllFiles(srcDir, destDir);
+});
+
 //-========================== fsProxy ==========================
 // fsProxy 用于渲染进程调用主进程的文件系统功能
 // class fsProxy {

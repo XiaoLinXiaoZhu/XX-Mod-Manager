@@ -30,7 +30,6 @@ import settingSection from '../section/settingSection.vue';
 import CssProxy from '../components/cssProxy.vue';
 import dialogModInfo from '../dialogs/dialogModInfo.vue';
 import helpSection from '../section/helpSection.vue';
-import { mod } from 'three/webgpu';
 
 import IManager from '../../electron/IManager';
 const iManager = new IManager();
