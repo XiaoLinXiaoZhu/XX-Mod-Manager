@@ -5,7 +5,7 @@
   "main": "./electron/main.js",
   "author": "XLXZ",
   "license": "MIT",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "type": "commonjs",
   "scripts": {
     "dev": "vite",
