@@ -2,7 +2,6 @@
 // 所有的数据都从 这里 获取，包括 各种页面的样式，事件的触发，数据的获取等等
 // 这样的话，方便将所有非核心功能 转化为 插件，方便管理和拓展
 
-
 // 这个类应该 被划分到 渲染进程底下，但是 主进程也应该能够访问到这个类
 const { ipcRenderer, ipcMain } = require('electron');
 const { app } = require('electron');
@@ -50,6 +49,10 @@ class IManager {
         this.data = {};
         this.plugins = {};
         this.eventList = {};
+
+        // 支持 插件 功能
+        this.plugins = [];
+        this.pluginData = {};
 
         // 初始化
         this.init();
@@ -102,26 +105,9 @@ class IManager {
 
 
     //-==================== 内部方法 ====================
-    //     // 定义 loadMods 方法
-    // const loadMods = async () => {
-    //     const currentConfig = await ipcRenderer.invoke('get-current-config');
-    //     //debug
-    //     console.log(currentConfig);
-    //     const modSourcePath = currentConfig.modSourcePath;
-    //     console.log(`modSourcePath: ${modSourcePath},type: ${typeof modSourcePath}`);
-    //     const loadMods = await ipcRenderer.invoke('get-mods', modSourcePath);
-    //     console.log(loadMods);
-    //     mods.value = loadMods;
-
-    //     // 加载 character
-    //     loadMods.forEach((mod) => {
-    //         if (!characters.value.includes(mod.character)) {
-    //             characters.value.push(mod.character);
-    //         }
-    //     });
-    //     //debug
-    //     console.log(characters.value);
-    // };
+    async snack(message, type = 'info') {
+        ipcRenderer.send('snack', message, type);
+    }
     async loadConfig() {
         const currentConfig = await ipcRenderer.invoke('get-current-config');
 
@@ -232,6 +218,11 @@ class IManager {
         // 加载预设
         await this.loadPresets();
         console.log('✅>> loadPresets done');
+
+        // 加载插件
+        await this.loadPlugins();
+        console.log('✅>> loadPlugins done');
+
 
         //debug
         console.log('✅>> init IManager done');
@@ -404,35 +395,6 @@ class IManager {
         await ipcRenderer.invoke('move-all-files', sourcePath, targetPath);
     }
 
-
-    //-==================== 插件管理 ====================
-    // 注册插件
-    registerPlugin(plugin) {
-        this.plugins[plugin.name] = plugin;
-    }
-
-    // 获取插件
-    getPlugin(name) {
-        return this.plugins[name];
-    }
-
-    // 获取数据
-    getData(key) {
-        return this.data[key];
-    }
-
-    // 设置数据
-    setData(key, value) {
-        this.data[key] = value;
-    }
-
-    // 触发事件
-    triggerEvent(eventName, data) {
-        for (let key in this.plugins) {
-            this.plugins[key].trigger(eventName, data);
-        }
-    }
-
     //-==================== 事件管理 ====================
     // 注册事件
     on(eventName, callback) {
@@ -451,6 +413,73 @@ class IManager {
         }
     }
 
+    //-===================== 插件 =====================
+    registerPlugin(plugin) {
+        this.plugins.push(plugin);
+        if (typeof plugin.init === 'function') {
+            plugin.init(this);
+        }
+
+        //debug
+        console.log(`▶️plugin ${plugin.name} loaded`, plugin);
+    }
+
+    registerPluginData(pluginName, pluginConfig) {
+        this.pluginData[pluginName] = pluginConfig;
+        //debug
+        console.log(`registerPluginData ${pluginName}`, pluginConfig);
+        // pluginConfig 是 data 的 数组
+
+        // data 为一个对象，包含了插件的可配置数据，比如说是否启用，是否显示等等
+        // 它会被 解析 之后 在 设置页面 中显示，并且为 插件提供数据
+        // 当它发生变化时，会触发 插件的 onChange 方法
+
+        // data 的格式为
+        // {
+        //     name: 'ifAblePlugin',
+        //     data: true,
+        //     type: 'boolean',
+        //     displayName: 'If Able Plugin',
+        //     description: 'If true, the plugin will be enabled',
+        //     t_name:{
+        //         zh_cn:'是否启用插件',
+        //         en:'Enable Plugin'
+        //     },
+        //     t_description:{
+        //         zh_cn:'如果为真，插件将被启用',
+        //         en:'If true, the plugin will be enabled'
+        //     },
+        //     onChange: (value) => {
+        //         console.log('ifAblePlugin changed:', value);
+        //     }
+        // }
+    }
+
+    async loadPlugins() {
+        // 插件为 一个 js 文件，通过 require 引入
+        // 然后调用 init 方法，将 iManager 传递给插件
+
+        // 先加载内置的插件
+        const builtInPlugins = ['autoStartPlugin'];
+        builtInPlugins.forEach((pluginName) => {
+            const plugin = require(`./plugins/${pluginName}.js`);
+            this.registerPlugin(plugin);
+        });
+
+        // 从 plugins 文件夹中加载插件，其位于 
+        const userDataPath = await ipcRenderer.invoke('get-user-data-path');
+        const pluginPath = path.join(userDataPath, 'plugins');
+        const files = fs.readdirSync(pluginPath);
+        files.forEach((file) => {
+            if (file.endsWith('.js')) {
+                const plugin = require(path.join(pluginPath, file));
+                this.registerPlugin(plugin);
+            }
+        });
+
+        //debug 打印所有插件
+        console.log(this.plugins);
+    }
 
 }
 

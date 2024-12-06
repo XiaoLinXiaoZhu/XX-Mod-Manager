@@ -242,6 +242,8 @@
 
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
+
+            <!-- -这里后面提供 插件的设置 -->
         </div>
     </div>
 </template>
@@ -315,6 +317,8 @@ watch(presetPath, (newVal) => {
     iManager.saveConfig();
 });
 
+const pluginData = ref({});
+
 onMounted(async () => {
     //debug
     console.log('settingSection mounted');
@@ -331,6 +335,51 @@ onMounted(async () => {
     presetPath.value = iManager.config.presetPath;
     //初始化tab
     currentTab.value = tabs.value[0];
+
+    // 挂载插件的额外设置
+    pluginData.value = iManager.pluginData;
+    console.log('pluginData', pluginData);
+    // pluginData 是 一组 plungeName:pluginData 的键值对
+    // 每个 pluginData 是一个 数组，数组中的每个元素是一个data对象，data对象包含了插件的设置
+    // 每个 data 对象包含了以下属性
+    // data 的格式为
+    // {
+    //     name: 'ifAblePlugin',
+    //     data: true,
+    //     type: 'boolean',
+    //     displayName: 'If Able Plugin',
+    //     description: 'If true, the plugin will be enabled',
+    //     t_name:{
+    //         zh_cn:'是否启用插件',
+    //         en:'Enable Plugin'
+    //     },
+    //     t_description:{
+    //         zh_cn:'如果为真，插件将被启用',
+    //         en:'If true, the plugin will be enabled'
+    //     },
+    //     onChange: (value) => {
+    //         console.log('ifAblePlugin changed:', value);
+    //     }
+    // }
+    // 通过这个数据，我们可以动态生成插件的设置界面
+
+    // 生成插件设置界面
+    // 1. 生成插件的设置界面
+    // 2. 生成插件的设置界面的数据
+
+    // 遍历插件数据
+    for (const pluginName in pluginData.value) {
+        const plugin = pluginData.value[pluginName];
+        // 遍历插件的设置
+        for (const data of plugin) {
+            // 生成设置界面
+            // 生成设置界面的数据
+            //debug
+            console.log(`in plugin ${pluginName}, data:`, data);
+        }
+    }
+
+
 });
 </script>
 
