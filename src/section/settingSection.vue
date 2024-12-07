@@ -255,7 +255,8 @@
                         <h3 v-if="pluginData.t_name">{{ pluginData.t_name[locale] }}</h3>
                         <h3 v-else>{{ pluginName }}</h3>
                         <!-- -如果iManager.disabledPluginNames 中包含 pluginName，则显示为 false，否则显示为 true -->
-                        <s-switch :checked="!iManager.disabledPluginNames.includes(pluginName)" @change="iManager.togglePlugin(pluginName)">
+                        <s-switch :checked="!iManager.disabledPluginNames.includes(pluginName)"
+                            @change="iManager.togglePlugin(pluginName)">
                         </s-switch>
                     </div>
                 </div>
@@ -265,14 +266,28 @@
             <!-- -这里后面提供 各个插件的设置 -->
             <div v-for="(pluginData, pluginName) in pluginConfig" :key="pluginName">
                 <div v-if="currentTab === pluginName">
-                    <!-- <div>
-                        {{ pluginName }}
-                    </div>
+
+                    <s-fold>
+                        <s-button slot="trigger">show details</s-button>
+                        <div>
+                            {{ pluginName }}
+                        </div>
+                        <s-divider></s-divider>
+                        <div class="OO-box OO-shade-box">
+                            <div v-for="data in pluginData" :key="data.name">
+                                <div class="OO-setting-bar">
+                                    <h3 v-if="data.t_name">{{ data.t_name[locale] }}</h3>
+                                    <h3 v-else>{{ data.displayName }}</h3>
+                                    <div>
+                                        {{ data.data }}
+                                    </div>
+                                </div>
+                                {{ data }}
+                            </div>
+                        </div>
+                    </s-fold>
+
                     <s-divider></s-divider>
-                    <div>
-                        {{ pluginData }}
-                    </div>
-                    <s-divider></s-divider> -->
                     <div v-for="data in pluginData" :key="data.name">
                         <div class="OO-setting-bar">
                             <h3 v-if="data.t_name">{{ data.t_name[locale] }}</h3>
@@ -284,18 +299,21 @@
                                 <s-text-field :value="data.data"
                                     @input="data.onChange($event.target.value)"></s-text-field>
                             </div>
-                            <div v-else-if="data.type === 'number'">
-                                <s-text-field :value="data.data"
-                                    @input="data.onChange($event.target.value)"></s-text-field>
+                            <s-text-field :value="data.data" @input="data.onChange($event.target.value)"
+                                v-else-if="data.type === 'number'"></s-text-field>
+                            <div v-else-if="data.type === 'select'" style="display: flex;flex-direction:row;">
+                                <div v-for="(option, index) in data.options" :key="index">
+                                    <input type="radio" :name="data.name" :id="option.value" :value="option.value"
+                                        v-model="data.data">
+                                    <label :for="option.value">
+                                        <s-chip selectable="true" type="default" :id="option.value"
+                                            @click="data.onChange(option.value)">
+                                            <p>{{ option.t_value ? option.t_value[locale] : option.value }}</p>
+                                        </s-chip>
+                                    </label>
+                                </div>
                             </div>
-                            <div v-else-if="data.type === 'select'">
-                                <s-select :value="data.data" @change="data.onChange($event.target.value)">
-                                    <s-option v-for="option in data.options" :key="option" :value="option">
-                                        {{ option }}
-                                    </s-option>
-                                </s-select>
-                            </div>
-                            <div v-else-if="data.type === 'path'" class="OO-s-text-field-container" >
+                            <div v-else-if="data.type === 'path'" class="OO-s-text-field-container">
                                 <s-text-field :value="data.data" @input="data.onChange($event.target.value)">
                                 </s-text-field>
                                 <s-icon-button type="filled" slot="start" class="OO-icon-button"
@@ -303,6 +321,9 @@
                                     <s-icon type="add"></s-icon>
                                 </s-icon-button>
                             </div>
+                            <s-button @click="data.onChange()" v-else-if="data.type === 'button'">
+                                {{ data.t_buttonName ? data.t_buttonName[locale] : data.buttonName }}
+                            </s-button>
                         </div>
                         <div v-if="data.t_description">
                             <p> {{ data.t_description[locale] }} </p>
@@ -325,10 +346,7 @@ import chipButton from '../components/chipButton.vue';
 import { computed, h, onMounted, ref, watch } from 'vue';
 import IManager from '../../electron/IManager';
 const iManager = new IManager();
-
-
 import { useI18n } from 'vue-i18n'
-import { Switch } from 'sober';
 const { t, locale } = useI18n()
 
 const tabs = ref(['normal', 'advanced', 'switch-config', 'about', 'plugin']);
