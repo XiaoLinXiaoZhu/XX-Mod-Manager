@@ -237,6 +237,7 @@ class IManager {
         //调用 start 方法
         setTimeout(() => {
             this.start();
+            this.trigger('initDone', this);
         }, 100);
     }
 
@@ -518,15 +519,27 @@ class IManager {
         // }
     }
 
+    getPluginData(pluginName, dataName) {
+        const pluginData = this.pluginConfig[pluginName];
+        const data = pluginData.find((data) => data.name === dataName);
+        return data.data;
+    }
+
     async loadPlugins() {
         // 插件为 一个 js 文件，通过 require 引入
         // 然后调用 init 方法，将 iManager 传递给插件
 
         // 先加载内置的插件
-        const builtInPlugins = ['autoStartPlugin'];
+        const builtInPlugins = ['testPlugin', 'autoStartPlugin'];
         builtInPlugins.forEach((pluginName) => {
-            const plugin = require(`./plugins/${pluginName}.js`);
-            this.registerPlugin(plugin);
+            try {
+                const plugin = require(`./plugins/${pluginName}.js`);
+                this.registerPlugin(plugin);
+            }
+            catch (e) {
+                console.log(`❌plugin ${pluginName} load failed`);
+                snack(`内置插件 ${pluginName} 加载失败`,'error');
+            }
         });
 
         // 从 plugins 文件夹中加载插件，其位于 

@@ -267,7 +267,7 @@
             <div v-for="(pluginData, pluginName) in pluginConfig" :key="pluginName">
                 <div v-if="currentTab === pluginName">
 
-                    <s-fold>
+                    <s-fold folded="true">
                         <s-button slot="trigger">show details</s-button>
                         <div>
                             {{ pluginName }}

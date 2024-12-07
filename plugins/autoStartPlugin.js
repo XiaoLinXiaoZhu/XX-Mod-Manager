@@ -1,6 +1,3 @@
-
-
-
 // pluginConfig 是 data 的 数组
 
 // data 为一个对象，包含了插件的可配置数据，比如说是否启用，是否显示等等
@@ -26,156 +23,87 @@
 //         console.log('ifAblePlugin changed:', value);
 //     }
 // }
-const pluginName = 'testPlugin';
+
+
+const pluginName = 'autoStartPlugin';
 module.exports = {
     name: pluginName,
     t_name:{
-        zh_cn:'测试插件',
-        en:'Test Plugin'
+        zh_cn:'自动启动插件',
+        en:'Auto Start Plugin'
     },
     init(iManager){
         iManager.snack('Auto Start Plugin Loaded');
 
         let pluginData = [];
 
-
-        //- 测试 boolean 类型
-        let ifAblePlugin = {
-            name: 'ifAblePlugin',
-            data: true,
+        //- 是否自动启动游戏
+        let autoStartGame = {
+            name: 'autoStartGame',
+            data: false,
             type: 'boolean',
-            displayName: 'If Able Plugin',
-            description: 'If true, the plugin will be enabled',
+            displayName: 'Auto Start Game',
+            description: 'If true, the game will start automatically',
             t_name:{
-                zh_cn:'是否启用插件',
-                en:'Enable Plugin'
+                zh_cn:'自动启动游戏',
+                en:'Auto Start Game'
             },
             t_description:{
-                zh_cn:'如果为真，插件将被启用',
-                en:'If true, the plugin will be enabled'
+                zh_cn:'如果为真，游戏将自动启动',
+                en:'If true, the game will start automatically'
             },
             onChange: (value) => {
-                console.log('ifAblePlugin changed:', value);
-                ifAblePlugin.data = value;
-                iManager.snack('ifAblePlugin changed:'+value);
+                console.log('autoStartGame changed:', value);
+                autoStartGame.data = value;
+                iManager.snack('autoStartGame changed:'+value);
                 iManager.savePluginConfig();
             }
-        };
-        pluginData.push(ifAblePlugin);
+        }
+        pluginData.push(autoStartGame);
 
-        //- 测试 path 类型
-        let modLoaderPath = {
-            name: 'modLoaderPath',
+        //- 游戏路径
+        let gamePath = {
+            name: 'gamePath',
             data: '',
             type: 'path',
-            displayName: 'Mod Loader Path',
-            description: 'The path of the mod loader',
+            displayName: 'Game Path',
+            description: 'The path of the game',
             t_name:{
-                zh_cn:'Mod Loader 路径',
-                en:'Mod Loader Path'
+                zh_cn:'游戏路径',
+                en:'Game Path'
             },
             t_description:{
-                zh_cn:'Mod Loader 的路径',
-                en:'The path of the mod loader'
+                zh_cn:'游戏的路径',
+                en:'The path of the game'
             },
             onChange: (value) => {
-                console.log('modLoaderPath changed:', value);
-                modLoaderPath.data = value;
-                iManager.snack('Mod Loader Path changed:'+value);
+                console.log('gamePath changed:', value);
+                gamePath.data = value;
+                iManager.snack('gamePath changed:'+value);
                 iManager.savePluginConfig();
             }
         }
-        pluginData.push(modLoaderPath);
+        pluginData.push(gamePath);
 
-        //- 测试 number 类型
-        let refreshTime = {
-            name: 'refreshTime',
-            data: 1000,
-            type: 'number',
-            displayName: 'Refresh Time',
-            description: 'The time to refresh',
-            t_name:{
-                zh_cn:'刷新时间',
-                en:'Refresh Time'
-            },
-            t_description:{
-                zh_cn:'刷新的时间',
-                en:'The time to refresh'
-            },
-            onChange: (value) => {
-                console.log('refreshTime changed:', value);
-                refreshTime.data = value;
-                iManager.snack('Refresh Time changed:'+value);
-                iManager.savePluginConfig();
-            }
-        }
-        pluginData.push(refreshTime);
+        iManager.registerPluginConfig(pluginName, pluginData);
 
-        //- 测试 button 类型
-        let testButton = {
-            name: 'testButton',
-            type: 'button',
-            displayName: 'Test Button',
-            description: 'Test Button',
-            t_name:{
-                zh_cn:'测试按钮',
-                en:'Test Button'
-            },
-            t_description:{
-                zh_cn:'测试按钮',
-                en:'Test Button'
-            },
-            buttonName: 'Test Button',
-            t_buttonName:{
-                zh_cn:'测试按钮',
-                en:'Test Button'
-            },
-            onChange: (value) => {
-                iManager.snack('Test Button Clicked');
-            }
-        }
-        pluginData.push(testButton);
-
-        //- 测试 select 类型
-        let testSelect = {
-            name: 'testSelect',
-            data: 'a',
-            type: 'select',
-            displayName: 'Test Select',
-            description: 'Test Select',
-            t_name:{
-                zh_cn:'测试选择',
-                en:'Test Select'
-            },
-            t_description:{
-                zh_cn:'测试选择',
-                en:'Test Select'
-            },
-            options:[
-                {
-                    value:'a',
-                    t_value:{
-                        zh_cn:'选项A',
-                        en:'Option A'
-                    }
-                },
-                {
-                    value:'b',
-                    t_value:{
-                        zh_cn:'选项B',
-                        en:'Option B'
-                    }
+        iManager.on('initDone', (iManager) => {
+            //debug
+            console.log('autoStartPlugin initDone',iManager.pluginConfig[pluginName]);
+            const pluginConfig = iManager.pluginConfig[pluginName]; // 获取插件配置,这个是 data 的数组
+            // 如果 name 为 autoStartGame 的 data 为 true,则自动启动游戏
+            //debug
+            console.log('autoStartGame:',pluginConfig.find((data) => data.name === 'autoStartGame'));
+            if(iManager.getPluginData(pluginName, 'autoStartGame')){
+                // 如果游戏路径存在,则启动游戏
+                if(iManager.getPluginData(pluginName, 'gamePath')){
+                    iManager.snack('Auto Start Game '+ iManager.getPluginData(pluginName, 'gamePath'));
+                    // 启动游戏
+                    // iManager.startGame(pluginConfig.find((data) => data.name === 'gamePath').data);
+                }else{
+                    iManager.snack('Game Path not set');
                 }
-            ],
-            onChange: (value) => {
-                console.log('testSelect changed:', value);
-                testSelect.data = value;
-                iManager.snack('Test Select changed:'+value);
-                iManager.savePluginConfig();
             }
-        }
-        pluginData.push(testSelect);
-
-        iManager.registerPluginConfig(pluginName,pluginData);
+        });
     }
 }
