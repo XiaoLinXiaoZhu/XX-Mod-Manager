@@ -220,6 +220,7 @@ class IManager {
         console.log('✅>> loadPresets done');
 
         // 加载插件
+        await this.loadDisabledPlugins();
         await this.loadPlugins();
         console.log('✅>> loadPlugins done');
 
@@ -415,10 +416,54 @@ class IManager {
 
     //-===================== 插件 =====================
     plugins = {};
+    disabledPluginNames = [];
     pluginConfig = {};
 
+    disablePlugin(pluginName) {
+        this.disabledPluginNames.push(pluginName);
+        this.trigger('pluginDisabled', pluginName);
+        this.saveDisabledPlugins();
+    }
+
+    enablePlugin(pluginName) {
+        this.disabledPluginNames = this.disabledPluginNames.filter((name) => name !== pluginName);
+        this.trigger('pluginEnabled', pluginName);
+        this.saveDisabledPlugins();
+    }
+
+    togglePlugin(pluginName) {
+        if (this.disabledPluginNames.includes(pluginName)) {
+            this.enablePlugin(pluginName);
+        }
+        else {
+            this.disablePlugin(pluginName);
+        }
+    }
+
+    //是否启用的这个状态应该保存在本地
+    //这样每次打开软件的时候，都会根据这个状态来加载插件
+    async saveDisabledPlugins() {
+        ipcRenderer.invoke('save-disabled-plugins', this.disabledPluginNames);
+    }
+
+    async loadDisabledPlugins() {
+        this.disabledPluginNames = await ipcRenderer.invoke('get-disabled-plugins');
+        // this.trigger('disabledPluginsLoaded', disabledPluginNames);
+        //debug
+        console.log('disabledPluginNames:', this.disabledPluginNames);
+    }
+
     registerPlugin(plugin) {
+        //debug
         this.plugins[plugin.name] = plugin;
+
+        if (this.disabledPluginNames.includes(plugin.name)) {
+            //debug
+            console.log(`⛔plugin ${plugin.name} disabled`);
+            snack(`插件 ${plugin.name} 已禁用`);
+            return;
+        }
+
         if (typeof plugin.init === 'function') {
             plugin.init(this);
         }
@@ -429,8 +474,11 @@ class IManager {
             console.log(`ℹ️loadPluginConfig ${plugin.name}`, localPluginData);
             if (localPluginData) {
                 //debug
-                console.log(`🟦loadPluginConfig ${plugin.name}`, localPluginData);
-                // this.pluginConfig[plugin.name] = localPluginData;
+                console.log(`❇️plugin ${plugin.name} loaded with local data`, localPluginData);
+                // 这里的 localPluginData 只包含 pluginData的 data，而不包含其他的属性，所以只需要将data赋值为localPluginData
+                this.pluginConfig[plugin.name].forEach((data) => {
+                    data.data = localPluginData[data.name];
+                });
             }
         }
         );

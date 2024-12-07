@@ -54,6 +54,7 @@ module.exports = {
             },
             onChange: (value) => {
                 console.log('ifAblePlugin changed:', value);
+                ifAblePlugin.data = value;
                 iManager.snack('ifAblePlugin changed:'+value);
                 iManager.savePluginConfig();
             }
@@ -76,6 +77,7 @@ module.exports = {
             },
             onChange: (value) => {
                 console.log('modLoaderPath changed:', value);
+                modLoaderPath.data = value;
                 iManager.snack('Mod Loader Path changed:'+value);
                 iManager.savePluginConfig();
             }

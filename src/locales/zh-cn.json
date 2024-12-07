@@ -22,7 +22,8 @@
     "normal": "常规设置",
     "advanced": "高级设置",
     "switch-config": "切换配置",
-    "about": "关于"
+    "about": "关于",
+    "plugin": "插件"
   },
   "setting": {
     "title": "设置",

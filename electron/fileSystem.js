@@ -387,6 +387,23 @@ ipcMain.handle('get-plugin-config', async (event, pluginName) => {
 }
 );
 
+// 保存插件启用状态
+ipcMain.handle('save-disabled-plugins', async (event, disabledPlugins) => {
+    const dataPath = app.getPath('userData');
+    const filePath = path.join(dataPath, 'disabledPlugins.json');
+    fs.writeFileSync(filePath, JSON.stringify(disabledPlugins), 'utf-8');
+});
+
+// 获取插件启用状态
+ipcMain.handle('get-disabled-plugins', async (event) => {
+    const dataPath = app.getPath('userData');
+    const filePath = path.join(dataPath, 'disabledPlugins.json');
+    if (fs.existsSync(filePath)) {
+        return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    }
+    return [];
+});
+
 //-=========================== apply ===========================
 
 // ipcMain.handle('apply-mods', async (event, mods) => {

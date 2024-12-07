@@ -244,18 +244,35 @@
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
 
-            <!-- -这里后面提供 插件的设置 -->
+            <!-- -插件管理面板，控制插件的开关 -->
+            <div v-if="currentTab === 'plugin'">
+                <div class="OO-setting-bar">
+                    <h3> 插件管理 </h3>
+                </div>
+                <div class="OO-box OO-shade-box" style="margin: 10px 0;">
+                    <h3> 插件列表 </h3>
+                    <div class="OO-setting-bar" v-for="(pluginData, pluginName) in plugins" :key="pluginName">
+                        <h3 v-if="pluginData.t_name">{{ pluginData.t_name[locale] }}</h3>
+                        <h3 v-else>{{ pluginName }}</h3>
+                        <!-- -如果iManager.disabledPluginNames 中包含 pluginName，则显示为 false，否则显示为 true -->
+                        <s-switch :checked="!iManager.disabledPluginNames.includes(pluginName)" @change="iManager.togglePlugin(pluginName)">
+                        </s-switch>
+                    </div>
+                </div>
 
+
+            </div>
+            <!-- -这里后面提供 各个插件的设置 -->
             <div v-for="(pluginData, pluginName) in pluginConfig" :key="pluginName">
                 <div v-if="currentTab === pluginName">
-                    <div>
+                    <!-- <div>
                         {{ pluginName }}
                     </div>
                     <s-divider></s-divider>
                     <div>
                         {{ pluginData }}
                     </div>
-                    <s-divider></s-divider>
+                    <s-divider></s-divider> -->
                     <div v-for="data in pluginData" :key="data.name">
                         <div class="OO-setting-bar">
                             <h3 v-if="data.t_name">{{ data.t_name[locale] }}</h3>
@@ -278,10 +295,8 @@
                                     </s-option>
                                 </s-select>
                             </div>
-
-                            <div class="OO-s-text-field-container" v-else-if="data.type === 'path'">
-                                <s-text-field :value="data.data"
-                                    @input="data.onChange($event.target.value)">
+                            <div v-else-if="data.type === 'path'" class="OO-s-text-field-container" >
+                                <s-text-field :value="data.data" @input="data.onChange($event.target.value)">
                                 </s-text-field>
                                 <s-icon-button type="filled" slot="start" class="OO-icon-button"
                                     @click="iManager.getFilePath('modLoaderPath', 'exe').then((res) => { data.data = res, data.onChange(res) })">
@@ -307,7 +322,7 @@
 <script setup>
 import leftMenu from '../components/leftMenu.vue';
 import chipButton from '../components/chipButton.vue';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, h, onMounted, ref, watch } from 'vue';
 import IManager from '../../electron/IManager';
 const iManager = new IManager();
 
@@ -316,7 +331,7 @@ import { useI18n } from 'vue-i18n'
 import { Switch } from 'sober';
 const { t, locale } = useI18n()
 
-const tabs = ref(['normal', 'advanced', 'switch-config', 'about']);
+const tabs = ref(['normal', 'advanced', 'switch-config', 'about', 'plugin']);
 const translatedTabs = computed(() => {
     const tTab = tabs.value.map((tab) => {
         // 如果 是 插件的 tab ，则尝试获取 plugin.t_name
@@ -380,6 +395,7 @@ watch(presetPath, (newVal) => {
     iManager.saveConfig();
 });
 
+const plugins = ref({});
 const pluginConfig = ref({});
 watch(pluginConfig, (newVal) => {
     //debug
@@ -405,6 +421,7 @@ onMounted(async () => {
     currentTab.value = tabs.value[0];
 
     // 挂载插件的额外设置
+    plugins.value = iManager.plugins;
     pluginConfig.value = iManager.pluginConfig;
     console.log('pluginConfig', pluginConfig);
     // pluginConfig 是 一组 plungeName:pluginData 的键值对

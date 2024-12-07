@@ -22,7 +22,8 @@
     "normal": "General Settings",
     "advanced": "Advanced Settings",
     "switch-config": "Switch Configuration",
-    "about": "About"
+    "about": "About",
+    "plugin": "Plugin"
   },
   "setting": {
     "title": "Settings",
