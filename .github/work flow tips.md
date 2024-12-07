@@ -12,3 +12,22 @@ Now, this is the easiest way I found to make new releases:
 -   Wait a few minutes to let the actions finish, then you will see the draft release with the artifacts. Just click on the edit button of the draft release to setup the description and discard/add any artifacts.
 
 Let me know if you encounter any issues or want to suggest any change 👍
+
+
+used most
+```
+npm version patch
+git push --follow-tags
+```
+
+for minor changes
+```
+npm version minor
+git push --follow-tags
+```
+
+for major changes
+```
+npm version major
+git push --follow-tags
+```
