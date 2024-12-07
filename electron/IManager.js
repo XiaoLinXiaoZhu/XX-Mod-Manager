@@ -51,8 +51,8 @@ class IManager {
         this.eventList = {};
 
         // 支持 插件 功能
-        this.plugins = [];
-        this.pluginData = {};
+        this.plugins = {};
+        this.pluginConfig = {};
 
         // 初始化
         this.init();
@@ -414,20 +414,35 @@ class IManager {
     }
 
     //-===================== 插件 =====================
+    plugins = {};
+    pluginConfig = {};
+
     registerPlugin(plugin) {
-        this.plugins.push(plugin);
+        this.plugins[plugin.name] = plugin;
         if (typeof plugin.init === 'function') {
             plugin.init(this);
         }
+
+        // 尝试加载 插件的本地配置
+        ipcRenderer.invoke('get-plugin-config', plugin.name).then((localPluginData) => {
+            //debug
+            console.log(`ℹ️loadPluginConfig ${plugin.name}`, localPluginData);
+            if (localPluginData) {
+                //debug
+                console.log(`🟦loadPluginConfig ${plugin.name}`, localPluginData);
+                // this.pluginConfig[plugin.name] = localPluginData;
+            }
+        }
+        );
 
         //debug
         console.log(`▶️plugin ${plugin.name} loaded`, plugin);
     }
 
-    registerPluginData(pluginName, pluginConfig) {
-        this.pluginData[pluginName] = pluginConfig;
+    registerPluginConfig(pluginName, pluginConfig) {
+        this.pluginConfig[pluginName] = pluginConfig;
         //debug
-        console.log(`registerPluginData ${pluginName}`, pluginConfig);
+        console.log(`registerPluginConfig ${pluginName}`, pluginConfig);
         // pluginConfig 是 data 的 数组
 
         // data 为一个对象，包含了插件的可配置数据，比如说是否启用，是否显示等等
@@ -481,6 +496,25 @@ class IManager {
         console.log(this.plugins);
     }
 
+    // 将 插件的 配置 本地化 存储
+    async savePluginConfig() {
+        // pluginConfig 里面存储了 所有插件的配置 pluginData
+        // 每个 pluginData 是一个 数组 ，包含了 插件的配置
+        // 但是我们不需要保存 pluginData里面的所有数据，比如说显示名称，描述，onChange等，只需要保存 data
+        // data 是一个对象，包含了 插件的配置数据
+
+        for (const pluginName in this.pluginConfig) {
+            const pluginData = this.pluginConfig[pluginName];
+            const localPluginData = {};
+            pluginData.forEach((data) => {
+                localPluginData[data.name] = data.data;
+            });
+
+            console.log('savePluginConfig:', pluginName, localPluginData);
+
+            await ipcRenderer.invoke('save-plugin-config', pluginName, localPluginData);    
+        }
+    }
 }
 
 export default IManager;

@@ -104,3 +104,11 @@ ipcRenderer.on('snack', (event, message,type = 'info') => {
             break;
         }
 })
+
+
+//-======================== 窗口关闭时，保存配置 ========================-//
+// window.onbeforeunload = () => {
+//     console.log('onbeforeunload');
+//     iManager.saveConfig();
+//     iManager.savePluginConfig();
+// }

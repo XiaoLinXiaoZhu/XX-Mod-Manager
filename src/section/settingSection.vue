@@ -103,9 +103,10 @@
                         </s-icon-button>
                     </div>
                 </div>
-                <p data-translate-key="modSourcePath-info">  {{ $t('setting.modSourcePath-info') }}
-                    <br>当前目录为: {{modSourcePath }}</p>
-                
+                <p data-translate-key="modSourcePath-info"> {{ $t('setting.modSourcePath-info') }}
+                    <br>当前目录为: {{ modSourcePath }}
+                </p>
+
                 <s-divider></s-divider>
 
                 <div class="OO-setting-bar">
@@ -244,6 +245,61 @@
             </div>
 
             <!-- -这里后面提供 插件的设置 -->
+
+            <div v-for="(pluginData, pluginName) in pluginConfig" :key="pluginName">
+                <div v-if="currentTab === pluginName">
+                    <div>
+                        {{ pluginName }}
+                    </div>
+                    <s-divider></s-divider>
+                    <div>
+                        {{ pluginData }}
+                    </div>
+                    <s-divider></s-divider>
+                    <div v-for="data in pluginData" :key="data.name">
+                        <div class="OO-setting-bar">
+                            <h3 v-if="data.t_name">{{ data.t_name[locale] }}</h3>
+                            <h3 v-else>{{ data.displayName }}</h3>
+
+                            <s-switch :checked="data.data" @change="data.onChange($event.target.checked)"
+                                v-if="data.type === 'boolean'"></s-switch>
+                            <div v-else-if="data.type === 'string'">
+                                <s-text-field :value="data.data"
+                                    @input="data.onChange($event.target.value)"></s-text-field>
+                            </div>
+                            <div v-else-if="data.type === 'number'">
+                                <s-text-field :value="data.data"
+                                    @input="data.onChange($event.target.value)"></s-text-field>
+                            </div>
+                            <div v-else-if="data.type === 'select'">
+                                <s-select :value="data.data" @change="data.onChange($event.target.value)">
+                                    <s-option v-for="option in data.options" :key="option" :value="option">
+                                        {{ option }}
+                                    </s-option>
+                                </s-select>
+                            </div>
+
+                            <div class="OO-s-text-field-container" v-else-if="data.type === 'path'">
+                                <s-text-field :value="data.data"
+                                    @input="data.onChange($event.target.value)">
+                                </s-text-field>
+                                <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                                    @click="iManager.getFilePath('modLoaderPath', 'exe').then((res) => { data.data = res, data.onChange(res) })">
+                                    <s-icon type="add"></s-icon>
+                                </s-icon-button>
+                            </div>
+                        </div>
+                        <div v-if="data.t_description">
+                            <p> {{ data.t_description[locale] }} </p>
+                        </div>
+                        <div v-else>
+                            <p> {{ data.description }} </p>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
         </div>
     </div>
 </template>
@@ -263,6 +319,13 @@ const { t, locale } = useI18n()
 const tabs = ref(['normal', 'advanced', 'switch-config', 'about']);
 const translatedTabs = computed(() => {
     const tTab = tabs.value.map((tab) => {
+        // 如果 是 插件的 tab ，则尝试获取 plugin.t_name
+        //console.log('trying to get plugin name', tab, iManager.plugins[tab],iManager.plugins);
+        if (iManager.plugins[tab]) {
+            //debug
+            console.log('trying to get plugin name', tab, iManager.plugins[tab], locale.value);
+            return iManager.plugins[tab].t_name[locale.value] || tab;
+        }
         return t(`setting-tab.${tab}`)
     });
     //debug
@@ -317,8 +380,13 @@ watch(presetPath, (newVal) => {
     iManager.saveConfig();
 });
 
-const pluginData = ref({});
-
+const pluginConfig = ref({});
+watch(pluginConfig, (newVal) => {
+    //debug
+    console.log('===pluginConfig changed:', newVal);
+    iManager.pluginConfig = newVal;
+    iManager.saveConfig();
+});
 onMounted(async () => {
     //debug
     console.log('settingSection mounted');
@@ -337,9 +405,9 @@ onMounted(async () => {
     currentTab.value = tabs.value[0];
 
     // 挂载插件的额外设置
-    pluginData.value = iManager.pluginData;
-    console.log('pluginData', pluginData);
-    // pluginData 是 一组 plungeName:pluginData 的键值对
+    pluginConfig.value = iManager.pluginConfig;
+    console.log('pluginConfig', pluginConfig);
+    // pluginConfig 是 一组 plungeName:pluginData 的键值对
     // 每个 pluginData 是一个 数组，数组中的每个元素是一个data对象，data对象包含了插件的设置
     // 每个 data 对象包含了以下属性
     // data 的格式为
@@ -363,13 +431,15 @@ onMounted(async () => {
     // }
     // 通过这个数据，我们可以动态生成插件的设置界面
 
+    // 为 plugin 添加 tab
+    tabs.value.push(...Object.keys(pluginConfig.value));
     // 生成插件设置界面
     // 1. 生成插件的设置界面
     // 2. 生成插件的设置界面的数据
 
     // 遍历插件数据
-    for (const pluginName in pluginData.value) {
-        const plugin = pluginData.value[pluginName];
+    for (const pluginName in pluginConfig.value) {
+        const plugin = pluginConfig.value[pluginName];
         // 遍历插件的设置
         for (const data of plugin) {
             // 生成设置界面

@@ -29,10 +29,16 @@
 const pluginName = 'autoStartPlugin';
 module.exports = {
     name: pluginName,
+    t_name:{
+        zh_cn:'自启动插件',
+        en:'Auto Start Plugin'
+    },
     init(iManager){
         iManager.snack('Auto Start Plugin Loaded');
 
-        const ifAblePlugin = {
+        let pluginData = [];
+
+        let ifAblePlugin = {
             name: 'ifAblePlugin',
             data: true,
             type: 'boolean',
@@ -48,13 +54,35 @@ module.exports = {
             },
             onChange: (value) => {
                 console.log('ifAblePlugin changed:', value);
+                iManager.snack('ifAblePlugin changed:'+value);
+                iManager.savePluginConfig();
             }
         };
-
-        let pluginData = [];
         pluginData.push(ifAblePlugin);
 
+        let modLoaderPath = {
+            name: 'modLoaderPath',
+            data: '',
+            type: 'path',
+            displayName: 'Mod Loader Path',
+            description: 'The path of the mod loader',
+            t_name:{
+                zh_cn:'Mod Loader 路径',
+                en:'Mod Loader Path'
+            },
+            t_description:{
+                zh_cn:'Mod Loader 的路径',
+                en:'The path of the mod loader'
+            },
+            onChange: (value) => {
+                console.log('modLoaderPath changed:', value);
+                iManager.snack('Mod Loader Path changed:'+value);
+                iManager.savePluginConfig();
+            }
+        }
+        pluginData.push(modLoaderPath);
 
-        iManager.registerPluginData(pluginName,pluginData);
+
+        iManager.registerPluginConfig(pluginName,pluginData);
     }
 }

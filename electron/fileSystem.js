@@ -332,6 +332,15 @@ ipcMain.handle('get-file-path', async (event, fileName, fileType) => {
             ]
         });
     }
+    else if (fileType == 'exe') {
+        result = await dialog.showOpenDialog({
+            title: 'Select ' + fileName,
+            properties: ['openFile'],
+            filters: [
+                { name: fileName, extensions: ['exe'] }
+            ]
+        });
+    }
     else {
         result = await dialog.showOpenDialog({
             title: 'Select ' + fileName,
@@ -351,6 +360,32 @@ ipcMain.handle('get-file-path', async (event, fileName, fileType) => {
 }
 );
 
+//-=========================== 插件 ===========================
+// save-plugin-config
+ipcMain.handle('save-plugin-config', async (event, pluginName, config) => {
+    const dataPath = app.getPath('userData');
+    const filePath = path.join(dataPath, 'pluginConfig.json');
+    if (!fs.existsSync(filePath)) {
+        fs.writeFileSync(filePath, '{}', 'utf-8');
+    }
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    data[pluginName] = config;
+    //debug
+    console.log(`save-plugin-config:${filePath}`, data);
+    fs.writeFileSync(filePath, JSON.stringify(data), 'utf-8');
+});
+
+ipcMain.handle('get-plugin-config', async (event, pluginName) => {
+    const dataPath = app.getPath('userData');
+    const filePath = path.join(dataPath, 'pluginConfig.json');
+    if (fs.existsSync(filePath
+    )) {
+        const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        return data[pluginName];
+    }   
+    return null;
+}
+);
 
 //-=========================== apply ===========================
 
