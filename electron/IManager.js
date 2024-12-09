@@ -571,6 +571,9 @@ class IManager {
         // 从 plugins 文件夹中加载插件，其位于 
         const userDataPath = await ipcRenderer.invoke('get-user-data-path');
         const pluginPath = path.join(userDataPath, 'plugins');
+        if (!fs.existsSync(pluginPath)) {
+            fs.mkdirSync(pluginPath);
+        }
         const files = fs.readdirSync(pluginPath);
         files.forEach((file) => {
             if (file.endsWith('.js')) {
