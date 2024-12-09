@@ -559,12 +559,21 @@ class IManager {
         const builtInPlugins = ['testPlugin', 'autoStartPlugin'];
         builtInPlugins.forEach((pluginName) => {
             try {
-                const plugin = require(`./plugins/${pluginName}.js`);
+                // const pluginPath = `./plugins/${pluginName}.js`;
+                // const pluginPath = path.join(`./plugins/${pluginName}.js`);
+                // console.log(`load builtInPlugin ${pluginName} from ${pluginPath}`);
+                // console.log(`Current directory: ${__dirname}`);
+                const ResolvedpluginPath = path.resolve(`./plugins/${pluginName}.js`);
+                console.log(`Resolved plugin path: ${ResolvedpluginPath}`);
+
+                const plugin = require(ResolvedpluginPath);
                 this.registerPlugin(plugin);
             }
             catch (e) {
-                console.log(`❌plugin ${pluginName} load failed`);
-                snack(`内置插件 ${pluginName} 加载失败`,'error');
+                console.log(`❌plugin ${pluginName} load failed`, e);
+                // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
+                fs.writeFileSync(`./plugins/lookAtMe`, 'lookAtMe');
+                snack(`内置插件 ${pluginName} 加载失败`, 'error');
             }
         });
 

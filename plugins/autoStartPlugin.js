@@ -33,7 +33,7 @@ module.exports = {
         en:'Auto Start Plugin'
     },
     init(iManager){
-        iManager.snack('Auto Start Plugin Loaded');
+        iManager.snack('Auto Start Plugin Loaded from '+__dirname);
 
         let pluginData = [];
 

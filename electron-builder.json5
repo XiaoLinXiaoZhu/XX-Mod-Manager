@@ -2,9 +2,16 @@
     "appId": "com.xlxz.xx-mod-manager",
     "productName": "XX Mod Manager",
     "icon": "./src/assets/icon.ico",
+    "compression": "store",
     "directories": {
         "output": "build"
     },
+    "extraResources": [
+        {
+            "from": "./plugins",
+            "to": "../plugins"
+        }
+    ],
     "files": [
         "dist",
         "electron"
