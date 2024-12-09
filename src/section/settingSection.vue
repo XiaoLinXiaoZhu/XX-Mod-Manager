@@ -6,46 +6,15 @@
         <div class="setting-content OO-box">
             <!-- -=========== 常规设置 =========== -->
             <div v-if="currentTab === 'normal'">
+                <settingBar :data="languageData"></settingBar>
+                <s-divider></s-divider>
+                <settingBar :data="themeData"></settingBar>
+                <s-divider></s-divider>
 
-                <div class="OO-setting-bar" id="setting-get-language">
-                    <h3 data-translate-key="language"> {{ $t('setting.language') }} </h3>
-                    <div id="language-picker">
-                        <input type="radio" name="language" id="zh_cn" checked value="zh_cn" v-model="language">
-                        <label for="zh_cn">
-                            <s-chip selectable="true" type="default" id="zh_cn">
-                                <p>简体中文</p>
-                            </s-chip>
-                        </label>
-                        <input type="radio" name="language" id="en" value="en" v-model="language">
-                        <label for="en">
-                            <s-chip selectable="true" type="default" id="en">
-                                <p>English</p>
-                            </s-chip>
-                        </label>
-                    </div>
-                </div>
-                <s-divider></s-divider>
-                <div class="OO-setting-bar" id="setting-get-theme">
-                    <h3 data-translate-key="theme"> {{ $t('setting.theme') + ": " + theme }} </h3>
-                    <div id="theme-picker">
-                        <input type="radio" name="theme" id="auto" checked value="auto" v-model="theme">
-                        <label for="auto"> <s-chip selectable="true" type="default" id="auto">
-                                <p data-translate-key="auto"> {{ $t('setting.auto') }} </p>
-                            </s-chip> </label>
-                        <input type="radio" name="theme" id="dark" value="dark" v-model="theme">
-                        <label for="dark"> <s-chip selectable="true" type="default" id="dark">
-                                <p data-translate-key="dark"> {{ $t('setting.dark') }} </p>
-                            </s-chip> </label>
-                        <input type="radio" name="theme" id="light" value="light" v-model="theme">
-                        <label for="light"> <s-chip selectable="true" type="default" id="light">
-                                <p data-translate-key="light"> {{ $t('setting.light') }} </p>
-                            </s-chip> </label>
-                    </div>
-                </div>
-                <s-divider></s-divider>
                 <h3>
                     {{ $t('setting.unavailable') }}
                 </h3>
+
                 <div id="auto-apply" class="OO-setting-bar">
                     <h3 data-translate-key="auto-apply"> 自动应用 </h3>
                     <s-switch id="auto-apply-switch"></s-switch>
@@ -252,7 +221,7 @@
                 <div class="OO-box OO-shade-box" style="margin: 10px 0;">
                     <h3> 插件列表 </h3>
                     <div class="OO-setting-bar" v-for="(pluginData, pluginName) in plugins" :key="pluginName">
-                        <h3 v-if="pluginData.t_name">{{ pluginData.t_name[locale] }}</h3>
+                        <h3 v-if="pluginData.t_displayName">{{ pluginData.t_displayName[locale] }}</h3>
                         <h3 v-else>{{ pluginName }}</h3>
                         <!-- -如果iManager.disabledPluginNames 中包含 pluginName，则显示为 false，否则显示为 true -->
                         <s-switch :checked="!iManager.disabledPluginNames.includes(pluginName)"
@@ -276,7 +245,7 @@
                         <div class="OO-box OO-shade-box">
                             <div v-for="data in pluginData" :key="data.name">
                                 <div class="OO-setting-bar">
-                                    <h3 v-if="data.t_name">{{ data.t_name[locale] }}</h3>
+                                    <h3 v-if="data.t_displayName">{{ data.t_displayName[locale] }}</h3>
                                     <h3 v-else>{{ data.displayName }}</h3>
                                     <div>
                                         {{ data.data }}
@@ -289,48 +258,7 @@
 
                     <s-divider></s-divider>
                     <div v-for="data in pluginData" :key="data.name">
-                        <div class="OO-setting-bar">
-                            <h3 v-if="data.t_name">{{ data.t_name[locale] }}</h3>
-                            <h3 v-else>{{ data.displayName }}</h3>
-
-                            <s-switch :checked="data.data" @change="data.onChange($event.target.checked)"
-                                v-if="data.type === 'boolean'"></s-switch>
-                            <div v-else-if="data.type === 'string'">
-                                <s-text-field :value="data.data"
-                                    @input="data.onChange($event.target.value)"></s-text-field>
-                            </div>
-                            <s-text-field :value="data.data" @input="data.onChange($event.target.value)"
-                                v-else-if="data.type === 'number'"></s-text-field>
-                            <div v-else-if="data.type === 'select'" style="display: flex;flex-direction:row;">
-                                <div v-for="(option, index) in data.options" :key="index">
-                                    <input type="radio" :name="data.name" :id="option.value" :value="option.value"
-                                        v-model="data.data">
-                                    <label :for="option.value">
-                                        <s-chip selectable="true" type="default" :id="option.value"
-                                            @click="data.onChange(option.value)">
-                                            <p>{{ option.t_value ? option.t_value[locale] : option.value }}</p>
-                                        </s-chip>
-                                    </label>
-                                </div>
-                            </div>
-                            <div v-else-if="data.type === 'path'" class="OO-s-text-field-container">
-                                <s-text-field :value="data.data" @input="data.onChange($event.target.value)">
-                                </s-text-field>
-                                <s-icon-button type="filled" slot="start" class="OO-icon-button"
-                                    @click="iManager.getFilePath('modLoaderPath', 'exe').then((res) => { data.data = res, data.onChange(res) })">
-                                    <s-icon type="add"></s-icon>
-                                </s-icon-button>
-                            </div>
-                            <s-button @click="data.onChange()" v-else-if="data.type === 'button'">
-                                {{ data.t_buttonName ? data.t_buttonName[locale] : data.buttonName }}
-                            </s-button>
-                        </div>
-                        <div v-if="data.t_description">
-                            <p> {{ data.t_description[locale] }} </p>
-                        </div>
-                        <div v-else>
-                            <p> {{ data.description }} </p>
-                        </div>
+                        <settingBar :data="data"></settingBar>
                     </div>
                 </div>
 
@@ -343,21 +271,24 @@
 <script setup>
 import leftMenu from '../components/leftMenu.vue';
 import chipButton from '../components/chipButton.vue';
+import settingBar from '../components/settingBar.vue';
 import { computed, h, onMounted, ref, watch } from 'vue';
 import IManager from '../../electron/IManager';
 const iManager = new IManager();
+import settingSectionData from './settingSectionData';
+const { languageData, themeData, modTargetPathData, modSourcePathData, presetPathData } = settingSectionData;
 import { useI18n } from 'vue-i18n'
 const { t, locale } = useI18n()
 
 const tabs = ref(['normal', 'advanced', 'switch-config', 'about', 'plugin']);
 const translatedTabs = computed(() => {
     const tTab = tabs.value.map((tab) => {
-        // 如果 是 插件的 tab ，则尝试获取 plugin.t_name
+        // 如果 是 插件的 tab ，则尝试获取 plugin.t_displayName
         //console.log('trying to get plugin name', tab, iManager.plugins[tab],iManager.plugins);
         if (iManager.plugins[tab]) {
             //debug
             console.log('trying to get plugin name', tab, iManager.plugins[tab], locale.value);
-            return iManager.plugins[tab].t_name[locale.value] || tab;
+            return iManager.plugins[tab].t_displayName[locale.value] || tab;
         }
         return t(`setting-tab.${tab}`)
     });
@@ -394,11 +325,7 @@ watch(language, (newVal) => {
     iManager.saveConfig();
 });
 watch(theme, (newVal) => {
-    iManager.config.theme = newVal;
-    //现在暂时是手动调用 事件 激活
-    iManager.trigger('theme-change', newVal);
-
-    iManager.saveConfig();
+    iManager.setTheme(newVal);
 });
 watch(modTargetPath, (newVal) => {
     iManager.config.modTargetPath = newVal;
@@ -452,7 +379,7 @@ onMounted(async () => {
     //     type: 'boolean',
     //     displayName: 'If Able Plugin',
     //     description: 'If true, the plugin will be enabled',
-    //     t_name:{
+    //     t_displayName:{
     //         zh_cn:'是否启用插件',
     //         en:'Enable Plugin'
     //     },

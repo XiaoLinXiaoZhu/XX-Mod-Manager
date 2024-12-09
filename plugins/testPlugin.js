@@ -14,7 +14,7 @@
 //     type: 'boolean',
 //     displayName: 'If Able Plugin',
 //     description: 'If true, the plugin will be enabled',
-//     t_name:{
+//     t_displayName:{
 //         zh_cn:'是否启用插件',
 //         en:'Enable Plugin'
 //     },
@@ -29,7 +29,7 @@
 const pluginName = 'testPlugin';
 module.exports = {
     name: pluginName,
-    t_name:{
+    t_displayName:{
         zh_cn:'测试插件',
         en:'Test Plugin'
     },
@@ -46,7 +46,7 @@ module.exports = {
             type: 'boolean',
             displayName: 'If Able Plugin',
             description: 'If true, the plugin will be enabled',
-            t_name:{
+            t_displayName:{
                 zh_cn:'是否启用插件',
                 en:'Enable Plugin'
             },
@@ -70,7 +70,7 @@ module.exports = {
             type: 'path',
             displayName: 'Mod Loader Path',
             description: 'The path of the mod loader',
-            t_name:{
+            t_displayName:{
                 zh_cn:'Mod Loader 路径',
                 en:'Mod Loader Path'
             },
@@ -94,7 +94,7 @@ module.exports = {
             type: 'number',
             displayName: 'Refresh Time',
             description: 'The time to refresh',
-            t_name:{
+            t_displayName:{
                 zh_cn:'刷新时间',
                 en:'Refresh Time'
             },
@@ -117,7 +117,7 @@ module.exports = {
             type: 'button',
             displayName: 'Test Button',
             description: 'Test Button',
-            t_name:{
+            t_displayName:{
                 zh_cn:'测试按钮',
                 en:'Test Button'
             },
@@ -143,7 +143,7 @@ module.exports = {
             type: 'select',
             displayName: 'Test Select',
             description: 'Test Select',
-            t_name:{
+            t_displayName:{
                 zh_cn:'测试选择',
                 en:'Test Select'
             },

@@ -211,6 +211,9 @@ class IManager {
         // 加载配置
         await this.loadConfig();
         console.log('✅>> loadConfig done');
+        // 切换语言
+        this.trigger('languageChange', this.config.language);
+        console.log('✅>> languageChange to', this.config.language);
         // 加载mod
         await this.loadMods();
         console.log('✅>> loadMods done');
@@ -317,7 +320,16 @@ class IManager {
     }
 
     async setConfig(key, value) {
+        if (this.config[key] === undefined) {
+            //debug
+            console.log('未知属性，请检查', key, this.config);
+            snack('未知属性，请检查');
+            return;
+        }
         this.config[key] = value;
+        // 考虑 这里 要不要 增加一个 事件钩子，当 config 改变时，触发一个事件
+        // 暂时没有这个需求
+        this.saveConfig();
     }
 
     async setConfigFromDialog(key, fileType) {
@@ -354,6 +366,20 @@ class IManager {
         this.trigger('languageChange', language);
         //debug eventList
         console.log(this.eventList);
+        this.saveConfig();
+    }
+
+    async setTheme(theme) {
+        if (theme !== 'auto' && theme !== 'dark' && theme !== 'light') {
+            snack('不支持的主题');
+            return;
+        }
+        if (this.config.theme === theme) {
+            return;
+        }
+
+        this.config.theme = theme;
+        this.trigger('themeChange', theme);
         this.saveConfig();
     }
 
@@ -505,7 +531,7 @@ class IManager {
         //     type: 'boolean',
         //     displayName: 'If Able Plugin',
         //     description: 'If true, the plugin will be enabled',
-        //     t_name:{
+        //     t_displayName:{
         //         zh_cn:'是否启用插件',
         //         en:'Enable Plugin'
         //     },

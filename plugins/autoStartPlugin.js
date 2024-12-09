@@ -11,7 +11,7 @@
 //     type: 'boolean',
 //     displayName: 'If Able Plugin',
 //     description: 'If true, the plugin will be enabled',
-//     t_name:{
+//     t_displayName:{
 //         zh_cn:'是否启用插件',
 //         en:'Enable Plugin'
 //     },
@@ -28,7 +28,7 @@
 const pluginName = 'autoStartPlugin';
 module.exports = {
     name: pluginName,
-    t_name:{
+    t_displayName:{
         zh_cn:'自动启动插件',
         en:'Auto Start Plugin'
     },
@@ -44,7 +44,7 @@ module.exports = {
             type: 'boolean',
             displayName: 'Auto Start Game',
             description: 'If true, the game will start automatically',
-            t_name:{
+            t_displayName:{
                 zh_cn:'自动启动游戏',
                 en:'Auto Start Game'
             },
@@ -68,7 +68,7 @@ module.exports = {
             type: 'path',
             displayName: 'Game Path',
             description: 'The path of the game',
-            t_name:{
+            t_displayName:{
                 zh_cn:'游戏路径',
                 en:'Game Path'
             },

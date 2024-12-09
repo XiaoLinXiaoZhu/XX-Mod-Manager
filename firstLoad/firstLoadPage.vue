@@ -385,11 +385,7 @@ watch(language, (newVal) => {
     iManager.saveConfig();
 });
 watch(theme, (newVal) => {
-    iManager.config.theme = newVal;
-    //现在暂时是手动调用 事件 激活
-    iManager.trigger('theme-change', newVal);
-
-    iManager.saveConfig();
+    iManager.setTheme(newVal);
 });
 watch(modTargetPath, (newVal) => {
     //debug

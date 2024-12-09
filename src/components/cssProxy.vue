@@ -11,7 +11,7 @@ import { watch } from 'vue';
 
 
 iManager.waitInit().then(() => {
-    iManager.on('theme-change', (theme) => {
+    iManager.on('themeChange', (theme) => {
         const appContainer = document.querySelector('#app-container');
         if (!appContainer) return;
         appContainer.setAttribute('theme', theme);
@@ -23,7 +23,7 @@ iManager.waitInit().then(() => {
         }
     });
 
-    iManager.trigger('theme-change', iManager.config.theme);
+    iManager.trigger('themeChange', iManager.config.theme);
 
     
 });

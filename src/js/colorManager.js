@@ -17,7 +17,7 @@ let endColor = new Color(0xffd300);
 let currentColor = startColor;
 
 // 根据 theme 的变化，改变颜色
-iManager.on('theme-change', (theme) => {
+iManager.on('themeChange', (theme) => {
     if (theme === 'dark') {
         startColor = new Color(0x94ad00);
         endColor = new Color(0xffd300);

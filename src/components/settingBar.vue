@@ -1,0 +1,69 @@
+<template>
+    <div class="OO-setting-bar">
+        <h3 v-if="data.t_displayName">{{ data.t_displayName[local] }}</h3>
+        <h3 v-else>{{ data.displayName }}</h3>
+
+        <s-switch :checked="data.data" @change="onChange($event.target.checked)"
+            v-if="data.type === 'boolean'"></s-switch>
+        <div v-else-if="data.type === 'string'">
+            <s-text-field :value="data.data" @input="onChange($event.target.value)"></s-text-field>
+        </div>
+        <s-text-field :value="data.data" @input="onChange($event.target.value)"
+            v-else-if="data.type === 'number'"></s-text-field>
+        <div v-else-if="data.type === 'select'" style="display: flex;flex-direction:row;">
+            <div v-for="(option, index) in data.options" :key="index" style="margin-left: 3px;">
+                <input type="radio" :name="data.name" :id="option.value" :value="option.value" v-model="data.data">
+                <label :for="option.value">
+                    <s-chip selectable="true" type="default" :id="option.value"
+                        @click="onChange(option.value)">
+                        <p>{{ option.t_value ? option.t_value[local] : option.value }}</p>
+                    </s-chip>
+                </label>
+            </div>
+        </div>
+        <div v-else-if="data.type === 'path'" class="OO-s-text-field-container">
+            <s-text-field :value="data.data" @input="onChange($event.target.value)">
+            </s-text-field>
+            <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                @click="iManager.getFilePath(data.t_displayName ? data.t_displayName[local] : data.displayName, 'exe').then((res) => { data.data = res; onChange(res); })">
+                <s-icon type="add"></s-icon>
+            </s-icon-button>
+        </div>
+        <s-button @click="onChange()" v-else-if="data.type === 'button'">
+            {{ data.t_buttonName ? data.t_buttonName[local] : data.buttonName }}
+        </s-button>
+    </div>
+    <div v-if="data.t_description">
+        <p> {{ data.t_description[local] }} </p>
+    </div>
+    <div v-else-if="data.description !== ''">
+        <p> {{ data.description }} </p>
+    </div>
+</template>
+
+<script setup>
+import { ref, defineProps, computed, defineEmits } from 'vue';
+import IManager from '../../electron/IManager';
+const iManager = new IManager();
+
+const props = defineProps({
+    data: Object,
+});
+
+const data = ref(props.data);
+const local = ref(iManager.config.language);
+
+iManager.on('languageChange', (lang) => {
+    local.value = lang;
+});
+
+// 重新代理 onChange 方法
+const emit = defineEmits(['change']);
+const onChange = (value) => {
+    emit('change', value, data.value.type, data.value);
+    data.value.onChange(value);
+};
+
+//debug
+console.log(local.value);
+</script>
