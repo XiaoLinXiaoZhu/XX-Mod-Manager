@@ -204,15 +204,6 @@ watch(() => props.mod, async (newVal) => {
   }
 });
 
-// const handleSelectImage = async () => {
-//   const imgPath = await iManager.selectImage();
-//   if (imgPath) {
-//     const imgBase64 = await iManager.getImageBase64(imgPath);
-//     img.value = "data:image/png;base64," + imgBase64;
-//     modInfo.value.preview = imgPath;
-//   }
-// };
-
 const handleHotkeyInput = (hotkey, value) => {
   if (value === '') {
     // 删除快捷键

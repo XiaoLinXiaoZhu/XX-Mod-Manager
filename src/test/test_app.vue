@@ -52,6 +52,13 @@ iManager.waitInit().then(() => {
     iManager.on('lastClickedModChanged', (mod) => {
         lastClickedMod.value = mod;
     });
+
+    iManager.on('modInfoChanged', (mod) => {
+        lastClickedMod.value = null;
+        setTimeout(() => {
+            lastClickedMod.value = mod;
+        }, 1);
+    });
 });
 </script>
 

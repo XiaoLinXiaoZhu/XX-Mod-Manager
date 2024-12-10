@@ -167,7 +167,26 @@ onMounted(async () => {
     });
 
     iManager.on('lastClickedModChanged', (mod) => {
-        lastClickedMod.value = mod;
+            lastClickedMod.value = mod;
+    });
+
+        // 接受文件拖拽事件，可以直接通过拖拽文件到窗口中导入 mod，或者拖拽图片到窗口中为 mod 添加预览图
+    modContainerRef.value.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const modItem = event.target.closest('.mod-item');
+        if (modItem && modItem.id != iManager.temp.lastClickedMod.name) {
+            event.dataTransfer.dropEffect = 'copy';
+            iManager.setLastClickedModByName(modItem.id);
+        }
+    });
+
+    modContainerRef.value.addEventListener('drop', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        // console.log('drop', event,event.dataTransfer.files,event.dataTransfer.items);
+        iManager.handleDrop(event);
     });
 });
 

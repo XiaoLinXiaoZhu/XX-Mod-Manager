@@ -96,6 +96,9 @@ const openModUrl = () => {
 const modInfoRef = useTemplateRef("modInfoRef");
 
 const setDisplayMod = async (mod) => {
+    if (mod == null) {
+        return;
+    }
     console.log(`set mod: ${mod.name}`);
     //modInfo.value = await iManager.getModInfo(mod);
     modInfo.value = mod;

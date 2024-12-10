@@ -285,6 +285,197 @@ class IManager {
         location.reload();
     }
 
+    //------ 文件拖拽 ------
+    async handleDrop(event) {
+        console.log('handleDrop', event);
+        const items = event.dataTransfer.items;
+        try {
+            items[0].webkitGetAsEntry();
+            this.handleDropEntry(event);
+        }
+        catch (error) {
+            this.handleDropFile(event);
+        }
+    }
+
+    async handleDropEntry(event) {
+        // webkitGetAsEntry 方法存在，说明是从文件管理器拖入的文件
+        // 从文件管理器拖入的文件是 Entry 对象。
+        const items = event.dataTransfer.items;
+        const item = items[0].webkitGetAsEntry();
+
+        console.log('get entry from drag event', item);
+        if (item.isDirectory) {
+            // 如果拖入的是文件夹，则视为用户想要添加mod
+            console.log('Directory:', item.fullPath);
+            this.handleFolderDrop(item);
+            return;
+        }
+        if (item.isFile) {
+            // 如果拖入的是文件，则视为用户想要更换mod的封面或者添加mod 压缩包
+            const file = items[0].getAsFile();
+            if (file.type.startsWith('image/')) {
+                // debug
+                console.log(`Image file: ${file.name}`);
+                // 交给 handleImageDrop 处理
+                this.handleImageDrop(file);
+                return;
+            }
+            if (file.name.endsWith('.zip')) {
+                // debug
+                console.log(`Zip file: ${file.name}`);
+                // 交给 handleZipDrop 处理
+                this.handleZipDrop(file);
+                return;
+            }
+            console.log('File type:', file.type);
+            snack('Invalid file type：' + file.type);
+        }
+    }
+
+    async handleDropFile(event) {
+        // webkitGetAsEntry 方法不存在，说明是从网页拖入的文件
+        // 从网页拖入的文件是 File 对象。
+        try {
+            const files = event.dataTransfer.files;
+            //debug
+            console.log(`get file from drag event ${files[0].name}`);
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    // 交给 handleImageDrop 处理
+                    this.handleImageDrop(file);
+                    return;
+                }
+                console.log('File type:', file.type);
+                snack('Invalid file type：' + file.type);
+            }
+        }
+        catch (error) {
+            console.log('Invalid drag event');
+            snack('Invalid drag event');
+        }
+    }
+
+    async handleImageDrop(file) {
+        // 再次确认是否是图片文件
+        if (!file.type.startsWith('image/')) {
+            snack('Invalid image file');
+            return;
+        }
+        // 因为electron的file对象不是标准的file对象，所以需要使用reader来读取文件
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const imageUrl = event.target.result;
+            //debug
+            // console.log(`handle image drop: ${file.name}`,imageUrl);
+            //! updateModCardCover(imageUrl, modItem, mod);
+            // 这里的 imageUrl 是一个 base64 字符串，可以直接用于显示图片
+            this.setModPreviewBase64ByName(imageUrl,this.temp.lastClickedMod.name);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async handleZipDrop(file, modItem, mod) {
+        //debug
+        console.log(`handle zip drop: ${file.name}`);
+        //snack 提示
+        snack('Not implemented yet');
+    }
+
+    async handleFolderDrop(item) {
+        // 如果拖入的是文件夹，则视为用户想要添加一个mod
+        // 检查是否已经存在同名的mod
+        // debug
+        console.log(`handle folder drop: ${item.fullPath}`);
+        // 这里的 item.fullPath 是一个虚拟路径，以 / 开头，需要去掉
+        const modName = item.fullPath.slice(1);
+        // 如果 modList 中已经存在同名的mod，则提示用户
+        if (this.data.modList.find((mod) => mod.name === modName)) {
+            snack(`Mod ${modName} already exists`);
+            return;
+        }
+        // 将文件夹拷贝到 modSourceDir 中
+        // 但是这里的 item 的 fullPath 是一个虚拟路径，无法直接使用 fs 进行操作
+        // 但是我们可以递归读取每一个文件，然后将其拷贝到 modSourceDir 的对应位置
+        copyFolder(item, this.config.modSourcePath);
+        // 复制完成后，刷新 modList
+        //debug
+        console.log(`Copied folder: ${item.fullPath}`);
+        loadModList(() => {
+            // 刷新完成后，弹出提示
+            snack(`Added mod ${modName}`);
+
+            // 将筛选设置为 unknown
+            //! setFilter('Unknown');
+
+            currentMod = modName;
+            //! showEditModInfoDialog();
+        });
+    }
+
+    // 递归复制文件夹
+    async copyFolder(item, targetDir) {
+        // debug
+        console.log(`copy folder ${item.fullPath} to ${targetDir}`);
+        const relativePath = item.fullPath.slice(1); // 去掉开头的 '/'
+        const targetPath = path.join(targetDir, relativePath);
+
+        if (item.isDirectory) {
+            if (!fs.existsSync(targetPath)) {
+                fs.mkdirSync(targetPath, { recursive: true });
+            }
+            const reader = item.createReader();
+            reader.readEntries((entries) => {
+                entries.forEach((entry) => {
+                    copyFolder(entry, targetDir);
+                });
+            });
+        } else if (item.isFile) {
+            item.file((file) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const buffer = Buffer.from(reader.result);
+                    // 如果 targetPath 不存在，则创建文件
+                    console.log(`Copied file from ${item.fullPath} to ${targetPath}`);
+                    fs.writeFileSync(targetPath, buffer);
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+    }
+
+    //-------- 保存mod的预览图 --------
+    async setModPreviewBase64ByName(previewBase64 , modName){
+        // 将图片保存到modSource文件夹中，文件名为preview+后缀名，并且将其保存到mod.json中
+        // 检查 modName 是否存在
+        const modInfo = this.data.modList.find((mod) => mod.name === modName);
+        if (!modInfo) {
+            snack(`Mod ${modName} not found`);
+            return;
+        }
+        //debug
+        console.log(`update mod card cover of`, modInfo);
+        const imageExt = previewBase64.split(';')[0].split('/')[1];
+        const modImageName = `preview.${imageExt}`;
+        const modImageDest = path.join(this.config.modSourcePath, modName, modImageName)
+        fs.writeFileSync(modImageDest, previewBase64.split(',')[1], 'base64');
+
+        //debug
+        modInfo.preview = modImageDest;
+        // ipcRenderer.invoke('set-mod-info', mod, modInfo);
+        this.saveModInfo(modInfo);
+
+        // 刷新侧边栏的mod信息
+        this.trigger('lastClickedModChanged', modInfo);
+
+        // snack提示
+        snack(`Updated cover for ${modInfo}`);
+
+        // 返回 图片的路径
+        return modImageDest;
+    }
+
     //-==================== 对外接口 ====================
     async openNewWindow(windowPath) {
         await ipcRenderer.send('open-new-window', windowPath);
@@ -638,7 +829,7 @@ class IManager {
 
             console.log('savePluginConfig:', pluginName, localPluginData);
 
-            await ipcRenderer.invoke('save-plugin-config', pluginName, localPluginData);    
+            await ipcRenderer.invoke('save-plugin-config', pluginName, localPluginData);
         }
     }
 }

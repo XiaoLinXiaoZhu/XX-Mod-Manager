@@ -271,7 +271,10 @@ onMounted(() => {
     iManager.waitInit().then(() => {
         loadPresetList();
         iManager.on("lastClickedModChanged", (mod) => {
-            lastClickedMod.value = mod;
+            lastClickedMod.value = null;
+            setTimeout(() => {
+                lastClickedMod.value = mod;
+            }, 1);
             //debug
             console.log('set mod info display to', mod.name);
             savePreset();
