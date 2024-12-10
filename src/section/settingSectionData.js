@@ -31,19 +31,21 @@ import IManager from "../../electron/IManager";
 const iManager = new IManager();
 
 
+
 //- ========================== 常规设置 ========================== -//
-//-------------------- 语言 ------------------//
-let languageData = {
-    name: 'language',
-    data: iManager.config.language,
-    type: 'select',
-    displayName: 'Language',
-    description: '',
-    t_displayName: {
-        zh_cn: '语言',
-        en: 'Language'
-    },
-    options: [{
+function getData() {
+    //-------------------- 语言 ------------------//
+    let languageData = {
+        name: 'language',
+        data: iManager.config.language,
+        type: 'select',
+        displayName: 'Language',
+        description: '',
+        t_displayName: {
+            zh_cn: '语言',
+            en: 'Language'
+        },
+        options: [{
             value: 'en',
             t_value: {
                 zh_cn: 'English',
@@ -57,24 +59,24 @@ let languageData = {
                 en: '简体中文'
             }
         }
-    ],
-    onChange: (value) => {
-        console.log('language changed:', value);
-        iManager.trigger('languageChange', value);
+        ],
+        onChange: (value) => {
+            console.log('language changed:', value);
+            iManager.setLanguage(value);
+        }
     }
-}
-//-------------------- 主题 ------------------//
-let themeData = {
-    name: 'theme',
-    data: iManager.config.theme,
-    type: 'select',
-    displayName: 'Theme',
-    description: '',
-    t_displayName: {
-        zh_cn: '主题',
-        en: 'Theme'
-    },
-    options: [{
+    //-------------------- 主题 ------------------//
+    let themeData = {
+        name: 'theme',
+        data: iManager.config.theme,
+        type: 'select',
+        displayName: 'Theme',
+        description: '',
+        t_displayName: {
+            zh_cn: '主题',
+            en: 'Theme'
+        },
+        options: [{
             value: 'auto',
             t_value: {
                 zh_cn: '自动',
@@ -95,74 +97,100 @@ let themeData = {
                 en: 'Light'
             }
         }
-    ],
-    onChange: (value) => {
-        console.log('theme changed:', value);
-        iManager.setTheme(value);
+        ],
+        onChange: (value) => {
+            console.log('theme changed:', value);
+            iManager.setTheme(value);
+        }
     }
-}
-//-------------------- 模组目标路径 ------------------//
-let modTargetPathData = {
-    name: 'modTargetPath',
-    data: '',
-    type: 'path',
-    displayName: 'Mod Target Path',
-    description: 'The path of the mod target',
-    t_displayName: {
-        zh_cn: '模组目标路径',
-        en: 'Mod Target Path'
-    },
-    t_description: {
-        zh_cn: '模组目标的路径',
-        en: 'The path of the mod target'
-    },
-    onChange: (value) => {
-        console.log('modTargetPath changed:', value);
-        iManager.setConfig('modTargetPath', value);
+    //-------------------- 模组目标路径 ------------------//
+    let modTargetPathData = {
+        name: 'modTargetPath',
+        data: iManager.config.modTargetPath,
+        type: 'path',
+        displayName: 'Mod Target Path',
+        description: 'The path of the mod target',
+        t_displayName: {
+            zh_cn: '模组目标路径',
+            en: 'Mod Target Path'
+        },
+        t_description: {
+            zh_cn: 'mod目标目录为modLoader读取mod的位置，一般为Mods文件夹',
+            en: 'Mod target directory is the location where modLoader reads mod, usually the Mods folder'
+        },
+        onChange: (value) => {
+            console.log('modTargetPath changed:', value);
+            iManager.setConfig('modTargetPath', value);
+        }
     }
-}
-//-------------------- 模组源路径 ------------------//
-let modSourcePathData = {
-    name: 'modSourcePath',
-    data: '',
-    type: 'path',
-    displayName: 'Mod Source Path',
-    description: 'The path of the mod source',
-    t_displayName: {
-        zh_cn: '模组源路径',
-        en: 'Mod Source Path'
-    },
-    t_description: {
-        zh_cn: '模组源的路径',
-        en: 'The path of the mod source'
-    },
-    onChange: (value) => {
-        console.log('modSourcePath changed:', value);
-        iManager.setConfig('modSourcePath', value);
+    //-------------------- 模组源路径 ------------------//
+    let modSourcePathData = {
+        name: 'modSourcePath',
+        data: iManager.config.modSourcePath,
+        type: 'path',
+        displayName: 'Mod Source Path',
+        description: 'The path of the mod source',
+        t_displayName: {
+            zh_cn: 'mod来源路径',
+            en: 'Mod Source Path'
+        },
+        t_description: {
+            zh_cn: 'mod来源目录为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod目标目录。',
+            en: 'Mod Source directory is the location where the program stores mod. When the mod is enabled, a link will be created from here to the mod target directory.'
+        },
+        onChange: (value) => {
+            console.log('modSourcePath changed:', value);
+            iManager.setConfig('modSourcePath', value);
+        }
     }
-}
-//-------------------- 预设路径 ------------------//
-let presetPathData = {
-    name: 'presetPath',
-    data: '',
-    type: 'path',
-    displayName: 'Preset Path',
-    description: 'The path of the preset',
-    t_displayName: {
-        zh_cn: '预设路径',
-        en: 'Preset Path'
-    },
-    t_description: {
-        zh_cn: '预设的路径',
-        en: 'The path of the preset'
-    },
-    onChange: (value) => {
-        console.log('presetPath changed:', value);
-        iManager.setConfig('presetPath', value);
+    //-------------------- 预设路径 ------------------//
+    let presetPathData = {
+        name: 'presetPath',
+        data: iManager.config.presetPath,
+        type: 'path',
+        displayName: 'Preset Path',
+        description: 'The path of the preset',
+        t_displayName: {
+            zh_cn: '预设路径',
+            en: 'Preset Path'
+        },
+        t_description: {
+            zh_cn: '预设路径为存储预设的位置，预设是一组mod的集合，可以通过预设一键启用多个mod',
+            en: 'The preset path is the location where the preset is stored. The preset is a collection of mods that can be enabled with one click.'
+        },
+        onChange: (value) => {
+            console.log('presetPath changed:', value);
+            iManager.setConfig('presetPath', value);
+        }
+    }
+
+    //-------------------- 初始化所有数据的按钮 ------------------//
+    let initAllDataButton = {
+        name: 'initAllData',
+        type: 'button',
+        displayName: 'Init All Data',
+        description: 'Initialize all data',
+        t_displayName: {
+            zh_cn: '初始化所有数据',
+            en: 'Init All Data'
+        },
+        t_description: {
+            zh_cn: '初始化所有数据',
+            en: 'Initialize all data'
+        },
+        buttonName: 'Init All Data',
+        t_buttonName: {
+            zh_cn: '初始化所有数据',
+            en: 'Init All Data'
+        },
+        onChange: () => {
+            iManager.initAllData();
+        }
+    }
+    return {
+        languageData, themeData, modTargetPathData, modSourcePathData, presetPathData,initAllDataButton
     }
 }
 
 
-export default {
-    languageData, themeData, modTargetPathData, modSourcePathData, presetPathData
-}
+export default getData;

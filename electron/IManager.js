@@ -82,7 +82,7 @@ class IManager {
     //     name: null, // 当前配置的名称
     //     path: null, // 当前配置的路径
     // };
-
+    os = process.platform;
     config = {
         firstLoad: true, // 是否第一次加载
         language: 'zh_cn', // 语言
@@ -259,7 +259,31 @@ class IManager {
         }
     }
 
+    //-==================== 对外接口 - 数据处理 ====================
 
+
+    //-==================== 对外接口 - 能力接口 ====================
+
+    async startExe(exePath) {
+        const spawn = require('child_process').spawn;
+        const exe = spawn(exePath);
+        exe.stdout.on('data', (data) => {
+            // console.log(data.toString());
+        });
+        exe.stderr.on('data', (data) => {
+            console.log(data.toString());
+        });
+        exe.on('close', (code) => {
+            console.log(`child process exited with code ${code}`);
+        });
+        return exe;
+    }
+
+    async initAllData() {
+        await ipcRenderer.invoke('init-all-data');
+        // 刷新页面
+        location.reload();
+    }
 
     //-==================== 对外接口 ====================
     async openNewWindow(windowPath) {
@@ -629,10 +653,10 @@ function waitInitIManager() {
 }
 
 ipcRenderer.on('wakeUp', () => {
-    // this.temp.wakeUped = true;
     console.log('🌞wakeUp');
     snack('🌞wakeUp');
-    // this.trigger('wakeUp', this);
+    const iManager = new IManager();
+    iManager.trigger('wakeUp');
 });
 
 export default IManager;

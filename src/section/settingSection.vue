@@ -12,110 +12,58 @@
                 <s-divider></s-divider>
 
                 <h3>
-                    {{ $t('setting.unavailable') }}
+                    {{ $t('setting.movedToPlugin') }}
                 </h3>
 
-                <div id="auto-apply" class="OO-setting-bar">
-                    <h3 data-translate-key="auto-apply"> 自动应用 </h3>
-                    <s-switch id="auto-apply-switch"></s-switch>
+                <div class="OO-setting-bar">
+                    <h3> 自动应用 </h3>
+                    <s-switch disabled="true"></s-switch>
                 </div>
-                <p data-translate-key="auto-apply-info">当选择/取消选择mod时自动应用配置(可能带来轻微卡顿)</p>
-                <div id="auto-refresh-function" class="OO-setting-bar">
-                    <h3 data-translate-key="auto-refresh-in-zzz"> 自动刷新 </h3>
-                    <s-switch id="auto-refresh-in-zzz" data-platform="win32"></s-switch>
+                <p>当选择/取消选择mod时自动应用配置(可能带来轻微卡顿)</p>
+                <div class="OO-setting-bar">
+                    <h3> 自动刷新 </h3>
+                    <s-switch data-platform="win32" disabled="true"></s-switch>
                 </div>
-                <p data-translate-key="auto-refresh-in-zzz-info">启用 应用mod时 将会自动在绝区零中激活刷新</p>
+                <p>启用 应用mod时 将会自动在绝区零中激活刷新</p>
                 <s-divider></s-divider>
 
                 <!-- 启动程序的时候也一并启动游戏和modLoader -->
-                <div id="auto-start-game" class="OO-setting-bar">
-                    <h3 data-translate-key="auto-start-game"> 自动启动游戏 </h3>
-                    <s-switch id="auto-start-game-switch"></s-switch>
+                <div class="OO-setting-bar">
+                    <h3> 自动启动游戏 </h3>
+                    <s-switch disabled="true"></s-switch>
                 </div>
-                <p data-translate-key="auto-start-game-info">启动程序的时候也一并启动游戏和modLoader(需要在进阶设置设置游戏目录和modLoader目录)</p>
+                <p>启动程序的时候也一并启动游戏和modLoader(需要在进阶设置设置游戏目录和modLoader目录)</p>
                 <s-divider></s-divider>
-                <div id="use-admin" class="OO-setting-bar">
-                    <h3 data-translate-key="use-admin"> 使用管理员权限 </h3>
-                    <s-switch id="use-admin-switch" data-platform="win32"></s-switch>
+                <div class="OO-setting-bar">
+                    <h3> 使用管理员权限 </h3>
+                    <s-switch data-platform="win32" disabled="true"></s-switch>
                 </div>
-                <p data-translate-key="use-admin-info">启动程序时是否使用管理员权限(需要重启程序生效)</p>
+                <p>启动程序时是否使用管理员权限(需要重启程序生效)</p>
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
             <!-- -高级设置 -->
             <!-- -在这里可以设定 modRootDir，modSourceDir，modLoaderDir，gameDir -->
             <div v-if="currentTab === 'advanced'">
-                <div class="OO-setting-bar">
-                    <h3 data-translate-key="modTargetPath"> {{ $t('setting.modTargetPath') }} </h3>
-                    <div class="OO-s-text-field-container">
-                        <s-text-field :value="modTargetPath" @input="modTargetPath = $event.target.value">
-                        </s-text-field>
-                        <s-icon-button type="filled" slot="start" class="OO-icon-button"
-                            @click="iManager.setConfigFromDialog('modTargetPath', 'directory').then((res) => { modTargetPath = res })">
-                            <s-icon type="add"></s-icon>
-                        </s-icon-button>
-                    </div>
 
-                </div>
-                <p> {{ $t('setting.modTargetPath-info') }} <br>当前目录为: {{
-                    modTargetPath }}</p>
+                <settingBar :data="modTargetPathData"></settingBar>
 
                 <s-divider></s-divider>
-
-                <div class="OO-setting-bar">
-                    <h3 data-translate-key="modSourcePath"> {{ $t('setting.modSourcePath') }} </h3>
-                    <div class="OO-s-text-field-container">
-                        <s-text-field :value="modSourcePath" @input="modSourcePath = $event.target.value">
-                        </s-text-field>
-                        <s-icon-button type="filled" slot="start" class="OO-icon-button"
-                            @click="iManager.setConfigFromDialog('modSourcePath', 'directory').then((res) => { modSourcePath = res })">
-                            <s-icon type="add"></s-icon>
-                        </s-icon-button>
-                    </div>
-                </div>
-                <p data-translate-key="modSourcePath-info"> {{ $t('setting.modSourcePath-info') }}
-                    <br>当前目录为: {{ modSourcePath }}
-                </p>
+                <settingBar :data="modSourcePathData"></settingBar>
 
                 <s-divider></s-divider>
-
-                <div class="OO-setting-bar">
-                    <h3> {{ $t('setting.presetPath') }} </h3>
-                    <div class="OO-s-text-field-container">
-                        <s-text-field :value="presetPath" @input="presetPath = $event.target.value">
-                        </s-text-field>
-                        <s-icon-button type="filled" slot="start" class="OO-icon-button"
-                            @click="iManager.setConfigFromDialog('presetPath', 'directory').then((res) => { presetPath = res })">
-                            <s-icon type="add"></s-icon>
-                        </s-icon-button>
-                    </div>
-                </div>
-                <p data-translate-key="presetPath-info"> {{ $t('setting.presetPath-info') }} <br>当前目录为: {{
-                    presetPath }}</p>
+                <settingBar :data="presetPathData"></settingBar>
 
                 <s-divider></s-divider>
-
+                <s-button @click="console.log(iManager.config)" data-translate-key="show-config">
+                    显示配置
+                </s-button>
+                <s-divider></s-divider>
+                <settingBar :data="initAllDataButton"></settingBar>
 
                 <h3>
                     {{ $t('setting.unavailable') }}
                 </h3>
-                <div class="OO-setting-bar">
-                    <h3 data-translate-key="modLoaderDir"> mod加载器目录 </h3>
-                    <s-text-field>
-                        <input type="text" id="set-modLoaderDir-input">
-                    </s-text-field>
-                </div>
-                <p data-translate-key="modLoaderDir-info"> Mod加载器目录为modLoader程序的位置，用于在管理器中打开modLoader </p>
-                <s-divider></s-divider>
 
-
-                <div class="OO-setting-bar">
-                    <h3 data-translate-key="gameDir"> 游戏目录 </h3>
-                    <s-text-field>
-                        <input type="text" id="set-gameDir-input">
-                    </s-text-field>
-                </div>
-                <p data-translate-key="gameDir-info"> 游戏目录为游戏程序的位置，用于在管理器中打开游戏 </p>
-                <s-divider></s-divider>
                 <div class="OO-setting-bar">
                     <h3 data-translate-key="refresh-mod-info-swapkey"> 刷新mod信息中的快捷键 </h3>
                     <s-button id="refresh-mod-info-swapkey-button" data-translate-key="refresh">
@@ -123,12 +71,7 @@
                     </s-button>
                 </div>
                 <s-divider></s-divider>
-                <div class="OO-setting-bar" id="settings-init-config">
-                    <h3 data-translate-key="init-config"> 初始化配置 </h3>
-                    <s-button id="init-config-button" data-translate-key="init">
-                        初始化所有配置
-                    </s-button>
-                </div>
+
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
             <!-- -切换配置 -->
@@ -275,8 +218,16 @@ import settingBar from '../components/settingBar.vue';
 import { computed, h, onMounted, ref, watch } from 'vue';
 import IManager from '../../electron/IManager';
 const iManager = new IManager();
-import settingSectionData from './settingSectionData';
-const { languageData, themeData, modTargetPathData, modSourcePathData, presetPathData } = settingSectionData;
+import getData from './settingSectionData.js';
+const {
+    languageData,
+    themeData,
+    modTargetPathData,
+    modSourcePathData,
+    presetPathData,
+    initAllDataButton
+} = getData();
+
 import { useI18n } from 'vue-i18n'
 const { t, locale } = useI18n()
 
@@ -305,40 +256,6 @@ const handleTabChange = (tab) => {
     console.log('handleTabChange', tab);
 };
 
-const language = ref('zh_cn');
-const theme = ref('auto');
-const modTargetPath = ref('');
-const modSourcePath = ref('');
-const presetPath = ref('');
-
-
-watch(language, (newVal) => {
-    // iManager.config.language = newVal;
-    //变量命名不能包含-，所以这里需要转换
-    console.log('language change', newVal);
-
-    // // 通过 i18n 的 locale 来切换语言
-    // locale.value = newVal;
-
-    // 改为通过 iManager 来切换语言
-    iManager.setLanguage(newVal);
-    iManager.saveConfig();
-});
-watch(theme, (newVal) => {
-    iManager.setTheme(newVal);
-});
-watch(modTargetPath, (newVal) => {
-    iManager.config.modTargetPath = newVal;
-    iManager.saveConfig();
-});
-watch(modSourcePath, (newVal) => {
-    iManager.config.modSourcePath = newVal;
-    iManager.saveConfig();
-});
-watch(presetPath, (newVal) => {
-    iManager.config.presetPath = newVal;
-    iManager.saveConfig();
-});
 
 const plugins = ref({});
 const pluginConfig = ref({});
@@ -352,16 +269,7 @@ onMounted(async () => {
     //debug
     console.log('settingSection mounted');
     await iManager.waitInit();
-    //初始化语言
-    language.value = iManager.config.language;
-    //初始化主题
-    theme.value = iManager.config.theme;
-    //初始化modTargetPath
-    modTargetPath.value = iManager.config.modTargetPath;
-    //初始化modSourcePath
-    modSourcePath.value = iManager.config.modSourcePath;
-    //初始化presetPath
-    presetPath.value = iManager.config.presetPath;
+
     //初始化tab
     currentTab.value = tabs.value[0];
 

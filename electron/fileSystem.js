@@ -534,6 +534,27 @@ ipcMain.handle('move-all-files', async (event, srcDir, destDir) => {
     moveAllFiles(srcDir, destDir);
 });
 
+//-========================== 初始化所有数据 ==========================
+// init-all-data
+ipcMain.handle('init-all-data', async (event) => {
+    // 获取 配置路径
+    const dataPath = app.getPath('userData');
+    const configPath = path.join(dataPath, 'config.json');
+    // 获取 预设路径，在config.json中
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    const presetPath = config.presetPath;
+
+    // 删除 presetPath 下的所有文件
+    if (fs.existsSync(presetPath)) {
+        fs.readdirSync(presetPath).forEach(file => {
+            fs.unlinkSync(path.join(presetPath, file));
+        });
+    }
+
+    // 删除 config.json
+    fs.unlinkSync(configPath);
+});
+
 //-========================== fsProxy ==========================
 // fsProxy 用于渲染进程调用主进程的文件系统功能
 // class fsProxy {

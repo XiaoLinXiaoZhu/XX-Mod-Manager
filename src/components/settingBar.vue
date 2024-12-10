@@ -78,6 +78,9 @@ const onChange = (value) => {
     }
 };
 
-//debug
-console.log(local.value);
+onMounted(() => {
+    console.log(data.value);
+    // 有的设置项是从 iManager 中获取的，所以需要 刷新一下
+    data.value.data = data.value.data
+});
 </script>

@@ -48,13 +48,11 @@ const createWindow = () => {
   // 因为现在是 使用 vite + vue3 开发的，所以这里加载的是 vite 启动的地址
   
 
-
-  mainWindow.webContents.send('snack', 'hello from main.js')
+  
   // 打开开发工具
   //mainWindow.webContents.openDevTools()
   // 隐藏菜单栏
   mainWindow.setMenuBarVisibility(false)
-
 }
 
 // 这段程序将会在 Electron 结束初始化
@@ -68,6 +66,13 @@ app.whenReady().then(() => {
     // 点击托盘图标时通常会重新创建一个新窗口
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+  //! 这里因为 vite 的热更新问题，它的服务器 需要 先加载完毕，才能加载 electron 的窗口
+  //! 按理来说应该寻找一个更好的解决方案，而不是这样延迟加载
+  setTimeout(() => {
+    console.log('===== createWindow end =====');
+    currentMainWindow.webContents.send('wakeUp')
+  }, 1000);
 })
 
 // 除了 macOS 外，当所有窗口都被关闭的时候退出程序。 因此, 通常

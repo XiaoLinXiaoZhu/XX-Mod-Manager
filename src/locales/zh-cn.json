@@ -37,11 +37,12 @@
     "unavailable": "开发中，下面的功能暂时不可用",
     "auto-apply": "自动应用",
     "modTargetPath": "模组目标路径",
-    "modTargetPath-info": "mod目标目录为modLoader读取mod的位置，一般为Mods文件夹",
+    "modTargetPath-info": "",
     "modSourcePath": "模组源路径",
     "modSourcePath-info": "mod来源目录为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod目标目录。",
     "presetPath": "预设路径",
-    "presetPath-info": "预设路径为存储预设的位置，预设是一组mod的集合，可以通过预设一键启用多个mod"
+    "presetPath-info": "预设路径为存储预设的位置，预设是一组mod的集合，可以通过预设一键启用多个mod",
+    "movedToPlugin": "下面的功能移动到插件继续提供"
   },
   "modInfo": {
     "emptyTitle": "点击mod卡片以查看详细信息",
@@ -50,7 +51,7 @@
     "hotkeys": "快捷键",
     "description": "描述"
   },
-  "editDialog":{
+  "editDialog": {
     "edit-mod-info": "编辑MOD信息",
     "mod-info-name-tip": "Mod名称为文件夹名称，点击按钮即可前往文件夹进行修改",
     "mod-info-character-tip": "角色名称为mod中的角色名称，程序依照此名称进行分类显示，当然它不一定是角色名称，也可以是其他的分类名称，比如'tools'、'mise'等",

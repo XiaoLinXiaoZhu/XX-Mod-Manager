@@ -126,7 +126,7 @@
                         <h2 style="margin: 5px 0 10px 0;"> 就快要好了，再进行一些设置，让XXMM代理 你的 Mods 文件夹 </h2>
                         <p> 请设置 mod目标路径 和 mod源路径 以及 预设路径 </p>
                         <p> 如果你不清楚这些是什么，请查看下面的说明 </p>
-                        <img src="../src/assets/description.png" alt="description" style="width: 50%;height: auto;">    
+                        <img src="../src/assets/description.png" alt="description" style="width: 50%;height: auto;">
                         <p> 【mod目标路径】 是你的 模组加载器 实际加载的路径，对于ZZMI来说，就是ZZMI的Mods文件夹；对于XXMI来说，就是XXMI内部路径/zzz/Mods </p>
                         <p> 【mod源路径】 是 本程序 读取mod的路径，也是你应当用来存放mod的路径。如果你之前没有用过XXMI，那么它应该被设置为任意位置的一个空文件夹 </p>
                         <p class="alert"> 请注意，mod目标路径 和 mod源路径 不能相同，否则会导致程序无法正常运行 </p>
@@ -135,7 +135,7 @@
                             所以请不要在mod文件夹内添加任何文件！将你的mod添加到modSource文件夹中即可。
                         </p>
                         <p> 【预设路径】 是 用于存放mod预设的路径，程序将在这里存放一组mod的配置，然后通过预设功能快速切换。如果你之前 没有用过XXMI，那么它应该被设置为任意位置的一个空文件夹 </p>
-                        </div>
+                    </div>
                     <div class="OO-setting-bar">
                         <h3> {{ $t('setting.modTargetPath') }} </h3>
                         <div class="OO-s-text-field-container">
@@ -215,63 +215,12 @@
             <!-- -自动化设置 -->
             <div class="OO-box font-hongmeng  section" v-if="currentSection === 'auto'">
                 <div class="section-box">
-                    <h3>
-                        {{ $t('setting.unavailable') }}
-                    </h3>
-                    <div class="OO-setting-bar">
-                        <h3> {{ $t('setting.autoStartGame') }} </h3>
-                        <s-switch v-model="autoStartGame"></s-switch>
+                    <div class="OO-box OO-shade-box">
+                        <h2 style="margin: 5px 0 10px 0;"> 自动化设置 </h2>
+                        <p> 本程序支持自动启动游戏，自动应用mod，自动刷新应用的mod等功能，你可以在设置里面进行设置 </p>
+                        <br>
+                        <p> 你也可以为程序安装插件，来实现更多的功能 </p>
                     </div>
-                    <p> {{ $t('setting.autoStartGame-info') }} </p>
-                    <s-divider></s-divider>
-
-                    <div class="OO-setting-bar">
-                        <h3> {{ $t('setting.modLoaderDir') }} </h3>
-                        <div class="OO-s-text-field-container">
-                            <s-text-field :value="modLoaderDir" @input="modLoaderDir = $event.target.value">
-                            </s-text-field>
-                            <s-icon-button type="filled" slot="start" class="OO-icon-button"
-                                @click="iManager.setConfigFromDialog('modLoaderDir', 'file').then((res) => { modLoaderDir = res })">
-                                <s-icon type="add"></s-icon>
-                            </s-icon-button>
-                        </div>
-                    </div>
-                    <p> {{ $t('setting.modLoaderDir-info') }} </p>
-                    <s-divider></s-divider>
-
-                    <div class="OO-setting-bar">
-                        <h3> {{ $t('setting.gameDir') }} </h3>
-                        <div class="OO-s-text-field-container">
-                            <s-text-field :value="gameDir" @input="gameDir = $event.target.value">
-                            </s-text-field>
-                            <s-icon-button type="filled" slot="start" class="OO-icon-button"
-                                @click="iManager.setConfigFromDialog('gameDir', 'file').then((res) => { gameDir = res })">
-                                <s-icon type="add"></s-icon>
-                            </s-icon-button>
-                        </div>
-                    </div>
-                    <p> {{ $t('setting.gameDir-info') }} </p>
-                    <s-divider></s-divider>
-
-                    <div class="OO-setting-bar">
-                        <h3> {{ $t('setting.autoApply') }} </h3>
-                        <s-switch v-model="ifAutoApply"></s-switch>
-                    </div>
-                    <p> {{ $t('setting.autoApply-info') }} </p>
-                    <s-divider></s-divider>
-
-                    <div class="OO-setting-bar">
-                        <h3> {{ $t('setting.autoRefreshInZZZ') }} </h3>
-                        <s-switch v-model="ifAutoRefreshInZZZ"></s-switch>
-                    </div>
-                    <p> {{ $t('setting.autoRefreshInZZZ-info') }} </p>
-                    <s-divider></s-divider>
-
-                    <div class="OO-setting-bar">
-                        <h3> {{ $t('setting.useAdmin') }} </h3>
-                        <s-switch v-model="ifUseAdmin"></s-switch>
-                    </div>
-                    <p> {{ $t('setting.useAdmin-info') }} </p>
 
                     <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
                 </div>
@@ -284,6 +233,8 @@
                     <div class="OO-box OO-shade-box">
                         <h2> 恭喜设置完毕 </h2>
                         <p> 你已经完成了所有设置，现在可以开始使用本程序了,请关闭本页面 </p>
+                        <s-button type="text"
+                            @click="closeSettingPage"> 点击关闭 </s-button>
                     </div>
                     <h3> 关于本程序 </h3>
                     <div class="OO-setting-bar" style="height: fit-content;">
@@ -300,24 +251,22 @@
                     <s-divider></s-divider>
                     <div class="OO-setting-bar" style="height: 100px;">
                         <h3> 感谢 soliddanii <br>提供的帮助 </h3>
-                        <s-button class="link-button" type="text" link="https://github.com/soliddanii"
-                           > 点击跳转 </s-button>
+                        <s-button class="link-button" type="text" link="https://github.com/soliddanii"> 点击跳转 </s-button>
                     </div>
                     <div class="OO-setting-bar">
                         <h3> Github </h3>
                         <s-button class="link-button" type="text"
-                            link="https://github.com/XiaoLinXiaoZhu/Mods-Manager-for-3Dmigoto/"
-                           > 点击跳转 </s-button>
+                            link="https://github.com/XiaoLinXiaoZhu/Mods-Manager-for-3Dmigoto/"> 点击跳转 </s-button>
                     </div>
                     <div class="OO-setting-bar">
                         <h3> Gamebanana </h3>
-                        <s-button class="link-button" type="text" link='https://gamebanana.com/tools/17889'
-                           > 点击跳转 </s-button>
+                        <s-button class="link-button" type="text" link='https://gamebanana.com/tools/17889'> 点击跳转
+                        </s-button>
                     </div>
                     <div class="OO-setting-bar">
                         <h3> Caimogu </h3>
-                        <s-button class="link-button" type="text" link='https://www.caimogu.cc/post/1408504.html'
-                           > 点击跳转 </s-button>
+                        <s-button class="link-button" type="text" link='https://www.caimogu.cc/post/1408504.html'> 点击跳转
+                        </s-button>
                     </div>
 
                     <div class="OO-setting-bar">
@@ -429,6 +378,16 @@ const next = () => {
 const prev = () => {
     sectionSelectorRef.value.prevSection();
 };
+
+function closeSettingPage() {
+    console.log('closeSettingPage');
+    iManager.config.firstLoad = false;
+    iManager.saveConfig();
+    ipcRenderer.send('refresh-main-window');
+
+    //关闭窗口
+    window.close();
+}
 
 onMounted(async () => {
     await iManager.waitInit();
