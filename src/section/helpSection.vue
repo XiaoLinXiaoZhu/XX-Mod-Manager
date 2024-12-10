@@ -1,10 +1,9 @@
 <template>
   <!-- -帮助页面 -->
-  <div id="help-section"
-    style="display: flex;flex-direction: row;height: calc(100% - 60px);width: 100%;overflow: display;">
+  <div id="help-section">
     <leftMenu :tabs="tabs" :translatedTabs="translatedTabs" @tabChange="handleTabChange">
     </leftMenu>
-    <div style="margin-left: 10px;height:calc(100% - 20px);overflow-y: auto;width: 100%;" class="OO-box">
+    <div class="help-content OO-box">
       <!--  中文帮助页面 -->
       <div id="help-dialog-cn" v-if="language === 'zh_cn'" class="font-hongmeng"
         style="display: flex;padding: 0px;flex-direction: column;width: 100%;padding: 0px;height: 100%;">
@@ -416,3 +415,21 @@ onMounted(() => {
 });
 
 </script>
+
+<style scoped>
+#help-section {
+  display: flex;
+  flex-direction: row;
+  height: calc(100% - 60px);
+  width: 100%;
+  overflow: display;
+}
+
+.help-content {
+  margin: 0 10px;
+  height: calc(100% - 20px);
+  /* width: calc(100% - 200px); */
+  flex: 1;
+  overflow-y: auto;
+}
+</style>
