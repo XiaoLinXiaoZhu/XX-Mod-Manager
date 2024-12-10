@@ -100,13 +100,16 @@ class IManager {
     };
     temp = {
         lastClickedMod: null, // 最后点击的mod，用于显示详情
+        currentCharacter: null, // 当前角色
+        currentTab: 'mod', // 当前tab
+        wakeUped: false, // 是否 在唤醒状态
     };
 
 
 
     //-==================== 内部方法 ====================
     async snack(message, type = 'info') {
-        ipcRenderer.send('snack', message, type);
+        snack(message, type);
     }
     async loadConfig() {
         const currentConfig = await ipcRenderer.invoke('get-current-config');
@@ -616,5 +619,22 @@ class IManager {
     }
 }
 
+function waitInitIManager() {
+    return new Promise((resolve, reject) => {
+        const iManager = new IManager();
+        iManager.waitInit().then(() => {
+            resolve(iManager);
+        });
+    });
+}
+
+ipcRenderer.on('wakeUp', () => {
+    // this.temp.wakeUped = true;
+    console.log('🌞wakeUp');
+    snack('🌞wakeUp');
+    // this.trigger('wakeUp', this);
+});
+
 export default IManager;
+export { snack, waitInitIManager };
 

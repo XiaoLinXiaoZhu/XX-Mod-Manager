@@ -1,5 +1,5 @@
 <template>
-    <div class="OO-setting-bar">
+    <div class="OO-setting-bar" v-if="display">
         <h3 v-if="data.t_displayName">{{ data.t_displayName[local] }}</h3>
         <h3 v-else>{{ data.displayName }}</h3>
 
@@ -33,6 +33,10 @@
             {{ data.t_buttonName ? data.t_buttonName[local] : data.buttonName }}
         </s-button>
     </div>
+    <div class="OO-setting-bar" v-else>
+        <h3 v-if="data.t_displayName">{{ data.t_displayName[local] }}</h3>
+        <h3 v-else>{{ data.displayName }}</h3>
+    </div>
     <div v-if="data.t_description">
         <p> {{ data.t_description[local] }} </p>
     </div>
@@ -42,7 +46,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, computed, defineEmits } from 'vue';
+import { ref, defineProps, computed, defineEmits, onMounted } from 'vue';
 import IManager from '../../electron/IManager';
 const iManager = new IManager();
 
@@ -52,6 +56,7 @@ const props = defineProps({
 
 const data = ref(props.data);
 const local = ref(iManager.config.language);
+const display = ref(true);
 
 iManager.on('languageChange', (lang) => {
     local.value = lang;
@@ -61,7 +66,16 @@ iManager.on('languageChange', (lang) => {
 const emit = defineEmits(['change']);
 const onChange = (value) => {
     emit('change', value, data.value.type, data.value);
-    data.value.onChange(value);
+    const result = data.value.onChange(value);
+    // 如果 result 不为 undefined 则说明， 显示的值需要更新
+    if (result !== undefined) {
+        data.value.data = result;
+        // 强制更新
+        display.value = false;
+        setTimeout(() => {
+            display.value = true;
+        }, 0);
+    }
 };
 
 //debug

@@ -33,7 +33,7 @@ const i18n = createI18n({
 
 // 使用i18n插件
 vue_app.use(i18n);
-
+iManager.i18n = i18n;
 //-==================== 挂载 ====================-//
 
 vue_app.mount('#app');
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 
-//-======================== snackbar ========================-//
+//-======================== snack ========================-//
 ipcRenderer.on('snack', (event, message,type = 'info') => {
     console.log(`snack:${message} type:${type}`);
     switch (type) {
@@ -104,7 +104,6 @@ ipcRenderer.on('snack', (event, message,type = 'info') => {
             break;
         }
 })
-
 
 //-======================== 窗口关闭时，保存配置 ========================-//
 // window.onbeforeunload = () => {

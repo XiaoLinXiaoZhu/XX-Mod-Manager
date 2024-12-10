@@ -140,7 +140,7 @@ function tryGetModPreview(modPath, modConfigPreviewName) {
     if (imageFiles.length <= 0) {
         snack('No image file found in mod folder, use default image instead');
         return {
-            previewPath: path.join(__dirname, '../src/assets/default.png'),
+            previewPath: path.resolve(__dirname, '../src/assets/default.png'),
             previewName: 'default.png',
         }
     }
