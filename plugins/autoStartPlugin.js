@@ -42,6 +42,22 @@ function startGame(iManager, gamePath) {
     iManager.startExe(gamePath);
 }
 
+function startModLoader(iManager, modLoaderPath) {
+    // 检查 mod 加载器路径是否存在
+    if (!modLoaderPath) {
+        const snackMessage = iManager.config.language === 'zh_cn' ? 'Mod加载器路径未设置' : 'Mod Loader Path not set';
+        iManager.snack(snackMessage, "error");
+        return false;
+    }
+    if (!fs.existsSync(modLoaderPath)) {
+        const snackMessage = iManager.config.language === 'zh_cn' ? 'Mod加载器路径不存在' : 'Mod Loader Path not exist';
+        iManager.snack(snackMessage, "error");
+        return false;
+    }
+    // 启动 mod 加载器
+    iManager.startExe(modLoaderPath);
+}
+
 const pluginName = 'autoStartPlugin';
 module.exports = {
     name: pluginName,
@@ -54,8 +70,8 @@ module.exports = {
 
         iManager.on('wakeUp', () => {
             console.log('wakeUp');
-            startGame(iManager, iManager.getPluginData(pluginName, 'gamePath'));
-            iManager.snack('Successful auto start game', "info");
+            if (iManager.getPluginData(pluginName, 'autoStartModLoader')) startModLoader(iManager, iManager.getPluginData(pluginName, 'modLoaderPath'));
+            if (iManager.getPluginData(pluginName, 'autoStartGame')) startGame(iManager, iManager.getPluginData(pluginName, 'gamePath'));
         });
         
 
@@ -87,7 +103,7 @@ module.exports = {
         pluginData.push(modLoaderPath);
 
         //- 手动启动mod加载器的按钮
-        let startModLoader = {
+        let startModLoaderButton = {
             name: 'startModLoader',
             type: 'button',
             displayName: 'Start Mod Loader',
@@ -116,7 +132,7 @@ module.exports = {
                 iManager.startExe(modLoaderPath);
             }
         };
-        pluginData.push(startModLoader);
+        pluginData.push(startModLoaderButton);
 
 
 
@@ -152,7 +168,62 @@ module.exports = {
         };
         pluginData.push(autoStartModLoader);
 
-        
+
+        //- 游戏路径
+        let gamePath = {
+            name: 'gamePath',
+            data: '',
+            type: 'path',
+            displayName: 'Game Path',
+            description: 'The path of the game',
+            t_displayName:{
+                zh_cn:'游戏路径',
+                en:'Game Path'
+            },
+            t_description:{
+                zh_cn:'游戏的路径',
+                en:'The path of the game'
+            },
+            onChange: (value) => {
+                console.log('gamePath changed:', value);
+                gamePath.data = value;
+                iManager.snack('gamePath changed:'+value);
+                iManager.savePluginConfig();
+            }
+        }
+        pluginData.push(gamePath);
+
+        //- 手动启动游戏的按钮
+        let startGameButton = {
+            name: 'startGame',
+            type: 'button',
+            displayName: 'Start Game',
+            description: 'Start the game manually',
+            t_displayName:{
+                zh_cn:'启动游戏',
+                en:'Start Game'
+            },
+            t_description:{
+                zh_cn:'手动启动游戏',
+                en:'Start the game manually'
+            },
+            buttonName: 'Start Game',
+            t_buttonName:{
+                zh_cn:'启动游戏',
+                en:'Start Game'
+            },
+            onChange: () => {
+                // 检查游戏路径是否存在
+                const gamePath = iManager.getPluginData(pluginName, 'gamePath');
+                if (!gamePath || !fs.existsSync(gamePath)) {
+                    const snackMessage = iManager.config.language === 'zh_cn' ? '游戏路径未设置或不存在' : 'Game Path not set or not exist'; 
+                    iManager.snack(snackMessage,"error");
+                    return false;
+                }
+                iManager.startExe(gamePath);
+            }
+        };
+        pluginData.push(startGameButton);
 
         //- 是否自动启动游戏
         let autoStartGame = {
@@ -183,30 +254,6 @@ module.exports = {
             }
         }
         pluginData.push(autoStartGame);
-
-        //- 游戏路径
-        let gamePath = {
-            name: 'gamePath',
-            data: '',
-            type: 'path',
-            displayName: 'Game Path',
-            description: 'The path of the game',
-            t_displayName:{
-                zh_cn:'游戏路径',
-                en:'Game Path'
-            },
-            t_description:{
-                zh_cn:'游戏的路径',
-                en:'The path of the game'
-            },
-            onChange: (value) => {
-                console.log('gamePath changed:', value);
-                gamePath.data = value;
-                iManager.snack('gamePath changed:'+value);
-                iManager.savePluginConfig();
-            }
-        }
-        pluginData.push(gamePath);
 
         iManager.registerPluginConfig(pluginName, pluginData);
     }
