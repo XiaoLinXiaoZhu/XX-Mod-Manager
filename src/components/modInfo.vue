@@ -40,7 +40,7 @@
                         </svg>
                     </s-icon>
                 </s-button>
-                <p>Edit</p>
+                <p>{{ $t('modInfo.edit') }}</p>
             </s-tooltip>
 
             <s-tooltip>
@@ -52,9 +52,9 @@
                             </path>
                         </svg>
                     </s-icon>
-                    <p>Open URL</p>
+                    <p>{{ $t('modInfo.openUrl') }}</p>
                 </s-button>
-                <p>Open URL</p>
+                <p>{{ $t('modInfo.openUrl') }}</p>
             </s-tooltip>
         </div>
     </div>

@@ -41,14 +41,17 @@
     "modSourcePath": "Mod Source Path",
     "modSourcePath-info": "The mod source directory is where the program stores mods. When a mod is enabled, a link will be created from here to the mod target directory",
     "presetPath": "Preset Path",
-    "presetPath-info": "The preset path is where presets are stored. A preset is a collection of mods that can be enabled with one click"
+    "presetPath-info": "The preset path is where presets are stored. A preset is a collection of mods that can be enabled with one click",
+    "movedToPlugin": "The following functions are moved to plugins to continue to be provided"
   },
   "modInfo": {
     "emptyTitle": "Click on a mod card to view detailed information",
     "emptyCharacter": "No Character",
     "emptyDescription": "No Description",
     "hotkeys": "Hotkeys",
-    "description": "Description"
+    "description": "Description",
+    "edit": "Edit mod information",
+    "openUrl": "Open mod link"
   },
   "editDialog": {
     "edit-mod-info": "Edit MOD Info",
@@ -71,5 +74,15 @@
     "save": "Save",
     "cancel": "Cancel",
     "ignore": "Ignore"
+  },
+  "buttons": {
+    "addPreset": "Add preset",
+    "apply": "Apply",
+    "cancel": "Cancel",
+    "compactMode": "compact mode",
+    "edit": "edit",
+    "managePreset": "Manage presets",
+    "reset": "reset",
+    "save": "save"
   }
 }

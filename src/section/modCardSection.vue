@@ -10,14 +10,14 @@
                         <s-icon type="menu" ></s-icon>
                     </s-icon-button>
                     
-                    <p> manage presets </p>
+                    <p> {{ $t('buttons.managePreset') }} </p>
                 </s-tooltip>
 
                 <s-tooltip>
                     <s-icon-button slot="trigger" @click="handlePresetAddButtonClicked">
                         <s-icon type="add" ></s-icon>
                     </s-icon-button>
-                    <p> add preset </p>
+                    <p> {{ $t('buttons.addPreset') }} </p>
                 </s-tooltip>
             </template>
         </leftMenu>
@@ -30,13 +30,14 @@
         <div class="bottom-left">
             <s-tooltip>
                 <s-switch v-model="compactMode" @change="handleCompactButtonClicked" slot="trigger" />
-                <p> Compact Mode </p>
+                <p> {{ $t('buttons.compactMode') }} </p>
             </s-tooltip>
         </div>
         <div class="bottom-right">
             <!-- <s-button @click="handleApplyButtonClicked" /> -->
              <s-button @click="handleApplyButtonClicked" id="apply-button" class="OO-color-gradient font-hongmeng">
-                Apply
+                <s-icon type="chevron_right" slot="start"></s-icon>
+                {{ $t('buttons.apply') }}
             </s-button>
             <!-- <s-button @click="handleClick" id="apply-button" class="OO-color-gradient font-hongmeng">
                 Open Tape Page

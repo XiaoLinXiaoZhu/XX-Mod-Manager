@@ -14,6 +14,9 @@ const path = require('path');
 // 导入fs
 const fs = require('fs');
 
+// 导入 adm-zip
+const AdmZip = require('adm-zip');
+
 function snack(message, type = 'info') {
     ipcRenderer.send('snack', message, type);
 }
@@ -418,11 +421,51 @@ class IManager {
         reader.readAsDataURL(file);
     }
 
-    async handleZipDrop(file, modItem, mod) {
+    async handleZipDrop(file) {
         //debug
         console.log(`handle zip drop: ${file.name}`);
-        //snack 提示
-        snack('Not implemented yet');
+        
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            const buffer = Buffer.from(event.target.result);
+            const zip = new AdmZip(buffer);
+            const modName = file.name.replace('.zip', '');
+            const modPath = path.join(this.config.modSourcePath, modName);
+
+            // 创建mod文件夹
+            if (!fs.existsSync(modPath)) {
+            fs.mkdirSync(modPath, { recursive: true });
+            }
+            else {
+            snack(`Mod ${modName} already exists`);
+            return;
+            }
+
+            // 将zip文件解压到mod文件夹
+            try{
+                zip.extractAllTo(modPath, true);
+            }
+            catch(error){
+                console.log(`Error: ${error}`);
+                snack(`Error: ${error}`);
+                return;
+            }
+
+            // 提示用户
+            snack(`Mod ${modName} added successfully`);
+
+            // 刷新mod列表
+            await this.loadMods();
+            const mod = await this.getModInfo(modName);
+            this.trigger('addMod', mod);
+
+            setTimeout(() => {
+            this.setLastClickedMod(mod);
+            this.setCurrentCharacter(mod.character);
+            this.showDialog('edit-mod-dialog');
+            }, 200);
+        };
+        reader.readAsArrayBuffer(file);
     }
 
     async handleFolderDrop(item) {

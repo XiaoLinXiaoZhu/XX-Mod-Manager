@@ -138,7 +138,7 @@ function tryGetModPreview(modPath, modConfigPreviewName) {
     const imageFiles = files.filter(file => file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg') || file.endsWith('.webp'));
     //如果没有图片文件，则使用默认图片,之后直接跳出程序
     if (imageFiles.length <= 0) {
-        snack('No image file found in mod folder, use default image instead');
+        // snack('No image file found in mod folder, use default image instead');
         return {
             previewPath: path.resolve(__dirname, '../src/assets/default.png'),
             previewName: 'default.png',
@@ -293,7 +293,7 @@ async function savePreset(presetPath, presetName, mods) {
         fs.mkdirSync(presetPath);
     }
     fs.writeFileSync(presetFilePath, JSON.stringify(mods));
-    snack(`Preset ${presetName} saved`);
+    // snack(`Preset ${presetName} saved`);
 }
 
 ipcMain.handle('get-preset-list', async (event) => {

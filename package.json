@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@tweenjs/tween.js": "^25.0.0",
+    "adm-zip": "^0.5.16",
     "concurrently": "^9.1.0",
     "sober": "^0.6.8",
     "three": "^0.170.0",
