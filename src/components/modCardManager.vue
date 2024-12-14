@@ -49,7 +49,7 @@ const loadMods = async () => {
     characters.value = ['all', 'selected', ...iManager.data.characterList];
 
     //debug
-    console.log(`success load mods, mod count: ${mods.value.length}, character count: ${characters.value.length}`);
+    console.log(`❇️❇️❇️❇️❇️❇️❇️success load mods, mod count: ${mods.value.length}, character count: ${characters.value.length}`);
 };
 
 const modCardRefs = ref({});
@@ -98,11 +98,13 @@ const handleFilterChange = (character) => {
     }
 };
 
-function loadPreset(mods){
+async function loadPreset(presetName) {
+    const mods =await iManager.loadPreset(presetName);
     //遍历modCardRefs，如果 满足 mods.includes(mod.name) ^ mod.clicked 则调用click
     for (const [key, value] of Object.entries(modCardRefs.value)) {
         //debug
         //console.log(`LoadPreset: in mod ${key},mods.includes:${mods.includes(key)},clicked:${clicked}`);
+        if (!value) continue;
         const clicked = value.$el.getAttribute('clicked') == 'true';
         if (mods.includes(key) ^ clicked) {
             value.click();
@@ -111,7 +113,7 @@ function loadPreset(mods){
         
     //debug
     console.log('loadPreset',mods);
-    //handleFilterChange('已选择');
+    // handleFilterChange('已选择');
 };
 
 const modContainerRef = useTemplateRef('modContainerRef');
@@ -156,9 +158,22 @@ onMounted(async () => {
     observeMods();
     refreshPlaceholderRef.value.style.height = '0px';
 
-    iManager.on('modInfoChanged', () => {
+    iManager.on('modInfoChanged', (modInfo) => {
         //debug
         console.log('get modInfoChanged');
+        mods.value =  null;
+        setTimeout(async () => {
+            await loadMods();
+            observeMods();
+
+            iManager.setLastClickedModByName(modInfo.name);
+            iManager.setCurrentCharacter(modInfo.character);
+        }, 1);
+    });
+
+    iManager.on('addMod', () => {
+        //debug
+        console.log('get addMod');
         mods.value =  null;
         setTimeout(() => {
             loadMods();
@@ -170,7 +185,16 @@ onMounted(async () => {
             lastClickedMod.value = mod;
     });
 
-        // 接受文件拖拽事件，可以直接通过拖拽文件到窗口中导入 mod，或者拖拽图片到窗口中为 mod 添加预览图
+    iManager.on('currentCharacterChanged', (character) => {
+        currentCharacter.value = character;
+        handleFilterChange(character);
+    });
+
+    iManager.on('currentPresetChanged', (preset) => {
+        loadPreset(preset);
+    });
+
+    // 接受文件拖拽事件，可以直接通过拖拽文件到窗口中导入 mod，或者拖拽图片到窗口中为 mod 添加预览图
     modContainerRef.value.addEventListener('dragover', (event) => {
         event.preventDefault();
         event.stopPropagation();

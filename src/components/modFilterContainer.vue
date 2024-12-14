@@ -16,6 +16,7 @@
   import { useTemplateRef,ref, reactive, onMounted, watch, computed } from 'vue';
   import chipButton from './chipButton.vue';
   import { useI18n } from 'vue-i18n'
+import { waitInitIManager } from '../../electron/IManager';
   const { t } = useI18n()
 
   const props = defineProps({
@@ -46,7 +47,7 @@
   
   const selectItem = (item, index) => {
     //debug
-    console.log(`selected ${item}`)
+    console.log(`selected ${item.text}`)
     currentCharacter.value = item.text;
     updateSlider(index);
     emitCurrentCharacter();
@@ -88,6 +89,22 @@
   
   onMounted(() => {
     updateSlider(0); // Initialize the slider position
+
+    waitInitIManager().then((iManager) => {
+      //debug
+      console.log(`get iManager: ${iManager}`)
+
+      iManager.on('currentCharacterChanged', (character) => {
+        if (character === currentCharacter.value) return;
+        //debug
+        console.log(`get currentCharacterChanged: ${character}`)
+        currentCharacter.value = character;
+        const index = getFilterItems().findIndex((item) => item === character);
+        console.log(`get index: ${index}`)
+        updateSlider(index);
+      });
+
+    });
   });
   
   watch(currentCharacter, (newVal, oldVal) => {
@@ -110,7 +127,7 @@
   const emit = defineEmits(['changeFilter']);
   const emitCurrentCharacter = () => {
         emit('changeFilter', currentCharacter.value);
-    };
+  };
     
   </script>
   

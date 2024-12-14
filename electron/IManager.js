@@ -88,6 +88,7 @@ class IManager {
         lastClickedMod: null, // 最后点击的mod，用于显示详情
         currentCharacter: null, // 当前角色
         currentTab: 'mod', // 当前tab
+        currentPreset: "default", // 当前预设
         wakeUped: false, // 是否 在唤醒状态
     };
 
@@ -125,7 +126,7 @@ class IManager {
             snack('mod路径不存在');
             return;
         }
-        
+
         // 加载 character
         this.data.characterList = new Set(loadMods.map((mod) => mod.character));
         this.data.modList = loadMods;
@@ -133,6 +134,7 @@ class IManager {
         //debug
         console.log(loadMods);
         console.log(this.data.characterList);
+        return loadMods;
     }
 
     async loadPresets() {
@@ -141,6 +143,9 @@ class IManager {
     }
 
     async loadPreset(presetName) {
+        if (presetName === 'default') {
+            return [];
+        }
         const presetPath = this.config.presetPath;
         const presetFilePath = path.join(presetPath, `${presetName}.json`);
         if (fs.existsSync(presetFilePath)) {
@@ -180,6 +185,15 @@ class IManager {
             return;
         }
         dialog.show();
+    }
+
+    async dismissDialog(dialogID) {
+        const dialog = document.getElementById(dialogID);
+        if (!dialog) {
+            console.log(`dialog ${dialogID} not found`);
+            return;
+        }
+        dialog.dismiss();
     }
 
     async setLastClickedModByName(modName) {
@@ -243,6 +257,39 @@ class IManager {
 
             this.trigger('lastClickedModChanged', this.temp.lastClickedMod);
         }
+    }
+    //-==================== 对外接口 - 状态变更 ====================
+    async setLastClickedMod(mod) {
+        this.temp.lastClickedMod = mod;
+        this.trigger('lastClickedModChanged', mod);
+    }
+
+    async setLastClickedModByName(modName) {
+        const mod = this.data.modList.find((mod) => mod.name === modName);
+        if (mod) {
+            this.temp.lastClickedMod = mod;
+            this.trigger('lastClickedModChanged', mod);
+        }
+    }
+
+    async setCurrentCharacter(character) {
+        this.temp.currentCharacter = character;
+        this.trigger('currentCharacterChanged', character);
+    }
+
+    async setCurrentTab(tab) {
+        this.temp.currentTab = tab;
+        this.trigger('currentTabChanged', tab);
+    }
+
+    async setCurrentPreset(presetName) {
+        this.temp.currentPreset = presetName;
+        this.trigger('currentPresetChanged', presetName);
+
+        // 这个功能放到插件里面实现，不是核心功能
+        // setTimeout(() => {
+        //     this.setCurrentCharacter('selected');
+        // }, 200);
     }
 
     //-==================== 对外接口 - 数据处理 ====================
@@ -351,6 +398,7 @@ class IManager {
         }
     }
 
+
     async handleImageDrop(file) {
         // 再次确认是否是图片文件
         if (!file.type.startsWith('image/')) {
@@ -365,7 +413,7 @@ class IManager {
             // console.log(`handle image drop: ${file.name}`,imageUrl);
             //! updateModCardCover(imageUrl, modItem, mod);
             // 这里的 imageUrl 是一个 base64 字符串，可以直接用于显示图片
-            this.setModPreviewBase64ByName(imageUrl,this.temp.lastClickedMod.name);
+            this.setModPreviewBase64ByName(imageUrl, this.temp.lastClickedMod.name);
         };
         reader.readAsDataURL(file);
     }
@@ -392,20 +440,39 @@ class IManager {
         // 将文件夹拷贝到 modSourceDir 中
         // 但是这里的 item 的 fullPath 是一个虚拟路径，无法直接使用 fs 进行操作
         // 但是我们可以递归读取每一个文件，然后将其拷贝到 modSourceDir 的对应位置
-        this.copyFolder(item, this.config.modSourcePath);
+        this.showDialog('loading-dialog');
+        await this.copyFolder(item, this.config.modSourcePath);
+        // 关闭加载对话框
+        this.dismissDialog('loading-dialog');
+
         // 复制完成后，刷新 modList
         //debug
         console.log(`Copied folder: ${item.fullPath}`);
-        this.loadMods(() => {
-            // 刷新完成后，弹出提示
-            snack(`Added mod ${modName}`);
+        await this.loadMods();
+        console.log(`❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️`);
+        // 刷新完成后，弹出提示
+        snack(`Added mod ${modName}`);
+        console.log(`ModList:`, this.data.modList);
+        
 
-            // 将筛选设置为 unknown
-            //! setFilter('Unknown');
+        const mod = await this.getModInfo(modName)
+        console.log(`getModInfo:`, mod);
+        snack(`After Added mod ${modName}`);
+        this.trigger('addMod', mod);
 
-            currentMod = modName;
-            //! showEditModInfoDialog();
-        });
+        setTimeout(() => {
+            this.setLastClickedMod(mod);
+            this.setCurrentCharacter(mod.character);
+
+            this.showDialog('edit-mod-dialog');
+        }, 200);
+    }
+
+    async setFilter(character) {
+        //debug
+        console.log(`set filter: ${character}`);
+        this.temp.currentCharacter = character;
+        this.trigger('currentCharacterChanged', character);
     }
 
     // 递归复制文件夹
@@ -420,27 +487,25 @@ class IManager {
                 fs.mkdirSync(targetPath, { recursive: true });
             }
             const reader = item.createReader();
-            reader.readEntries((entries) => {
-                entries.forEach((entry) => {
-                    copyFolder(entry, targetDir);
-                });
-            });
+            const entries = await new Promise((resolve) => reader.readEntries(resolve));
+            for (const entry of entries) {
+                await this.copyFolder(entry, targetDir);
+            }
         } else if (item.isFile) {
-            item.file((file) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const buffer = Buffer.from(reader.result);
-                    // 如果 targetPath 不存在，则创建文件
-                    console.log(`Copied file from ${item.fullPath} to ${targetPath}`);
-                    fs.writeFileSync(targetPath, buffer);
-                };
+            const file = await new Promise((resolve) => item.file(resolve));
+            const reader = new FileReader();
+            const buffer = await new Promise((resolve) => {
+                reader.onload = () => resolve(Buffer.from(reader.result));
                 reader.readAsArrayBuffer(file);
             });
+            // 如果 targetPath 不存在，则创建文件
+            console.log(`Copied file from ${item.fullPath} to ${targetPath}`);
+            fs.writeFileSync(targetPath, buffer);
         }
     }
 
     //-------- 保存mod的预览图 --------
-    async setModPreviewBase64ByName(previewBase64 , modName){
+    async setModPreviewBase64ByName(previewBase64, modName) {
         // 将图片保存到modSource文件夹中，文件名为preview+后缀名，并且将其保存到mod.json中
         // 检查 modName 是否存在
         const modInfo = this.data.modList.find((mod) => mod.name === modName);
@@ -489,7 +554,7 @@ class IManager {
     async addPreset(presetName) {
         // const newPresetPath = this.config.presetPath + '/' + presetName;
         const newPresetPath = path.join(this.config.presetPath, presetName + '.json');
-        await fs.writeFile(newPresetPath, JSON.stringify({}));
+        fs.writeFileSync(newPresetPath, JSON.stringify(this.data.modList));
     }
 
     async changePreview(modName, previewPath) {
@@ -609,6 +674,9 @@ class IManager {
             return;
         }
         this.data.modList[index] = modInfo;
+
+        // 刷新 角色列表
+        this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
 
         // 本地保存
         const jsonModInfo = JSON.stringify(modInfo);

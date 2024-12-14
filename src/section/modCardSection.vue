@@ -1,6 +1,6 @@
 <template>
     <div class="main-container">
-        <leftMenu :tabs="presets" @tabChange="handleTabChange" >
+        <leftMenu :tabs="presets" @tabChange="handlePresetChange" >
             <template #up-button>
                 <s-icon type="arrow_drop_up"></s-icon>
             </template>
@@ -233,21 +233,23 @@ function loadPresetList() {
 }
 
 function loadPreset(preset) {
-    iManager.loadPreset(preset).then((mods) => {
-        //debug
-        console.log('loadPreset', mods);
-        modCardManagerRef.value.loadPreset(mods);
-    });
+    // iManager.loadPreset(preset).then((mods) => {
+    //     //debug
+    //     console.log('loadPreset', mods);
+    //     modCardManagerRef.value.loadPreset(mods);
+    // });
 }
 
-function handleTabChange(tab) {
+function handlePresetChange(tab) {
     currentPreset.value = tab;
     console.log('tab changed to', tab);
-    if (tab == 'default') {
-        modCardManagerRef.value.loadPreset([]);
-    } else {
-        loadPreset(tab);
-    }
+    // if (tab == 'default') {
+    //     modCardManagerRef.value.loadPreset([]);
+    // } else {
+    //     loadPreset(tab);
+    // }
+
+    iManager.setCurrentPreset(tab);
 }
 
 const selectedMods = () => Array.from(document.querySelectorAll('.mod-item')).filter(item => item.getAttribute('clicked') == 'true').map(item => item.id);

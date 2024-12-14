@@ -175,13 +175,15 @@
 import { ref } from 'vue';
 import { defineProps, defineEmits, onMounted, computed, watch, useTemplateRef } from 'vue';
 import IManager from '../../electron/IManager';
-import { mod } from 'three/webgpu';
 const iManager = new IManager();
 
 // 参数为 字符串类型的 mod，之后通过 iManager.getModInfo(mod) 获取 mod 信息
 const props = defineProps({
   mod: Object
 });
+
+let saved = false;
+
 // modInfo 为 mod 信息，用于储存临时修改的 mod 信息，最后保存时再将其赋值给 props.mod
 const modInfo = ref({
   name: 'no name',
@@ -251,9 +253,6 @@ const handleCancel = async () => {
   editModInfoDialog.value.dismiss();
 }
 
-
-
-
 const handleSave = () => {
   //debug
   console.log('modInfo.value', modInfo.value);
@@ -273,6 +272,7 @@ const handleSave = () => {
   }
   props.mod = modInfo.value;
   iManager.saveModInfo(modInfo.value);
+  saved = true;
   editModInfoDialog.value.dismiss();
 }
 
@@ -301,6 +301,12 @@ onMounted(() => {
 
   editModInfoDialog.value.addEventListener('dismiss', async () => {
   // 如果 modInfo 与 props.mod 不同，则询问是否保存
+  //debug
+  if (saved) {
+    saved = false;
+    return;
+  }
+  console.log('dismiss', JSON.stringify(modInfo.value), JSON.stringify(props.mod));
   if (JSON.stringify(modInfo.value) !== JSON.stringify(props.mod)) {
     iManager.showDialog('save-change-dialog');
   }

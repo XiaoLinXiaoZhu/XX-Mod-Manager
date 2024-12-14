@@ -15,6 +15,7 @@
     <CssProxy />
     <dialogAddPreset></dialogAddPreset>
     <dialogModInfo :mod="lastClickedMod" />
+    <dialogLoading />
 </template>
 
 <script setup>
@@ -30,6 +31,7 @@ import settingSection from '../section/settingSection.vue';
 import CssProxy from '../components/cssProxy.vue';
 import dialogModInfo from '../dialogs/dialogModInfo.vue';
 import helpSection from '../section/helpSection.vue';
+import dialogLoading from '../dialogs/dialogLoading.vue';
 
 import IManager from '../../electron/IManager';
 const iManager = new IManager();
