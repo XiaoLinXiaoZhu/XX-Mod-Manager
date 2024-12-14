@@ -14,24 +14,6 @@ const path = require('path');
 // 导入fs
 const fs = require('fs');
 
-// // thenBase 是一个语法糖，实现then方法的链式调用
-// class thenBase {
-//     constructor() {
-//         this.thenList = [];
-//     }
-
-//     then(callback) {
-//         this.thenList.push(callback);
-//         return this;
-//     }
-
-//     run(data) {
-//         this.thenList.forEach((callback) => {
-//             data = callback(data);
-//         });
-//     }
-// }
-
 function snack(message, type = 'info') {
     ipcRenderer.send('snack', message, type);
 }
@@ -83,6 +65,7 @@ class IManager {
     //     path: null, // 当前配置的路径
     // };
     os = process.platform;
+    // 从本地加载的配置项
     config = {
         firstLoad: true, // 是否第一次加载
         language: 'zh_cn', // 语言
@@ -92,12 +75,15 @@ class IManager {
         presetPath: null // 预设路径
     };
 
-    dataPath = ''; // 数据路径
+    // 程序运行时的数据
+    // dataPath = ''; // 数据路径
     data = {
         modList: [], // mod列表
         presetList: [], // 预设列表
         characterList: [], // 角色列表
     };
+
+    // 临时数据，用于存储一些临时的数据
     temp = {
         lastClickedMod: null, // 最后点击的mod，用于显示详情
         currentCharacter: null, // 当前角色
@@ -139,6 +125,7 @@ class IManager {
             snack('mod路径不存在');
             return;
         }
+        
         // 加载 character
         this.data.characterList = new Set(loadMods.map((mod) => mod.character));
         this.data.modList = loadMods;
@@ -207,7 +194,6 @@ class IManager {
     // 初始化
     async init() {
         // 将 imanage 的 实例 传递给 主进程
-
 
         //debug
         console.log('✅>> init IManager');
@@ -289,9 +275,11 @@ class IManager {
     async handleDrop(event) {
         console.log('handleDrop', event);
         const items = event.dataTransfer.items;
+
+        // 两个方法都试试看，我也不知道哪个会成功
         try {
             items[0].webkitGetAsEntry();
-            this.handleDropEntry(event);
+            await this.handleDropEntry(event);
         }
         catch (error) {
             this.handleDropFile(event);
@@ -299,12 +287,18 @@ class IManager {
     }
 
     async handleDropEntry(event) {
-        // webkitGetAsEntry 方法存在，说明是从文件管理器拖入的文件
-        // 从文件管理器拖入的文件是 Entry 对象。
+        // webkitGetAsEntry 方法存在，说明是从本地文件夹拖入的文件
+        // 从本地文件夹拖入的文件是 Entry 对象。
         const items = event.dataTransfer.items;
         const item = items[0].webkitGetAsEntry();
 
         console.log('get entry from drag event', item);
+        if (item == null) {
+            //debug
+            console.log('What is this?');
+            throw new Error('Invalid drag event');
+            return;
+        }
         if (item.isDirectory) {
             // 如果拖入的是文件夹，则视为用户想要添加mod
             console.log('Directory:', item.fullPath);
@@ -398,11 +392,11 @@ class IManager {
         // 将文件夹拷贝到 modSourceDir 中
         // 但是这里的 item 的 fullPath 是一个虚拟路径，无法直接使用 fs 进行操作
         // 但是我们可以递归读取每一个文件，然后将其拷贝到 modSourceDir 的对应位置
-        copyFolder(item, this.config.modSourcePath);
+        this.copyFolder(item, this.config.modSourcePath);
         // 复制完成后，刷新 modList
         //debug
         console.log(`Copied folder: ${item.fullPath}`);
-        loadModList(() => {
+        this.loadMods(() => {
             // 刷新完成后，弹出提示
             snack(`Added mod ${modName}`);
 

@@ -178,7 +178,7 @@ function creatMod(modPath) {
         mod.url = modConfig.url;
 
         // mod.hotkeys = modConfig.hotkeys;
-        if  (modConfig.hotkeys != undefined) {
+        if (modConfig.hotkeys != undefined) {
             mod.hotkeys = modConfig.hotkeys;
         }
 
@@ -186,6 +186,16 @@ function creatMod(modPath) {
         mod.preview = modPreview.previewPath;
         mod.state = modPreview.state;
         mod.snack = modPreview.snack;
+    }
+    else {
+        const modPreview = tryGetModPreview(modPath, '');
+        mod.preview = modPreview.previewPath;
+        mod.state = modPreview.state;
+        mod.snack = modPreview.snack;
+
+        // 如果没有mod.json文件，则创建一个
+        const modSourcePath = path.dirname(modPath);
+        saveModInfo(modSourcePath, JSON.stringify(mod));
     }
 
     return mod;
@@ -229,7 +239,7 @@ ipcMain.handle('get-mods-from-current-config', async (event) => {
 });
 
 ipcMain.handle('get-mod-info', async (event, modSourcePath, modName) => {
-    if(!modSourcePath){
+    if (!modSourcePath) {
         const currentConfig = await getCurrentConfig();
         modSourcePath = currentConfig.modSourcePath;
     }
@@ -382,7 +392,7 @@ ipcMain.handle('get-plugin-config', async (event, pluginName) => {
     )) {
         const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
         return data[pluginName];
-    }   
+    }
     return null;
 }
 );
@@ -460,6 +470,10 @@ ipcMain.handle('apply-mods', async (event, mods, modSourcePath, modTargetPath) =
 });
 
 ipcMain.handle('save-mod-info', async (event, modSourcePath, jsonModInfo) => {
+    saveModInfo(modSourcePath, jsonModInfo);
+});
+
+function saveModInfo(modSourcePath, jsonModInfo) {
     //- mod的格式
     // const mod = {
     //     name: path.basename(modPath),
@@ -469,7 +483,7 @@ ipcMain.handle('save-mod-info', async (event, modSourcePath, jsonModInfo) => {
     //     url: '',
     //     hotkeys: [],
     // }
-    
+
     // 需要保存为：
     // const saveInfo = {
     //     character: mod.character,
@@ -495,9 +509,10 @@ ipcMain.handle('save-mod-info', async (event, modSourcePath, jsonModInfo) => {
 
     //debug
     console.log(modSourcePath);
-    const modConfigPath = path.join(modSourcePath,modInfo.name,'mod.json');
+    const modConfigPath = path.join(modSourcePath, modInfo.name, 'mod.json');
     fs.writeFileSync(modConfigPath, JSON.stringify(saveInfo), 'utf-8');
-});
+}
+
 
 function printModInfo(modInfo) {
     console.log('save-mod-info:');
