@@ -82,7 +82,7 @@ module.exports = {
         let modLoaderPath = {
             name: 'modLoaderPath',
             data: '',
-            type: 'path',
+            type: 'exePath',
             displayName: 'Mod Loader Path',
             description: 'The path of the mod loader',
             t_displayName:{
@@ -173,7 +173,7 @@ module.exports = {
         let gamePath = {
             name: 'gamePath',
             data: '',
-            type: 'path',
+            type: 'exePath',
             displayName: 'Game Path',
             description: 'The path of the game',
             t_displayName:{
