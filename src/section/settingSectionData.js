@@ -107,7 +107,7 @@ function getData() {
     let modTargetPathData = {
         name: 'modTargetPath',
         data: iManager.config.modTargetPath,
-        type: 'path',
+        type: 'dir',
         displayName: 'Mod Target Path',
         description: 'The path of the mod target',
         t_displayName: {
@@ -127,7 +127,7 @@ function getData() {
     let modSourcePathData = {
         name: 'modSourcePath',
         data: iManager.config.modSourcePath,
-        type: 'path',
+        type: 'dir',
         displayName: 'Mod Source Path',
         description: 'The path of the mod source',
         t_displayName: {
@@ -147,7 +147,7 @@ function getData() {
     let presetPathData = {
         name: 'presetPath',
         data: iManager.config.presetPath,
-        type: 'path',
+        type: 'dir',
         displayName: 'Preset Path',
         description: 'The path of the preset',
         t_displayName: {

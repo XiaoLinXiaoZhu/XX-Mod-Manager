@@ -21,7 +21,15 @@
                 </label>
             </div>
         </div>
-        <div v-else-if="data.type === 'path'" class="OO-s-text-field-container">
+        <div v-else-if="data.type === 'dir'" class="OO-s-text-field-container">
+            <s-text-field :value="data.data" @input="onChange($event.target.value)">
+            </s-text-field>
+            <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                @click="iManager.getFilePath(data.t_displayName ? data.t_displayName[local] : data.displayName, 'directory').then((res) => { data.data = res; onChange(res); })">
+                <s-icon type="add"></s-icon>
+            </s-icon-button>
+        </div>
+        <div v-else-if="data.type === 'exePath'" class="OO-s-text-field-container">
             <s-text-field :value="data.data" @input="onChange($event.target.value)">
             </s-text-field>
             <s-icon-button type="filled" slot="start" class="OO-icon-button"
