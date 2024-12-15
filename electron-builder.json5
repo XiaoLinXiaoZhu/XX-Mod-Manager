@@ -10,6 +10,10 @@
         {
             "from": "./plugins",
             "to": "../plugins"
+        },
+        {
+            "from": "./src/assets/default.png",
+            "to": "../src/assets/default.png"
         }
     ],
     "files": [
