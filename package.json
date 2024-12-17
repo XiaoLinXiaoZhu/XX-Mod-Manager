@@ -11,7 +11,7 @@
     "dev": "vite",
     "build": "vite build && electron-builder --win --linux",
     "preview": "vite preview",
-    "vite": "concurrently \"npm run dev\" \"electron . --dev\"",
+    "vite": "concurrently \"npm run dev\" \"electron . --dev --devTools\"",
     "start": "electron .",
     "publish": "electron-builder --publish always"
   },

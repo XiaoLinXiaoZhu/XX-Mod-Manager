@@ -31,11 +31,15 @@ const createWindow = () => {
   setMainWindow(mainWindow);
 
 
-  
+  let devTools = false;
+  devTools = process.argv.includes('--devTools');
   //debug
   console.log('===== createWindow =====');
   if(devMode){
     mainWindow.loadURL('http://localhost:3000/')
+    if(devTools){
+      mainWindow.webContents.openDevTools()
+    }
   }
   else{
     mainWindow.loadFile('dist/index.html')
