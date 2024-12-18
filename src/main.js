@@ -46,7 +46,6 @@ iManager.waitInit().then((iManager) => {
         //debug
         console.log('set language:', language);
     });
-
     iManager.trigger('languageChange', iManager.config.language);
 
 
@@ -58,8 +57,6 @@ iManager.waitInit().then((iManager) => {
         iManager.openNewWindow('firstLoad');
     }
 })
-
-
 //-=====================事件监听====================-//
 console.log('main.js');
 
@@ -77,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('DOMContentLoaded' + nodeVersion);
 })
+
 
 
 //-======================== snack ========================-//
@@ -111,3 +109,28 @@ ipcRenderer.on('snack', (event, message,type = 'info') => {
 //     iManager.saveConfig();
 //     iManager.savePluginConfig();
 // }
+
+//! 保存窗口大小,位置,全屏状态
+//! 全屏 状态稍后再说
+window.addEventListener('unload', function (event) {
+    // setLoacalStorage('fullscreen', isFullScreen);
+
+
+    // if (!isFullScreen) {
+    //     setLoacalStorage('bounds', JSON.stringify({
+    //         x: window.screenX,
+    //         y: window.screenY,
+    //         width: window.outerWidth,
+    //         height: window.innerHeight,
+    //     }));
+    // }
+
+    iManager.config.bounds = {
+        x: window.screenX,
+        y: window.screenY,
+        width: window.outerWidth,
+        height: window.innerHeight,
+    };
+    iManager.saveConfig();
+    iManager.savePluginConfig();
+});

@@ -21,6 +21,8 @@ function snack(message, type = 'info') {
     ipcRenderer.send('snack', message, type);
 }
 
+// // 导入 hmc-win32
+const HMC = require('hmc-win32');
 
 
 class IManager {
@@ -75,7 +77,13 @@ class IManager {
         theme: 'dark', // 主题
         modSourcePath: null, // mod的源路径
         modTargetPath: null, // mod的目标路径
-        presetPath: null // 预设路径
+        presetPath: null, // 预设路径
+        bounds: {
+            width: 800,
+            height: 600,
+            x: -1,
+            y: -1,
+        }
     };
 
     // 程序运行时的数据
@@ -105,17 +113,27 @@ class IManager {
         const currentConfig = await ipcRenderer.invoke('get-current-config');
 
         console.log(currentConfig);
+        //如果为空，则使用默认配置
         if (currentConfig == {} || currentConfig == null) {
             snack('配置文件不存在');
             this.saveConfig();
             return;
         }
-        //如果为空，则使用默认配置
 
-        this.config = currentConfig;
+        // this.config = currentConfig;
+        // 这样会导致 较新的配置项 丢失，所以需要逐个赋值
+        for (const key in currentConfig) {
+            try {
+                this.config[key] = currentConfig[key];
+            }
+            catch (error) {
+                console.log(`Loading config error: ${error}`);
+                snack(`Loading config error: ${error}`);
+            }
+        }
         //debug
         if (fs.existsSync(this.config.presetPath) === false) {
-            //fs.mkdirSync(this.config.presetPath);
+            fs.mkdirSync(this.config.presetPath);
         }
 
         this.saveConfig();
@@ -217,9 +235,9 @@ class IManager {
         // 加载配置
         await this.loadConfig();
         console.log('✅>> loadConfig done');
-        // 切换语言
-        this.trigger('languageChange', this.config.language);
-        console.log('✅>> languageChange to', this.config.language);
+        //------ 设置窗口大小 -----
+        await this.setWindowBounds();
+        console.log('✅>> setWindowBounds done');
         // 加载mod
         await this.loadMods();
         console.log('✅>> loadMods done');
@@ -242,7 +260,6 @@ class IManager {
         // 这样 传递的数据 会被序列化，导致 无法传递 函数
         // 并且 不能够 同步，因为实际上传递的是复制的数据，而不是引用
 
-
         //调用 start 方法
         setTimeout(() => {
             this.start();
@@ -257,9 +274,14 @@ class IManager {
             //debug
             this.temp.lastClickedMod = this.data.modList[0];
             console.log('✅>> lastClickedMod init', this.temp.lastClickedMod);
-
             this.trigger('lastClickedModChanged', this.temp.lastClickedMod);
         }
+
+        //------ 切换语言 -----
+        this.trigger('languageChange', this.config.language);
+        console.log('✅>> languageChange to', this.config.language);
+
+        
     }
     //-==================== 对外接口 - 状态变更 ====================
     async setLastClickedMod(mod) {
@@ -295,24 +317,25 @@ class IManager {
         // }, 200);
     }
 
+    async setWindowBounds() {
+        const bounds = this.config.bounds;
+        //debug
+        console.log('setWindowBounds:', bounds);
+        ipcRenderer.invoke('set-bounds', JSON.stringify(bounds));
+    }
+
     //-==================== 对外接口 - 数据处理 ====================
 
 
     //-==================== 对外接口 - 能力接口 ====================
 
     async startExe(exePath) {
-        const spawn = require('child_process').spawn;
-        const exe = spawn(exePath);
-        exe.stdout.on('data', (data) => {
-            // console.log(data.toString());
-        });
-        exe.stderr.on('data', (data) => {
-            console.log(data.toString());
-        });
-        exe.on('close', (code) => {
-            console.log(`child process exited with code ${code}`);
-        });
-        return exe;
+        // 纠错
+        if (!fs.existsSync(exePath)) {
+            snack('文件不存在');
+            return;
+        }
+        HMC.openApp(exePath);
     }
 
     async initAllData() {
@@ -424,7 +447,7 @@ class IManager {
     async handleZipDrop(file) {
         //debug
         console.log(`handle zip drop: ${file.name}`);
-        
+
         const reader = new FileReader();
         reader.onload = async (event) => {
             const buffer = Buffer.from(event.target.result);
@@ -434,18 +457,18 @@ class IManager {
 
             // 创建mod文件夹
             if (!fs.existsSync(modPath)) {
-            fs.mkdirSync(modPath, { recursive: true });
+                fs.mkdirSync(modPath, { recursive: true });
             }
             else {
-            snack(`Mod ${modName} already exists`);
-            return;
+                snack(`Mod ${modName} already exists`);
+                return;
             }
 
             // 将zip文件解压到mod文件夹
-            try{
+            try {
                 zip.extractAllTo(modPath, true);
             }
-            catch(error){
+            catch (error) {
                 console.log(`Error: ${error}`);
                 snack(`Error: ${error}`);
                 return;
@@ -460,9 +483,9 @@ class IManager {
             this.trigger('addMod', mod);
 
             setTimeout(() => {
-            this.setLastClickedMod(mod);
-            this.setCurrentCharacter(mod.character);
-            this.showDialog('edit-mod-dialog');
+                this.setLastClickedMod(mod);
+                this.setCurrentCharacter(mod.character);
+                this.showDialog('edit-mod-dialog');
             }, 200);
         };
         reader.readAsArrayBuffer(file);
@@ -496,7 +519,7 @@ class IManager {
         // 刷新完成后，弹出提示
         snack(`Added mod ${modName}`);
         console.log(`ModList:`, this.data.modList);
-        
+
 
         const mod = await this.getModInfo(modName)
         console.log(`getModInfo:`, mod);

@@ -1,5 +1,5 @@
 // main.js
-const { app, BrowserWindow, ipcMain, ipcRenderer } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron');
 const path = require('node:path')
 require('./fileSystem.js')
 const setMainWindow = require('./fileSystem.js').setMainWindow
@@ -35,6 +35,11 @@ const createWindow = () => {
   devTools = process.argv.includes('--devTools');
   //debug
   console.log('===== createWindow =====');
+  //mainWindow.loadFile(path.resolve(__dirname,"../dist/index.html"))
+
+  // 加载 index.html(这里不管是什么路径，都是相对于你的项目根目录的路径)
+  //mainWindow.loadFile('./electron/index.html')
+  // 因为现在是 使用 vite + vue3 开发的，所以这里加载的是 vite 启动的地址
   if(devMode){
     mainWindow.loadURL('http://localhost:3000/')
     if(devTools){
@@ -45,18 +50,16 @@ const createWindow = () => {
     mainWindow.loadFile('dist/index.html')
   }
 
-    //mainWindow.loadFile(path.resolve(__dirname,"../dist/index.html"))
-
-  // 加载 index.html(这里不管是什么路径，都是相对于你的项目根目录的路径)
-  //mainWindow.loadFile('./electron/index.html')
-  // 因为现在是 使用 vite + vue3 开发的，所以这里加载的是 vite 启动的地址
-  
-
-  
   // 打开开发工具
   //mainWindow.webContents.openDevTools()
   // 隐藏菜单栏
   mainWindow.setMenuBarVisibility(false)
+
+  //因为需要调整窗口大小，所以需要等待窗口加载完成
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+    console.log('main window is ready');
+  });
 }
 
 // 这段程序将会在 Electron 结束初始化
@@ -120,11 +123,107 @@ ipcMain.on('open-new-window', (event, arg) => {
   //newWindow.webContents.openDevTools()
 })
 
+
+
+
+
+//-==================== 窗口控制 ====================
+
 ipcMain.on('refresh-main-window', (event) => {
   currentMainWindow.reload()
 });
 
+ipcMain.handle('minimize-window', async () => {
+  BrowserWindow.getFocusedWindow().minimize();
+});
 
+ipcMain.handle('maximize-window', async () => {
+  const win = BrowserWindow.getFocusedWindow();
+  if (win.isMaximized()) {
+    win.unmaximize();
+  }
+  else {
+    win.maximize();
+  }
+});
+
+ipcMain.handle('close-window', async () => {
+  BrowserWindow.getFocusedWindow().close();
+});
+
+ipcMain.handle('toggle-fullscreen', async () => {
+  //窗口化全屏
+  const win = BrowserWindow.getFocusedWindow();
+  if (win.isFullScreen()) {
+    win.setFullScreen(false);
+    return false;
+  }
+  else {
+    win.setFullScreen(true);
+    return true;
+  }
+});
+
+
+// 设置窗口大小
+ipcMain.handle('set-bounds', async (event, boundsStr) => {
+  try {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const bounds = JSON.parse(boundsStr);
+    //debug
+    console.log('set-bounds', bounds, win == null);
+
+    if (win && bounds) {
+      const screenArea = screen.getDisplayMatching(bounds).workArea;
+
+      // 如果bounds的x,y，为-1，表示居中
+      if (bounds.x === -1 || bounds.y === -1) {
+        const width = Math.min(bounds.width, screenArea.width);
+        const height = Math.min(bounds.height, screenArea.height);
+        const x = Math.floor((screenArea.width - width) / 2);
+        const y = Math.floor((screenArea.height - height) / 2);
+        //debug
+        console.log('set-bounds', { x: x, y: y, width: width, height: height });
+        win.setBounds({ x: x, y: y, width: width, height: height });
+      }
+      else
+       if (
+        (bounds.x + bounds.width) > (screenArea.x + screenArea.width) ||
+        bounds.x > (screenArea.x + screenArea.width) ||
+        bounds.x < screenArea.x ||
+        (bounds.y + bounds.height) > (screenArea.y + screenArea.height) ||
+        bounds.y > (screenArea.y + screenArea.height) ||
+        bounds.y < screenArea.y
+      ) {
+        // Fit and center window into the existing screenarea
+        const width = Math.min(bounds.width, screenArea.width);
+        const height = Math.min(bounds.height, screenArea.height);
+        const x = Math.floor((screenArea.width - width) / 2);
+        const y = Math.floor((screenArea.height - height) / 2);
+        //debug
+        console.log('set-bounds', { x: x, y: y, width: width, height: height });
+        win.setBounds({ x: x, y: y, width: width, height: height });
+      }
+      else {
+        win.setBounds(bounds);
+      }
+    }
+  } catch (e) {
+    console.error('set-bounds', e);
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+//-==================== 通知 ====================
 ipcMain.on('snack', (event, message, type = 'info') => {
   currentMainWindow.webContents.send('snack', message, type)
 })

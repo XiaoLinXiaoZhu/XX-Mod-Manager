@@ -19,6 +19,7 @@
     "@tweenjs/tween.js": "^25.0.0",
     "adm-zip": "^0.5.16",
     "concurrently": "^9.1.0",
+    "hmc-win32": "^1.4.92",
     "sober": "^0.6.8",
     "three": "^0.170.0",
     "vue": "^3.5.12",

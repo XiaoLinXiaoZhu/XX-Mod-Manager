@@ -1,6 +1,13 @@
 const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron');
 const path = require('node:path')
 const fs = require('fs');
+const os = require('os');
+//-==================== 核心变量 =====================
+
+//----------------- 状态 -----------------
+const isMac = os.platform() === "darwin";
+const isWindows = os.platform() === "win32";
+const isLinux = os.platform() === "linux";
 
 
 let currentMainWindow = null;
@@ -83,7 +90,7 @@ ipcMain.handle('get-current-config', async (event) => {
 ipcMain.handle('set-current-config', async (event, config) => {
     const dataPath = app.getPath('userData');
     const filePath = path.join(dataPath, 'config.json');
-    fs.writeFileSync(filePath, JSON.stringify(config), 'utf-8');
+    fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 });
 
 ipcMain.handle('getFiles', async (event, dirPath) => {
@@ -226,7 +233,7 @@ ipcMain.handle('get-mods', async (event, modSourcePath) => {
 ipcMain.handle('get-image', async (event, imagePath) => {
     // 传递一个 buffer 对象给渲染进程
     //debug
-    console.log(`get-image:${imagePath}`);
+    // console.log(`get-image:${imagePath}`);
     return fs.readFileSync(imagePath).toString('base64');
 });
 
@@ -569,6 +576,74 @@ ipcMain.handle('init-all-data', async (event) => {
     // 删除 config.json
     fs.unlinkSync(configPath);
 });
+
+//-------------------刷新游戏-------------------
+ipcMain.handle("refresh-in-zzz", async (event) => {
+    const HMC = require("hmc-win32");
+    // Refresh in ZZZ success flag
+    // 0: Failed
+    // 1: Success
+    // 2: Cannot find the process
+    // 3: Cannot find the zenless zone zero window
+    // 4: Cannot find the mod manager window
+  
+    // Only availabe in windows
+    if (isWindows) {
+      // Virtual key code for F10. This key is the default but
+      // can be changed in d3dx.ini. Future improvement.
+  
+      // We have the path to the 3dmigoto.exe, d3dx.ini is in the same folder
+      // We just need to read the d3dx.ini file and get the VK_F10 value 
+      const VK_F10 = 0x79;
+  
+      // Process name. Should be set as a config value for 
+      // this to work while managing other games.
+      const processName = "ZenlessZoneZero.exe";
+  
+      // Get the process from the name
+      const process = HMC.getProcessNameList(processName);
+  
+      if (process.length <= 0) return 2;
+  
+  
+      // Get the Zenless Zone Zero Hwnd handle
+      const window = HMC.getProcessWindow(process[0].pid);
+  
+      // Get the Mod manager Hwnd handle
+      const manager = HMC.getForegroundWindow();
+  
+      if (!window) return 3;
+      if (!manager) return 4;
+  
+      // ZZZ wont accept any keys if the manager is not run as admin.
+      // ZZZ wont accept virtual keys, only accepts direct input keys.
+      // Here is the trick to get ZZZ to register the VK input without admin:
+  
+      // 1. Press the F10 Key down on the manager
+      HMC.sendKeyboard(VK_F10, true);
+  
+      // 2. Set focus on ZZZ window
+      window.setFocus(true);
+  
+      // 3. Wait a reasonable amount of time for the key to register
+      await sleep(75);
+  
+      // 4. Set focus on the Manager window
+      manager.setFocus(true);
+  
+      // 5. Wait again for the window
+      await sleep(50);
+  
+      // 6. Release the F10 Key
+      HMC.sendKeyboard(VK_F10, false);
+  
+      // 7. Set focus on ZZZ window again
+      window.setFocus(true);
+
+      return 1;
+    }
+    return 0;
+  });
 
 //-========================== fsProxy ==========================
 // fsProxy 用于渲染进程调用主进程的文件系统功能
