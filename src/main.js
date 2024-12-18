@@ -134,3 +134,11 @@ window.addEventListener('unload', function (event) {
     iManager.saveConfig();
     iManager.savePluginConfig();
 });
+
+window.onbeforeunload = function (e) {
+    // console.log('onbeforeunload');
+    iManager.saveConfig();
+    iManager.savePluginConfig();
+    // e.returnValue = false;
+    // return false;
+};

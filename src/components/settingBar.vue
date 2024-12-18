@@ -5,17 +5,15 @@
 
         <s-switch :checked="data.data" @change="onChange($event.target.checked)"
             v-if="data.type === 'boolean'"></s-switch>
-        <div v-else-if="data.type === 'string'">
-            <s-text-field :value="data.data" @input="onChange($event.target.value)"></s-text-field>
-        </div>
+        <s-text-field v-else-if="data.type === 'string'" :value="data.data"
+            @input="onChange($event.target.value)"></s-text-field>
         <s-text-field :value="data.data" @input="onChange($event.target.value)"
             v-else-if="data.type === 'number'"></s-text-field>
         <div v-else-if="data.type === 'select'" style="display: flex;flex-direction:row;">
             <div v-for="(option, index) in data.options" :key="index" style="margin-left: 3px;">
                 <input type="radio" :name="data.name" :id="option.value" :value="option.value" v-model="data.data">
                 <label :for="option.value">
-                    <s-chip selectable="true" type="default" :id="option.value"
-                        @click="onChange(option.value)">
+                    <s-chip selectable="true" type="default" :id="option.value" @click="onChange(option.value)">
                         <p>{{ option.t_value ? option.t_value[local] : option.value }}</p>
                     </s-chip>
                 </label>

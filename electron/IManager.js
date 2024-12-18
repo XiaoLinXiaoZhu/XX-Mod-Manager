@@ -61,6 +61,7 @@ class IManager {
         return this;
     }
 
+    
 
     //-==================== 核心数据 ====================
 
@@ -70,6 +71,8 @@ class IManager {
     //     path: null, // 当前配置的路径
     // };
     os = process.platform;
+    // 对外暴露的 hmc 对象，使得插件可以直接调用 hmc 的方法
+    HMC = HMC;
     // 从本地加载的配置项
     config = {
         firstLoad: true, // 是否第一次加载
@@ -614,6 +617,7 @@ class IManager {
         const modTargetPath = this.config.modTargetPath;
         const modSourcePath = this.config.modSourcePath;
         await ipcRenderer.invoke('apply-mods', modList, modSourcePath, modTargetPath);
+        this.trigger('modsApplied', modList);
         ipcRenderer.send('snack', '应用成功');
     }
 
@@ -861,7 +865,14 @@ class IManager {
     }
 
     registerPluginConfig(pluginName, pluginConfig) {
-        this.pluginConfig[pluginName] = pluginConfig;
+        // 如果 pluginConfig 不存在，则创建一个新的数组，否则将 pluginConfig 添加到 pluginConfig 中
+        if (this.pluginConfig[pluginName] === undefined) {
+            this.pluginConfig[pluginName] = pluginConfig;
+        }
+        else {
+            this.pluginConfig[pluginName] = this.pluginConfig[pluginName].concat(pluginConfig);
+        }
+        
         //debug
         console.log(`registerPluginConfig ${pluginName}`, pluginConfig);
         // pluginConfig 是 data 的 数组
@@ -902,7 +913,7 @@ class IManager {
         // 然后调用 init 方法，将 iManager 传递给插件
 
         // 先加载内置的插件
-        const builtInPlugins = ['testPlugin', 'autoStartPlugin'];
+        const builtInPlugins = ['testPlugin', 'autoStartPlugin','refreshAfterApplyPlugin'];
         builtInPlugins.forEach((pluginName) => {
             try {
                 // const pluginPath = `./plugins/${pluginName}.js`;
