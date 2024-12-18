@@ -99,8 +99,6 @@ const pluginName = 'refreshAfterApply';
 // 上面是 原来集成到主程序的代码，现在我们将其转移到插件中
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const HMC = require("hmc-win32");
-
 const refreshInGame = async (iManager) => {
     // Refresh in ZZZ success flag
     // 0: Failed
@@ -109,6 +107,7 @@ const refreshInGame = async (iManager) => {
     // 3: Cannot find the zenless zone zero window
     // 4: Cannot find the mod manager window
     // Only availabe in windows
+    const HMC = iManager.HMC;
     const isWindows = process.platform === 'win32';
     if (!isWindows) return 0;
     const processName = iManager.getPluginData(pluginName, 'processName');
