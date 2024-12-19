@@ -135,7 +135,10 @@ class IManager {
             }
         }
         //debug
-        if (fs.existsSync(this.config.presetPath) === false) {
+        if (this.config.modSourcePath === null) {
+            console.log('modSourcePath is null');
+        }
+        else if (fs.existsSync(this.config.presetPath) === false) {
             fs.mkdirSync(this.config.presetPath);
         }
 

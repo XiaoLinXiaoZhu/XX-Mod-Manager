@@ -296,6 +296,10 @@ function loadPreset(presetPath, presetName) {
 
 async function savePreset(presetPath, presetName, mods) {
     const presetFilePath = path.join(presetPath, `${presetName}.json`);
+    if (!presetPath) {
+        snack('presetPath is undefined');
+        return;
+    }
     if (!fs.existsSync(presetPath)) {
         fs.mkdirSync(presetPath);
     }
