@@ -104,7 +104,11 @@ import { waitInitIManager } from '../../electron/IManager';
         updateSlider(index);
       });
 
+      setTimeout(() => {
+        selectItem({ text: currentCharacter.value }, 0);
+      }, 1);
     });
+    
   });
   
   watch(currentCharacter, (newVal, oldVal) => {

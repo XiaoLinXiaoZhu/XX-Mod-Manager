@@ -108,7 +108,7 @@ function playClickAnim(modItem, event = null, rect = null) {
         
         if (modItem.inWindow == undefined) {
             //如果modItem.inWindow未定义，则设置为true
-            modItem.inWindow = true;z``
+            modItem.inWindow = true;
         }
         if (!modItem.inWindow) {
             //如果modItem不在视窗内，则不进行动画
