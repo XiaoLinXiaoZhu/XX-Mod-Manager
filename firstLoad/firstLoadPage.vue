@@ -16,6 +16,7 @@
             <!-- -简单介绍 -->
             <div class="section OO-box font-hongmeng" v-if="currentSection === 'intro'">
                 <div class="section-box">
+                    <settingBar :data=languageData />
                     <div class="OO-box OO-shade-box">
                         <h2 style="margin: 5px 0 10px 0;"> 欢迎使用 XX-mod-manager(XXMM) </h2>
                     </div>
@@ -74,43 +75,11 @@
                         </p>
                     </div>
                     <!-- -语言设置 -->
-                    <div class="OO-setting-bar" id="setting-get-language">
-                        <h3> {{ $t('setting.language') }} </h3>
-                        <div id="language-picker">
-                            <input type="radio" name="language" id="zh_cn" checked value="zh_cn" v-model="language">
-                            <label for="zh_cn">
-                                <s-chip selectable="true" type="default" id="zh_cn">
-                                    <p>简体中文</p>
-                                </s-chip>
-                            </label>
-                            <input type="radio" name="language" id="en" value="en" v-model="language">
-                            <label for="en">
-                                <s-chip selectable="true" type="default" id="en">
-                                    <p>English</p>
-                                </s-chip>
-                            </label>
-                        </div>
-                    </div>
+                    <settingBar :data=languageData />
 
                     <!-- -主题设置 -->
                     <s-divider></s-divider>
-                    <div class="OO-setting-bar" id="setting-get-theme">
-                        <h3> {{ $t('setting.theme') + ": " + theme }} </h3>
-                        <div id="theme-picker">
-                            <input type="radio" name="theme" id="auto" checked value="auto" v-model="theme">
-                            <label for="auto"> <s-chip selectable="true" type="default" id="auto">
-                                    <p> {{ $t('setting.auto') }} </p>
-                                </s-chip> </label>
-                            <input type="radio" name="theme" id="dark" value="dark" v-model="theme">
-                            <label for="dark"> <s-chip selectable="true" type="default" id="dark">
-                                    <p> {{ $t('setting.dark') }} </p>
-                                </s-chip> </label>
-                            <input type="radio" name="theme" id="light" value="light" v-model="theme">
-                            <label for="light"> <s-chip selectable="true" type="default" id="light">
-                                    <p> {{ $t('setting.light') }} </p>
-                                </s-chip> </label>
-                        </div>
-                    </div>
+                    <settingBar :data=themeData />
                     <s-divider></s-divider>
                 </div>
 
@@ -136,18 +105,7 @@
                         </p>
                         <p> 【预设路径】 是 用于存放mod预设的路径，程序将在这里存放一组mod的配置，然后通过预设功能快速切换。如果你之前 没有用过XXMI，那么它应该被设置为任意位置的一个空文件夹 </p>
                     </div>
-                    <div class="OO-setting-bar">
-                        <h3> {{ $t('setting.modTargetPath') }} </h3>
-                        <div class="OO-s-text-field-container">
-                            <s-text-field :value="modTargetPath" @input="modTargetPath = $event.target.value">
-                            </s-text-field>
-                            <s-icon-button type="filled" slot="start" class="OO-icon-button"
-                                @click="iManager.setConfigFromDialog('modTargetPath', 'directory').then((res) => { modTargetPath = res; console.log('modTargetPath', res) })">
-                                <s-icon type="add"></s-icon>
-                            </s-icon-button>
-                        </div>
-
-                    </div>
+                    <settingBar :data=modTargetPathData />
                     <p> {{ $t('setting.modTargetPath-info') }} <br>当前目录为: {{
                         modTargetPath }}</p>
 
@@ -304,6 +262,12 @@ import { defineProps, defineEmits, ref, onMounted, computed, watch, useTemplateR
 import sectionSelector from '../src/components/sectionSelector.vue';
 import IManager from '../electron/IManager';
 import CssProxy from '../src/components/cssProxy.vue';
+import settingBar from '../src/components/settingBar.vue';
+import getData from '../src/section/settingSectionData.js';
+
+let {languageData, themeData, modTargetPathData, modSourcePathData, presetPathData,initAllDataButton} = getData();
+
+
 
 const ipcRenderer = require('electron').ipcRenderer;
 const iManager = new IManager();
@@ -313,8 +277,6 @@ const sections = ref(['intro', 'basic', 'advanced', 'auto', 'more']);
 const sectionSelectorRef = useTemplateRef('section-selector');
 const currentSection = ref('intro');
 
-const language = ref('zh_cn');
-const theme = ref('auto');
 const modTargetPath = ref('');
 const modSourcePath = ref('');
 const presetPath = ref('');
@@ -326,22 +288,6 @@ const ifAutoRefreshInZZZ = ref(false);
 const ifUseAdmin = ref(false);
 
 
-watch(language, (newVal) => {
-    // iManager.config.language = newVal;
-    //变量命名不能包含-，所以这里需要转换
-    console.log('language change', newVal);
-    iManager.setLanguage(newVal);
-    iManager.saveConfig();
-});
-watch(theme, (newVal) => {
-    iManager.setTheme(newVal);
-});
-watch(modTargetPath, (newVal) => {
-    //debug
-    console.log('modTargetPath change', newVal);
-    iManager.config.modTargetPath = newVal;
-    iManager.saveConfig();
-});
 watch(modSourcePath, (newVal) => {
     iManager.config.modSourcePath = newVal;
     iManager.saveConfig();
@@ -391,8 +337,6 @@ function closeSettingPage() {
 
 onMounted(async () => {
     await iManager.waitInit();
-    language.value = iManager.config.language;
-    theme.value = iManager.config.theme;
     modTargetPath.value = iManager.config.modTargetPath;
     modSourcePath.value = iManager.config.modSourcePath;
     presetPath.value = iManager.config.presetPath;

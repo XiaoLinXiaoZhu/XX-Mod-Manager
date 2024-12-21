@@ -41,7 +41,7 @@ const sliderStyle = computed(() => {
     const index = props.sections.indexOf(currentSection.value);
     return {
         width: `${100 / props.sections.length}%`,
-        transform: `translateX(${index * 95 - 22}%) skew(-20deg)`
+        transform: `translateX(calc(${index * 85 - 15}%)) skew(-20deg)`
     };
 });
 
@@ -96,6 +96,7 @@ defineExpose({
     pointer-events: auto;
     z-index: 4;
 }
+
 
 .section-item>p{
     transition: color 0.3s;

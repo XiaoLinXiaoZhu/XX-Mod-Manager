@@ -22,7 +22,7 @@ function snack(message, type = 'info') {
 }
 
 // // 导入 hmc-win32
-const HMC = require('hmc-win32');
+// const HMC = require('hmc-win32');
 
 
 class IManager {
@@ -36,6 +36,8 @@ class IManager {
         this.data = {};
         this.plugins = {};
         this.eventList = {};
+
+        this.HMC = require('hmc-win32');
 
         // 支持 插件 功能
         this.plugins = {};
@@ -72,7 +74,7 @@ class IManager {
     // };
     os = process.platform;
     // 对外暴露的 hmc 对象，使得插件可以直接调用 hmc 的方法
-    HMC = HMC;
+    HMC = null;
     // 从本地加载的配置项
     config = {
         firstLoad: true, // 是否第一次加载
@@ -341,7 +343,7 @@ class IManager {
             snack('文件不存在');
             return;
         }
-        HMC.openApp(exePath);
+        this.HMC.openApp(exePath);
     }
 
     async initAllData() {

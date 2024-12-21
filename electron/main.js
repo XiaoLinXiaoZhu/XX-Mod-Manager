@@ -10,6 +10,10 @@ let devMode = false;
 devMode = process.argv.includes('--dev');
 console.log('process.argv', process.argv);
 
+let firstpage = false;
+firstpage = process.argv.includes('--firstpage');
+console.log('firstpage', firstpage);
+
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -42,6 +46,9 @@ const createWindow = () => {
   // 因为现在是 使用 vite + vue3 开发的，所以这里加载的是 vite 启动的地址
   if(devMode){
     mainWindow.loadURL('http://localhost:3000/')
+    if(firstpage){
+      mainWindow.loadURL('http://localhost:3000/firstLoad/index.html')
+    }
     if(devTools){
       mainWindow.webContents.openDevTools()
     }
