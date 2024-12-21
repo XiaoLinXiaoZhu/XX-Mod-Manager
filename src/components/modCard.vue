@@ -4,7 +4,7 @@
         :clicked=clicked
         clickable="true" 
         :id="props.mod" 
-        inWindow="true" 
+        inWindow="none" 
         :character="props.character"
         :class="{compact: props.compactMode}"
         @click="click"
@@ -14,7 +14,9 @@
         <div slot="image" style="height: 200px;">
             <img id="editDialog-mod-info-image"
                 style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" alt="Mod Image"
-                :src="img" />
+                :src="img" v-if="enteredWindow || !props.lazyLoad" />
+            <s-skeleton id="editDialog-mod-info-image" style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" v-else />
+            <!-- <img id="editDialog-mod-info-image" style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" alt="Mod Image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" v-else /> -->
         </div>
         <div slot="headline" id="mod-item-headline">{{ props.mod }}</div>
         <div slot="subhead" id="mod-item-subhead">{{ props.character }}</div>
@@ -40,6 +42,7 @@ const props = defineProps({
     character: String,
     description: String,
     imagePath: String,
+    lazyLoad: Boolean,
     compactMode: Boolean,
     invokeClickChange: Boolean,
     hotKeys:{
@@ -47,6 +50,7 @@ const props = defineProps({
         default: () => []
     }
 })
+const enteredWindow = ref(false);
 
 const displayHotKeys = computed(() => {
     // hotKeys: [{key: 'Ctrl', description: 'description'}]
@@ -175,10 +179,18 @@ function playClickAnim(modItem, event = null, rect = null) {
         });
     })
 
+    const enterWindow = () => {
+        //debug
+        const modItem = modItemRef.value;
+        console.log(`modItem ${modItem.id} inWindow:${modItem.getAttribute('inWindow')}`);
+        enteredWindow.value = true;
+    }
+
 
 defineExpose({
     click,
-    playClickAnim
+    playClickAnim,
+    enterWindow
 })
 </script>
 

@@ -9,6 +9,7 @@
                     :character="mod.character"
                     :description="mod.description"
                     :hotKeys="mod.hotkeys"
+                    :lazyLoad="true"
                     :imagePath="mod.preview"
                     @click="click"
                     :compactMode="compactMode"
@@ -29,6 +30,7 @@ import modCard from './modCard.vue';
 import modFilterContainer from '../components/modFilterContainer.vue';
 import { Tween,Group } from "@tweenjs/tween.js";
 import IManager from '../../electron/IManager';
+import { mod } from 'three/tsl';
 
 const iManager = new IManager();
 
@@ -158,7 +160,21 @@ const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         const modItem = entry.target;
         // 如果元素在视口内，则使其inWindow属性为true
+        
+        // 这里时一个优化，卡片默认不加载图片，直到 enterWindow 为 true 时才加载图片
+        if (modItem.getAttribute('inWindow') == 'none') {
+            //debug
+            if (entry.isIntersecting) {
+                //debug
+                console.log(`item ${modItem.id} enter window , load image`,entry.isIntersecting);
+                modCardRefs.value[modItem.id].enterWindow();
+            }
+            return;
+        }
+
         modItem.inWindow = entry.isIntersecting;
+        modItem.setAttribute('inWindow', entry.isIntersecting);
+        
         //debug
         //console.log(`modItem ${modItem.id} inWindow:${modItem.inWindow}`);
     });
