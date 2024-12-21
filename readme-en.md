@@ -20,7 +20,7 @@ readme: [简体中文](readme.md) | English
 
 ## Disclaimer
 
-- **<font color=red>Development Warning</font>**: XXMI Launcher is still in development and may contain bugs, crashes, or other issues. Please report them to the [issues](https://github.com/XiaoLinXiaoZhu/XX-Mod-Manager/issues) page.
+- **<font color=red>Development Warning</font>**: XXMM is still in development and may contain bugs, crashes, or other issues. Please report them to the [issues](https://github.com/XiaoLinXiaoZhu/XX-Mod-Manager/issues) page.
 
 ## Features
 

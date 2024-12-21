@@ -21,7 +21,7 @@ readme: [English](readme-en.md) | 简体中文
 
 ## 免责声明
 
-- **<font color=red>开发中警告</font>**：XXMI Launcher仍在开发中，可能包含错误、崩溃或其他问题。请将它们报告给[issues](https://github.com/XiaoLinXiaoZhu/XX-Mod-Manager/issues)页面。
+- **<font color=red>开发中警告</font>**：XXMM仍在开发中，可能包含错误、崩溃或其他问题。请将它们报告给[issues](https://github.com/XiaoLinXiaoZhu/XX-Mod-Manager/issues)页面。
 
 ## 特性
 
