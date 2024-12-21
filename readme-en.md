@@ -148,6 +148,7 @@ If you are capable, you can support me in the following ways:
 
 ---v0.2.0
 - [x] Automatically refresh mods in-game after applying mods
+- [ ] Finish the first-time startup introduction page
 
 ---v0.3.0
 - [ ] Performance optimization, overall polishing of animations
