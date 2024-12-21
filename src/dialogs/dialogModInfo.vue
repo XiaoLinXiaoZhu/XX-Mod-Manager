@@ -78,7 +78,14 @@
                 <p style="line-height: 1.2;">
                   {{ $t('editDialog.mod-info-url-tip') }} </p>
               </s-tooltip>
-              <s-text-field :value="modInfo.url" @input="modInfo.url = $event.target.value" />
+              <div class="OO-s-text-field-container">
+                <s-text-field :value="modInfo.url" @input="modInfo.url = $event.target.value" />
+                <s-icon-button type="filled" slot="start" class="OO-icon-button" @click="iManager.openUrl(modInfo.url)">
+                  <s-icon><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                      <path d="m256-240-56-56 384-384H240v-80h480v480h-80v-344L256-240Z"></path>
+                    </svg></s-icon>
+                </s-icon-button>
+              </div>
             </div>
 
             <!-- -mod快捷键 -->
@@ -166,8 +173,10 @@
     <div slot="text">
       <p data-translate-key="dialog-ask-for-save-change"> 是否保存更改？ </p>
     </div>
-    <s-button slot="action" type="text" id="save-change-ignore" @click="handleCancel"> {{ $t('editDialog.ignore') }} </s-button>
-    <s-button slot="action" type="text" id="save-change-confirm" @click="handleSave"> {{ $t('editDialog.save') }} </s-button>
+    <s-button slot="action" type="text" id="save-change-ignore" @click="handleCancel"> {{ $t('editDialog.ignore') }}
+    </s-button>
+    <s-button slot="action" type="text" id="save-change-confirm" @click="handleSave"> {{ $t('editDialog.save') }}
+    </s-button>
   </s-dialog>
 </template>
 
@@ -300,17 +309,17 @@ onMounted(() => {
   editModInfoDialog.value.shadowRoot.appendChild(editModInfoDialogStyle);
 
   editModInfoDialog.value.addEventListener('dismiss', async () => {
-  // 如果 modInfo 与 props.mod 不同，则询问是否保存
-  //debug
-  if (saved) {
-    saved = false;
-    return;
-  }
-  console.log('dismiss', JSON.stringify(modInfo.value), JSON.stringify(props.mod));
-  if (JSON.stringify(modInfo.value) !== JSON.stringify(props.mod)) {
-    iManager.showDialog('save-change-dialog');
-  }
-});
+    // 如果 modInfo 与 props.mod 不同，则询问是否保存
+    //debug
+    if (saved) {
+      saved = false;
+      return;
+    }
+    console.log('dismiss', JSON.stringify(modInfo.value), JSON.stringify(props.mod));
+    if (JSON.stringify(modInfo.value) !== JSON.stringify(props.mod)) {
+      iManager.showDialog('save-change-dialog');
+    }
+  });
 });
 
 

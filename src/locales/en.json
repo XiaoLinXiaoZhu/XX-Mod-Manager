@@ -51,7 +51,8 @@
     "hotkeys": "Hotkeys",
     "description": "Description",
     "edit": "Edit mod information",
-    "openUrl": "Open mod link"
+    "openUrl": "Open mod link",
+    "openFolder": "open mod folder"
   },
   "editDialog": {
     "edit-mod-info": "Edit MOD Info",

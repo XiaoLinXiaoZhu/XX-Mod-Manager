@@ -44,17 +44,15 @@
             </s-tooltip>
 
             <s-tooltip>
-                <s-button slot="trigger" @click="openModUrl" class="open-url-button OO-color-gradient">
+                <s-button slot="trigger" @click="openModFolder" class="open-url-button OO-color-gradient">
                     <s-icon slot="start">
-                        <svg viewBox="0 0 960 960">
-                            <path
-                                d="M935.68 140.8a237.44 237.44 0 0 1 0 334.72l-204.16 204.16a237.44 237.44 0 0 1-334.72 0A64 64 0 0 1 486.4 588.8a108.8 108.8 0 0 0 153.6 0l204.8-203.52a108.8 108.8 0 0 0 0-153.6 107.52 107.52 0 0 0-153.6 0A64.256 64.256 0 0 1 600.32 140.8a238.08 238.08 0 0 1 335.36 0zM320 844.8a64 64 0 0 1 91.52 0 64 64 0 0 1 0 90.88 234.88 234.88 0 0 1-167.04 69.12A236.8 236.8 0 0 1 76.8 600.32L280.32 396.8a238.08 238.08 0 0 1 335.36 0A64.256 64.256 0 1 1 524.8 487.68a107.52 107.52 0 0 0-153.6 0L166.4 691.2a108.16 108.16 0 0 0 0 153.6 108.8 108.8 0 0 0 153.6 0z">
-                            </path>
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+  <path d="m256-240-56-56 384-384H240v-80h480v480h-80v-344L256-240Z"></path>
+</svg>
                     </s-icon>
-                    <p>{{ $t('modInfo.openUrl') }}</p>
+                    <p>{{ $t('modInfo.openFolder') }}</p>
                 </s-button>
-                <p>{{ $t('modInfo.openUrl') }}</p>
+                <p>{{ $t('modInfo.openFolder') }}</p>
             </s-tooltip>
         </div>
     </div>
@@ -64,7 +62,8 @@
 import { defineProps, defineEmits, useTemplateRef, onMounted, ref, watch } from 'vue';
 import IManager from '../../electron/IManager';
 const iManager = new IManager();
-
+import fsProxy from '../../electron/fsProxy';
+const fs = new fsProxy();
 
 const { ipcRenderer } = require('electron');
 
@@ -87,9 +86,14 @@ const editMod = () => {
     //emit('clickEditButton');
 };
 
-const openModUrl = () => {
+const openModFolder = () => {
     //ipcRenderer.send('open-url', props.mod?.url);
-
+    if (props.mod == null) {
+        ipcRenderer.send('snack', 'No mod selected', 'error');
+        return;
+    }
+    fs.openDir(iManager.config.modSourcePath + '/' + props.mod.name);
+    
 
 };
 

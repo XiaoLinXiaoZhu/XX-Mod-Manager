@@ -51,7 +51,8 @@
     "hotkeys": "快捷键",
     "description": "描述",
     "edit": "编辑mod信息",
-    "openUrl": "打开mod链接"
+    "openUrl": "打开mod链接",
+    "openFolder": "打开mod文件夹"
   },
   "editDialog": {
     "edit-mod-info": "编辑MOD信息",

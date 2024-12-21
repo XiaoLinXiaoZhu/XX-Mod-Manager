@@ -352,6 +352,14 @@ class IManager {
         location.reload();
     }
 
+    async openUrl(url) {
+        if (url === '') {
+            snack('链接为空');
+            return;
+        }
+        ipcRenderer.invoke('open-url', url);
+    }
+
     //------ 文件拖拽 ------
     async handleDrop(event) {
         console.log('handleDrop', event);

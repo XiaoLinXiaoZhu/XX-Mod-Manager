@@ -647,6 +647,13 @@ ipcMain.handle('fs-open-dir', async (event, path) => {
 }
 );
 
+// 在外部打开链接
+ipcMain.handle('open-url', async (event, url) => {
+    const { shell } = require('electron');
+    shell.openExternal(url);
+}
+);
+
 
 //-=============================导出=============================
 module.exports = {
