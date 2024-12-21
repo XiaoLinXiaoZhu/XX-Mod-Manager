@@ -9,7 +9,7 @@
                 alt="Mod Image" :src="img? img : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D'" />
         </div>
 
-        <s-scroll-view>
+        <s-scroll-view class="mod-info-content">
             <h4> {{ $t('modInfo.hotkeys') }}</h4>
             <div id="hotkey-container" class="OO-colunm-center">
                 <div v-for="hotkey in modInfo ? modInfo.hotkeys : []" class="hotkey OO-setting-bar OO-shade-box">
@@ -197,6 +197,7 @@ s-scroll-view {
     overflow-y: auto;
     overflow-x: hidden;
     color: var(--s-color-on-surface-variant);
+    line-break: anywhere;
 
     p {
         padding: 10px;
@@ -204,6 +205,11 @@ s-scroll-view {
         text-align: left;
         font-weight: 500;
     }
+}
+
+.mod-info-content {
+    margin: -10px -10px 0px 0px;
+    padding-right: 5px;
 }
 
 .buttons {
@@ -216,7 +222,9 @@ s-scroll-view {
     left: 5px;
     right: 5px;
     margin-bottom: 10px;
-    background-color: black;
+    background-color: #00000000;
+    border-radius: 20px;
+    /* backdrop-filter: blur(2px); */
 }
 
 .edit-button {

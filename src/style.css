@@ -565,3 +565,8 @@ p {
   box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2);
   transform: scale(0.83);
 }
+
+.OO-scorll-box>div {
+  margin-right: -10px;
+  padding-right: 10px;
+}

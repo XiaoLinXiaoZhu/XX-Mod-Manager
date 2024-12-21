@@ -104,7 +104,7 @@ defineExpose({
 }
 
 .section-item.active {
-    color: rgb(0, 0, 0);
+    color: var(--s-color-on-primary);
 }
 
 .slider-container{

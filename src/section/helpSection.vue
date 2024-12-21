@@ -5,7 +5,7 @@
     </leftMenu>
     <div class="help-content OO-box">
       <!--  中文帮助页面 -->
-      <div id="help-dialog-cn" v-if="language === 'zh_cn'" class="font-hongmeng"
+      <div id="help-dialog-cn" v-if="language === 'zh_cn'" class="font-hongmeng OO-scorll-box"
         style="display: flex;padding: 0px;flex-direction: column;width: 100%;padding: 0px;height: 100%;">
         <!-- 根据选择的设置选项展示不同的设置内容 -->
         <!-- -预设 -->
@@ -432,4 +432,5 @@ onMounted(() => {
   flex: 1;
   overflow-y: auto;
 }
+
 </style>

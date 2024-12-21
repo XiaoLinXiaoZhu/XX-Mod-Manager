@@ -3,7 +3,7 @@
         <leftMenu :tabs="tabs" :translatedTabs="translatedTabs" @tabChange="handleTabChange">
         </leftMenu>
 
-        <div class="setting-content OO-box">
+        <div class="setting-content OO-box OO-scorll-box">
             <!-- -=========== 常规设置 =========== -->
             <div v-if="currentTab === 'normal'">
                 <settingBar :data="languageData"></settingBar>
