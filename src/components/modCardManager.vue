@@ -27,7 +27,7 @@ import 'sober';
 import { ref, onMounted,computed,useTemplateRef,watch } from 'vue';
 import modCard from './modCard.vue';
 import modFilterContainer from '../components/modFilterContainer.vue';
-import { Tween,Group } from '@tweenjs/tween.js';
+import { Tween,Group } from "@tweenjs/tween.js";
 import IManager from '../../electron/IManager';
 
 const iManager = new IManager();
@@ -116,16 +116,42 @@ async function loadPreset(presetName) {
     // handleFilterChange('已选择');
 };
 
+const animate = new Group();
 const modContainerRef = useTemplateRef('modContainerRef');
 // 监控 compactMode 变量，为其的 grid-auto-rows 添加过渡效果
+let isAnimating = false;
+// 两个动画效果：从 350px 到 150px，从 150px 到 350px
+const compactAnimation = new Tween({height: 350}).to({height: 150}, 200).onComplete(isAnimating = false);
+compactAnimation.onUpdate((object) => {
+    modContainerRef.value.style.gridAutoRows = `${object.height}px`;
+});
+const expandAnimation = new Tween({height: 150}).to({height: 350}, 200).onComplete(isAnimating = false);
+expandAnimation.onUpdate((object) => {
+    modContainerRef.value.style.gridAutoRows = `${object.height}px`;
+});
+
+animate.add(compactAnimation);
+animate.add(expandAnimation);
+
 watch(() => props.compactMode, (newVal) => {
     if (newVal) {
         modContainerRef.value.style.gridAutoRows = '150px';
+        isAnimating = true;
+        compactAnimation.start();
+        updateAnimate();
     } else {
         modContainerRef.value.style.gridAutoRows = '350px';
+        isAnimating = true;
+        expandAnimation.start();
+        updateAnimate();
     }
 });
 
+function updateAnimate() {
+    if (!isAnimating) return;
+	requestAnimationFrame(updateAnimate)
+	animate.update()
+}
 
 // 定义 observer 变量
 const observer = new IntersectionObserver((entries) => {
@@ -281,6 +307,7 @@ defineExpose({
     .mod-item {
         width: 250px;
         height: 150px;
+        transition: height 0.4s;
     }
 }
 </style>
