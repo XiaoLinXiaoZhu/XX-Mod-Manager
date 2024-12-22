@@ -22,7 +22,7 @@ function snack(message, type = 'info') {
 }
 
 // // 导入 hmc-win32
-// const HMC = require('hmc-win32');
+const HMC = require('hmc-win32');
 
 
 class IManager {
@@ -37,7 +37,7 @@ class IManager {
         this.plugins = {};
         this.eventList = {};
 
-        this.HMC = require('hmc-win32');
+        this.HMC = HMC
 
         // 支持 插件 功能
         this.plugins = {};

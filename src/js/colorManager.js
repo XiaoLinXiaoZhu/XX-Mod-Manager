@@ -81,8 +81,9 @@ colorManager.onUpdate = function () {
 colorManager.needRefresh = true;
 colorManager.onPageInit = function () {}
 colorManager.init = function (element) { }
-colorManager.destroy = function (element) { }
-
+colorManager.destroy = function (element) {
+    element.style.backgroundColor = '';
+}
 
 //-========================= OO-color-gradient-svg ========================
 const colorManagerSvg = new ClassManager('OO-color-gradient-svg');

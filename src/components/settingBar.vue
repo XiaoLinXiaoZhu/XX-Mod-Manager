@@ -3,22 +3,31 @@
         <h3 v-if="data.t_displayName">{{ data.t_displayName[local] }}</h3>
         <h3 v-else>{{ data.displayName }}</h3>
 
+        <!-- -boolean -->
         <s-switch :checked="data.data" @change="onChange($event.target.checked)"
             v-if="data.type === 'boolean'"></s-switch>
+
+        <!-- -string -->
         <s-text-field v-else-if="data.type === 'string'" :value="data.data"
             @input="onChange($event.target.value)"></s-text-field>
+
+        <!-- -number -->
         <s-text-field :value="data.data" @input="onChange($event.target.value)"
             v-else-if="data.type === 'number'"></s-text-field>
+
+        <!-- -select -->
         <div v-else-if="data.type === 'select'" style="display: flex;flex-direction:row;">
             <div v-for="(option, index) in data.options" :key="index" style="margin-left: 3px;">
                 <input type="radio" :name="data.name" :id="option.value" :value="option.value" v-model="data.data">
                 <label :for="option.value">
-                    <s-chip selectable="true" type="default" :id="option.value" @click="onChange(option.value)">
+                    <s-chip selectable="true" type="default" :id="option.value" @click="onChange(option.value)" :class="{ 'OO-color-gradient': data.data === option.value }">
                         <p>{{ option.t_value ? option.t_value[local] : option.value }}</p>
                     </s-chip>
                 </label>
             </div>
         </div>
+
+        <!-- -dir -->
         <div v-else-if="data.type === 'dir'" class="OO-s-text-field-container">
             <s-text-field :value="data.data" @input="onChange($event.target.value)">
             </s-text-field>
@@ -27,6 +36,8 @@
                 <s-icon type="add"></s-icon>
             </s-icon-button>
         </div>
+
+        <!-- -exePath -->
         <div v-else-if="data.type === 'exePath'" class="OO-s-text-field-container">
             <s-text-field :value="data.data" @input="onChange($event.target.value)">
             </s-text-field>
@@ -35,6 +46,8 @@
                 <s-icon type="add"></s-icon>
             </s-icon-button>
         </div>
+
+        <!-- -button -->
         <s-button @click="onChange()" v-else-if="data.type === 'button'">
             {{ data.t_buttonName ? data.t_buttonName[local] : data.buttonName }}
         </s-button>
@@ -77,12 +90,20 @@ const onChange = (value) => {
     if (result !== undefined) {
         data.value.data = result;
         // 强制更新
-        display.value = false;
-        setTimeout(() => {
-            display.value = true;
-        }, 0);
+        refresh();
+    }
+    // 如果是 select 类型的，需要 更新一下以应用 颜色
+    if (data.value.type === 'select') {
+        data.value.data = value;
     }
 };
+
+function refresh() {
+    display.value = false;
+    setTimeout(() => {
+        display.value = true;
+    }, 1);
+}
 
 onMounted(() => {
     console.log(data.value);
