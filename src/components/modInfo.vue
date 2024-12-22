@@ -1,5 +1,5 @@
 <template>
-    <div class="mod-info-card OO-box font-hongmeng" ref="modInfoRef">
+    <div class="mod-info-card OO-box" ref="modInfoRef">
         <div class="mod-title">{{ modInfo ? modInfo.name : $t('modInfo.emptyTitle') }}</div>
         <div class="mod-character OO-color-gradient">
             <p> {{ modInfo ? modInfo.character : $t('modInfo.emptyCharacter') }}</p>
@@ -31,7 +31,7 @@
 
         <div class="buttons">
             <s-tooltip>
-                <s-button slot="trigger" @click="editMod" class="edit-button OO-color-gradient">
+                <s-button slot="trigger" @click="editMod" class="edit-button OO-button">
                     <s-icon>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
                             <path
@@ -44,7 +44,7 @@
             </s-tooltip>
 
             <s-tooltip>
-                <s-button slot="trigger" @click="openModFolder" class="open-url-button OO-color-gradient">
+                <s-button slot="trigger" @click="openModFolder" class="open-dir-button OO-button font-hongmeng">
                     <s-icon slot="start">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
   <path d="m256-240-56-56 384-384H240v-80h480v480h-80v-344L256-240Z"></path>
@@ -221,28 +221,29 @@ s-scroll-view {
     display: flex;
     justify-content: space-between;
     margin-top: 16px;
-
-    bottom: 0;
-    left: 5px;
-    right: 5px;
-    margin-bottom: 10px;
+    padding: 0;
+    bottom: 0px;
+    left: 8px;
+    right: 8px;
+    margin-bottom: 26px;
     background-color: #00000000;
     border-radius: 20px;
+    height: 30px;
     /* backdrop-filter: blur(2px); */
 }
 
 .edit-button {
-    border-radius: 24px;
-    height: 48px;
-    width: 48px;
-    min-width: 48px;
+    border-radius: 25px;
+    height: 50px;
+    width: 50px;
+    min-width: 0px;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
 }
 
-.open-url-button {
-    height: 48px;
+.open-dir-button {
+    height: 50px;
     border-radius: 24px;
     padding: 10px 20px;
 }

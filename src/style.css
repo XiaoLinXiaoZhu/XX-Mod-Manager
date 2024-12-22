@@ -18,7 +18,7 @@
 }
 
 .font-hongmeng {
-  font-family: "Microsoft YaHei", 微软雅黑, "MicrosoftJhengHei", 华文细黑, STHeiti, MingLiu, sans-serif;
+  font-family: "hongmengti","Microsoft YaHei", 微软雅黑, "MicrosoftJhengHei", 华文细黑, STHeiti, MingLiu, sans-serif;
   font-weight: 1000;
   font-size: 0.93em;
 }
@@ -540,6 +540,21 @@ p {
   border-radius: 28px;
   padding: 0 20px;
   box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.OO-button {
+  display: flex;
+  align-items:center;
+  position: relative;
+  background-color: var(--s-color-on-primary);
+  border: 5px solid var(--s-color-outline-variant);
+  border-radius: 20px;
+  box-shadow: 0 0 0px 3px var(--s-color-surface-container-high),inset 1px 1px 1px rgba(255, 255, 255, 0.2);
+  box-sizing: border-box;
+  overflow: hidden;
+  height: 40px;
+  color: var(--s-color-on-surface-variant);
+  font-weight: 1000;
 }
 
 .OO-center-bg {
