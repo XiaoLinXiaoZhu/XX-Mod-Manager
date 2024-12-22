@@ -166,7 +166,7 @@ const observer = new IntersectionObserver((entries) => {
             //debug
             if (entry.isIntersecting) {
                 //debug
-                console.log(`item ${modItem.id} enter window , load image`,entry.isIntersecting);
+                // console.log(`item ${modItem.id} enter window , load image`,entry.isIntersecting);
                 modCardRefs.value[modItem.id].enterWindow();
             }
             return;

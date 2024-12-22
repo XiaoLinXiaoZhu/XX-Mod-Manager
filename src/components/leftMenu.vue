@@ -116,17 +116,18 @@ s-ripple {
 
 .OO-button-box{
     position: relative;
-    height: 40px;
+    height: 32px;
     margin: 0;
-    width: calc(100% - 28px);
+    border-radius: 16px;
+    width: calc(100% - 26px);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 #up-button{
-    left: -6px;
-    top: -8px;
+    left: -7px;
+    top: -7px;
 }
 
 .placeholder{
@@ -134,7 +135,7 @@ s-ripple {
 }
 
 #down-button{
-    left: -6px;
-    bottom: -8px;
+    left: -7px;
+    bottom: -7px;
 }
 </style>

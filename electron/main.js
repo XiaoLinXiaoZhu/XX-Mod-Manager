@@ -14,6 +14,11 @@ let firstpage = false;
 firstpage = process.argv.includes('--firstpage');
 console.log('firstpage', firstpage);
 
+let devTools = false;
+devTools = process.argv.includes('--devTools');
+console.log('devTools', devTools);
+
+
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -35,8 +40,7 @@ const createWindow = () => {
   setMainWindow(mainWindow);
 
 
-  let devTools = false;
-  devTools = process.argv.includes('--devTools');
+
   //debug
   console.log('===== createWindow =====');
   //mainWindow.loadFile(path.resolve(__dirname,"../dist/index.html"))

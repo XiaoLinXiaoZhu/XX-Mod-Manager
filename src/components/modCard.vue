@@ -182,7 +182,7 @@ function playClickAnim(modItem, event = null, rect = null) {
     const enterWindow = () => {
         //debug
         const modItem = modItemRef.value;
-        console.log(`modItem ${modItem.id} inWindow:${modItem.getAttribute('inWindow')}`);
+        // console.log(`modItem ${modItem.id} inWindow:${modItem.getAttribute('inWindow')}`);
         enteredWindow.value = true;
     }
 
