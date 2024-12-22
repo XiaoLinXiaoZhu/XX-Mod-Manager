@@ -221,7 +221,6 @@ s-scroll-view {
     display: flex;
     justify-content: space-between;
     margin-top: 16px;
-    padding: 0;
     bottom: 0px;
     left: 8px;
     right: 8px;
@@ -234,6 +233,7 @@ s-scroll-view {
 
 .edit-button {
     border-radius: 25px;
+    padding: 0;
     height: 50px;
     width: 50px;
     min-width: 0px;

@@ -36,7 +36,7 @@
         <div class="bottom-right">
             <!-- <s-button @click="handleApplyButtonClicked" /> -->
              <s-button @click="handleApplyButtonClicked" id="apply-button" class="OO-color-gradient font-hongmeng">
-                <s-icon type="chevron_right" slot="start"></s-icon>
+                <s-icon type="chevron_right" slot="start" id="apply-button-icon"></s-icon>
                 {{ $t('buttons.apply') }}
             </s-button>
             <!-- <s-button @click="handleClick" id="apply-button" class="OO-color-gradient font-hongmeng">
@@ -324,7 +324,15 @@ onMounted(() => {
 
 #apply-button {
     padding: 0 40px;
+    padding-left: 60px;
     margin: 0 40px;
+    font-size: 20px;
 }
 
+#apply-button-icon{
+    margin-right: 60px;
+    height: 40px;
+    width: 40px;
+    position: absolute;
+}
 </style>

@@ -10,28 +10,43 @@ const iManager = new IManager();
 
 // 将上述代码 改为 使用 ClassManager 来管理
 
+const lightColor ={
+    startColor: new Color(0x53727E),
+    endColor: new Color(0x0E3F3C)
+}
+
+const darkColor = {
+    startColor: new Color(0x9fb900),
+    endColor: new Color(0xf2d900)
+}
 
 
 let startColor = new Color(0x94ad00);
 let endColor = new Color(0xffd300);
-let currentColor = startColor;
+let currentColor = new Color(0x94ad00);
+startColor = darkColor.startColor;
+endColor = darkColor.endColor;
+
+currentColor = startColor.clone();
+
+const colorChangeTime = 1500; // 颜色变化的时间
 
 // 根据 theme 的变化，改变颜色
 iManager.on('themeChange', (theme) => {
     if (theme === 'dark') {
-        startColor = new Color(0x94ad00);
-        endColor = new Color(0xffd300);
+        startColor = darkColor.startColor;
+        endColor = darkColor.endColor;
     } else {
-        startColor = new Color(0x63828E);
-        endColor = new Color(0x0E4F3C);
+        startColor = lightColor.startColor;
+        endColor = lightColor.endColor
     }
     
     // 重新创建一个tween对象
     ColorTween = new Tween({ color: startColor });
-    ColorTween.to({ color: endColor }, 2000)
+    ColorTween.to({ color: endColor }, colorChangeTime)
         .easing(Easing.Quadratic.InOut)
         .onUpdate((object) => {
-            currentColor = currentColor.lerp(object.color, 0.01);
+            currentColor = currentColor.lerp(object.color, 0.5);
         })
         .yoyo(true)
         .repeat(Infinity)
