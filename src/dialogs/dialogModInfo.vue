@@ -1,7 +1,7 @@
 <template>
   <s-dialog id="edit-mod-dialog" ref="edit-mod-dialog">
-    <div slot="headline" class="font-hongmeng">
-      <h3 style="height: fit-content;margin: 10px 30px 5px 30px;font-size: 26px;">
+    <div slot="headline" style="font-weight: 1000;font-size: 0.93em;">
+      <h3 style="height: fit-content;margin: 10px 30px 5px 30px;font-size: 26px;" class="font-hongmeng">
         {{ $t('editDialog.edit-mod-info') }}
       </h3>
 
