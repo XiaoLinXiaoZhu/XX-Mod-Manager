@@ -12,7 +12,7 @@
         <s-scroll-view class="mod-info-content">
             <h4> {{ $t('modInfo.hotkeys') }}</h4>
             <div id="hotkey-container" class="OO-colunm-center">
-                <div v-for="hotkey in modInfo ? modInfo.hotkeys : []" class="hotkey OO-setting-bar OO-shade-box">
+                <div v-for="hotkey in modInfo ? modInfo.hotkeys : []" class="hotkey OO-setting-bar OO-shade-box a-little-left">
                     <h3>{{ hotkey.description }}</h3>
                     <h3>{{ hotkey.key }}</h3>
                 </div>
@@ -20,7 +20,7 @@
 
             <h4> {{ $t('modInfo.description') }}</h4>
 
-            <div class="OO-box OO-shade-box" id="mod-info-description">
+            <div class="OO-box OO-shade-box a-little-left" id="mod-info-description">
 
                 <p id="mod-description" style="white-space: normal;">
                     {{ modInfo ? modInfo.description : $t('modInfo.emptyDescription') }}
@@ -250,5 +250,9 @@ s-scroll-view {
 
 .placeholder {
     height: 100px;
+}
+
+.a-little-left {
+    margin-right: 5px;
 }
 </style>
