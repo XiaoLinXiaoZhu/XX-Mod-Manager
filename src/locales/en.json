@@ -1,6 +1,9 @@
 {
   "message": {
-    "hello": "Hello, World"
+    "hello": "Hello, World",
+    "alert": {
+      "emptyModSourceOrTarget": "mod destination folder or mod source folder is empty"
+    }
   },
   "element": {
     "section": {
@@ -36,11 +39,11 @@
     "reset": "Reset",
     "unavailable": "In development, the following features are temporarily unavailable",
     "auto-apply": "Auto Apply",
-    "modTargetPath": "Mod Target Path",
+    "modTargetPath": "Mod Target Folder",
     "modTargetPath-info": "The mod target directory is where modLoader reads mods, usually the Mods folder",
     "modSourcePath": "Mod Source Folder",
     "modSourcePath-info": "The mod source directory is where the program stores mods. When a mod is enabled, a link will be created from here to the mod target directory",
-    "presetPath": "Preset Path",
+    "presetPath": "Preset Folder",
     "presetPath-info": "The preset path is where presets are stored. A preset is a collection of mods that can be enabled with one click",
     "movedToPlugin": "The following functions are moved to plugins to continue to be provided"
   },
@@ -84,6 +87,50 @@
     "edit": "edit",
     "managePreset": "Manage presets",
     "reset": "reset",
-    "save": "save"
-  }
+    "save": "save",
+    "clickToClose": "Click to close",
+    "forePage": "Next page",
+    "nextPage": "Previous page"
+  },
+  "author": "author",
+  "caimogu": "Caimogu",
+  "firstLoad": {
+    "Introduction": "This is a mod manager for managing 3dmigoto based mods. \nIt has powerful functions and beautiful interface, allowing you to manage mods more conveniently.",
+    "aboutProgram": "About this program",
+    "aboutProgramInfo": "This program is developed by XLXZ, is open source and free, and follows the GNU General Public License v3.0. \nUsed to manage mods based on 3dmigoto. In theory, it can also manage mods of other games (as long as they are based on 3dmigoto)",
+    "aboutProgramInfo-1": "The latest version is released on gamebanana. If you have any questions or suggestions, please submit them on github.",
+    "aboutProgramPrinciple": "Operating principle",
+    "aboutProgramPrincipleInfo": "This program implements mod loading by proxying the Mods folder, and dynamically adjusts the files inside the mod folder to implement mod loading.",
+    "advancedIntro": "It's almost ready. Let's make some settings and let XXMM proxy your Mods folder.",
+    "advancedIntro-1": "Please set the mod target folder, mod source folder and default folder",
+    "advancedIntro-2": "If you don't know what these are, please go back to the previous page to check",
+    "alertFolder": "Please note that the following three folders cannot be the same, otherwise the program will not run properly.",
+    "alertPreset": "This folder path is also required. If not set, the program will not run properly.",
+    "autoInfo-1": "This program supports functions such as automatically starting games, automatically applying mods, automatically refreshing applied mods, etc. You can set them in the settings.",
+    "autoInfo-2": "You can also install plug-ins for the program to achieve more functions",
+    "autoMove": "Move all files under mod target to mod source",
+    "autoSetting": "Automation settings",
+    "congratulate": "Congratulations on setting up",
+    "congratulate-1": "You have completed all settings and can now start using this program. Please close this page.",
+    "explanation": "Before using it, let us explain some terms",
+    "huan-ying-shi-yong-xxmodmanagerxxmm": "Welcome to XX-mod-manager(XXMM)",
+    "modPresetPathInfo": "This is the folder used by this program to store mod presets. The program will store a set of mod configurations here. After configuration, you will quickly switch between different mod combinations through the preset function. \nIt should be set to an empty folder anywhere",
+    "modSourcePathInfo": "This is the folder where this program reads mods, and the folder where you should store mods. \nIt should be set to an empty folder anywhere, you will then need to add your mod to this folder",
+    "modTargetPathInfo-1": "This is the folder actually loaded by your module loader. For ZZMI, it is the ZZMI Mods folder; for XXMI, it is the XXMI internal folder /zzz/Mods.",
+    "modTargetPathInfo-2": "This program implements mod loading by proxying the Mods folder, and dynamically adjusts the files inside the mod folder to implement mod loading, so please do not add any files in the mod target folder! \nJust add your mod to the mod source folder.",
+    "prerequisites": "Prerequisites",
+    "prerequisites-1": "Please make sure you have 3dmigoto or other mod loader installed and running successfully. \nIf you haven't installed 3dmigoto yet, please install 3dmigoto first. \nIf you don't understand what 3dmigoto is, please search it yourself.",
+    "prerequisites-2": "Please note that this program is only a mod manager, not a mod loader. It needs to rely on 3dmigoto or other mod loaders to load mods.",
+    "selectLanguageAndTheme": "Select your language and topic below",
+    "thanks": "special thanks",
+    "themeRecommand": "The theme recommends using a dark theme. When designing, I paid more attention to the aesthetics of the dark theme, which imitated the design style of ZZZ.",
+    "whatCanIt": "What functions does it have?",
+    "whatCanIt-1": "Intuitively manage mods through visual cards",
+    "whatCanIt-2": "Save various information of the mod through settings",
+    "whatCanIt-3": "Quickly switch between different mod combinations by setting a set of presets",
+    "whatCanIt-4": "By setting the automation function to achieve full automation from opening 3dmigoto to starting the game to automatically refreshing the application mod (a function that already exists in ZZMM, but has not yet been migrated to XXMM, the code needs to be refactored)",
+    "whatIsThis": "What's this?"
+  },
+  "gamebanana": "Gamebanana",
+  "github": "Github"
 }

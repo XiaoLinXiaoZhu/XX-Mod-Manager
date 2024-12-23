@@ -1,6 +1,9 @@
 {
   "message": {
-    "hello": "你好，世界"
+    "hello": "你好，世界",
+    "alert": {
+      "emptyModSourceOrTarget": "mod目标文件夹或mod源文件夹为空"
+    }
   },
   "element": {
     "section": {
@@ -84,6 +87,50 @@
     "edit": "编辑",
     "managePreset": "管理预设",
     "addPreset": "添加预设",
-    "compactMode": "紧凑模式"
-  }
+    "compactMode": "紧凑模式",
+    "clickToClose": "点击关闭",
+    "nextPage": "上一页",
+    "forePage": "下一页"
+  },
+  "firstLoad": {
+    "huan-ying-shi-yong-xxmodmanagerxxmm": "欢迎使用 XX-mod-manager(XXMM)",
+    "selectLanguageAndTheme": "在下方先选择你的语言和主题",
+    "themeRecommand": "主题推荐使用黑暗主题，在设计时，我更多的考虑了黑暗主题的美观性，它模仿了ZZZ的设计风格",
+    "whatIsThis": "这是什么？",
+    "Introduction": "这是一个mod管理器，用于管理基于3dmigoto的mod。它拥有强大的功能和美观的界面，让你更方便的管理mod。",
+    "whatCanIt": "它拥有什么功能？",
+    "whatCanIt-1": "通过可视化的卡片 直观地管理mod",
+    "whatCanIt-2": "通过设置 保存mod的各种信息",
+    "whatCanIt-3": "通过设置 一组预设 来快速切换 不同的mod组合",
+    "whatCanIt-4": "通过设置 自动化功能 来 实现从打开3dmigoto到启动游戏再到自动刷新应用的mod 的 全自动化 (ZZMM中已有的功能，但是还没迁移到XXMM，代码需要重构)",
+    "prerequisites": "先决条件",
+    "prerequisites-1": "请确保你已经安装了3dmigoto 或者其他的mod加载器，并且已经成功运行过。如果你还没有安装3dmigoto，请先安装3dmigoto。如果你不明白3dmigoto是什么，请自行搜索。",
+    "prerequisites-2": "请注意，本程序只是mod管理器，不是mod加载器，它需要依赖3dmigoto或者其他的mod加载器来加载mod",
+    "explanation": "在使用之前，让我们进行一些名词解释",
+    "alertFolder": "请注意，下述三个文件夹不能相同，否则会导致程序无法正常运行",
+    "modTargetPathInfo-1": "这是你的 模组加载器 实际加载的文件夹，对于ZZMI来说，就是ZZMI的Mods文件夹；对于XXMI来说，就是XXMI内部文件夹/zzz/Mods",
+    "modTargetPathInfo-2": "本程序通过代理Mods文件夹的方式来实现mod的加载，通过动态调整mod文件夹内部的文件来实现mod的加载， 所以请不要在mod目标文件夹内添加任何文件！将你的mod添加到mod源文件夹中即可。",
+    "modSourcePathInfo": "这是 本程序 读取mod的文件夹，也是你应当用来存放mod的文件夹。它应该被设置为任意位置的一个空文件夹，之后你需要将你的mod添加到这个文件夹中",
+    "modPresetPathInfo": "这是 本程序 用于存放mod预设的文件夹，程序将在这里存放一组mod的配置，在配置之后，你将通过预设功能快速切换不同的mod组合。它应该被设置为任意位置的一个空文件夹",
+    "aboutProgram": "关于本程序",
+    "aboutProgramPrinciple": "运行原理",
+    "aboutProgramPrincipleInfo": "本程序通过代理Mods文件夹的方式来实现mod的加载，通过动态调整mod文件夹内部的文件来实现mod的加载。",
+    "advancedIntro": "就快要好了，再进行一些设置，让XXMM代理 你的 Mods 文件夹",
+    "advancedIntro-1": "请设置 mod目标文件夹 和 mod源文件夹 以及 预设文件夹",
+    "advancedIntro-2": "如果你不清楚这些是什么，请回到上一页查看",
+    "autoMove": "将 mod目标 下的所有文件移动到 mod源",
+    "alertPreset": "该文件夹路径也为必填项，如果不设置，程序将无法正常运行",
+    "autoSetting": "自动化设置",
+    "autoInfo-1": "本程序支持自动启动游戏，自动应用mod，自动刷新应用的mod等功能，你可以在设置里面进行设置",
+    "autoInfo-2": "你也可以为程序安装插件，来实现更多的功能",
+    "congratulate": "恭喜设置完毕",
+    "congratulate-1": "你已经完成了所有设置，现在可以开始使用本程序了,请关闭本页面",
+    "aboutProgramInfo": "本程序由 XLXZ 开发,开源免费,遵循GNU General Public License v3.0。用于管理基于3dmigoto的mod ,理论上来说也可以管理其他游戏的mod(只要是基于3dmigoto的)",
+    "aboutProgramInfo-1": "最新版本在gamebanana上发布，如果你有任何问题或者建议，欢迎在github上提出",
+    "thanks": "特别感谢"
+  },
+  "author": "作者",
+  "github": "Github",
+  "gamebanana": "Gamebanana",
+  "caimogu": "Caimogu"
 }

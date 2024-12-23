@@ -17,8 +17,8 @@
             <div class="section OO-box" v-if="currentSection === 'intro'">
                 <div class="section-box">
                     <div class="OO-box OO-shade-box">
-                        <h2 style="margin: 5px 0 10px 0;"> 欢迎使用 XX-mod-manager(XXMM) </h2>
-                        <p> 在下方先选择你的语言和主题</p>
+                        <h2 style="margin: 5px 0 10px 0;"> {{ $t('firstLoad.huan-ying-shi-yong-xxmodmanagerxxmm') }} </h2>
+                        <p> {{ $t('firstLoad.selectLanguageAndTheme') }}</p>
                     </div>
                     <!-- -语言设置 -->
                     <settingBar :data=languageData />
@@ -26,32 +26,28 @@
                     <s-divider></s-divider>
                     <settingBar :data=themeData />
                     <p>
-                        主题推荐使用黑暗主题，在设计时，我更多的考虑了黑暗主题的美观性，它模仿了ZZZ的设计风格
-                    </p>
+                        {{ $t('firstLoad.themeRecommand') }} </p>
 
                     <div class="OO-setting-bar">
-                        <h3> 这是什么？ </h3>
+                        <h3> {{ $t('firstLoad.whatIsThis') }} </h3>
                     </div>
                     <div class="OO-box OO-shade-box">
-                        <p> 这是一个mod管理器，用于管理基于3dmigoto的mod。它拥有强大的功能和美观的界面，让你更方便的管理mod。
+                        <p> {{ $t('firstLoad.Introduction') }}
                         </p>
                     </div>
                     <div class="OO-setting-bar">
-                        <h3> 它拥有什么功能？ </h3>
+                        <h3> {{ $t('firstLoad.whatCanIt') }} </h3>
                     </div>
                     <div class="OO-box OO-shade-box">
                         <ol>
-                            <li> 通过可视化的卡片 直观地管理mod
+                            <li> {{ $t('firstLoad.whatCanIt-1') }}
                             </li>
                             <li>
-                                通过设置 保存mod的各种信息
-                            </li>
+                                {{ $t('firstLoad.whatCanIt-2') }} </li>
                             <li>
-                                通过设置 一组预设 来快速切换 不同的mod组合
-                            </li>
+                                {{ $t('firstLoad.whatCanIt-3') }} </li>
                             <li>
-                                通过设置 自动化功能 来 实现从打开3dmigoto到启动游戏再到自动刷新应用的mod 的 全自动化 (ZZMM中已有的功能，但是还没迁移到XXMM，代码需要重构)
-                            </li>
+                                {{ $t('firstLoad.whatCanIt-4') }} </li>
                         </ol>
                     </div>
                     <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
@@ -63,57 +59,50 @@
             <div class="OO-box section" v-if="currentSection === 'basic'">
                 <div class="section-box">
                     <div class="OO-setting-bar">
-                        <h3> 先决条件 </h3>
+                        <h3> {{ $t('firstLoad.prerequisites') }} </h3>
                     </div>
                     <div class="OO-box OO-shade-box">
-                        <p> 请确保你已经安装了3dmigoto
-                            或者其他的mod加载器，并且已经成功运行过。如果你还没有安装3dmigoto，请先安装3dmigoto。如果你不明白3dmigoto是什么，请自行搜索。 </p>
+                        <p> {{ $t('firstLoad.prerequisites-1') }} </p>
                         <br>
-                        <p> 请注意，本程序只是mod管理器，不是mod加载器，它需要依赖3dmigoto或者其他的mod加载器来加载mod </p>
+                        <p> {{ $t('firstLoad.prerequisites-2') }} </p>
                     </div>
                     <s-divider></s-divider>
                     <!-- -简单介绍 -->
 
                     <div class="OO-box OO-shade-box">
-                        <h2 style="margin: 5px 0 10px 0;"> 在使用之前，让我们进行一些名词解释 </h2>
+                        <h2 style="margin: 5px 0 10px 0;"> {{ $t('firstLoad.explanation') }} </h2>
                     </div>
                     <s-divider></s-divider>
-                    <p class="alert"> 请注意，下述三个文件夹不能相同，否则会导致程序无法正常运行 </p>
+                    <p class="alert"> {{ $t('firstLoad.alertFolder') }} </p>
                     <div class="OO-setting-bar">
                         <h3> {{ $t('setting.modTargetPath') }} </h3>
                     </div>
                     <div class="OO-box OO-shade-box">
-                        <p> 【{{ $t('setting.modTargetPath') }}】 是你的 模组加载器
-                            实际加载的文件夹，对于ZZMI来说，就是ZZMI的Mods文件夹；对于XXMI来说，就是XXMI内部文件夹/zzz/Mods </p>
+                        <p> {{ $t('firstLoad.modTargetPathInfo-1') }} </p>
                         <p class="alert" style="margin-top: 10px;">
-                            本程序通过代理Mods文件夹的方式来实现mod的加载，通过动态调整mod文件夹内部的文件来实现mod的加载，
-                            所以请不要在mod目标文件夹内添加任何文件！将你的mod添加到mod源文件夹中即可。
-                        </p>
+                            {{ $t('firstLoad.modTargetPathInfo-2') }} </p>
                     </div>
                     <s-divider></s-divider>
                     <div class="OO-setting-bar">
                         <h3> {{ $t('setting.modSourcePath') }} </h3>
                     </div>
                     <div class="OO-box OO-shade-box">
-                        <p> 【{{ $t('setting.modSourcePath') }}】 是 本程序
-                            读取mod的文件夹，也是你应当用来存放mod的文件夹。它应该被设置为任意位置的一个空文件夹，之后你需要将你的mod添加到这个文件夹中</p>
+                        <p> {{ $t('firstLoad.modSourcePathInfo') }}</p>
                     </div>
                     <s-divider></s-divider>
                     <div class="OO-setting-bar">
                         <h3> {{ $t('setting.presetPath') }} </h3>
                     </div>
                     <div class="OO-box OO-shade-box">
-                        <p> 【{{ $t('setting.presetPath') }}】 是
-                            用于存放mod预设的文件夹，程序将在这里存放一组mod的配置，在配置之后，你将通过预设功能快速切换不同的mod组合。它应该被设置为任意位置的一个空文件夹 </p>
+                        <p> {{ $t('firstLoad.modPresetPathInfo') }} </p>
                     </div>
-                    <h3> 关于本程序 </h3>
+                    <h3> {{ $t('firstLoad.aboutProgram') }} </h3>
                     <div class="OO-setting-bar">
-                        <h3> 运行原理 </h3>
+                        <h3> {{ $t('firstLoad.aboutProgramPrinciple') }} </h3>
                     </div>
                     <div class="OO-box OO-shade-box">
                         <p>
-                            本程序通过代理Mods文件夹的方式来实现mod的加载，通过动态调整mod文件夹内部的文件来实现mod的加载。
-                        </p>
+                            {{ $t('firstLoad.aboutProgramPrincipleInfo') }} </p>
                         <img src="../src/assets/description.png" alt="description" style="width: 50%;height: auto;">
                     </div>
 
@@ -129,13 +118,23 @@
                 <div class="section-box">
                     <!-- -简单介绍 -->
                     <div class="OO-box OO-shade-box">
-                        <h2 style="margin: 5px 0 10px 0;"> 就快要好了，再进行一些设置，让XXMM代理 你的 Mods 文件夹 </h2>
-                        <p> 请设置 mod目标文件夹 和 mod源文件夹 以及 预设文件夹 </p>
-                        <p> 如果你不清楚这些是什么，请回到上一页查看 </p>
+                        <h2 style="margin: 5px 0 10px 0;"> {{ $t('firstLoad.advancedIntro') }} </h2>
+                        <p> {{ $t('firstLoad.advancedIntro-1') }} </p>
+                        <p> {{ $t('firstLoad.advancedIntro-2') }} </p>
                     </div>
-                    <settingBar :data=modTargetPathData />
-                    <p> {{ $t('setting.modTargetPath-info') }} <br>当前文件夹为: {{
-                        modTargetPath }}</p>
+                    <!-- <settingBar :data=modTargetPathData /> -->
+                    <div class="OO-setting-bar">
+                        <h3> {{ $t('setting.modTargetPath') }} </h3>
+                        <div class="OO-s-text-field-container">
+                            <s-text-field :value="modTargetPath" @input="modTargetPath = $event.target.value">
+                            </s-text-field>
+                            <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                                @click="iManager.setConfigFromDialog('modTargetPath', 'directory').then((res) => { modTargetPath = res })">
+                                <s-icon type="add"></s-icon>
+                            </s-icon-button>
+                        </div>
+                    </div>
+                    <p> {{ $t('setting.modTargetPath-info') }} <br></p>
 
                     <s-divider></s-divider>
 
@@ -151,18 +150,17 @@
                         </div>
                     </div>
                     <p> {{ $t('setting.modSourcePath-info') }}
-                        <br>当前文件夹为: {{ modSourcePath }}
                     </p>
 
-                    <s-divider></s-divider>
+                    <!-- <s-divider></s-divider>
                     <div class="OO-setting-bar">
-                        <h3> 将 mod目标 下的所有文件移动到 mod源 </h3>
+                        <h3> {{ $t('firstLoad.autoMove') }} </h3>
                         <s-icon-button type="filled" slot="start" class="OO-icon-button"
                             style="border: 5px solid  var(--s-color-surface-container-high);transform: scale(1);left: 15px;"
                             @click="handleMoveAllFiles">
                             <s-icon type="add"></s-icon>
                         </s-icon-button>
-                    </div>
+                    </div> -->
                     <s-divider></s-divider>
                     <div class="OO-setting-bar">
                         <h3> {{ $t('setting.presetPath') }} </h3>
@@ -175,10 +173,8 @@
                             </s-icon-button>
                         </div>
                     </div>
-                    <p class="alert"> 该文件夹路径也为必填项，如果不设置，程序将无法正常运行 </p>
-                    <p> {{ $t('setting.presetPath-info') }} <br>当前文件夹为: {{
-                        presetPath }}</p>
-
+                    <p class="alert"> {{ $t('firstLoad.alertPreset') }} </p>
+                    <p> {{ $t('setting.presetPath-info') }} </p>
                     <s-divider></s-divider>
                     <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
                 </div>
@@ -188,10 +184,10 @@
             <div class="OO-box section" v-if="currentSection === 'auto'">
                 <div class="section-box">
                     <div class="OO-box OO-shade-box">
-                        <h2 style="margin: 5px 0 10px 0;"> 自动化设置 </h2>
-                        <p> 本程序支持自动启动游戏，自动应用mod，自动刷新应用的mod等功能，你可以在设置里面进行设置 </p>
+                        <h2 style="margin: 5px 0 10px 0;"> {{ $t('firstLoad.autoSetting') }} </h2>
+                        <p> {{ $t('firstLoad.autoInfo-1') }} </p>
                         <br>
-                        <p> 你也可以为程序安装插件，来实现更多的功能 </p>
+                        <p> {{ $t('firstLoad.autoInfo-2') }} </p>
                     </div>
 
                     <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
@@ -203,37 +199,35 @@
                 <div class="section-box">
                     <!-- -恭喜设置完毕 -->
                     <div class="OO-box OO-shade-box">
-                        <h2> 恭喜设置完毕 </h2>
-                        <p> 你已经完成了所有设置，现在可以开始使用本程序了,请关闭本页面 </p>
+                        <h2> {{ $t('firstLoad.congratulate') }} </h2>
+                        <p> {{ $t('firstLoad.congratulate-1') }} </p>
                         <br>
-                        <s-button class="OO-color-gradient font-hongmeng" @click="closeSettingPage"> 点击关闭 </s-button>
+                        <s-button class="OO-color-gradient font-hongmeng" @click="closeSettingPage"> {{ $t('buttons.clickToClose') }} </s-button>
                     </div>
 
                     <div class="OO-setting-bar">
-                        <h3> 关于本程序 </h3>
+                        <h3> {{ $t('firstLoad.aboutProgram') }} </h3>
                     </div>
 
                     <div class="OO-box OO-shade-box">
-                        <p> 本程序由 XLXZ 开发,开源免费,遵循GNU General Public License
-                            v3.0。用于管理基于3dmigoto的mod
-                            ,理论上来说也可以管理其他游戏的mod(只要是基于3dmigoto的) </p>
+                        <p> {{ $t('firstLoad.aboutProgramInfo') }} </p>
                     </div>
                     <div class="OO-setting-bar">
-                        <p> 最新版本在gamebanana上发布，如果你有任何问题或者建议，欢迎在github上提出 </p>
+                        <p> {{ $t('firstLoad.aboutProgramInfo-1') }} </p>
                     </div>
                     <div class="OO-setting-bar">
-                        <h3> 作者 </h3>
+                        <h3> {{ $t('author') }} </h3>
                         <p> XLXZ </p>
                     </div>
                     <div class="OO-setting-bar">
-                        <h3> 特别感谢 </h3>
+                        <h3> {{ $t('firstLoad.thanks') }} </h3>
                         <s-button class="OO-button-box" @click="iManager.openUrl('https://github.com/soliddanii')">
                             soliddanii
                         </s-button>
                     </div>
                     <s-divider></s-divider>
                     <div class="OO-setting-bar">
-                        <h3> Github </h3>
+                        <h3> {{ $t('github') }} </h3>
                         <s-icon-button type="filled" slot="start" class="OO-icon-button"
                             style="border: 5px solid  var(--s-color-surface-container-high);transform: scale(1);left: 15px;"
                             @click="iManager.openUrl('https://github.com/XiaoLinXiaoZhu/Mods-Manager-for-3Dmigoto')">
@@ -243,7 +237,7 @@
                         </s-icon-button>
                     </div>
                     <div class="OO-setting-bar">
-                        <h3> Gamebanana </h3>
+                        <h3> {{ $t('gamebanana') }} </h3>
                         <s-icon-button type="filled" slot="start" class="OO-icon-button"
                             style="border: 5px solid  var(--s-color-surface-container-high);transform: scale(1);left: 15px;"
                             @click="iManager.openUrl('https://gamebanana.com/tools/17889')">
@@ -253,7 +247,7 @@
                         </s-icon-button>
                     </div>
                     <div class="OO-setting-bar">
-                        <h3> Caimogu </h3>
+                        <h3> {{ $t('caimogu') }} </h3>
                         <s-icon-button type="filled" slot="start" class="OO-icon-button"
                             style="border: 5px solid  var(--s-color-surface-container-high);transform: scale(1);left: 15px;"
                             @click="iManager.openUrl('https://www.caimogu.cc/post/1408504.html')">
@@ -269,8 +263,8 @@
 
         </div>
         <div class="buttons">
-            <s-button type="text" @click="prev" id="prev" class="OO-button-box">上一页</s-button>
-            <s-button type="text" @click="next" id="next" class="OO-button-box">下一页</s-button>
+            <s-button type="text" @click="prev" id="prev" class="OO-button-box">{{ $t('buttons.nextPage') }}</s-button>
+            <s-button type="text" @click="next" id="next" class="OO-button-box">{{ $t('buttons.forePage') }}</s-button>
         </div>
 
     </div>
@@ -330,7 +324,7 @@ const handleMoveAllFiles = () => {
     console.log('handleMoveAllFiles', modTargetPath.value.length, modSourcePath.value.length);
     if (modTargetPath.value.length === 0 || modSourcePath.value.length === 0) {
         console.log('modTargetPath or modSourcePath is empty');
-        alert('mod目标文件夹或mod源文件夹为空');
+        alert(t('message.alert.emptyModSourceOrTarget'));
         return;
     }
     iManager.moveAllFiles(modTargetPath.value, modSourcePath.value);
@@ -367,6 +361,9 @@ onMounted(async () => {
     ifAutoApply.value = iManager.config.ifAutoApply;
     ifAutoRefreshInZZZ.value = iManager.config.ifAutoRefreshInZZZ;
     ifUseAdmin.value = iManager.config.ifUseAdmin;
+
+    // 不论用户是否看完了 都 取消首次加载
+    iManager.config.firstLoad = false;
 });
 
 </script>
