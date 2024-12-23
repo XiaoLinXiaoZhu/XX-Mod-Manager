@@ -103,7 +103,7 @@ function getData() {
             iManager.setTheme(value);
         }
     }
-    //-------------------- 模组目标路径 ------------------//
+    //-------------------- 模组目标文件夹 ------------------//
     let modTargetPathData = {
         name: 'modTargetPath',
         data: iManager.config.modTargetPath,
@@ -111,11 +111,11 @@ function getData() {
         displayName: 'Mod Target Path',
         description: 'The path of the mod target',
         t_displayName: {
-            zh_cn: '模组目标路径',
-            en: 'Mod Target Path'
+            zh_cn: 'mod 目标文件夹',
+            en: 'Mod Target Folder'
         },
         t_description: {
-            zh_cn: 'mod目标目录为modLoader读取mod的位置，一般为Mods文件夹',
+            zh_cn: 'mod目标文件夹为modLoader读取mod的位置，一般为Mods文件夹',
             en: 'Mod target directory is the location where modLoader reads mod, usually the Mods folder'
         },
         onChange: (value) => {
@@ -123,7 +123,7 @@ function getData() {
             iManager.setConfig('modTargetPath', value);
         }
     }
-    //-------------------- 模组源路径 ------------------//
+    //-------------------- 模组源文件夹 ------------------//
     let modSourcePathData = {
         name: 'modSourcePath',
         data: iManager.config.modSourcePath,
@@ -131,11 +131,11 @@ function getData() {
         displayName: 'Mod Source Path',
         description: 'The path of the mod source',
         t_displayName: {
-            zh_cn: 'mod来源路径',
-            en: 'Mod Source Path'
+            zh_cn: 'mod来源文件夹',
+            en: 'Mod Source Folder'
         },
         t_description: {
-            zh_cn: 'mod来源目录为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod目标目录。',
+            zh_cn: 'mod来源文件夹为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod目标文件夹。',
             en: 'Mod Source directory is the location where the program stores mod. When the mod is enabled, a link will be created from here to the mod target directory.'
         },
         onChange: (value) => {
@@ -143,7 +143,7 @@ function getData() {
             iManager.setConfig('modSourcePath', value);
         }
     }
-    //-------------------- 预设路径 ------------------//
+    //-------------------- 预设文件夹 ------------------//
     let presetPathData = {
         name: 'presetPath',
         data: iManager.config.presetPath,
@@ -151,11 +151,11 @@ function getData() {
         displayName: 'Preset Path',
         description: 'The path of the preset',
         t_displayName: {
-            zh_cn: '预设路径',
-            en: 'Preset Path'
+            zh_cn: '预设文件夹',
+            en: 'Preset Folder'
         },
         t_description: {
-            zh_cn: '预设路径为存储预设的位置，预设是一组mod的集合，可以通过预设一键启用多个mod',
+            zh_cn: '预设文件夹为存储预设的位置，预设是一组mod的集合，可以通过预设一键启用多个mod',
             en: 'The preset path is the location where the preset is stored. The preset is a collection of mods that can be enabled with one click.'
         },
         onChange: (value) => {

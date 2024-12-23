@@ -1,5 +1,5 @@
 <template>
-    <div id="control-bar">
+    <div class="control-bar">
         <div id="rectangle"
             style="width: 73%; height: 8px; background-color:var(--s-color-outline-variant); border-radius: 10px;align-self: center;">
         </div>
@@ -14,12 +14,20 @@
 
         <div class="section-container">
             <!-- -简单介绍 -->
-            <div class="section OO-box font-hongmeng" v-if="currentSection === 'intro'">
+            <div class="section OO-box" v-if="currentSection === 'intro'">
                 <div class="section-box">
-                    <settingBar :data=languageData />
                     <div class="OO-box OO-shade-box">
                         <h2 style="margin: 5px 0 10px 0;"> 欢迎使用 XX-mod-manager(XXMM) </h2>
+                        <p> 在下方先选择你的语言和主题</p>
                     </div>
+                    <!-- -语言设置 -->
+                    <settingBar :data=languageData />
+                    <!-- -主题设置 -->
+                    <s-divider></s-divider>
+                    <settingBar :data=themeData />
+                    <p>
+                        主题推荐使用黑暗主题，在设计时，我更多的考虑了黑暗主题的美观性，它模仿了ZZZ的设计风格
+                    </p>
 
                     <div class="OO-setting-bar">
                         <h3> 这是什么？ </h3>
@@ -46,41 +54,70 @@
                             </li>
                         </ol>
                     </div>
-                    <div class="OO-setting-bar">
-                        <h3> 先决条件 </h3>
-                    </div>
-                    <div class="OO-box OO-shade-box">
-                        <p> 请确保你已经安装了3dmigoto 或者其他的mod加载器，并且已经成功运行过。如果你还没有安装3dmigoto，请先安装3dmigoto
-                        </p>
-                    </div>
-
-
-
-
                     <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
                 </div>
             </div>
 
 
             <!-- -基础设置 -->
-            <div class="OO-box font-hongmeng  section" v-if="currentSection === 'basic'">
+            <div class="OO-box section" v-if="currentSection === 'basic'">
                 <div class="section-box">
-                    <!-- -简单介绍 -->
+                    <div class="OO-setting-bar">
+                        <h3> 先决条件 </h3>
+                    </div>
                     <div class="OO-box OO-shade-box">
-                        <h2 style="margin: 5px 0 10px 0;"> 在你使用之前，让我们进行一些设置 </h2>
-                        <p> 选择你的语言和主题
-                        </p>
-                        <p>
-                            主题推荐使用黑暗主题，在设计时，我更多的考虑了黑暗主题的美观性，它模仿了ZZZ的设计风格
+                        <p> 请确保你已经安装了3dmigoto
+                            或者其他的mod加载器，并且已经成功运行过。如果你还没有安装3dmigoto，请先安装3dmigoto。如果你不明白3dmigoto是什么，请自行搜索。 </p>
+                        <br>
+                        <p> 请注意，本程序只是mod管理器，不是mod加载器，它需要依赖3dmigoto或者其他的mod加载器来加载mod </p>
+                    </div>
+                    <s-divider></s-divider>
+                    <!-- -简单介绍 -->
+
+                    <div class="OO-box OO-shade-box">
+                        <h2 style="margin: 5px 0 10px 0;"> 在使用之前，让我们进行一些名词解释 </h2>
+                    </div>
+                    <s-divider></s-divider>
+                    <p class="alert"> 请注意，下述三个文件夹不能相同，否则会导致程序无法正常运行 </p>
+                    <div class="OO-setting-bar">
+                        <h3> {{ $t('setting.modTargetPath') }} </h3>
+                    </div>
+                    <div class="OO-box OO-shade-box">
+                        <p> 【{{ $t('setting.modTargetPath') }}】 是你的 模组加载器
+                            实际加载的文件夹，对于ZZMI来说，就是ZZMI的Mods文件夹；对于XXMI来说，就是XXMI内部文件夹/zzz/Mods </p>
+                        <p class="alert" style="margin-top: 10px;">
+                            本程序通过代理Mods文件夹的方式来实现mod的加载，通过动态调整mod文件夹内部的文件来实现mod的加载，
+                            所以请不要在mod目标文件夹内添加任何文件！将你的mod添加到mod源文件夹中即可。
                         </p>
                     </div>
-                    <!-- -语言设置 -->
-                    <settingBar :data=languageData />
+                    <s-divider></s-divider>
+                    <div class="OO-setting-bar">
+                        <h3> {{ $t('setting.modSourcePath') }} </h3>
+                    </div>
+                    <div class="OO-box OO-shade-box">
+                        <p> 【{{ $t('setting.modSourcePath') }}】 是 本程序
+                            读取mod的文件夹，也是你应当用来存放mod的文件夹。它应该被设置为任意位置的一个空文件夹，之后你需要将你的mod添加到这个文件夹中</p>
+                    </div>
+                    <s-divider></s-divider>
+                    <div class="OO-setting-bar">
+                        <h3> {{ $t('setting.presetPath') }} </h3>
+                    </div>
+                    <div class="OO-box OO-shade-box">
+                        <p> 【{{ $t('setting.presetPath') }}】 是
+                            用于存放mod预设的文件夹，程序将在这里存放一组mod的配置，在配置之后，你将通过预设功能快速切换不同的mod组合。它应该被设置为任意位置的一个空文件夹 </p>
+                    </div>
+                    <h3> 关于本程序 </h3>
+                    <div class="OO-setting-bar">
+                        <h3> 运行原理 </h3>
+                    </div>
+                    <div class="OO-box OO-shade-box">
+                        <p>
+                            本程序通过代理Mods文件夹的方式来实现mod的加载，通过动态调整mod文件夹内部的文件来实现mod的加载。
+                        </p>
+                        <img src="../src/assets/description.png" alt="description" style="width: 50%;height: auto;">
+                    </div>
 
-                    <!-- -主题设置 -->
-                    <s-divider></s-divider>
-                    <settingBar :data=themeData />
-                    <s-divider></s-divider>
+                    <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
                 </div>
 
 
@@ -88,25 +125,16 @@
             </div>
 
             <!-- -高级设置 -->
-            <div class="OO-box font-hongmeng  section" v-if="currentSection === 'advanced'">
+            <div class="OO-box section" v-if="currentSection === 'advanced'">
                 <div class="section-box">
                     <!-- -简单介绍 -->
                     <div class="OO-box OO-shade-box">
                         <h2 style="margin: 5px 0 10px 0;"> 就快要好了，再进行一些设置，让XXMM代理 你的 Mods 文件夹 </h2>
-                        <p> 请设置 mod目标路径 和 mod源路径 以及 预设路径 </p>
-                        <p> 如果你不清楚这些是什么，请查看下面的说明 </p>
-                        <img src="../src/assets/description.png" alt="description" style="width: 50%;height: auto;">
-                        <p> 【mod目标路径】 是你的 模组加载器 实际加载的路径，对于ZZMI来说，就是ZZMI的Mods文件夹；对于XXMI来说，就是XXMI内部路径/zzz/Mods </p>
-                        <p> 【mod源路径】 是 本程序 读取mod的路径，也是你应当用来存放mod的路径。如果你之前没有用过XXMI，那么它应该被设置为任意位置的一个空文件夹 </p>
-                        <p class="alert"> 请注意，mod目标路径 和 mod源路径 不能相同，否则会导致程序无法正常运行 </p>
-                        <p class="alert" style="margin-top: 10px;">
-                            本程序通过代理Mods文件夹的方式来实现mod的加载，通过动态调整mod文件夹内部的文件来实现mod的加载，
-                            所以请不要在mod文件夹内添加任何文件！将你的mod添加到modSource文件夹中即可。
-                        </p>
-                        <p> 【预设路径】 是 用于存放mod预设的路径，程序将在这里存放一组mod的配置，然后通过预设功能快速切换。如果你之前 没有用过XXMI，那么它应该被设置为任意位置的一个空文件夹 </p>
+                        <p> 请设置 mod目标文件夹 和 mod源文件夹 以及 预设文件夹 </p>
+                        <p> 如果你不清楚这些是什么，请回到上一页查看 </p>
                     </div>
                     <settingBar :data=modTargetPathData />
-                    <p> {{ $t('setting.modTargetPath-info') }} <br>当前目录为: {{
+                    <p> {{ $t('setting.modTargetPath-info') }} <br>当前文件夹为: {{
                         modTargetPath }}</p>
 
                     <s-divider></s-divider>
@@ -123,7 +151,7 @@
                         </div>
                     </div>
                     <p> {{ $t('setting.modSourcePath-info') }}
-                        <br>当前目录为: {{ modSourcePath }}
+                        <br>当前文件夹为: {{ modSourcePath }}
                     </p>
 
                     <s-divider></s-divider>
@@ -147,31 +175,17 @@
                             </s-icon-button>
                         </div>
                     </div>
-                    <p> {{ $t('setting.presetPath-info') }} <br>当前目录为: {{
+                    <p class="alert"> 该文件夹路径也为必填项，如果不设置，程序将无法正常运行 </p>
+                    <p> {{ $t('setting.presetPath-info') }} <br>当前文件夹为: {{
                         presetPath }}</p>
 
                     <s-divider></s-divider>
-
-
-
-                    <h3> 关于本程序 </h3>
-                    <div class="OO-setting-bar">
-                        <h3> 运行原理 </h3>
-                    </div>
-                    <div class="OO-box OO-shade-box">
-                        <p>
-                            本程序通过代理Mods文件夹的方式来实现mod的加载，通过动态调整mod文件夹内部的文件来实现mod的加载，
-                            所以请不要在mod文件夹内添加任何文件！将你的mod添加到modSource文件夹中即可。
-                        </p>
-                        <img src="../src/assets/description.png" alt="description" style="width: 50%;height: auto;">
-                    </div>
-
                     <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
                 </div>
             </div>
 
             <!-- -自动化设置 -->
-            <div class="OO-box font-hongmeng  section" v-if="currentSection === 'auto'">
+            <div class="OO-box section" v-if="currentSection === 'auto'">
                 <div class="section-box">
                     <div class="OO-box OO-shade-box">
                         <h2 style="margin: 5px 0 10px 0;"> 自动化设置 </h2>
@@ -185,17 +199,21 @@
             </div>
 
             <!-- -更多的说明 -->
-            <div class="OO-box font-hongmeng  section" v-if="currentSection === 'more'">
+            <div class="OO-box section" v-if="currentSection === 'more'">
                 <div class="section-box">
                     <!-- -恭喜设置完毕 -->
                     <div class="OO-box OO-shade-box">
                         <h2> 恭喜设置完毕 </h2>
                         <p> 你已经完成了所有设置，现在可以开始使用本程序了,请关闭本页面 </p>
-                        <s-button type="text"
-                            @click="closeSettingPage"> 点击关闭 </s-button>
+                        <br>
+                        <s-button class="OO-color-gradient font-hongmeng" @click="closeSettingPage"> 点击关闭 </s-button>
                     </div>
-                    <h3> 关于本程序 </h3>
-                    <div class="OO-setting-bar" style="height: fit-content;">
+
+                    <div class="OO-setting-bar">
+                        <h3> 关于本程序 </h3>
+                    </div>
+
+                    <div class="OO-box OO-shade-box">
                         <p> 本程序由 XLXZ 开发,开源免费,遵循GNU General Public License
                             v3.0。用于管理基于3dmigoto的mod
                             ,理论上来说也可以管理其他游戏的mod(只要是基于3dmigoto的) </p>
@@ -204,43 +222,46 @@
                         <p> 最新版本在gamebanana上发布，如果你有任何问题或者建议，欢迎在github上提出 </p>
                     </div>
                     <div class="OO-setting-bar">
-                        <p> 作者：XLXZ </p>
-                    </div>
-                    <s-divider></s-divider>
-                    <div class="OO-setting-bar" style="height: 100px;">
-                        <h3> 感谢 soliddanii <br>提供的帮助 </h3>
-                        <s-button class="link-button" type="text" link="https://github.com/soliddanii"> 点击跳转 </s-button>
+                        <h3> 作者 </h3>
+                        <p> XLXZ </p>
                     </div>
                     <div class="OO-setting-bar">
+                        <h3> 特别感谢 </h3>
+                        <s-button class="OO-button-box" @click="iManager.openUrl('https://github.com/soliddanii')">
+                            soliddanii
+                        </s-button>
+                    </div>
+                    <s-divider></s-divider>
+                    <div class="OO-setting-bar">
                         <h3> Github </h3>
-                        <s-button class="link-button" type="text"
-                            link="https://github.com/XiaoLinXiaoZhu/Mods-Manager-for-3Dmigoto/"> 点击跳转 </s-button>
+                        <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                            style="border: 5px solid  var(--s-color-surface-container-high);transform: scale(1);left: 15px;"
+                            @click="iManager.openUrl('https://github.com/XiaoLinXiaoZhu/Mods-Manager-for-3Dmigoto')">
+                            <s-icon><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                                    <path d="m256-240-56-56 384-384H240v-80h480v480h-80v-344L256-240Z"></path>
+                                </svg></s-icon>
+                        </s-icon-button>
                     </div>
                     <div class="OO-setting-bar">
                         <h3> Gamebanana </h3>
-                        <s-button class="link-button" type="text" link='https://gamebanana.com/tools/17889'> 点击跳转
-                        </s-button>
+                        <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                            style="border: 5px solid  var(--s-color-surface-container-high);transform: scale(1);left: 15px;"
+                            @click="iManager.openUrl('https://gamebanana.com/tools/17889')">
+                            <s-icon><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                                    <path d="m256-240-56-56 384-384H240v-80h480v480h-80v-344L256-240Z"></path>
+                                </svg></s-icon>
+                        </s-icon-button>
                     </div>
                     <div class="OO-setting-bar">
                         <h3> Caimogu </h3>
-                        <s-button class="link-button" type="text" link='https://www.caimogu.cc/post/1408504.html'> 点击跳转
-                        </s-button>
+                        <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                            style="border: 5px solid  var(--s-color-surface-container-high);transform: scale(1);left: 15px;"
+                            @click="iManager.openUrl('https://www.caimogu.cc/post/1408504.html')">
+                            <s-icon><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                                    <path d="m256-240-56-56 384-384H240v-80h480v480h-80v-344L256-240Z"></path>
+                                </svg></s-icon>
+                        </s-icon-button>
                     </div>
-
-                    <div class="OO-setting-bar">
-                        <h3> 运行原理 </h3>
-
-                    </div>
-                    <div class="OO-box OO-shade-box">
-                        <p>
-                            本程序通过代理Mods文件夹的方式来实现mod的加载，通过动态调整mod文件夹内部的文件来实现mod的加载，
-                            所以请不要在mod文件夹内添加任何文件！将你的mod添加到modSource文件夹中即可。
-                        </p>
-                        <img src="../src/assets/description.png" alt="description" style="width: 50%;height: auto;">
-                    </div>
-
-
-
                     <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
                 </div>
 
@@ -265,7 +286,7 @@ import CssProxy from '../src/components/cssProxy.vue';
 import settingBar from '../src/components/settingBar.vue';
 import getData from '../src/section/settingSectionData.js';
 
-let {languageData, themeData, modTargetPathData, modSourcePathData, presetPathData,initAllDataButton} = getData();
+let { languageData, themeData, modTargetPathData, modSourcePathData, presetPathData, initAllDataButton } = getData();
 
 
 
@@ -309,7 +330,7 @@ const handleMoveAllFiles = () => {
     console.log('handleMoveAllFiles', modTargetPath.value.length, modSourcePath.value.length);
     if (modTargetPath.value.length === 0 || modSourcePath.value.length === 0) {
         console.log('modTargetPath or modSourcePath is empty');
-        alert('mod目标路径或mod源路径为空');
+        alert('mod目标文件夹或mod源文件夹为空');
         return;
     }
     iManager.moveAllFiles(modTargetPath.value, modSourcePath.value);
@@ -391,6 +412,11 @@ onMounted(async () => {
     width: calc(100% - 30px);
     height: calc(100% - 60px);
     bottom: 0px;
+
+    >div {
+        margin-right: -10px;
+        padding-right: 10px;
+    }
 }
 
 .section-box {
@@ -414,5 +440,23 @@ onMounted(async () => {
 
 .alert {
     color: red;
+}
+
+.control-bar {
+    width: 100%;
+    margin: 0 0 10px 0;
+    height: 30px;
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    background-color: #00000000;
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    -webkit-app-region: drag;
 }
 </style>

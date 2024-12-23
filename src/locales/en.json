@@ -38,7 +38,7 @@
     "auto-apply": "Auto Apply",
     "modTargetPath": "Mod Target Path",
     "modTargetPath-info": "The mod target directory is where modLoader reads mods, usually the Mods folder",
-    "modSourcePath": "Mod Source Path",
+    "modSourcePath": "Mod Source Folder",
     "modSourcePath-info": "The mod source directory is where the program stores mods. When a mod is enabled, a link will be created from here to the mod target directory",
     "presetPath": "Preset Path",
     "presetPath-info": "The preset path is where presets are stored. A preset is a collection of mods that can be enabled with one click",

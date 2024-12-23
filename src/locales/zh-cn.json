@@ -36,12 +36,12 @@
     "reset": "重置",
     "unavailable": "开发中，下面的功能暂时不可用",
     "auto-apply": "自动应用",
-    "modTargetPath": "模组目标路径",
-    "modTargetPath-info": "mod目标目录为mod加载器加载mod的位置，当mod被启用时，会从mod来源目录创建链接到这里。",
-    "modSourcePath": "模组源路径",
-    "modSourcePath-info": "mod来源目录为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod目标目录。",
-    "presetPath": "预设路径",
-    "presetPath-info": "预设路径为存储预设的位置，预设是一组mod的集合，可以通过预设一键启用多个mod",
+    "modTargetPath": "mod 目标文件夹",
+    "modTargetPath-info": "mod目标文件夹为mod加载器加载mod的位置，当mod被启用时，会从mod来源文件夹创建链接到这里。",
+    "modSourcePath": "mod 源文件夹",
+    "modSourcePath-info": "mod来源文件夹为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod目标文件夹。",
+    "presetPath": "预设文件夹",
+    "presetPath-info": "预设文件夹为存储预设的位置，预设是一组mod的集合，可以通过预设一键启用多个mod",
     "movedToPlugin": "下面的功能移动到插件继续提供"
   },
   "modInfo": {
