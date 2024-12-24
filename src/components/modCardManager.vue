@@ -1,6 +1,6 @@
 <template>
     <div id="mod-card-manager" class="OO-box">
-        <mod-filter-container @changeFilter="handleFilterChange" :filterItems="characters" />
+        <mod-filter-container @changeFilter="handleFilterChange" :filterItems="characters" style="border-radius: 10px;"/>
         <s-scroll-view style="overflow-x:hidden;overflow-y: auto;">
             <div class="refresh-placeholder" ref="refreshPlaceholderRef"></div>
             <div id="mod-container" :compact="compactMode" ref="modContainerRef">
