@@ -549,7 +549,8 @@ p {
   background-color: var(--s-color-on-primary);
   border: 5px solid var(--s-color-outline-variant);
   border-radius: 20px;
-  box-shadow: 0 0 0px 3px var(--s-color-surface-container-high), inset 1px 1px 1px rgba(255, 255, 255, 0.2);
+  /* box-shadow: 0 0 0px 3px var(--s-color-surface-container-high), inset 1px 1px 1px rgba(255, 255, 255, 0.2); */
+  box-shadow: -0.5px -0.5px 1px 1px rgba(255, 255, 255, 0.3), 0 0 0px 2px var(--s-color-surface-container-high), inset 1px 1px 0px 1px var(--s-color-surface-container);
   box-sizing: border-box;
   overflow: hidden;
   height: 40px;
@@ -586,7 +587,7 @@ p {
   padding-right: 10px;
 }
 
-.OO-dot-background {
+.OO-background-dot {
   background:
     radial-gradient(black 15%, transparent 16%) 0 0,
     radial-gradient(black 15%, transparent 16%) 8px 8px,
@@ -595,4 +596,9 @@ p {
   background-color: #282828;
   background-size: 16px 16px;
   height: 500px;
+}
+
+.OO-background-stripes{
+  background-color: gray;
+background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.5) 35px, rgba(255,255,255,.5) 70px);
 }
