@@ -18,7 +18,7 @@
 }
 
 .font-hongmeng {
-  font-family: "hongmengti","Microsoft YaHei", 微软雅黑, "MicrosoftJhengHei", 华文细黑, STHeiti, MingLiu, sans-serif;
+  font-family: "hongmengti", "Microsoft YaHei", 微软雅黑, "MicrosoftJhengHei", 华文细黑, STHeiti, MingLiu, sans-serif;
   font-weight: 1000;
   font-size: 0.93em;
 }
@@ -390,7 +390,7 @@ p {
   padding: 5px 0;
 }
 
-.OO-setting-bar .OO-s-text-field-container{
+.OO-setting-bar .OO-s-text-field-container {
   position: absolute;
   --text-field-border-radius: 24px;
   --text-field-padding: 24px;
@@ -544,12 +544,12 @@ p {
 
 .OO-button {
   display: flex;
-  align-items:center;
+  align-items: center;
   position: relative;
   background-color: var(--s-color-on-primary);
   border: 5px solid var(--s-color-outline-variant);
   border-radius: 20px;
-  box-shadow: 0 0 0px 3px var(--s-color-surface-container-high),inset 1px 1px 1px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0px 3px var(--s-color-surface-container-high), inset 1px 1px 1px rgba(255, 255, 255, 0.2);
   box-sizing: border-box;
   overflow: hidden;
   height: 40px;
@@ -584,4 +584,15 @@ p {
 .OO-scorll-box>div {
   margin-right: -10px;
   padding-right: 10px;
+}
+
+.OO-dot-background {
+  background:
+    radial-gradient(black 15%, transparent 16%) 0 0,
+    radial-gradient(black 15%, transparent 16%) 8px 8px,
+    radial-gradient(rgba(255, 255, 255, .1) 15%, transparent 20%) 0 1px,
+    radial-gradient(rgba(255, 255, 255, .1) 15%, transparent 20%) 8px 9px;
+  background-color: #282828;
+  background-size: 16px 16px;
+  height: 500px;
 }
