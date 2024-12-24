@@ -10,35 +10,6 @@
                 <s-divider></s-divider>
                 <settingBar :data="themeData"></settingBar>
                 <s-divider></s-divider>
-
-                <h3>
-                    {{ $t('setting.movedToPlugin') }}
-                </h3>
-
-                <div class="OO-setting-bar">
-                    <h3> 自动应用 </h3>
-                    <s-switch disabled="true"></s-switch>
-                </div>
-                <p>当选择/取消选择mod时自动应用配置(可能带来轻微卡顿)</p>
-                <div class="OO-setting-bar">
-                    <h3> 自动刷新 </h3>
-                    <s-switch data-platform="win32" disabled="true"></s-switch>
-                </div>
-                <p>启用 应用mod时 将会自动在绝区零中激活刷新</p>
-                <s-divider></s-divider>
-
-                <!-- 启动程序的时候也一并启动游戏和modLoader -->
-                <div class="OO-setting-bar">
-                    <h3> 自动启动游戏 </h3>
-                    <s-switch disabled="true"></s-switch>
-                </div>
-                <p>启动程序的时候也一并启动游戏和modLoader(需要在进阶设置设置游戏目录和modLoader目录)</p>
-                <s-divider></s-divider>
-                <div class="OO-setting-bar">
-                    <h3> 使用管理员权限 </h3>
-                    <s-switch data-platform="win32" disabled="true"></s-switch>
-                </div>
-                <p>启动程序时是否使用管理员权限(需要重启程序生效)</p>
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
             <!-- -高级设置 -->
@@ -55,8 +26,7 @@
 
                 <s-divider></s-divider>
                 <s-button @click="console.log(iManager.config)" data-translate-key="show-config">
-                    显示配置
-                </s-button>
+                    {{ $t('setting.showDetail') }} </s-button>
                 <s-divider></s-divider>
                 <settingBar :data="initAllDataButton"></settingBar>
 
@@ -64,12 +34,12 @@
                     {{ $t('setting.unavailable') }}
                 </h3>
 
-                <div class="OO-setting-bar">
+                <!-- <div class="OO-setting-bar">
                     <h3 data-translate-key="refresh-mod-info-swapkey"> 刷新mod信息中的快捷键 </h3>
                     <s-button id="refresh-mod-info-swapkey-button" data-translate-key="refresh">
                         刷新
                     </s-button>
-                </div>
+                </div> -->
                 <s-divider></s-divider>
 
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
@@ -80,7 +50,7 @@
                 <h3>
                     {{ $t('setting.unavailable') }}
                 </h3>
-                <div class="OO-setting-bar">
+                <!-- <div class="OO-setting-bar">
                     <h3 data-translate-key="if-ask-switch-config"> 是否询问切换配置 </h3>
                     <s-switch id="if-ask-switch-config-switch"></s-switch>
                 </div>
@@ -111,7 +81,7 @@
                         保存配置
                     </s-button>
                 </div>
-                <p data-translate-key="save-config-info"> 保存当前配置到配置文件夹 </p>
+                <p data-translate-key="save-config-info"> 保存当前配置到配置文件夹 </p> -->
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
 
@@ -119,50 +89,67 @@
 
             <!-- -about page -->
             <div v-if="currentTab === 'about'">
-                <div class="OO-setting-bar" style="height: fit-content;">
-                    <p data-translate-key="about-content"> 本程序由 XLXZ 开发,开源免费,遵循GNU General Public License
-                        v3.0。用于管理基于3dmigoto的mod
-                        ,理论上来说也可以管理其他游戏的mod(只要是基于3dmigoto的) </p>
-                </div>
                 <div class="OO-setting-bar">
-                    <p data-translate-key="about-version"> 最新版本在gamebanana上发布，如果你有任何问题或者建议，欢迎在github上提出 </p>
-                </div>
-                <div class="OO-setting-bar">
-                    <p data-translate-key="about-author"> 作者：XLXZ </p>
-                </div>
-                <s-divider></s-divider>
-                <div class="OO-setting-bar" style="height: 100px;">
-                    <h3 data-translate-key="about-thanks"> 感谢 soliddanii <br>提供的帮助 </h3>
-                    <s-button class="link-button" type="text" link="https://github.com/soliddanii"
-                        data-translate-key="click-to-jump"> 点击跳转 </s-button>
-                </div>
-                <div class="OO-setting-bar">
-                    <h3> Github </h3>
-                    <s-button class="link-button" type="text"
-                        link="https://github.com/XiaoLinXiaoZhu/Mods-Manager-for-3Dmigoto/"
-                        data-translate-key="click-to-jump"> 点击跳转 </s-button>
-                </div>
-                <div class="OO-setting-bar">
-                    <h3> Gamebanana </h3>
-                    <s-button class="link-button" type="text" link='https://gamebanana.com/tools/17889'
-                        data-translate-key="click-to-jump"> 点击跳转 </s-button>
-                </div>
-                <div class="OO-setting-bar">
-                    <h3> Caimogu </h3>
-                    <s-button class="link-button" type="text" link='https://www.caimogu.cc/post/1408504.html'
-                        data-translate-key="click-to-jump"> 点击跳转 </s-button>
+                    <h3> {{ $t('firstLoad.aboutProgram') }} </h3>
                 </div>
 
+                <div class="OO-box OO-shade-box">
+                    <p> {{ $t('firstLoad.aboutProgramInfo') }} </p>
+                </div>
+                <div class="OO-setting-bar">
+                    <p> {{ $t('firstLoad.aboutProgramInfo-1') }} </p>
+                </div>
+                <div class="OO-setting-bar">
+                    <h3> {{ $t('author') }} </h3>
+                    <p> XLXZ </p>
+                </div>
+                <div class="OO-setting-bar">
+                    <h3> {{ $t('firstLoad.thanks') }} </h3>
+                    <s-button class="OO-button-box" @click="iManager.openUrl('https://github.com/soliddanii')">
+                        soliddanii
+                    </s-button>
+                </div>
+                <s-divider></s-divider>
+                <div class="OO-setting-bar">
+                    <h3> {{ $t('github') }} </h3>
+                    <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                        style="border: 5px solid  var(--s-color-surface-container-high);transform: scale(1);left: 15px;"
+                        @click="iManager.openUrl('https://github.com/XiaoLinXiaoZhu/Mods-Manager-for-3Dmigoto')">
+                        <s-icon><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                                <path d="m256-240-56-56 384-384H240v-80h480v480h-80v-344L256-240Z"></path>
+                            </svg></s-icon>
+                    </s-icon-button>
+                </div>
+                <div class="OO-setting-bar">
+                    <h3> {{ $t('gamebanana') }} </h3>
+                    <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                        style="border: 5px solid  var(--s-color-surface-container-high);transform: scale(1);left: 15px;"
+                        @click="iManager.openUrl('https://gamebanana.com/tools/17889')">
+                        <s-icon><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                                <path d="m256-240-56-56 384-384H240v-80h480v480h-80v-344L256-240Z"></path>
+                            </svg></s-icon>
+                    </s-icon-button>
+                </div>
+                <div class="OO-setting-bar">
+                    <h3> {{ $t('caimogu') }} </h3>
+                    <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                        style="border: 5px solid  var(--s-color-surface-container-high);transform: scale(1);left: 15px;"
+                        @click="iManager.openUrl('https://www.caimogu.cc/post/1408504.html')">
+                        <s-icon><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                                <path d="m256-240-56-56 384-384H240v-80h480v480h-80v-344L256-240Z"></path>
+                            </svg></s-icon>
+                    </s-icon-button>
+                </div>
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
 
             <!-- -插件管理面板，控制插件的开关 -->
             <div v-if="currentTab === 'plugin'">
                 <div class="OO-setting-bar">
-                    <h3> 插件管理 </h3>
+                    <h3> {{ $t('setting.managePlugin') }} </h3>
                 </div>
                 <div class="OO-box OO-shade-box" style="margin: 10px 0;">
-                    <h3> 插件列表 </h3>
+                    <h3> {{ $t('setting.pluginList') }} </h3>
                     <div class="OO-setting-bar" v-for="(pluginData, pluginName) in plugins" :key="pluginName">
                         <h3 v-if="pluginData.t_displayName">{{ pluginData.t_displayName[locale] }}</h3>
                         <h3 v-else>{{ pluginName }}</h3>
@@ -180,7 +167,7 @@
                 <div v-if="currentTab === pluginName">
 
                     <s-fold folded="true">
-                        <s-button slot="trigger">show details</s-button>
+                        <s-button slot="trigger">{{ $t('setting.showDetail') }}</s-button>
                         <div>
                             {{ pluginName }}
                         </div>
@@ -248,7 +235,7 @@ const translatedTabs = computed(() => {
     return tTab;
 });
 
-const currentTab = ref('常规设置');
+const currentTab = ref('normal');
 
 const handleTabChange = (tab) => {
     currentTab.value = tab;

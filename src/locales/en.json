@@ -45,7 +45,10 @@
     "modSourcePath-info": "The mod source directory is where the program stores mods. When a mod is enabled, a link will be created from here to the mod target directory",
     "presetPath": "Preset Folder",
     "presetPath-info": "The preset path is where presets are stored. A preset is a collection of mods that can be enabled with one click",
-    "movedToPlugin": "The following functions are moved to plugins to continue to be provided"
+    "movedToPlugin": "The following functions are moved to plugins to continue to be provided",
+    "managePlugin": "Plug-in management",
+    "pluginList": "Plugin list",
+    "showDetail": "show configuration"
   },
   "modInfo": {
     "emptyTitle": "Click on a mod card to view detailed information",
@@ -53,9 +56,9 @@
     "emptyDescription": "No Description",
     "hotkeys": "Hotkeys",
     "description": "Description",
-    "edit": "Edit mod information",
+    "edit": "Edit information",
     "openUrl": "Open mod link",
-    "openFolder": "open mod folder"
+    "openFolder": "open folder"
   },
   "editDialog": {
     "edit-mod-info": "Edit MOD Info",
@@ -90,7 +93,8 @@
     "save": "save",
     "clickToClose": "Click to close",
     "forePage": "Next page",
-    "nextPage": "Previous page"
+    "nextPage": "Previous page",
+    "confirm": "confirm"
   },
   "author": "author",
   "caimogu": "Caimogu",
@@ -132,5 +136,12 @@
     "whatIsThis": "What's this?"
   },
   "gamebanana": "Gamebanana",
-  "github": "Github"
+  "github": "Github",
+  "presetDialog": {
+    "emptyName": "Default name cannot be empty",
+    "name": "Default name",
+    "nameExist": "Default name already exists",
+    "requireName": "Please enter the default name",
+    "success": "Preset added successfully"
+  }
 }

@@ -45,7 +45,10 @@
     "modSourcePath-info": "mod来源文件夹为程序存储mod的位置，当mod被启用时，会从这里创建链接到mod目标文件夹。",
     "presetPath": "预设文件夹",
     "presetPath-info": "预设文件夹为存储预设的位置，预设是一组mod的集合，可以通过预设一键启用多个mod",
-    "movedToPlugin": "下面的功能移动到插件继续提供"
+    "movedToPlugin": "下面的功能移动到插件继续提供",
+    "showDetail": "显示配置",
+    "managePlugin": "插件管理",
+    "pluginList": "插件列表"
   },
   "modInfo": {
     "emptyTitle": "点击mod卡片以查看详细信息",
@@ -90,7 +93,8 @@
     "compactMode": "紧凑模式",
     "clickToClose": "点击关闭",
     "nextPage": "上一页",
-    "forePage": "下一页"
+    "forePage": "下一页",
+    "confirm": "确认"
   },
   "firstLoad": {
     "huan-ying-shi-yong-xxmodmanagerxxmm": "欢迎使用 XX-mod-manager(XXMM)",
@@ -132,5 +136,12 @@
   "author": "作者",
   "github": "Github",
   "gamebanana": "Gamebanana",
-  "caimogu": "Caimogu"
+  "caimogu": "Caimogu",
+  "presetDialog": {
+    "requireName": "请输入预设名称",
+    "name": "预设名称",
+    "nameExist": "预设名称已存在",
+    "success": "预设添加成功",
+    "emptyName": "预设名称不能为空"
+  }
 }
