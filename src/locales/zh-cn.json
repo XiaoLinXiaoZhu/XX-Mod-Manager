@@ -80,7 +80,9 @@
     "edit-mod-hotkeys": "编辑快捷键",
     "save": "保存",
     "cancel": "取消",
-    "ignore": "忽略"
+    "ignore": "忽略",
+    "changeNotSave": "检测到未保存的更改",
+    "ifSaveChange": "是否保存更改？"
   },
   "buttons": {
     "save": "保存",
@@ -143,5 +145,7 @@
     "nameExist": "预设名称已存在",
     "success": "预设添加成功",
     "emptyName": "预设名称不能为空"
-  }
+  },
+  "mod-image": "Mod图片",
+  "no-mod-selected": "未选择mod"
 }

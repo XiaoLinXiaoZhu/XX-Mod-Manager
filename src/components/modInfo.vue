@@ -6,7 +6,7 @@
         </div>
         <div class="mod-image">
             <img style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;"
-                alt="Mod Image" :src="img? img : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D'" />
+                alt="t('mod-image')" :src="img? img : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D'" />
         </div>
 
         <s-scroll-view class="mod-info-content">
@@ -67,6 +67,10 @@ const fs = new fsProxy();
 
 const { ipcRenderer } = require('electron');
 
+// 导入 i18n 的 t 函数
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 const props = defineProps({
     mod: Object,
 });
@@ -78,7 +82,7 @@ const emit = defineEmits(['clickEditButton']);
 
 const editMod = () => {
     if (props.mod == null) {
-        ipcRenderer.send('snack', 'No mod selected', 'error');
+        ipcRenderer.send('snack', t('no-mod-selected'), 'error');
         return;
     }
 
@@ -89,7 +93,7 @@ const editMod = () => {
 const openModFolder = () => {
     //ipcRenderer.send('open-url', props.mod?.url);
     if (props.mod == null) {
-        ipcRenderer.send('snack', 'No mod selected', 'error');
+        ipcRenderer.send('snack',t('no-mod-selected'), 'error');
         return;
     }
     fs.openDir(iManager.config.modSourcePath + '/' + props.mod.name);

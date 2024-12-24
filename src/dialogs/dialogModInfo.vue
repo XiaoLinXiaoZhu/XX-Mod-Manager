@@ -22,7 +22,7 @@
 
             <div id="img-container" style="width: 280px;height: 224px;border-radius: 0 30px;overflow: hidden;">
               <img id="editDialog-mod-info-image"
-                style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" alt="Mod Image"
+                style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;"
                 :src="img" />
             </div>
 
@@ -180,8 +180,8 @@
   </s-dialog> -->
   <DialogTemplate id="save-change-dialog">
     <template v-slot:content>
-      <h2 style="padding: 0;margin: 0;">检测到未保存的更改</h2>
-      <h3 style="z-index:1">是否保存更改？</h3>
+      <h2 style="padding: 0;margin: 0;">{{ $t('editDialog.changeNotSave') }}</h2>
+      <h3 style="z-index:1">{{ $t('editDialog.ifSaveChange') }}</h3>
     </template>
     <template v-slot:action>
       <s-button slot="action" type="text" id="save-change-ignore" @click="handleCancel" style="margin-left: 20px;margin-left: 20px;" class="OO-button">{{ $t('editDialog.ignore') }}</s-button>
@@ -207,11 +207,11 @@ let saved = false;
 
 // modInfo 为 mod 信息，用于储存临时修改的 mod 信息，最后保存时再将其赋值给 props.mod
 const modInfo = ref({
-  name: 'no name',
+  name: 'unknow',
   character: 'unknow',
   preview: '',
   url: '',
-  description: 'no description'
+  description: 'unknow',
 });
 const editModInfoDialog = useTemplateRef('edit-mod-dialog');
 const img = ref(null);

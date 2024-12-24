@@ -80,7 +80,9 @@
     "edit-mod-hotkeys": "Edit Hotkeys",
     "save": "Save",
     "cancel": "Cancel",
-    "ignore": "Ignore"
+    "ignore": "Ignore",
+    "changeNotSave": "Unsaved changes detected",
+    "ifSaveChange": "Save changes?"
   },
   "buttons": {
     "addPreset": "Add preset",
@@ -143,5 +145,7 @@
     "nameExist": "Default name already exists",
     "requireName": "Please enter the preset name",
     "success": "Preset added successfully"
-  }
+  },
+  "mod-image": "Mod Image",
+  "no-mod-selected": "No mod selected"
 }
