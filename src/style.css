@@ -602,3 +602,23 @@ p {
   background-color: gray;
 background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.5) 35px, rgba(255,255,255,.5) 70px);
 }
+
+/* 动画样式 */
+@keyframes slideBackground {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: -1000px 0; /* 图片宽度 */
+  }
+}
+
+.OO-slide-background{
+  background-repeat: repeat-x; /* 默认是repeat，不需要特别设置 */
+  background-position: 0 0; /* 初始位置 */
+  transform: rotate(-15deg); /* 整体旋转15度 */
+  overflow: hidden; /* 隐藏超出容器的部分 */
+  position: relative; /* 为动画做准备 */
+
+  animation: slideBackground 5s linear infinite; /* 动画持续时间为5秒，线性变化，无限循环 */
+}
