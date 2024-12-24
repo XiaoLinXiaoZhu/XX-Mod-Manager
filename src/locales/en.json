@@ -138,10 +138,10 @@
   "gamebanana": "Gamebanana",
   "github": "Github",
   "presetDialog": {
-    "emptyName": "Default name cannot be empty",
-    "name": "Default name",
+    "emptyName": "Preset name cannot be empty",
+    "name": "Preset name",
     "nameExist": "Default name already exists",
-    "requireName": "Please enter the default name",
+    "requireName": "Please enter the preset name",
     "success": "Preset added successfully"
   }
 }
