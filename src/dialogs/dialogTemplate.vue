@@ -21,19 +21,24 @@
 import { onMounted, ref, useTemplateRef } from 'vue'
 
 const props = defineProps({
-    id: String
+    id: String,
+    type: String
 });
 
 const componentRef = useTemplateRef("componentRef");
 
 
 onMounted(() => {
+    const canClick = props.type === 'block' ? false : true;
+
     const editModInfoDialogStyle = document.createElement('style');
     editModInfoDialogStyle.innerHTML = `
     .wrapper.show .scrim {
         opacity: 1 !important;
         filter: blur(0px) !important;
         backdrop-filter: blur(2px) !important;
+        pointer-events: ${canClick ? 'auto' : 'none'} !important;
+
     }
     .wrapper.show .scrim::after {
       content: "" !important;

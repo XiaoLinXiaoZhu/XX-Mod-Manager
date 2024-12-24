@@ -56,6 +56,10 @@ iManager.waitInit().then((iManager) => {
         console.log('ℹ️ first load');
         iManager.openNewWindow('firstLoad');
     }
+
+
+    // 测试 loading
+    // iManager.showDialog('loading-dialog');
 })
 //-=====================事件监听====================-//
 console.log('main.js');

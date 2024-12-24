@@ -168,7 +168,7 @@
 
   <!-- -取消时再次询问是否保存 -->
   <!-- -提示是否保存更改 -->
-  <s-dialog id="save-change-dialog">
+  <!-- <s-dialog id="save-change-dialog">
     <div slot="headline" data-translate-key="save-change"> 检测到未保存的更改 </div>
     <div slot="text">
       <p data-translate-key="dialog-ask-for-save-change"> 是否保存更改？ </p>
@@ -177,13 +177,25 @@
     </s-button>
     <s-button slot="action" type="text" id="save-change-confirm" @click="handleSave"> {{ $t('editDialog.save') }}
     </s-button>
-  </s-dialog>
+  </s-dialog> -->
+  <DialogTemplate id="save-change-dialog">
+    <template v-slot:content>
+      <h2 style="padding: 0;margin: 0;">检测到未保存的更改</h2>
+      <h3 style="z-index:1">是否保存更改？</h3>
+    </template>
+    <template v-slot:action>
+      <s-button slot="action" type="text" id="save-change-ignore" @click="handleCancel" style="margin-left: 20px;margin-left: 20px;" class="OO-button">{{ $t('editDialog.ignore') }}</s-button>
+      <s-button slot="action" type="text" id="save-change-confirm" @click="handleSave" style="margin-left: 20px;margin-left: 20px;color: var(--s-color-on-surface);" class="OO-button">{{ $t('editDialog.save') }}</s-button>
+    </template>
+  </DialogTemplate>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { defineProps, defineEmits, onMounted, computed, watch, useTemplateRef } from 'vue';
+import dialogTemplate from './dialogTemplate.vue';
 import IManager from '../../electron/IManager';
+import DialogTemplate from './dialogTemplate.vue';
 const iManager = new IManager();
 
 // 参数为 字符串类型的 mod，之后通过 iManager.getModInfo(mod) 获取 mod 信息

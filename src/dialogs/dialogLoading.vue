@@ -1,16 +1,33 @@
 <template>
-    <s-dialog id="loading-dialog" size="full">
+    
+    <!-- <s-dialog id="loading-dialog" size="full">
         <div slot="text" class="container">
             <s-circular-progress indeterminate="true" class="circular-progress"></s-circular-progress>
             <p class="text font-hongmeng" >Loading...</p>
         </div>
-    </s-dialog>
+    </s-dialog> -->
+    <dialogTemplate id="loading-dialog" type="block">
+        <template v-slot:content>
+            <div class="container">
+                <s-circular-progress indeterminate="true" class="circular-progress"></s-circular-progress>
+                <p class="text font-hongmeng" >Loading...</p>
+            </div>
+        </template> 
+        <template v-slot:action>
+            <div/>
+        </template>
+    </dialogTemplate>
+
 </template>
 
+<script setup>
+import dialogTemplate from './dialogTemplate.vue';
+</script>
 <style scoped>
     .circular-progress {
-        width: 20vh;
-        height: 20vh;
+        width: 10vh;
+        height: 10vh;
+        margin-top: 5vh;
     }
 
     .container {
