@@ -48,8 +48,8 @@ const currentTab = ref(props.tabs[0]);
 
 const selectTab = (tab) => {
     if (tab === currentTab.value) return;
-    emit('tabChange', tab);
     currentTab.value = tab;
+    emit('tabChange', tab);
 };
 
 const sliderStyle = computed(() => {
@@ -64,6 +64,11 @@ watch(() => props.tabs, (newTabs) => {
         currentTab.value = newTabs[0];
     }
 });
+
+defineExpose({
+    selectTab
+});
+
 </script>
 
 <style scoped>

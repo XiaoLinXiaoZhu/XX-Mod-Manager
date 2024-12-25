@@ -16,6 +16,7 @@
     <dialogAddPreset></dialogAddPreset>
     <dialogModInfo :mod="lastClickedMod" />
     <dialogLoading />
+    <DialogNeedRefresh />
 </template>
 
 <script setup>
@@ -34,6 +35,7 @@ import helpSection from '../section/helpSection.vue';
 import dialogLoading from '../dialogs/dialogLoading.vue';
 
 import IManager from '../../electron/IManager';
+import DialogNeedRefresh from '../dialogs/dialogNeedRefresh.vue';
 const iManager = new IManager();
 
 const sections = ref(['mod', 'help', 'settings']);

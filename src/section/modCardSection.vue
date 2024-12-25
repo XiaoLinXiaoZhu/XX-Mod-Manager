@@ -1,27 +1,27 @@
 <template>
     <div class="main-container">
-        <leftMenu :tabs="presets" @tabChange="handlePresetChange" >
+        <leftMenu :tabs="presets" @tabChange="handlePresetChange" ref="presetSelectorRef">
             <template #up-button>
                 <s-icon type="arrow_drop_up"></s-icon>
             </template>
             <template #down-button>
                 <s-tooltip style="margin-right: calc(100% - 40px);">
-                    <s-icon-button  slot="trigger" @click="handlePresetManageButtonClicked">
-                        <s-icon type="menu" ></s-icon>
+                    <s-icon-button slot="trigger" @click="handlePresetManageButtonClicked">
+                        <s-icon type="menu"></s-icon>
                     </s-icon-button>
-                    
+
                     <p> {{ $t('buttons.managePreset') }} </p>
                 </s-tooltip>
 
                 <s-tooltip>
                     <s-icon-button slot="trigger" @click="handlePresetAddButtonClicked">
-                        <s-icon type="add" ></s-icon>
+                        <s-icon type="add"></s-icon>
                     </s-icon-button>
                     <p> {{ $t('buttons.addPreset') }} </p>
                 </s-tooltip>
             </template>
         </leftMenu>
-        <modCardManager id="mod-card-manager" @click="handleModCardClick" :compactMode="compactMode" ref="modCardManagerRef">
+        <modCardManager id="mod-card-manager" :compactMode="compactMode" ref="modCardManagerRef">
         </modCardManager>
         <modInfo :mod="lastClickedMod"></modInfo>
     </div>
@@ -35,7 +35,7 @@
         </div>
         <div class="bottom-right">
             <!-- <s-button @click="handleApplyButtonClicked" /> -->
-             <s-button @click="handleApplyButtonClicked" id="apply-button" class="OO-color-gradient font-hongmeng">
+            <s-button @click="handleApplyButtonClicked" id="apply-button" class="OO-color-gradient font-hongmeng">
                 <s-icon type="chevron_right" slot="start" id="apply-button-icon"></s-icon>
                 {{ $t('buttons.apply') }}
             </s-button>
@@ -47,11 +47,11 @@
 
 
     <svg width="0" height="0">
-    <defs>
-        <clipPath id="svgCircle">
-        <circle cx="100" cy="100" r="100" />
-        </clipPath>
-    </defs>
+        <defs>
+            <clipPath id="svgCircle">
+                <circle cx="100" cy="100" r="100" />
+            </clipPath>
+        </defs>
     </svg>
 </template>
 
@@ -63,7 +63,7 @@ import backButton from '../components/backButton.vue';
 import sectionSelector from '../components/sectionSelector.vue';
 import leftMenu from '../components/leftMenu.vue';
 import modInfo from '../components/modInfo.vue';
-import { ref, watch,onMounted,useTemplateRef } from 'vue';
+import { ref, watch, onMounted, useTemplateRef } from 'vue';
 import IManager from '../../electron/IManager';
 import fsProxy from '../../electron/fsProxy';
 const iManager = new IManager();
@@ -88,15 +88,18 @@ function handleModCardClick(mod) {
 function handlePresetManageButtonClicked() {
     console.log('preset manage button clicked');
     fs.openDir(iManager.config.presetPath);
+    iManager.showDialog('dialog-need-refresh');
 }
 
 function handlePresetAddButtonClicked() {
     console.log('preset add button clicked');
-    const addPresetDialog = document.getElementById('add-preset-dialog');
-    addPresetDialog.show();
+    // const addPresetDialog = document.getElementById('add-preset-dialog');
+    // addPresetDialog.show();
+    iManager.showDialog('add-preset-dialog');
 }
 
 //-============================== Compact Mode ==============================
+//#region Compact Mode
 const compactMode = ref(false);
 const enterCompactMode = (item) => {
     item.animate([
@@ -138,41 +141,41 @@ const enterCompactMode = (item) => {
 };
 const exitCompactMod = (item) => {
     item.animate([
-                { height: '150px' },
-                { height: '350px' }
+        { height: '150px' },
+        { height: '350px' }
+    ], {
+        duration: 300,
+        easing: 'ease-in-out',
+        iterations: 1
+    });
+
+    //item下的slot=headline，slot=text，slot=subhead的div元素会缓缓下移
+    //获取这些元素
+    //遍历子元素，匹配slot属性
+    item.childNodes.forEach(child => {
+        if (child.slot == 'headline' || child.slot == 'subhead' || child.slot == 'text') {
+            child.animate([
+                { transform: 'translateY(-200px)' },
+                { transform: 'translateY(0px)' }
             ], {
                 duration: 300,
                 easing: 'ease-in-out',
                 iterations: 1
             });
-
-            //item下的slot=headline，slot=text，slot=subhead的div元素会缓缓下移
-            //获取这些元素
-            //遍历子元素，匹配slot属性
-            item.childNodes.forEach(child => {
-                if (child.slot == 'headline' || child.slot == 'subhead' || child.slot == 'text') {
-                    child.animate([
-                        { transform: 'translateY(-200px)' },
-                        { transform: 'translateY(0px)' }
-                    ], {
-                        duration: 300,
-                        easing: 'ease-in-out',
-                        iterations: 1
-                    });
-                }
-                if (child.slot == 'image') {
-                    //获取slot下的img元素
-                    const img = child.querySelector('img');
-                    img.animate([
-                        { opacity: 0.2, filter: 'blur(5px)' },
-                        { opacity: 1, filter: 'blur(0px)' }
-                    ], {
-                        duration: 300,
-                        easing: 'ease-in-out',
-                        iterations: 1
-                    });
-                }
+        }
+        if (child.slot == 'image') {
+            //获取slot下的img元素
+            const img = child.querySelector('img');
+            img.animate([
+                { opacity: 0.2, filter: 'blur(5px)' },
+                { opacity: 1, filter: 'blur(0px)' }
+            ], {
+                duration: 300,
+                easing: 'ease-in-out',
+                iterations: 1
             });
+        }
+    });
 }
 function handleCompactButtonClicked() {
     console.log('compact button clicked');
@@ -217,8 +220,10 @@ function handleCompactButtonClicked() {
     }
 
 }
+//#endregion
 
 //-============================= presets ==============================
+//#region presets
 const modCardManagerRef = useTemplateRef('modCardManagerRef');
 const presets = ref([]);
 const currentPreset = ref('default');
@@ -233,6 +238,12 @@ function loadPresetList() {
     presets.value = list;
 }
 
+iManager.on('addPreset', (preset) => {
+    //debug
+    console.log('addPreset', preset);
+    loadPresetList();
+});
+
 function loadPreset(preset) {
     // iManager.loadPreset(preset).then((mods) => {
     //     //debug
@@ -244,11 +255,6 @@ function loadPreset(preset) {
 function handlePresetChange(tab) {
     currentPreset.value = tab;
     console.log('tab changed to', tab);
-    // if (tab == 'default') {
-    //     modCardManagerRef.value.loadPreset([]);
-    // } else {
-    //     loadPreset(tab);
-    // }
 
     iManager.setCurrentPreset(tab);
 }
@@ -260,13 +266,17 @@ function savePreset() {
     iManager.savePreset(currentPreset.value, selectedMods());
 }
 
+const presetSelectorRef = useTemplateRef('presetSelectorRef');
+
+//#endregion
+
 //-=========================== apply button ============================
 function handleApplyButtonClicked() {
     //debug
     const mods = Array.from(document.querySelectorAll('.mod-item'));
     iManager.applyMods(selectedMods()).then(() => {
         console.log('apply success');
-        
+
     });
 }
 
@@ -282,13 +292,16 @@ onMounted(() => {
             console.log('set mod info display to', mod.name);
             savePreset();
         });
+
+        iManager.on('currentPresetChanged', (preset) => {
+            presetSelectorRef.value.selectTab(preset);
+        });
     });
 });
 </script>
 
 
 <style scoped>
-
 #mod-card-manager {
     height: calc(100% - 20px);
 }
@@ -329,7 +342,7 @@ onMounted(() => {
     font-size: 20px;
 }
 
-#apply-button-icon{
+#apply-button-icon {
     margin-right: 60px;
     height: 40px;
     width: 40px;

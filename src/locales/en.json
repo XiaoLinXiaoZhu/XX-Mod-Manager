@@ -3,7 +3,8 @@
     "hello": "Hello, World",
     "alert": {
       "emptyModSourceOrTarget": "mod destination folder or mod source folder is empty"
-    }
+    },
+    "requireRefresh": "Program needs to be refreshed to apply changes"
   },
   "element": {
     "section": {
@@ -96,7 +97,8 @@
     "clickToClose": "Click to close",
     "forePage": "Next page",
     "nextPage": "Previous page",
-    "confirm": "confirm"
+    "confirm": "confirm",
+    "refresh": "refresh"
   },
   "author": "author",
   "caimogu": "Caimogu",

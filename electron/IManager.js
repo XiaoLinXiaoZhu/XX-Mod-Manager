@@ -308,11 +308,17 @@ class IManager {
     async setCurrentCharacter(character) {
         this.temp.currentCharacter = character;
         this.trigger('currentCharacterChanged', character);
+
+        //debug
+        console.log(`currentCharacterChanged: ${character}`);
     }
 
     async setCurrentTab(tab) {
         this.temp.currentTab = tab;
         this.trigger('currentTabChanged', tab);
+
+        //debug
+        console.log(`currentTabChanged: ${tab}`);
     }
 
     async setCurrentPreset(presetName) {
@@ -638,6 +644,15 @@ class IManager {
         // const newPresetPath = this.config.presetPath + '/' + presetName;
         const newPresetPath = path.join(this.config.presetPath, presetName + '.json');
         fs.writeFileSync(newPresetPath, JSON.stringify(this.data.modList));
+
+        // 刷新预设列表
+        await this.loadPresets();
+
+        this.trigger('addPreset', presetName);
+        
+        setTimeout(() => {
+            this.setCurrentPreset(presetName);
+        }, 200);
     }
 
     async changePreview(modName, previewPath) {
@@ -787,12 +802,27 @@ class IManager {
     }
 
     //-==================== 事件管理 ====================
+    // 所有的事件：
+    //----------生命周期----------
+    // wakeUp
+    //----------状态变更----------
+    // themeChange,lastClickedModChanged,modInfoChanged,currentCharacterChanged,addMod,currentPresetChanged,languageChange,
+    //----------事件节点----------
+    // modsApplied,addMod,addPreset
+
     // 注册事件
     on(eventName, callback) {
         if (!this.eventList[eventName]) {
             this.eventList[eventName] = [];
         }
         this.eventList[eventName].push(callback);
+        //debug
+        console.log(`event ${eventName} registered, all events:`);
+        let events = '';
+        for (const key in this.eventList) {
+            events += key + ',';
+        }
+        console.log(events);
     }
 
     // 触发事件

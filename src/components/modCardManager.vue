@@ -11,7 +11,6 @@
                     :hotKeys="mod.hotkeys"
                     :lazyLoad="true"
                     :imagePath="mod.preview"
-                    @click="click"
                     :compactMode="compactMode"
                     :invokeClickChange=false
                     :ref="setModCardRef(mod.name)"
@@ -63,9 +62,6 @@ const setModCardRef = (name) => (el) => {
 const emit = defineEmits(['click']);
 // 定义 lastClickedMod 变量
 const lastClickedMod = ref(null);
-
-// 定义 click 方法
-const click = (mod) => {};
 
 // 定义 handleFilterChange 方法
 const handleFilterChange = (character) => {

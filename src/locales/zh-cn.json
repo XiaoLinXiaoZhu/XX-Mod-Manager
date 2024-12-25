@@ -3,7 +3,8 @@
     "hello": "你好，世界",
     "alert": {
       "emptyModSourceOrTarget": "mod目标文件夹或mod源文件夹为空"
-    }
+    },
+    "requireRefresh": "程序需要刷新以应用更改"
   },
   "element": {
     "section": {
@@ -96,7 +97,8 @@
     "clickToClose": "点击关闭",
     "nextPage": "上一页",
     "forePage": "下一页",
-    "confirm": "确认"
+    "confirm": "确认",
+    "refresh": "刷新"
   },
   "firstLoad": {
     "huan-ying-shi-yong-xxmodmanagerxxmm": "欢迎使用 XX-mod-manager(XXMM)",

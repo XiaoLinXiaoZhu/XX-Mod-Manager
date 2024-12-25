@@ -47,7 +47,6 @@ function handleAddPreset() {
             //debug
             console.log("presetName is not exists");
             iManager.addPreset(presetName.value);
-            iManager.loadConfig();
             ipcRenderer.send('snack', t('presetDialog.success'), 'info');
         }
     }
