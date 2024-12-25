@@ -26,7 +26,7 @@
                 <settingBar :data="presetPathData"></settingBar>
 
                 <s-divider></s-divider>
-                <s-button @click="console.log(iManager.config)" data-translate-key="show-config">
+                <s-button class="OO-color-gradient" @click="console.log(iManager.config)">
                     {{ $t('setting.showDetail') }} </s-button>
                 <s-divider></s-divider>
                 <settingBar :data="initAllDataButton"></settingBar>
@@ -168,7 +168,7 @@
                 <div v-if="currentTab === pluginName">
 
                     <s-fold folded="true">
-                        <s-button slot="trigger">{{ $t('setting.showDetail') }}</s-button>
+                        <s-button class="OO-color-gradient" slot="trigger">{{ $t('setting.showDetail') }}</s-button>
                         <div>
                             {{ pluginName }}
                         </div>
