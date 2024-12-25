@@ -486,15 +486,19 @@ class IManager {
             }
 
             // 将zip文件解压到mod文件夹
+            this.showDialog('loading-dialog');
             try {
                 zip.extractAllTo(modPath, true);
             }
             catch (error) {
+                this.dismissDialog('loading-dialog');
                 console.log(`Error: ${error}`);
                 snack(`Error: ${error}`);
                 return;
             }
 
+            // 关闭加载对话框
+            this.dismissDialog('loading-dialog');
             // 提示用户
             snack(`Mod ${modName} added successfully`);
 

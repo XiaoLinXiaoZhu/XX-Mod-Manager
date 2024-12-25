@@ -1,6 +1,6 @@
 <template>
     <s-dialog ref="componentRef" :id="props.id">
-        <div slot="headline" :style="{maxWidth: props.maxWidth?props.maxWidth:'500px'}">
+        <div slot="headline" :style="{maxWidth: props.maxWidth?props.maxWidth:'500px'}" style="font-size: 15px;">
             <slot name="content">
                 <p data-translate-key="ask-preset-name">请输入预设名称</p>
                 <div class="OO-setting-bar">
