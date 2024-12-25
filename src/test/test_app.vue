@@ -27,7 +27,7 @@
     </div>
     <CssProxy />
     <dialogAddPreset></dialogAddPreset>
-    <dialogModInfo :mod="lastClickedMod" />
+    <dialogModInfo2 :mod="lastClickedMod" />
     <dialogLoading />
     <DialogNeedRefresh />
 </template>
@@ -44,6 +44,7 @@ import dialogAddPreset from '../dialogs/dialogAddPreset.vue';
 import settingSection from '../section/settingSection.vue'; 
 import CssProxy from '../components/cssProxy.vue';
 import dialogModInfo from '../dialogs/dialogModInfo.vue';
+import dialogModInfo2 from '../dialogs/dialogModInfo2.vue';
 import helpSection from '../section/helpSection.vue';
 import dialogLoading from '../dialogs/dialogLoading.vue';
 

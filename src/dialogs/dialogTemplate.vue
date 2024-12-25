@@ -1,6 +1,6 @@
 <template>
     <s-dialog ref="componentRef" :id="props.id">
-        <div slot="headline" class="font-hongmeng">
+        <div slot="headline" :style="{maxWidth: props.maxWidth?props.maxWidth:'500px'}">
             <slot name="content">
                 <p data-translate-key="ask-preset-name">请输入预设名称</p>
                 <div class="OO-setting-bar">
@@ -22,7 +22,8 @@ import { onMounted, ref, useTemplateRef } from 'vue'
 
 const props = defineProps({
     id: String,
-    type: String
+    type: String,
+    maxWidth: String
 });
 
 const componentRef = useTemplateRef("componentRef");
@@ -116,7 +117,7 @@ div[slot="headline"] {
     align-items: center;
 
     width: 100%;
-    max-width: 500px;
+    /* max-width: 500px; */
 }
 
 s-dialog s-button[slot="action"] {
