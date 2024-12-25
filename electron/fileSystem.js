@@ -332,6 +332,8 @@ ipcMain.handle('load-preset', async (event, presetName) => {
 ipcMain.handle('save-preset', async (event, presetName, mods) => {
     const modConfig = await getCurrentConfig();
     const presetPath = modConfig.presetPath;
+    //debug
+    // console.log(`save-preset:${presetPath} ${presetName}`, mods);
     savePreset(presetPath, presetName, mods);
 });
 

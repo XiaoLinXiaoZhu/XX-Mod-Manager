@@ -263,6 +263,8 @@ const selectedMods = () => Array.from(document.querySelectorAll('.mod-item')).fi
 
 function savePreset() {
     if (currentPreset.value == 'default') return;
+    //debug
+    console.log('save preset', currentPreset.value, selectedMods());
     iManager.savePreset(currentPreset.value, selectedMods());
 }
 

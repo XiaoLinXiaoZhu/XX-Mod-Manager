@@ -308,7 +308,6 @@ class IManager {
     async setCurrentCharacter(character) {
         this.temp.currentCharacter = character;
         this.trigger('currentCharacterChanged', character);
-
         //debug
         console.log(`currentCharacterChanged: ${character}`);
     }

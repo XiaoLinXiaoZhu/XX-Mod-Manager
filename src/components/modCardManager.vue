@@ -67,7 +67,7 @@ const lastClickedMod = ref(null);
 const handleFilterChange = (character) => {
     currentCharacter.value = character;
     //debug
-    console.log(currentCharacter.value);
+    // console.log(currentCharacter.value);
 
     // 通过设置 card 的 display 属性来实现筛选
     if (character === 'all') {
@@ -110,7 +110,7 @@ async function loadPreset(presetName) {
     }
         
     //debug
-    console.log('loadPreset',mods);
+    console.log('loadPreset',presetName);
     // handleFilterChange('已选择');
 };
 
