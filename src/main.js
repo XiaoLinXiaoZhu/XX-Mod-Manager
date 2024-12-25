@@ -51,11 +51,13 @@ iManager.waitInit().then((iManager) => {
 
     // ------------------ first load ------------------ //
     // 首次打开时打开 初始化窗口
-    if (iManager.config.firstLoad) {
-        // debug 
-        console.log('ℹ️ first load');
-        iManager.openNewWindow('firstLoad');
-    }
+    iManager.on('wakeUp', () => {
+        if (iManager.config.firstLoad) {
+            // debug 
+            console.log('ℹ️ first load');
+            iManager.openNewWindow('firstLoad');
+        }
+    });
 
 
     // 测试 loading
