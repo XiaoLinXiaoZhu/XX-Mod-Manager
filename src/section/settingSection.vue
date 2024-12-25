@@ -10,6 +10,7 @@
                 <s-divider></s-divider>
                 <settingBar :data="themeData"></settingBar>
                 <s-divider></s-divider>
+                <settingBar :data="openFirstLoadButton"></settingBar>
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
             <!-- -高级设置 -->
@@ -212,7 +213,8 @@ const {
     modTargetPathData,
     modSourcePathData,
     presetPathData,
-    initAllDataButton
+    initAllDataButton,
+    openFirstLoadButton
 } = getData();
 
 import { useI18n } from 'vue-i18n'

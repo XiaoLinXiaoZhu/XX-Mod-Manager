@@ -73,7 +73,7 @@ const fs = new fsProxy();
 function handleClick() {
     //打开新的页面
     console.log('click');
-    iManager.openNewWindow('tapePage/');
+    iManager.openNewWindow('tapePage');
 }
 
 const lastClickedMod = ref(null);

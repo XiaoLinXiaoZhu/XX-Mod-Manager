@@ -187,8 +187,32 @@ function getData() {
             iManager.initAllData();
         }
     }
+
+    //-------------------- 打开 firstLoad 页面的按钮 ------------------//
+    let openFirstLoadButton = {
+        name: 'openFirstLoad',
+        type: 'button',
+        displayName: 'Open First Load',
+        description: 'Open First Load',
+        t_displayName: {
+            zh_cn: '打开 firstLoad 页面',
+            en: 'Open First Load'
+        },
+        t_description: {
+            zh_cn: '打开 firstLoad 页面',
+            en: 'Open First Load'
+        },
+        buttonName: 'Open First Load',
+        t_buttonName: {
+            zh_cn: '打开 firstLoad 页面',
+            en: 'Open First Load'
+        },
+        onChange: () => {
+            iManager.openNewWindow('firstLoad');
+        }
+    }
     return {
-        languageData, themeData, modTargetPathData, modSourcePathData, presetPathData,initAllDataButton
+        languageData, themeData, modTargetPathData, modSourcePathData, presetPathData,initAllDataButton,openFirstLoadButton
     }
 }
 
