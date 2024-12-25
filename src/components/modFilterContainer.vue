@@ -91,7 +91,7 @@ const onMouseMove = (event) => {
 onMounted(() => {
   updateSlider(0); // Initialize the slider position
 
-  waitInitIManager().then((iManager) => {
+  iManager.waitInit().then((iManager) => {
     //debug
     console.log(`get iManager: ${iManager}`)
 
@@ -106,7 +106,10 @@ onMounted(() => {
     });
 
     setTimeout(() => {
-      selectItem({ text: currentCharacter.value }, 0);
+      // 语言变化会导致宽度变化，所以 需要刷新一下
+      updateSlider(0);
+      //debug
+      console.log(`✅✅✅✅✅✅✅ get currentCharacter.value: ${currentCharacter.value}`)
     }, 1);
   });
 
