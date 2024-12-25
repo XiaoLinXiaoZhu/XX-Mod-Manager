@@ -7,9 +7,22 @@
         </div>
 
         <div class="section-container">
-            <modCardSection v-if="currentSection === 'mod'" />
+            <!-- <modCardSection v-if="currentSection === 'mod'" />
             <helpSection v-if="currentSection === 'help'" />
-            <settingSection v-if="currentSection === 'settings'" />
+            <settingSection v-if="currentSection === 'settings'" /> -->
+            <!-- -使用 v-if 会导致多次重载以及事件绑定 改为使用 左右滑动 -->
+            <div class="section-slider" :style="{transform: `translateX(calc(${sections.indexOf(currentSection)} * (10px - 100vw) ))`}">
+                <div style="width: calc(100vw - 10px);">
+                    <modCardSection />
+                </div>
+                <div style="width: calc(100vw - 10px);">
+                    <helpSection v-if="loaded" />
+                </div>
+                <div style="width: calc(100vw - 10px);">
+                    <settingSection v-if="loaded" />
+                </div>
+            </div>
+            
         </div>
     </div>
     <CssProxy />
@@ -36,6 +49,9 @@ import dialogLoading from '../dialogs/dialogLoading.vue';
 
 import IManager from '../../electron/IManager';
 import DialogNeedRefresh from '../dialogs/dialogNeedRefresh.vue';
+
+const loaded = ref(false);
+
 const iManager = new IManager();
 
 const sections = ref(['mod', 'help', 'settings']);
@@ -53,6 +69,7 @@ const closeApp = () => {
 };
 
 iManager.waitInit().then(() => {
+    loaded.value = true;
     iManager.on('lastClickedModChanged', (mod) => {
         lastClickedMod.value = mod;
     });
@@ -98,4 +115,16 @@ iManager.waitInit().then(() => {
     top: 50px;
     overflow:visible;
 }
+
+.section-slider {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    transition: transform 0.3s;
+    overflow: visible;
+    position: relative;
+    height: calc(100%);
+    width: 1300%;
+}
+
 </style>

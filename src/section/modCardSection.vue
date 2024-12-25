@@ -35,8 +35,7 @@
         </div>
         <div class="bottom-right">
             <!-- <s-button @click="handleApplyButtonClicked" /> -->
-            <s-button @click="handleApplyButtonClicked" id="apply-button" class="OO-color-gradient font-hongmeng">
-                <s-icon type="chevron_right" slot="start" id="apply-button-icon"></s-icon>
+            <s-button @click="handleApplyButtonClicked" id="apply-button" class="OO-color-gradient font-hongmeng OO-button OO-background-dot">
                 {{ $t('buttons.apply') }}
             </s-button>
             <!-- <s-button @click="handleClick" id="apply-button" class="OO-color-gradient font-hongmeng">
@@ -329,8 +328,8 @@ onMounted(() => {
 .bottom {
     position: absolute;
     height: 60px;
-    width: 100%;
-    bottom: 0px;
+    width: 100vw;
+    bottom: -10px;
     /* background-color: var(--s-color-primary); */
     display: flex;
     justify-content: space-between;
@@ -338,16 +337,10 @@ onMounted(() => {
 }
 
 #apply-button {
-    padding: 0 40px;
-    padding-left: 60px;
+    padding: 0 60px;
     margin: 0 40px;
     font-size: 20px;
-}
 
-#apply-button-icon {
-    margin-right: 60px;
-    height: 40px;
-    width: 40px;
-    position: absolute;
+    color: var(--s-color-dark-surface);
 }
 </style>
