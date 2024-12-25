@@ -836,11 +836,11 @@ class IManager {
         this.eventList[eventName].push(callback);
         //debug
         console.log(`event ${eventName} registered, all events:`);
-        let events = '';
+        let result = '';
         for (const key in this.eventList) {
-            events += key + ',';
+            result += key + ':' + this.eventList[key].length + '\n';
         }
-        console.log(events);
+        console.log(result);
     }
 
     // 触发事件
