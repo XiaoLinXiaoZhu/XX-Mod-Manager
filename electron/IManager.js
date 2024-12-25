@@ -22,7 +22,8 @@ function snack(message, type = 'info') {
 }
 
 // // 导入 hmc-win32
-const HMC = require('hmc-win32');
+const HMC_Name = 'hmc-win32';
+const HMC = require(HMC_Name);
 
 
 class IManager {
@@ -116,7 +117,6 @@ class IManager {
     }
     async loadConfig() {
         const currentConfig = await ipcRenderer.invoke('get-current-config');
-
         console.log(currentConfig);
         //如果为空，则使用默认配置
         if (currentConfig == {} || currentConfig == null) {

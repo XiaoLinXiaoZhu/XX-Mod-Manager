@@ -364,6 +364,7 @@ onMounted(async () => {
 
     // 不论用户是否看完了 都 取消首次加载
     iManager.config.firstLoad = false;
+    iManager.saveConfig();
 });
 
 </script>
