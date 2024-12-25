@@ -5,8 +5,8 @@
             <h1 data-translate-key="ask-preset-name" style="z-index: 1;">{{ $t('message.requireRefresh') }}</h1>
         </template>
         <template v-slot:action>
-            <s-button slot="action" type="text" id="dialog-cancel" class="OO-button font-hongmeng OO-color-gradient" @click="refresh">
-                <p style="color: var(--s-color-dark-surface);">{{ $t('buttons.refresh') }}</p>
+            <s-button slot="action" type="text" id="dialog-cancel" @click="refresh" class="OO-button font-hongmeng OO-color-gradient" style="color: var(--s-color-dark-surface);">
+                {{ $t('buttons.refresh') }}
             </s-button>
         </template>
     </dialogTemplate>

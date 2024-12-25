@@ -556,6 +556,29 @@ p {
   height: 40px;
   color: var(--s-color-on-surface-variant);
   font-weight: 1000;
+
+  p{
+    z-index: 1;
+  }
+  
+}
+
+.OO-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.1;
+
+  background-color: #00000000 !important;
+
+  background-color: #001;
+  background-image: radial-gradient(black 15%, transparent 16%),
+    radial-gradient(black 15%, transparent 16%);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
 }
 
 .OO-center-bg {
@@ -587,20 +610,29 @@ p {
   padding-right: 10px;
 }
 
-.OO-background-dot {
-  background:
-    radial-gradient(var(--s-color-surface-container) 15%, transparent 16%) 0 0,
-    radial-gradient(var(--s-color-surface-container) 15%, transparent 16%) 8px 8px,
-    radial-gradient(rgba(255, 255, 255, .1) 15%, transparent 20%) 0 1px,
-    radial-gradient(rgba(255, 255, 255, .1) 15%, transparent 20%) 8px 9px;
-  background-color: #282828;
-  background-size: 16px 16px;
+/* .OO-background-dot {} */
+
+.OO-background-dot::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   opacity: 0.1;
+
+  background-color: #00000000 !important;
+
+  background-color: #001;
+  background-image: radial-gradient(black 15%, transparent 16%),
+    radial-gradient(black 15%, transparent 16%);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
 }
 
-.OO-background-stripes{
+.OO-background-stripes {
   background-color: gray;
-background-image: repeating-linear-gradient(45deg, transparent, transparent 7px, rgba(255,255,255,.5) 7px, rgba(255,255,255,.5) 14px);
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 7px, rgba(255, 255, 255, .5) 7px, rgba(255, 255, 255, .5) 14px);
 }
 
 /* 动画样式 */
@@ -608,17 +640,25 @@ background-image: repeating-linear-gradient(45deg, transparent, transparent 7px,
   0% {
     background-position: 0 0;
   }
+
   100% {
-    background-position: -1000px 0; /* 图片宽度 */
+    background-position: -1000px 0;
+    /* 图片宽度 */
   }
 }
 
-.OO-slide-background{
-  background-repeat: repeat-x; /* 默认是repeat，不需要特别设置 */
-  background-position: 0 0; /* 初始位置 */
-  transform: rotate(-15deg); /* 整体旋转15度 */
-  overflow: hidden; /* 隐藏超出容器的部分 */
-  position: relative; /* 为动画做准备 */
+.OO-slide-background {
+  background-repeat: repeat-x;
+  /* 默认是repeat，不需要特别设置 */
+  background-position: 0 0;
+  /* 初始位置 */
+  transform: rotate(-15deg);
+  /* 整体旋转15度 */
+  overflow: hidden;
+  /* 隐藏超出容器的部分 */
+  position: relative;
+  /* 为动画做准备 */
 
-  animation: slideBackground 5s linear infinite; /* 动画持续时间为5秒，线性变化，无限循环 */
+  animation: slideBackground 5s linear infinite;
+  /* 动画持续时间为5秒，线性变化，无限循环 */
 }

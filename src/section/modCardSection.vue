@@ -35,7 +35,7 @@
         </div>
         <div class="bottom-right">
             <!-- <s-button @click="handleApplyButtonClicked" /> -->
-            <s-button @click="handleApplyButtonClicked" id="apply-button" class="OO-color-gradient font-hongmeng OO-button OO-background-dot">
+            <s-button @click="handleApplyButtonClicked" id="apply-button" class="OO-color-gradient font-hongmeng OO-button">
                 {{ $t('buttons.apply') }}
             </s-button>
             <!-- <s-button @click="handleClick" id="apply-button" class="OO-color-gradient font-hongmeng">
