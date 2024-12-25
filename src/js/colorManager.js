@@ -100,6 +100,26 @@ colorManager.destroy = function (element) {
     element.style.backgroundColor = '';
 }
 
+//-======================== OO-color-gradient-word ========================
+// 定义 classManager
+const colorManager2 = new ClassManager('OO-color-gradient-word');
+
+colorManager2.onUpdate = function () {
+    //debug
+    group.update();
+    const currentColor = getColor();
+    this.items.forEach(item => {
+        item.style.color = `#${currentColor}`;
+    });
+}
+
+colorManager2.needRefresh = true;
+colorManager2.onPageInit = function () {}
+colorManager2.init = function (element) { }
+colorManager2.destroy = function (element) {
+    element.style.color = '';
+}
+
 //-========================= OO-color-gradient-svg ========================
 const colorManagerSvg = new ClassManager('OO-color-gradient-svg');
 colorManagerSvg.onUpdate = function () {

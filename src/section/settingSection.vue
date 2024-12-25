@@ -155,7 +155,7 @@
                         <h3 v-if="pluginData.t_displayName">{{ pluginData.t_displayName[locale] }}</h3>
                         <h3 v-else>{{ pluginName }}</h3>
                         <!-- -如果iManager.disabledPluginNames 中包含 pluginName，则显示为 false，否则显示为 true -->
-                        <s-switch :checked="!iManager.disabledPluginNames.includes(pluginName)"
+                        <s-switch class="OO-color-gradient-word" :checked="!iManager.disabledPluginNames.includes(pluginName)"
                             @change="iManager.togglePlugin(pluginName)">
                         </s-switch>
                     </div>

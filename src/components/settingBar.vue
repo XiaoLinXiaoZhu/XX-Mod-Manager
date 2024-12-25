@@ -4,7 +4,7 @@
         <h3 v-else>{{ data.displayName }}</h3>
 
         <!-- -boolean -->
-        <s-switch :checked="data.data" @change="onChange($event.target.checked)"
+        <s-switch :checked="data.data" @change="onChange($event.target.checked)" class="OO-color-gradient-word"
             v-if="data.type === 'boolean'"></s-switch>
 
         <!-- -string -->

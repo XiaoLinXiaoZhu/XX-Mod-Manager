@@ -29,7 +29,7 @@
     <div class="bottom">
         <div class="bottom-left">
             <s-tooltip>
-                <s-switch v-model="compactMode" @change="handleCompactButtonClicked" slot="trigger" />
+                <s-switch class="OO-color-gradient-word" v-model="compactMode" @change="handleCompactButtonClicked" slot="trigger" />
                 <p> {{ $t('buttons.compactMode') }} </p>
             </s-tooltip>
         </div>
