@@ -501,6 +501,15 @@ class IManager {
             // 刷新mod列表
             await this.loadMods();
             const mod = await this.getModInfo(modName);
+
+            // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
+            //debug
+            console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
+
+            if (this.temp.currentCharacter !== null && mod.character === 'Unknown') {
+                mod.character = this.temp.currentCharacter;
+                await this.saveModInfo(mod);
+            }
             this.trigger('addMod', mod);
 
             setTimeout(() => {
@@ -545,6 +554,16 @@ class IManager {
         const mod = await this.getModInfo(modName)
         console.log(`getModInfo:`, mod);
         snack(`After Added mod ${modName}`);
+
+        // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
+        //debug
+        console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
+        if (this.temp.currentCharacter !== null && mod.character === 'Unknown') {
+            mod.character = this.temp.currentCharacter;
+            await this.saveModInfo(mod);
+        }
+
+
         this.trigger('addMod', mod);
 
         setTimeout(() => {
