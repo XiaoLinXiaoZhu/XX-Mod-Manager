@@ -299,6 +299,10 @@ const ifAutoApply = ref(false);
 const ifAutoRefreshInZZZ = ref(false);
 const ifUseAdmin = ref(false);
 
+watch(modTargetPath, (newVal) => {
+    iManager.config.modTargetPath = newVal;
+    iManager.saveConfig();
+});
 
 watch(modSourcePath, (newVal) => {
     iManager.config.modSourcePath = newVal;
@@ -340,6 +344,9 @@ const prev = () => {
 function closeSettingPage() {
     console.log('closeSettingPage');
     iManager.config.firstLoad = false;
+    iManager.config.modTargetPath = modTargetPath.value;
+    iManager.config.modSourcePath = modSourcePath.value;
+    iManager.config.presetPath = presetPath.value;
     iManager.saveConfig();
     ipcRenderer.send('refresh-main-window');
 

@@ -110,11 +110,6 @@ ipcRenderer.on('snack', (event, message,type = 'info') => {
 })
 
 //-======================== 窗口关闭时，保存配置 ========================-//
-// window.onbeforeunload = () => {
-//     console.log('onbeforeunload');
-//     iManager.saveConfig();
-//     iManager.savePluginConfig();
-// }
 
 //! 保存窗口大小,位置,全屏状态
 //! 全屏 状态稍后再说
@@ -137,8 +132,8 @@ window.addEventListener('unload', function (event) {
         width: window.outerWidth,
         height: window.innerHeight,
     };
-    iManager.saveConfig();
-    iManager.savePluginConfig();
+    // iManager.saveConfig();
+    // iManager.savePluginConfig();
 });
 
 window.onbeforeunload = function (e) {
