@@ -7,7 +7,7 @@ import 'sober'
 import 'sober/style/scroll-view.css'
 import { Snackbar } from 'sober'
 const { ipcRenderer} = require('electron');
-import IManager from '../electron/IManager'
+import IManager, { snack } from '../electron/IManager'
 const iManager = new IManager();
 
 //-====================入口文件====================-//
@@ -51,6 +51,7 @@ iManager.waitInit().then((iManager) => {
 
     // ------------------ first load ------------------ //
     // 首次打开时打开 初始化窗口
+    iManager.snack('first load : '+iManager.config.firstLoad);
     iManager.on('wakeUp', () => {
         if (iManager.config.firstLoad) {
             // debug 
@@ -132,12 +133,21 @@ window.addEventListener('unload', function (event) {
         width: window.outerWidth,
         height: window.innerHeight,
     };
-    // iManager.saveConfig();
-    // iManager.savePluginConfig();
+
+    //! 如果在这里保存配置，会导致 firstLoad 窗口更改的配置被覆盖，需要增加一个判断
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    // debug
+    console.log('unload');
+    if (iManager.config.firstLoad) return;
+
+    console.log('save config');
+    iManager.saveConfig();
+    iManager.savePluginConfig();
 });
 
 window.onbeforeunload = function (e) {
     // console.log('onbeforeunload');
+    if (iManager.config.firstLoad) return;
     iManager.saveConfig();
     iManager.savePluginConfig();
     // e.returnValue = false;
