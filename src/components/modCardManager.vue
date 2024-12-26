@@ -1,6 +1,6 @@
 <template>
     <div id="mod-card-manager" class="OO-box">
-        <mod-filter-container @changeFilter="handleFilterChange" :filterItems="characters" style="border-radius: 10px;"/>
+        <chipRadioBar :items="characters"  @itemChange="handleFilterChange" :translatedItems="translateCharacters" ref="characterFilterRef"/>
         <s-scroll-view style="overflow-x:hidden;overflow-y: auto;">
             <div class="refresh-placeholder" ref="refreshPlaceholderRef"></div>
             <div id="mod-container" :compact="compactMode" ref="modContainerRef">
@@ -23,7 +23,7 @@
 
 <script setup>
 import 'sober';
-
+import chipRadioBar from './chipRadioBar.vue';
 import { ref, onMounted,computed,useTemplateRef,watch } from 'vue';
 import modCard from './modCard.vue';
 import modFilterContainer from '../components/modFilterContainer.vue';
@@ -40,6 +40,14 @@ const props = defineProps({
 // 定义 mods 变量
 const mods = ref(null);
 const characters = ref(['all', 'selected']);
+const translateCharacters = computed(() => {
+    if (iManager.config.language == 'zh_cn') {
+        return ['全部', '已选择'];
+    } else {
+        return ['all', 'selected'];
+    }
+});
+const characterFilterRef = useTemplateRef('characterFilterRef');
 const currentCharacter = ref('all');
 
 // 定义 loadMods 方法
@@ -47,7 +55,7 @@ const loadMods = async () => {
     const loadMods = iManager.data.modList;
     mods.value = loadMods;
     characters.value = ['all', 'selected', ...iManager.data.characterList];
-
+    currentCharacter.value = 'all';
     // 检查是否选择了预设，如果选择了预设，则加载预设
     if (iManager.temp.currentPreset && iManager.temp.currentPreset != 'default') {
         await loadPreset(iManager.temp.currentPreset);
@@ -213,6 +221,7 @@ onMounted(async () => {
         //debug
         console.log('get modInfoChanged');
         mods.value =  null;
+        characters.value = null;
         setTimeout(async () => {
             await loadMods();
             observeMods();
@@ -237,6 +246,9 @@ onMounted(async () => {
     iManager.on('currentCharacterChanged', (character) => {
         if (currentCharacter.value == character) return;
         currentCharacter.value = character;
+
+        characterFilterRef.value.selectItemByName(character);
+
         changeFilter(character);
     });
 

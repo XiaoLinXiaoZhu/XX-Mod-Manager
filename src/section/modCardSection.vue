@@ -245,9 +245,9 @@ const presetSelectorRef = useTemplateRef('presetSelectorRef');
 
 //#endregion
 
-//-=========================== apply button ============================
+//-=========================== apply button ===========================
 function handleApplyButtonClicked() {
-    //debug
+    // debug
     const mods = Array.from(document.querySelectorAll('.mod-item'));
     iManager.applyMods(selectedMods()).then(() => {
         console.log('apply success');

@@ -273,7 +273,7 @@ const handleCancel = async () => {
   const imgBase64 = await iManager.getImageBase64(modInfo.value.preview);
 
   img.value = "data:image/png;base64," + imgBase64;
-  editModInfoDialog.value.dismiss();
+  editModInfoDialog.value.$el.dismiss();
 }
 
 const handleSave = () => {
@@ -282,7 +282,7 @@ const handleSave = () => {
   // 保存修改的 mod 信息
 
   if (props.mod == modInfo.value) {
-    editModInfoDialog.value.dismiss();
+    editModInfoDialog.value.$el.dismiss();
     return;
   }
 
@@ -296,7 +296,7 @@ const handleSave = () => {
   props.mod = modInfo.value;
   iManager.saveModInfo(modInfo.value);
   saved = true;
-  editModInfoDialog.value.dismiss();
+  editModInfoDialog.value.$el.dismiss();
 }
 
 // onMounted(() => {
