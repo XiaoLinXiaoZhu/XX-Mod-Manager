@@ -1,3 +1,16 @@
+<!-- *
+* @ Author: XLXZ
+* @ Description: 只在左侧显示的菜单栏，仅作为 UI 组件，不涉及具体业务逻辑
+
+* @ Input: tabs: Array<string> 选项卡列表
+*         translatedTabs: Array<string> 选项卡列表的翻译
+* @ Output: tabChange: string 当选项卡发生变化时触发
+
+* @ function: selectTab: (tab: string) => void 选中某个选项卡
+
+* @ Slot: up-button: 用于自定义上方按钮
+*        down-button: 用于自定义下方按钮
+* -->
 <template>
     <div class="left-menu OO-box">
         <div class="OO-button-box" id="up-button">
@@ -66,6 +79,7 @@ watch(() => props.tabs, (newTabs) => {
 });
 
 defineExpose({
+    currentTab, // 当前选中的选项卡,一般不使用，而是通过监听 tabChange 事件来获取
     selectTab
 });
 
@@ -91,6 +105,8 @@ defineExpose({
     text-align: center;
     z-index: 1;
     height: 20px;
+
+
 }
 
 .tab p {
@@ -103,6 +119,12 @@ defineExpose({
 
 .tab.active {
     color: var(--s-color-on-primary);
+
+    s-ripple {
+        opacity: 1;
+        color: var(--s-color-primary);
+        transition: opacity 0.3s, color 0.5s;
+    }
 }
 
 .slider {

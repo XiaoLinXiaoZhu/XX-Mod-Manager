@@ -55,11 +55,7 @@
 </template>
 
 <script setup>
-import modCard from '../components/modCard.vue'
 import modCardManager from '../components/modCardManager.vue'
-import chipButton from '../components/chipButton.vue';
-import backButton from '../components/backButton.vue';
-import sectionSelector from '../components/sectionSelector.vue';
 import leftMenu from '../components/leftMenu.vue';
 import modInfo from '../components/modInfo.vue';
 import { ref, watch, onMounted, useTemplateRef } from 'vue';
@@ -69,20 +65,7 @@ const iManager = new IManager();
 const fs = new fsProxy();
 
 //-============================== 事件处理 ==============================
-function handleClick() {
-    //打开新的页面
-    console.log('click');
-    iManager.openNewWindow('tapePage');
-}
-
 const lastClickedMod = ref(null);
-
-function handleModCardClick(mod) {
-    console.log('mod card clicked', mod);
-    lastClickedMod.value = mod;
-
-    savePreset();
-}
 
 function handlePresetManageButtonClicked() {
     console.log('preset manage button clicked');
@@ -223,7 +206,6 @@ function handleCompactButtonClicked() {
 
 //-============================= presets ==============================
 //#region presets
-const modCardManagerRef = useTemplateRef('modCardManagerRef');
 const presets = ref([]);
 const currentPreset = ref('default');
 
@@ -242,14 +224,6 @@ iManager.on('addPreset', (preset) => {
     console.log('addPreset', preset);
     loadPresetList();
 });
-
-function loadPreset(preset) {
-    // iManager.loadPreset(preset).then((mods) => {
-    //     //debug
-    //     console.log('loadPreset', mods);
-    //     modCardManagerRef.value.loadPreset(mods);
-    // });
-}
 
 function handlePresetChange(tab) {
     currentPreset.value = tab;

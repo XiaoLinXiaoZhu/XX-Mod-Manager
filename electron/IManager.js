@@ -545,11 +545,14 @@ class IManager {
         // 关闭加载对话框
         this.dismissDialog('loading-dialog');
 
-        // 复制完成后，刷新 modList
+        
         //debug
         console.log(`Copied folder: ${item.fullPath}`);
+        // 复制完成后，刷新 modList
         await this.loadMods();
         console.log(`❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️`);
+
+
         // 刷新完成后，弹出提示
         snack(`Added mod ${modName}`);
         console.log(`ModList:`, this.data.modList);
@@ -562,11 +565,10 @@ class IManager {
         // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
         //debug
         console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
-        if (this.temp.currentCharacter !== null && mod.character === 'Unknown') {
+        if (this.temp.currentCharacter !== null && this.temp.currentCharacter !== 'All' && this.temp.currentCharacter !== 'Selected' && mod.character === 'Unknown') {
             mod.character = this.temp.currentCharacter;
             await this.saveModInfo(mod);
         }
-
 
         this.trigger('addMod', mod);
 

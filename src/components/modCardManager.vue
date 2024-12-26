@@ -29,7 +29,6 @@ import modCard from './modCard.vue';
 import modFilterContainer from '../components/modFilterContainer.vue';
 import { Tween,Group } from "@tweenjs/tween.js";
 import IManager from '../../electron/IManager';
-import { mod } from 'three/tsl';
 
 const iManager = new IManager();
 
@@ -49,59 +48,73 @@ const loadMods = async () => {
     mods.value = loadMods;
     characters.value = ['all', 'selected', ...iManager.data.characterList];
 
+    // 检查是否选择了预设，如果选择了预设，则加载预设
+    if (iManager.temp.currentPreset && iManager.temp.currentPreset != 'default') {
+        await loadPreset(iManager.temp.currentPreset);
+    }
+
     //debug
-    console.log(`❇️❇️❇️❇️❇️❇️❇️success load mods, mod count: ${mods.value.length}, character count: ${characters.value.length}`);
+    console.log(`❇️❇️❇️❇️❇️❇️❇️\nsuccess load mods, mod count: ${mods.value.length}, character count: ${characters.value.length}`);
 };
 
+// 绑定 mod卡片的引用
 const modCardRefs = ref({});
 // 定义 setModCardRef 方法
 const setModCardRef = (name) => (el) => {
     modCardRefs.value[name] = el;
 };
 
-const emit = defineEmits(['click']);
-// 定义 lastClickedMod 变量
-const lastClickedMod = ref(null);
-
 // 定义 handleFilterChange 方法
 const handleFilterChange = (character) => {
     currentCharacter.value = character;
-    //debug
-    // console.log(currentCharacter.value);
 
-    // 通过设置 card 的 display 属性来实现筛选
-    if (character === 'all') {
-        mods.value.forEach((mod) => {
-            const modItem = document.getElementById(mod.name);
-            modItem.style.display = 'block';
-        });
-    } else if (character === 'selected') {
-        mods.value.forEach((mod) => {
-            const modItem = document.getElementById(mod.name);
-            if (modItem.getAttribute('clicked') === 'true') {
-                modItem.style.display = 'block';
-            } else {
-                modItem.style.display = 'none';
-            }
-        });
-    } else {
-        mods.value.forEach((mod) => {
-            const modItem = document.getElementById(mod.name);
-            if (mod.character === character) {
-                modItem.style.display = 'block';
-            } else {
-                modItem.style.display = 'none';
-            }
-        });
-    }
+    changeFilter(character);
+
+    iManager.setCurrentCharacter(character);
 };
+
+async function changeFilter(character) {
+    // 通过设置 card 的 display 属性来实现筛选
+
+    //debug
+    console.log('changeFilter', character);
+    if (character === 'all') {
+        for (const [key, value] of Object.entries(modCardRefs.value)) {
+            if (!value) continue;
+            if (value.$el.style.display === 'block') continue;
+            value.$el.style.display = 'block';
+        }
+    } else if (character === 'selected') {
+        for (const [key, value] of Object.entries(modCardRefs.value)) {
+            if (!value) continue;
+            if (value.$el.getAttribute('clicked') === 'true') {
+                if (value.$el.style.display === 'block') continue;
+                value.$el.style.display = 'block';
+            } else {
+                if (value.$el.style.display === 'none') continue;
+                value.$el.style.display = 'none';
+            }
+        }
+    } else {
+        for (const [key, value] of Object.entries(modCardRefs.value)) {
+            if (!value) continue;
+            if (value.$props.character === character) {
+                if (value.$el.style.display === 'block') continue;
+                value.$el.style.display = 'block';
+            } else {
+                if (value.$el.style.display === 'none') continue;
+                value.$el.style.display = 'none';
+            }
+        }
+    }
+}
+
+
 
 async function loadPreset(presetName) {
     const mods =await iManager.loadPreset(presetName);
     //遍历modCardRefs，如果 满足 mods.includes(mod.name) ^ mod.clicked 则调用click
     for (const [key, value] of Object.entries(modCardRefs.value)) {
-        //debug
-        //console.log(`LoadPreset: in mod ${key},mods.includes:${mods.includes(key)},clicked:${clicked}`);
         if (!value) continue;
         const clicked = value.$el.getAttribute('clicked') == 'true';
         if (mods.includes(key) ^ clicked) {
@@ -209,6 +222,8 @@ onMounted(async () => {
         }, 1);
     });
 
+
+    // ! on addMod event, reload mods
     iManager.on('addMod', () => {
         //debug
         console.log('get addMod');
@@ -219,13 +234,10 @@ onMounted(async () => {
         }, 1);
     });
 
-    iManager.on('lastClickedModChanged', (mod) => {
-            lastClickedMod.value = mod;
-    });
-
     iManager.on('currentCharacterChanged', (character) => {
+        if (currentCharacter.value == character) return;
         currentCharacter.value = character;
-        handleFilterChange(character);
+        changeFilter(character);
     });
 
     iManager.on('currentPresetChanged', (preset) => {
