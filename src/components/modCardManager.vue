@@ -9,10 +9,9 @@
                     :character="mod.character"
                     :description="mod.description"
                     :hotKeys="mod.hotkeys"
-                    :lazyLoad="true"
+                    :lazyLoad=true
                     :imagePath="mod.preview"
                     :compactMode="compactMode"
-                    :invokeClickChange=false
                     :ref="setModCardRef(mod.name)"
                 />
             </div>
@@ -123,6 +122,12 @@ async function changeFilter(character) {
             item.classList.remove('hidden');
         });
     }
+
+    // 重新触发 observer
+    // observeMods();
+    // 它必须要有一个“进入视口”的动作，否则不会触发 observer
+    // 为了触发 observer，我们可以手动触发一次滚动事件
+    window.dispatchEvent(new Event('scroll'));
 }
 
 
@@ -193,6 +198,9 @@ const observer = new IntersectionObserver((entries) => {
                 //debug
                 // console.log(`item ${modItem.id} enter window , load image`,entry.isIntersecting);
                 modCardRefs.value[modItem.id].enterWindow();
+
+                modItem.setAttribute('inWindow', entry.isIntersecting);
+                modItem.inWindow = entry.isIntersecting;
             }
             return;
         }
@@ -205,7 +213,7 @@ const observer = new IntersectionObserver((entries) => {
     });
     }, {
         root: null, // 使用视口作为根
-        rootMargin: '600px 50px', // 扩展视口边界
+        rootMargin: '1000px 0px 1000px 0px', // 扩展视口边界
         threshold: 0 // 只要元素进入视口就触发回调
 });
 
@@ -341,8 +349,7 @@ defineExpose({
     transition: height 0.5s;
 }
 
-#mod-container[compact="true"] {
-    display: grid;
+/* #mod-container[compact="true"] {
     grid-column: span 4;
     grid-column-start: span 4;
     grid-column-end: auto;
@@ -353,11 +360,5 @@ defineExpose({
     justify-items: center;
 
     transition: all 0.5s;
-
-    .mod-item {
-        width: 250px;
-        height: 150px;
-        transition: height 0.4s;
-    }
-}
+} */
 </style>

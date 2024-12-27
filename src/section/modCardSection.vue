@@ -92,15 +92,14 @@ const enterCompactMode = (item) => {
         easing: 'ease-in-out',
         iterations: 1
     });
-
     //item下的slot=headline，slot=text，slot=subhead的div元素会缓缓上移
     //获取这些元素
     //遍历子元素，匹配slot属性
     item.childNodes.forEach(child => {
-        if (child.slot == 'headline' || child.slot == 'subhead' || child.slot == 'text') {
+        if (child.slot == 'headline') {
             child.animate([
-                { transform: 'translateY(200px)' },
-                { transform: 'translateY(0px)' }
+                { paddingTop: '200px' },
+                { paddingTtop: '0px' }
             ], {
                 duration: 300,
                 easing: 'ease-in-out',
@@ -163,7 +162,7 @@ function handleCompactButtonClicked() {
     console.log('compact button clicked');
     compactMode.value = !compactMode.value;
     //切换compactMode
-
+    return;
     let modItems = Array.from(document.querySelectorAll('.mod-item')).map(item => {
         return {
             item: item,
@@ -175,12 +174,16 @@ function handleCompactButtonClicked() {
 
     const compact = (Items) => {
         Items.forEach(item => {
+            //debug
+            // console.log('item', item,"\n", item.item.inWindow, item.animated, compactMode.value);
             if (!item.item.inWindow) {
                 return;
             }
             if (!item.animated) {
                 if (compactMode.value) {
                     enterCompactMode(item.item);
+                    //debug
+                    console.log('enter compact mode');
                 }
                 else {
                     exitCompactMod(item.item);
@@ -191,16 +194,15 @@ function handleCompactButtonClicked() {
     };
 
     compact(modItems);
-    // 在之后的0.4s内，每0.1s 重新调用compact函数
-    const maxTime = 200;
-    const dertaTime = 10;
-    let currentTime = 0;
-    for (let i = 0; i < maxTime; i += dertaTime) {
-        setTimeout(() => {
-            compact(modItems);
-        }, i);
-    }
-
+    // // 在之后的0.4s内，每0.1s 重新调用compact函数
+    // const maxTime = 200;
+    // const dertaTime = 10;
+    // let currentTime = 0;
+    // for (let i = 0; i < maxTime; i += dertaTime) {
+    //     setTimeout(() => {
+    //         compact(modItems);
+    //     }, i);
+    // }
 }
 //#endregion
 
