@@ -40,13 +40,7 @@ const props = defineProps({
 // 定义 mods 变量
 const mods = ref(null);
 const characters = ref(['all', 'selected']);
-const translateCharacters = computed(() => {
-    if (iManager.config.language == 'zh_cn') {
-        return ['全部', '已选择'];
-    } else {
-        return ['all', 'selected'];
-    }
-});
+const translateCharacters = ref(['全部', '已选择']);
 const characterFilterRef = useTemplateRef('characterFilterRef');
 const currentCharacter = ref('all');
 
@@ -216,6 +210,12 @@ onMounted(async () => {
     await loadMods();
     observeMods();
     refreshPlaceholderRef.value.style.height = '0px';
+
+    if (iManager.config.language == 'zh_cn') {
+        translateCharacters.value = ['全部', '已选择'];
+    } else {
+        translateCharacters.value = ['All', 'Selected'];
+    }
 
     iManager.on('modInfoChanged', (modInfo) => {
         //debug

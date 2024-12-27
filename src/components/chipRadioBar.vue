@@ -21,6 +21,7 @@
 </template> -->
 
 <template>
+    <div>{{ translatedItems }} {{ iManager.config.language }}</div>
     <div class="chip-radio-bar" @wheel="onWheel" @mousedown="onMouseDown" @mouseup="onMouseUp" @mousemove="onMouseMove"
         ref="containerRef">
         <chipButton v-for="(item, index) in items"
@@ -118,7 +119,11 @@ onMounted(() => {
     //debug
     console.log('onMounted',props.translatedItems,props.items)
     updateSlider(0); // Initialize the slider position
-
+    iManager.waitInit().then(() => {
+        setTimeout(() => {
+            updateSlider(0);
+        }, 1);
+    });
 });
 
 //-============对外的接口================

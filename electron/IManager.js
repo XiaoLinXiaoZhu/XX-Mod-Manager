@@ -841,12 +841,12 @@ class IManager {
         }
         this.eventList[eventName].push(callback);
         //debug
-        console.log(`event ${eventName} registered, all events:`);
-        let result = '';
-        for (const key in this.eventList) {
-            result += key + ':' + this.eventList[key].length + '\n';
-        }
-        console.log(result);
+        // console.log(`event ${eventName} registered, all events:`);
+        // let result = '';
+        // for (const key in this.eventList) {
+        //     result += key + ':' + this.eventList[key].length + '\n';
+        // }
+        // console.log(result);
     }
 
     // 触发事件

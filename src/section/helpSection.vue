@@ -23,8 +23,8 @@
       </div>
 
       <!-- -帮助页面，但是英文 -->
-      <div id="help-dialog-en" v-else
-        style="display: flex;padding: 0px;flex-direction: column;width: 100%;padding: 0px;height: 100%;">
+      <div id="help-dialog-en" v-else class="OO-scorll-box"
+      style="display: flex;flex-direction: column;width: 100%;height: 100%;overflow-y: auto;overflow-x: hidden;">
         <!-- -Presets -->
         <Markdown :content="presetContentEn" v-if="currentTab === 'help-preset'"></Markdown>
         <!-- -Mods -->
