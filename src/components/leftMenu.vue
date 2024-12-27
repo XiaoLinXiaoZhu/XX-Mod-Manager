@@ -93,7 +93,7 @@ const updateSlider = (index) => {
     const tabs = containerRef.value.querySelectorAll('.tab');
     const selectedTab = tabs[index];
     //debug
-    console.log(`updateSlider: `, selectedTab, index,tabs)
+    // console.log(`updateSlider: `, selectedTab, index,tabs)
     sliderStyle.top = `${selectedTab.offsetTop}px`;
     sliderStyle.height = `${selectedTab.offsetHeight}px`;
 };
@@ -105,7 +105,11 @@ const updateSlider = (index) => {
 // });
 
 onMounted(() => {
-    // updateSlider(0);
+    // 尝试使得 当前 滑块为第一个选项卡
+    try{updateSlider(0);}
+    catch(e){
+        console.log(e)
+    }
 });
 
 defineExpose({
@@ -163,7 +167,7 @@ defineExpose({
     height: 40px;
     background-color: var(--s-color-primary);
     border-radius: 10px;
-    transition: ALL 0.3s;
+    transition: height 0.3s ease-in-out, top 0.3s;
 }
 
 s-ripple {
