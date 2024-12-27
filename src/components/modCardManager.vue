@@ -1,7 +1,7 @@
 <template>
     <div id="mod-card-manager" class="OO-box">
-        <chipRadioBar :items="characters"  @itemChange="handleFilterChange" :translatedItems="translateCharacters" ref="characterFilterRef"/>
-        <s-scroll-view style="overflow-x:hidden;overflow-y: auto;">
+        <chipRadioBar class="characterFilter" :items="characters"  @itemChange="handleFilterChange" :translatedItems="translateCharacters" ref="characterFilterRef"/>
+        <s-scroll-view style="overflow-x:hidden;overflow-y: auto;border-radius: 0 0 10px 10px;">
             <div class="refresh-placeholder" ref="refreshPlaceholderRef"></div>
             <div id="mod-container" :compact="compactMode" ref="modContainerRef">
                 <modCard v-for="mod in mods" :key="mod.name" 
@@ -309,6 +309,7 @@ defineExpose({
 #mod-container {
     width: 100%;
     height: fit-content;
+
     display: grid;
     /* grid-column: span 4;
     grid-column-start: span 4; */
@@ -347,6 +348,11 @@ defineExpose({
     height: 100%;
     width: 100%;
     transition: height 0.5s;
+}
+
+.characterFilter {
+    /* background-color: aqua; */
+    border-radius: 10px;
 }
 
 /* #mod-container[compact="true"] {

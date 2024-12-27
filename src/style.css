@@ -72,6 +72,12 @@ body {
   background-size: cover;
 }
 
+#app-container {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 
 /* -================ 属性 ================== */
 
