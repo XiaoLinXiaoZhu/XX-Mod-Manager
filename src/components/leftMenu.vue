@@ -18,30 +18,27 @@
                 <s-icon type="arrow_drop_up"></s-icon>
             </slot>
         </div>
-        <div>
+        <div ref="containerRef">
+            
+            <div v-for="(tab, index) in tabs" :key="index" :class="['tab', { active: currentTab === tab }]"
+                @click="selectTab(tab,index)">
+                <p> {{ translatedTabs[index] || tab }} </p>
+                <s-ripple attached="true"></s-ripple>
+            </div>
             <div class="slider OO-color-gradient" :style="sliderStyle"></div>
-                <div 
-                    v-for="(tab, index) in tabs" 
-                    :key="index" 
-                    :class="['tab', { active: currentTab === tab }]" 
-                    @click="selectTab(tab)"
-                >
-                    <p> {{ translatedTabs[index] || tab }} </p>
-                    <s-ripple attached="true"></s-ripple>
-                </div>
         </div>
         <div class="placeholder"></div>
-    <div class="OO-button-box" id="down-button">
-        <slot name="down-button">
-            <s-icon type="arrow_drop_down"></s-icon>
-        </slot>
-    </div>
-        
+        <div class="OO-button-box" id="down-button">
+            <slot name="down-button">
+                <s-icon type="arrow_drop_down"></s-icon>
+            </slot>
+        </div>
+
     </div>
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, useTemplateRef,reactive, onMounted } from 'vue';
 
 const props = defineProps({
     tabs: {
@@ -59,35 +56,68 @@ const emit = defineEmits(['tabChange']);
 
 const currentTab = ref(props.tabs[0]);
 
-const selectTab = (tab) => {
+const selectTab = (tab,index) => {
     if (tab === currentTab.value) return;
     currentTab.value = tab;
     emit('tabChange', tab);
+    updateSlider(index);
 };
 
-const sliderStyle = computed(() => {
-    const index = props.tabs.indexOf(currentTab.value);
-    return {
-        transform: `translateY(${index * 100}%)`
-    };
+const selectTabByName = (tab) => {
+    if (tab === currentTab.value) return;
+    currentTab.value = tab;
+    emit('tabChange', tab);
+    const index = props.tabs.indexOf(tab);
+    //debug
+    console.log(`selectTabByName: `, tab, index)
+    if (index === -1) return;
+    updateSlider(index);
+};
+
+const sliderStyle = reactive({
+    top: '0px',
+    height: '0px'
 });
 
-watch(() => props.tabs, (newTabs) => {
-    if (!newTabs.includes(currentTab.value)) {
-        currentTab.value = newTabs[0];
-    }
+
+// const sliderStyle = computed(() => {
+//     const index = props.tabs.indexOf(currentTab.value);
+//     return {
+//         transform: `translateY(${index * 100}%)`
+//     };
+// });
+const containerRef = useTemplateRef('containerRef');
+
+
+const updateSlider = (index) => {
+    const tabs = containerRef.value.querySelectorAll('.tab');
+    const selectedTab = tabs[index];
+    //debug
+    console.log(`updateSlider: `, selectedTab, index,tabs)
+    sliderStyle.top = `${selectedTab.offsetTop}px`;
+    sliderStyle.height = `${selectedTab.offsetHeight}px`;
+};
+
+// watch(() => props.tabs, (newTabs) => {
+//     if (!newTabs.includes(currentTab.value)) {
+//         currentTab.value = newTabs[0];
+//     }
+// });
+
+onMounted(() => {
+    // updateSlider(0);
 });
 
 defineExpose({
     currentTab, // 当前选中的选项卡,一般不使用，而是通过监听 tabChange 事件来获取
-    selectTab
+    selectTab,
+    selectTabByName
 });
 
 </script>
 
 <style scoped>
-
-.left-menu{
+.left-menu {
     display: flex;
     flex-direction: column;
     position: relative;
@@ -104,9 +134,9 @@ defineExpose({
     transition: background-color 0.3s;
     text-align: center;
     z-index: 1;
-    height: 20px;
-
-
+    /* height: 20px; */
+    height: fit-content;
+    line-break: anywhere;
 }
 
 .tab p {
@@ -133,7 +163,7 @@ defineExpose({
     height: 40px;
     background-color: var(--s-color-primary);
     border-radius: 10px;
-    transition: transform 0.3s;
+    transition: ALL 0.3s;
 }
 
 s-ripple {
@@ -141,7 +171,7 @@ s-ripple {
     border-radius: 10px;
 }
 
-.OO-button-box{
+.OO-button-box {
     position: relative;
     height: 32px;
     margin: 0;
@@ -152,16 +182,16 @@ s-ripple {
     justify-content: center;
 }
 
-#up-button{
+#up-button {
     left: -7px;
     top: -7px;
 }
 
-.placeholder{
+.placeholder {
     flex: 1;
 }
 
-#down-button{
+#down-button {
     left: -7px;
     bottom: -7px;
 }

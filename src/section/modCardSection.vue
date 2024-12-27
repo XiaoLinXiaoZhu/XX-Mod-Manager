@@ -258,6 +258,9 @@ function handleApplyButtonClicked() {
 onMounted(() => {
     iManager.waitInit().then(() => {
         loadPresetList();
+        setTimeout(() => {
+            iManager.setCurrentPreset('default');
+        }, 1);  
         iManager.on("lastClickedModChanged", (mod) => {
             lastClickedMod.value = null;
             setTimeout(() => {
@@ -269,7 +272,7 @@ onMounted(() => {
         });
 
         iManager.on('currentPresetChanged', (preset) => {
-            presetSelectorRef.value.selectTab(preset);
+            presetSelectorRef.value.selectTabByName(preset);
         });
     });
 });
