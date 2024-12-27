@@ -196,7 +196,9 @@ defineExpose({
 
 <style scoped>
 
-
+.mod-item.hidden {
+    display: none;
+}
 
 .mod-item[clicked="true"] {
     perspective: 500px;

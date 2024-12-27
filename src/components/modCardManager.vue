@@ -76,38 +76,52 @@ const handleFilterChange = (character) => {
 };
 
 async function changeFilter(character) {
-    // 通过设置 card 的 display 属性来实现筛选
+    // 通过设置 card 的 class 属性来实现筛选
 
     //debug
     console.log('changeFilter', character);
     if (character === 'all') {
-        for (const [key, value] of Object.entries(modCardRefs.value)) {
-            if (!value) continue;
-            if (value.$el.style.display === 'block') continue;
-            value.$el.style.display = 'block';
-        }
+        // for (const [key, value] of Object.entries(modCardRefs.value)) {
+        //     if (!value) continue;
+        //     value.$el.classList.remove('hidden');
+        // }
+        // 使用querySelectorAll 会比遍历快很多
+        document.querySelectorAll('.mod-item.hidden').forEach(item => {
+            item.classList.remove('hidden');
+        });
     } else if (character === 'selected') {
-        for (const [key, value] of Object.entries(modCardRefs.value)) {
-            if (!value) continue;
-            if (value.$el.getAttribute('clicked') === 'true') {
-                if (value.$el.style.display === 'block') continue;
-                value.$el.style.display = 'block';
+        // for (const [key, value] of Object.entries(modCardRefs.value)) {
+        //     if (!value) continue;
+        //     if (value.$el.getAttribute('clicked') === 'true') {
+        //         value.$el.classList.remove('hidden');
+        //     } else {
+        //         value.$el.classList.add('hidden');
+        //     }
+        // }
+        document.querySelectorAll('.mod-item').forEach(item => {
+            if (item.getAttribute('clicked') === 'true') {
+                item.classList.remove('hidden');
             } else {
-                if (value.$el.style.display === 'none') continue;
-                value.$el.style.display = 'none';
+                item.classList.add('hidden');
             }
-        }
+        });
     } else {
-        for (const [key, value] of Object.entries(modCardRefs.value)) {
-            if (!value) continue;
-            if (value.$props.character === character) {
-                if (value.$el.style.display === 'block') continue;
-                value.$el.style.display = 'block';
-            } else {
-                if (value.$el.style.display === 'none') continue;
-                value.$el.style.display = 'none';
-            }
-        }
+        // for (const [key, value] of Object.entries(modCardRefs.value)) {
+        //     if (!value) continue;
+        //     if (value.$props.character === character) {
+        //         value.$el.classList.remove('hidden');
+        //     } else {
+        //         value.$el.classList.add('hidden');
+        //     }
+        // }
+
+        // return;
+        document.querySelectorAll('.mod-item').forEach(item => {
+            item.classList.add('hidden');
+        });
+        document.querySelectorAll(`.mod-item[character="${character}"]`).forEach(item => {
+            item.classList.remove('hidden');
+        });
     }
 }
 

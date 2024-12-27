@@ -21,7 +21,6 @@
 </template> -->
 
 <template>
-    <div>{{ translatedItems }} {{ iManager.config.language }}</div>
     <div class="chip-radio-bar" @wheel="onWheel" @mousedown="onMouseDown" @mouseup="onMouseUp" @mousemove="onMouseMove"
         ref="containerRef">
         <chipButton v-for="(item, index) in items"
