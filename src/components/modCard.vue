@@ -314,8 +314,8 @@ defineExpose({
     height: 350px;
     margin-bottom: 0px;
     will-change: transform;
-    transition: x, y 0.5s cubic-bezier(.36, -0.64, .34, 1.76);
 
+    transition: x, y 0.5s cubic-bezier(.36, -0.64, .34, 1.76);
     >div[slot="image"] {
         width: 250px;
         height: 200px;

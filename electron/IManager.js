@@ -64,7 +64,7 @@ class IManager {
         return this;
     }
 
-    
+
 
     //-==================== 核心数据 ====================
 
@@ -289,7 +289,7 @@ class IManager {
         this.trigger('languageChange', this.config.language);
         console.log('✅>> languageChange to', this.config.language);
 
-        
+
     }
     //-==================== 对外接口 - 状态变更 ====================
     async setLastClickedMod(mod) {
@@ -545,7 +545,7 @@ class IManager {
         // 关闭加载对话框
         this.dismissDialog('loading-dialog');
 
-        
+
         //debug
         console.log(`Copied folder: ${item.fullPath}`);
         // 复制完成后，刷新 modList
@@ -673,7 +673,7 @@ class IManager {
         await this.loadPresets();
 
         this.trigger('addPreset', presetName);
-        
+
         setTimeout(() => {
             this.setCurrentPreset(presetName);
         }, 200);
@@ -828,7 +828,7 @@ class IManager {
     //-==================== 事件管理 ====================
     // 所有的事件：
     //----------生命周期----------
-    // wakeUp
+    // wakeUp,initDone
     //----------状态变更----------
     // themeChange,lastClickedModChanged,modInfoChanged,currentCharacterChanged,addMod,currentPresetChanged,languageChange,
     //----------事件节点----------
@@ -939,7 +939,7 @@ class IManager {
         else {
             this.pluginConfig[pluginName] = this.pluginConfig[pluginName].concat(pluginConfig);
         }
-        
+
         //debug
         console.log(`registerPluginConfig ${pluginName}`, pluginConfig);
         // pluginConfig 是 data 的 数组
@@ -969,18 +969,12 @@ class IManager {
         // }
     }
 
-    getPluginData(pluginName, dataName) {
-        const pluginData = this.pluginConfig[pluginName];
-        const data = pluginData.find((data) => data.name === dataName);
-        return data.data;
-    }
-
     async loadPlugins() {
         // 插件为 一个 js 文件，通过 require 引入
         // 然后调用 init 方法，将 iManager 传递给插件
 
         // 先加载内置的插件
-        const builtInPlugins = ['testPlugin', 'autoStartPlugin','refreshAfterApplyPlugin'];
+        const builtInPlugins = ['testPlugin', 'autoStartPlugin', 'refreshAfterApplyPlugin',"modCardFadeInOutPlugin"];
         builtInPlugins.forEach((pluginName) => {
             try {
                 // const pluginPath = `./plugins/${pluginName}.js`;
@@ -1037,6 +1031,55 @@ class IManager {
 
             await ipcRenderer.invoke('save-plugin-config', pluginName, localPluginData);
         }
+    }
+
+    //----------插件接口----------
+    getPluginData(pluginName, dataName) {
+        const pluginData = this.pluginConfig[pluginName];
+        const data = pluginData.find((data) => data.name === dataName);
+        return data.data;
+    }
+
+    // // 支持 css 在当前页面的插入/删除
+    // addCss(css) {
+    //     const style = document.createElement('style');
+    //     style.innerHTML = css;
+    //     document.head.appendChild(style);
+    // }
+
+    // removeCss(css) {
+    //     const style = document.createElement('style');
+    //     style.innerHTML = css;
+    //     document.head.removeChild(style);
+    // }
+    addCssWithHash(css) {
+        const hash = this.hashCode(css);
+        const existingStyle = document.getElementById(hash);
+        if (existingStyle) {
+            return;
+        }
+        const style = document.createElement('style');
+        style.id = hash;
+        style.innerHTML = css;
+        document.head.appendChild(style);
+    }
+
+    removeCssWithHash(css) {
+        const hash = this.hashCode(css);
+        const style = document.getElementById(hash);
+        if (style) {
+            document.head.removeChild(style);
+        }
+    }
+
+    hashCode(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+            hash |= 0; // Convert to 32bit integer
+        }
+        return hash.toString();
     }
 }
 
