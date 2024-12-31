@@ -10,6 +10,7 @@
 <template>
     <div class="markdown-container" v-html="transformedContent">
     </div>
+    <slot></slot>
 </template>
 
 <script setup>
