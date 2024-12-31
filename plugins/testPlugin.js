@@ -27,17 +27,57 @@
 //     }
 // }
 const pluginName = 'testPlugin';
+const markdown_cn = `# 测试插件
+这是一个简单的测试插件，用于测试插件的功能和显示效果
+# 声明配置项
+插件可以通过声明数据来在设置页面中显示配置项，用户可以通过设置页面来配置插件的功能：
+- boolean 类型的数据可以通过开关来控制
+- number 类型的数据可以通过输入框来控制
+- path 类型的数据可以通过文件夹选择器来控制
+- select 类型的数据可以通过选择器来控制
+- button 类型的数据可以通过按钮来触发事件
+- markdown 类型的数据可以展示 markdown 格式的文本
+
+# 监听数据变化
+插件可以通过声明 onChange 方法来监听数据的变化，当数据发生变化时，onChange 方法会被触发。
+# 保存数据
+插件可以通过调用 iManager.savePluginConfig() 方法来手动保存数据，当然程序在关闭时会自动保存数据。
+# 事件监听
+插件可以通过 iManager.on() 方法来监听事件，从而实现插件的功能。
+---
+# 配置项展示：
+下面是一些配置项的展示：`;
 module.exports = {
     name: pluginName,
-    t_displayName:{
-        zh_cn:'测试插件',
-        en:'Test Plugin'
+    t_displayName: {
+        zh_cn: '测试插件',
+        en: 'Test Plugin'
     },
-    init(iManager){
-        iManager.snack('Auto Start Plugin Loaded from'+__dirname);
+    init(iManager) {
+        iManager.snack('Auto Start Plugin Loaded from' + __dirname);
 
         let pluginData = [];
 
+        //- 测试 markdown 类型
+        let testMarkdown = {
+            name: 'testMarkdown',
+            data: '',
+            type: 'markdown',
+            displayName: 'Test Markdown',
+            description: 'Test Markdown',
+            t_displayName: {
+                zh_cn: '测试 Markdown',
+                en: 'Test Markdown'
+            },
+            t_description: {
+                zh_cn: markdown_cn,
+                en: 'Test Markdown'
+            },
+            onChange: (value) => {
+                // markdown 类型的数据不会触发 onChange,它只作为展示
+            }
+        }
+        pluginData.push(testMarkdown);
 
         //- 测试 boolean 类型
         let ifAblePlugin = {
@@ -46,18 +86,18 @@ module.exports = {
             type: 'boolean',
             displayName: 'If Able Plugin',
             description: 'If true, the plugin will be enabled',
-            t_displayName:{
-                zh_cn:'是否启用插件',
-                en:'Enable Plugin'
+            t_displayName: {
+                zh_cn: '是否启用插件',
+                en: 'Enable Plugin'
             },
-            t_description:{
-                zh_cn:'如果为真，插件将被启用',
-                en:'If true, the plugin will be enabled'
+            t_description: {
+                zh_cn: '如果为真，插件将被启用',
+                en: 'If true, the plugin will be enabled'
             },
             onChange: (value) => {
                 console.log('ifAblePlugin changed:', value);
                 ifAblePlugin.data = value;
-                iManager.snack('ifAblePlugin changed:'+value);
+                iManager.snack('ifAblePlugin changed:' + value);
                 iManager.savePluginConfig();
             }
         };
@@ -67,49 +107,47 @@ module.exports = {
         let modLoaderPath = {
             name: 'modLoaderPath',
             data: '',
-            type: 'path',
+            type: 'dir',
             displayName: 'Mod Loader Path',
             description: 'The path of the mod loader',
-            t_displayName:{
-                zh_cn:'Mod Loader 路径',
-                en:'Mod Loader Path'
+            t_displayName: {
+                zh_cn: 'Mod Loader 路径',
+                en: 'Mod Loader Path'
             },
-            t_description:{
-                zh_cn:'Mod Loader 的路径',
-                en:'The path of the mod loader'
+            t_description: {
+                zh_cn: 'Mod Loader 的路径',
+                en: 'The path of the mod loader'
             },
             onChange: (value) => {
                 console.log('modLoaderPath changed:', value);
                 modLoaderPath.data = value;
-                iManager.snack('Mod Loader Path changed:'+value);
+                iManager.snack('Mod Loader Path changed:' + value);
                 iManager.savePluginConfig();
             }
         }
         pluginData.push(modLoaderPath);
 
         //- 测试 number 类型
-        let refreshTime = {
-            name: 'refreshTime',
-            data: 1000,
+        let testNumber = {
+            name: 'testNumber',
+            data: 0,
             type: 'number',
-            displayName: 'Refresh Time',
-            description: 'The time to refresh',
-            t_displayName:{
-                zh_cn:'刷新时间',
-                en:'Refresh Time'
+            displayName: 'Test Number',
+            description: 'Test Number',
+            t_displayName: {
+                zh_cn: '测试数字',
+                en: 'test Number'
             },
-            t_description:{
-                zh_cn:'刷新的时间',
-                en:'The time to refresh'
+            t_description: {
+                zh_cn: '测试数字',
+                en: 'test Number'
             },
             onChange: (value) => {
-                console.log('refreshTime changed:', value);
-                refreshTime.data = value;
-                iManager.snack('Refresh Time changed:'+value);
-                iManager.savePluginConfig();
+                console.log('testNumber changed:', value);
+                testNumber.data = value;
             }
         }
-        pluginData.push(refreshTime);
+        pluginData.push(testNumber);
 
         //- 测试 button 类型
         let testButton = {
@@ -117,18 +155,18 @@ module.exports = {
             type: 'button',
             displayName: 'Test Button',
             description: 'Test Button',
-            t_displayName:{
-                zh_cn:'测试按钮',
-                en:'Test Button'
+            t_displayName: {
+                zh_cn: '测试按钮',
+                en: 'Test Button'
             },
-            t_description:{
-                zh_cn:'测试按钮',
-                en:'Test Button'
+            t_description: {
+                zh_cn: '测试按钮',
+                en: 'Test Button'
             },
             buttonName: 'Test Button',
-            t_buttonName:{
-                zh_cn:'测试按钮',
-                en:'Test Button'
+            t_buttonName: {
+                zh_cn: '测试按钮',
+                en: 'Test Button'
             },
             onChange: (value) => {
                 iManager.snack('Test Button Clicked');
@@ -143,39 +181,35 @@ module.exports = {
             type: 'select',
             displayName: 'Test Select',
             description: 'Test Select',
-            t_displayName:{
-                zh_cn:'测试选择',
-                en:'Test Select'
+            t_displayName: {
+                zh_cn: '测试选择',
+                en: 'Test Select'
             },
-            t_description:{
-                zh_cn:'测试选择',
-                en:'Test Select'
+            t_description: {
+                zh_cn: '测试选择',
+                en: 'Test Select'
             },
-            options:[
-                {
-                    value:'a',
-                    t_value:{
-                        zh_cn:'选项A',
-                        en:'Option A'
-                    }
-                },
-                {
-                    value:'b',
-                    t_value:{
-                        zh_cn:'选项B',
-                        en:'Option B'
-                    }
+            options: [{
+                value: 'a',
+                t_value: {
+                    zh_cn: '选项A',
+                    en: 'Option A'
                 }
-            ],
+            },
+            {
+                value: 'b',
+                t_value: {
+                    zh_cn: '选项B',
+                    en: 'Option B'
+                }
+            }],
             onChange: (value) => {
                 console.log('testSelect changed:', value);
-                testSelect.data = value;
-                iManager.snack('Test Select changed:'+value);
-                iManager.savePluginConfig();
+                iManager.snack('Test Select changed: ' + value);
             }
         }
         pluginData.push(testSelect);
 
-        iManager.registerPluginConfig(pluginName,pluginData);
+        iManager.registerPluginConfig(pluginName, pluginData);
     }
 }

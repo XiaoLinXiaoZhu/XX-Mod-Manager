@@ -1,5 +1,10 @@
 <template>
-    <div class="OO-setting-bar" v-if="display">
+    <!-- -markdown -->
+     <div v-if="data.type === 'markdown'">
+        <markdown v-if="data.t_description" :content="data.t_description[local] || data.description"></markdown>
+        <markdown v-else :content="data.description"></markdown>
+    </div>
+    <div class="OO-setting-bar" v-else-if="display">
         <h3 v-if="data.t_displayName">{{ data.t_displayName[local] }}</h3>
         <h3 v-else>{{ data.displayName }}</h3>
 
@@ -56,7 +61,11 @@
         <h3 v-if="data.t_displayName">{{ data.t_displayName[local] }}</h3>
         <h3 v-else>{{ data.displayName }}</h3>
     </div>
-    <div v-if="data.t_description">
+
+    <div v-if="data.type === 'markdown'">
+        <s-markdown :content="data.data"></s-markdown>
+    </div>
+    <div v-else-if="data.t_description">
         <p> {{ data.t_description[local] }} </p>
     </div>
     <div v-else-if="data.description !== ''">
@@ -67,6 +76,7 @@
 <script setup>
 import { ref, defineProps, computed, defineEmits, onMounted } from 'vue';
 import IManager from '../../electron/IManager';
+import markdown from './markdown.vue';
 const iManager = new IManager();
 
 const props = defineProps({

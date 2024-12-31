@@ -212,7 +212,7 @@ function getData() {
         }
     }
     return {
-        languageData, themeData, modTargetPathData, modSourcePathData, presetPathData,initAllDataButton,openFirstLoadButton
+        languageData, themeData, modTargetPathData, modSourcePathData, presetPathData, initAllDataButton, openFirstLoadButton
     }
 }
 
