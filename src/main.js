@@ -51,11 +51,12 @@ iManager.waitInit().then((iManager) => {
 
     // ------------------ first load ------------------ //
     // 首次打开时打开 初始化窗口
-    iManager.snack('first load : '+iManager.config.firstLoad);
+    // iManager.snack('first load : '+iManager.config.firstLoad);
     iManager.on('wakeUp', () => {
         if (iManager.config.firstLoad) {
             // debug 
             console.log('ℹ️ first load');
+            iManager.snack('first load');
             iManager.openNewWindow('firstLoad');
         }
     });

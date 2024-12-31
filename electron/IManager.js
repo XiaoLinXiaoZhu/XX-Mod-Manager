@@ -974,24 +974,42 @@ class IManager {
         // 然后调用 init 方法，将 iManager 传递给插件
 
         // 先加载内置的插件
-        const builtInPlugins = ['testPlugin', 'autoStartPlugin', 'refreshAfterApplyPlugin',"modCardFadeInOutPlugin"];
-        builtInPlugins.forEach((pluginName) => {
-            try {
-                // const pluginPath = `./plugins/${pluginName}.js`;
-                // const pluginPath = path.join(`./plugins/${pluginName}.js`);
-                // console.log(`load builtInPlugin ${pluginName} from ${pluginPath}`);
-                // console.log(`Current directory: ${__dirname}`);
-                const ResolvedpluginPath = path.resolve(`./plugins/${pluginName}.js`);
-                console.log(`Resolved plugin path: ${ResolvedpluginPath}`);
+        // const builtInPlugins = ['testPlugin', 'autoStartPlugin', 'refreshAfterApplyPlugin',"modCardFadeInOutPlugin"];
+        // builtInPlugins.forEach((pluginName) => {
+        //     try {
+        //         // const pluginPath = `./plugins/${pluginName}.js`;
+        //         // const pluginPath = path.join(`./plugins/${pluginName}.js`);
+        //         // console.log(`load builtInPlugin ${pluginName} from ${pluginPath}`);
+        //         // console.log(`Current directory: ${__dirname}`);
+        //         const ResolvedpluginPath = path.resolve(`./plugins/${pluginName}.js`);
+        //         console.log(`Resolved plugin path: ${ResolvedpluginPath}`);
 
-                const plugin = require(ResolvedpluginPath);
-                this.registerPlugin(plugin);
-            }
-            catch (e) {
-                console.log(`❌plugin ${pluginName} load failed`, e);
-                // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
-                fs.writeFileSync(`./plugins/lookAtMe`, 'lookAtMe');
-                snack(`内置插件 ${pluginName} 加载失败`, 'error');
+        //         const plugin = require(ResolvedpluginPath);
+        //         this.registerPlugin(plugin);
+        //     }
+        //     catch (e) {
+        //         console.log(`❌plugin ${pluginName} load failed`, e);
+        //         // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
+        //         fs.writeFileSync(`./plugins/lookAtMe`, 'lookAtMe');
+        //         snack(`内置插件 ${pluginName} 加载失败`, 'error');
+        //     }
+        // });
+
+        // 因为内置插件可以设置开关，所以说直接加载位于 plugins 文件夹中的插件
+        const builtInPluginPath = path.resolve('./plugins');
+        const builtInPlugins = fs.readdirSync(builtInPluginPath);
+        builtInPlugins.forEach((pluginName) => {
+            if (pluginName.endsWith('.js')) {
+                try {
+                    const plugin = require(path.join(builtInPluginPath, pluginName));
+                    this.registerPlugin(plugin);
+                }
+                catch (e) {
+                    console.log(`❌plugin ${pluginName} load failed`, e);
+                    // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
+                    fs.writeFileSync(`./plugins/lookAtMe`, 'lookAtMe');
+                    snack(`内置插件 ${pluginName} 加载失败`, 'error');
+                }
             }
         });
 
@@ -1004,8 +1022,17 @@ class IManager {
         const files = fs.readdirSync(pluginPath);
         files.forEach((file) => {
             if (file.endsWith('.js')) {
-                const plugin = require(path.join(pluginPath, file));
-                this.registerPlugin(plugin);
+                try {
+                    const plugin = require(path.join(pluginPath, file));
+                    this.registerPlugin(plugin);
+                }
+                catch (e) {
+                    console.log(`❌plugin ${file} load failed`, e);
+                    snack(`插件 ${file} 加载失败`, 'error');
+
+                    // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
+                    fs.writeFileSync(`./plugins/lookAtMe`, 'lookAtMe');
+                }
             }
         });
 

@@ -62,8 +62,8 @@ const modCardCss = (animationSpeed) => `
 .mod-item {
     float: left;
     margin: 6px;
-
-    transition: x, y 0.5s cubic-bezier(.36, -0.64, .34, 1.76), height ${animationSpeed}s ease-in-out ${animationSpeed / 2}s, width ${animationSpeed}s ease-in-out ${animationSpeed / 2}s !important;
+    opacity: 1;
+    transition: x, y 0.5s cubic-bezier(.36, -0.64, .34, 1.76), height ${animationSpeed}s ease-in-out ${animationSpeed / 2}s, width ${animationSpeed}s ease-in-out ${animationSpeed / 2}s,opacity ${animationSpeed}s ease-in-out ${animationSpeed / 2}s,border ${animationSpeed}s ease-in-out ,transform ${animationSpeed}s ease-in-out ${animationSpeed / 2}s !important;
 }
 `;
 
@@ -109,8 +109,8 @@ module.exports = {
                 en: 'Use Mod Card Fade In Out'
             },
             t_description: {
-                zh_cn: '如果为真，mod卡片将淡入淡出',
-                en: 'If true, the mod card will fade in and out'
+                zh_cn: '开启后,mod卡片在显示和隐藏时会有淡入淡出效果，但是会有一定的性能消耗',
+                en: 'If true, the mod card will fade in and out, but it will consume some performance'
             },
             onChange: (value) => {
                 useModCardFadeInOut.data = value;
@@ -143,8 +143,8 @@ module.exports = {
                 en: 'Fade In Speed'
             },
             t_description: {
-                zh_cn: '淡入动画的速度',
-                en: 'The speed of the fade in animation'
+                zh_cn: '淡入动画的速度,单位为秒',
+                en: 'The speed of the fade in animation, in seconds'
             },
             onChange: (value) => {
                 console.log('fadeInSpeed changed:', value);
@@ -174,8 +174,8 @@ module.exports = {
                 en: 'Fade Out Speed'
             },
             t_description: {
-                zh_cn: '淡出动画的速度',
-                en: 'The speed of the fade out animation'
+                zh_cn: '淡出动画的速度,单位为秒',
+                en: 'The speed of the fade out animation, in seconds'
             },
             onChange: (value) => {
                 console.log('fadeOutSpeed changed:', value);
