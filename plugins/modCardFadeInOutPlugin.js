@@ -34,8 +34,8 @@ const fadeOutCss = (animationSpeed) => `
 .mod-item.hidden {
     display: block !important;
 
-    width: 0px;
-    height: 0px;
+    width: 0px !important;
+    height: 0px !important;
     padding: 0px !important;
     margin: 0px !important;
     border: 0px !important;
