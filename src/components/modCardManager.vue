@@ -1,5 +1,5 @@
 <template>
-    <div id="mod-card-manager" class="OO-box">
+    <div id="mod-card-manager" class="OO-box" ref="modCardManagerRef">
         <chipRadioBar class="characterFilter" :items="characters"  @itemChange="handleFilterChange" :translatedItems="translateCharacters" ref="characterFilterRef"/>
         <s-scroll-view style="overflow-x:hidden;overflow-y: auto;border-radius: 0 0 10px 10px;">
             <div class="refresh-placeholder" ref="refreshPlaceholderRef"></div>
@@ -225,7 +225,7 @@ const observeMods = () => {
 };
 
 const refreshPlaceholderRef = useTemplateRef('refreshPlaceholderRef');
-
+const modCardManagerRef = useTemplateRef('modCardManagerRef');
 // 在组件挂载时调用 observeMods 方法
 onMounted(async () => {
     await iManager.waitInit();
@@ -279,7 +279,7 @@ onMounted(async () => {
     });
 
     // 接受文件拖拽事件，可以直接通过拖拽文件到窗口中导入 mod，或者拖拽图片到窗口中为 mod 添加预览图
-    modContainerRef.value.addEventListener('dragover', (event) => {
+    modCardManagerRef.value.addEventListener('dragover', (event) => {
         event.preventDefault();
         event.stopPropagation();
 
@@ -290,7 +290,7 @@ onMounted(async () => {
         }
     });
 
-    modContainerRef.value.addEventListener('drop', (event) => {
+    modCardManagerRef.value.addEventListener('drop', (event) => {
         event.preventDefault();
         event.stopPropagation();
         // console.log('drop', event,event.dataTransfer.files,event.dataTransfer.items);
