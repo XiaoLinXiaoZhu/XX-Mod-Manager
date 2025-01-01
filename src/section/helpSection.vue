@@ -80,27 +80,29 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 const explainContentCn =
-  `# ${t('firstLoad.prerequisites')}
-${t('firstLoad.prerequisites-1')}
-${t('firstLoad.prerequisites-2')}
+  `# 先决条件
+请确保你已经安装了3dmigoto 或者其他的mod加载器，并且已经成功运行过。如果你还没有安装3dmigoto，请先安装3dmigoto。如果你不明白3dmigoto是什么，请自行搜索。
+请注意，本程序只是mod管理器，不是mod加载器，它需要依赖3dmigoto或者其他的mod加载器来加载mod
 
 首先你需要理清楚这个程序是如何实现mod管理的：
 它将你存放在 【mod 源文件夹】 的 mod 创建虚拟链接 到 【mod 目标文件夹】 中。
 【mod加载器】 会读取 【mod 目标文件夹】 中的mod，然后加载到游戏中。
 ---
-# ${t('firstLoad.explanation')}
-${t('firstLoad.alertFolder')}
+# 在使用之前，让我们进行一些名词解释
+请注意，下述三个文件夹不能相同，否则会导致程序无法正常运行
 如果你还是无法理解，可以先将其设置为空的文件夹，观察程序的运行效果，然后再进行设置。
-# ${t('setting.modTargetPath')}
-${t('firstLoad.modTargetPathInfo-1')}
-${t('firstLoad.modTargetPathInfo-2')}
-# ${t('setting.modSourcePath')}
-${t('firstLoad.modSourcePathInfo')}
-# ${t('setting.presetPath')}
-${t('firstLoad.modPresetPathInfo')}
-# ${t('firstLoad.aboutProgram')}
-# ${t('firstLoad.aboutProgramPrinciple')}
-${t('firstLoad.aboutProgramPrincipleInfo')}
+# mod 目标文件夹
+这是你的 模组加载器 实际加载的文件夹：
+- 对于ZZMI来说，就是ZZMI的Mods文件夹；
+- 对于XXMI来说，就是XXMI内部文件夹/zzz/Mods
+本程序通过代理Mods文件夹的方式来实现mod的加载，通过动态调整mod文件夹内部的文件来实现mod的加载， 所以请不要在mod目标文件夹内添加任何文件！将你的mod添加到mod源文件夹中即可。
+# mod 源文件夹
+这是 本程序 读取mod的文件夹，也是你应当用来存放mod的文件夹。它应该被设置为任意位置的一个空文件夹，之后你需要将你的mod添加到这个文件夹中
+# 预设文件夹
+这是 本程序 用于存放mod预设的文件夹，程序将在这里存放一组mod的配置，在配置之后，你将通过预设功能快速切换不同的mod组合。它应该被设置为任意位置的一个空文件夹
+# 关于本程序
+# 运行原理
+本程序通过代理Mods文件夹的方式来实现mod的加载，通过动态调整mod文件夹内部的文件来实现mod的加载。
   <img src="../src/assets/description.png" alt="description" style="width: 50%;height: auto;">
 `;
 
@@ -261,27 +263,27 @@ const troubleContentCn =
 ;
 
 const explainContentEn =
-  `# ${t('firstLoad.prerequisites')}
-${t('firstLoad.prerequisites-1')}
-${t('firstLoad.prerequisites-2')}
+  `# Prerequisites
+Please make sure you have 3dmigoto or other mod loader installed and running successfully. \nIf you haven't installed 3dmigoto yet, please install 3dmigoto first. \nIf you don't understand what 3dmigoto is, please search it yourself.
+Please note that this program is only a mod manager, not a mod loader. It needs to rely on 3dmigoto or other mod loaders to load mods.
 
 First, you need to understand how this program manages mods:
 It creates virtual links from the mods stored in the [mod source folder] to the [mod target folder].
 The [mod loader] reads the mods in the [mod target folder] and loads them into the game.
 ---
-# ${t('firstLoad.explanation')}
-${t('firstLoad.alertFolder')}
+# Before using it, let us explain some terms
+Please note that the following three folders cannot be the same, otherwise the program will not run properly.
 If you still don't understand, you can set it to an empty folder first, observe the program's operation, and then set it up.
-# ${t('setting.modTargetPath')}
-${t('firstLoad.modTargetPathInfo-1')}
-${t('firstLoad.modTargetPathInfo-2')}
-# ${t('setting.modSourcePath')}
-${t('firstLoad.modSourcePathInfo')}
-# ${t('setting.presetPath')}
-${t('firstLoad.modPresetPathInfo')}
-# ${t('firstLoad.aboutProgram')}
-# ${t('firstLoad.aboutProgramPrinciple')}
-${t('firstLoad.aboutProgramPrincipleInfo')}
+# Mod Target Folder
+This is the folder actually loaded by your module loader. For ZZMI, it is the ZZMI Mods folder; for XXMI, it is the XXMI internal folder /zzz/Mods.
+This program implements mod loading by proxying the Mods folder, and dynamically adjusts the files inside the mod folder to implement mod loading, so please do not add any files in the mod target folder! \nJust add your mod to the mod source folder.
+# Source Folder
+This is the folder where this program reads mods, and the folder where you should store mods. \nIt should be set to an empty folder anywhere, you will then need to add your mod to this folder
+# Preset Folder
+This is the folder used by this program to store mod presets. The program will store a set of mod configurations here. After the configuration, you will quickly switch between different mod combinations through the preset function. \nIt should be set to an empty folder anywhere
+# About this program
+# Operating principle
+This program implements mod loading by proxying the Mods folder, and dynamically adjusts the files inside the mod folder to implement mod loading.
   <img src="../src/assets/description.png" alt="description" style="width: 50%;height: auto;">
 `;
 
