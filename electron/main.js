@@ -110,6 +110,7 @@ ipcMain.on('open-new-window', (event, arg) => {
   console.log('open-new-window', arg);
 
   const newWindow = new BrowserWindow({
+    frame: false,
     width: 800,
     height: 600,
     webPreferences: {

@@ -23,18 +23,20 @@
         <!-- -多个游戏 -->
         <Markdown :content="multipleGamesContentCn" v-if="currentTab === 'help-multiple-games'"></Markdown>
         <!-- -故障排除 -->
-        <Markdown :content="troubleContentCn" v-if="currentTab === 'help-trouble'">
-          <div class="OO-setting-bar">
-            <h3> QQ群 </h3>
-            <p> 877012859 </p>
-          </div>
-          <div class="OO-setting-bar">
-            <h3> Discord </h3>
-            <s-button class="OO-button-box" @click="iManager.openUrl('https://discord.gg/4RbjKJuVKS')">
-              join Discord
-            </s-button>
-          </div>
-        </Markdown>
+        <div v-if="currentTab === 'help-trouble'">
+          <Markdown :content="troubleContentCn">
+            <div class="OO-setting-bar" style="height: 50px !important;">
+              <h3> QQ群 </h3>
+              <p> 877012859 </p>
+            </div>
+            <div class="OO-setting-bar">
+              <h3> Discord </h3>
+              <s-button class="OO-button-box" @click="iManager.openUrl('https://discord.gg/4RbjKJuVKS')">
+                join Discord
+              </s-button>
+            </div>
+          </Markdown>
+        </div>
         <!-- -配置mod加载器 -->
         <Markdown :content="configModLoaderContentCn" v-if="currentTab === 'help-config-mod-loader'"></Markdown>
 
@@ -48,6 +50,8 @@
         <Markdown :content="explainContentEn" v-if="currentTab === 'help-explain'"></Markdown>
         <!-- -Import Mods -->
         <Markdown :content="importContentEn" v-if="currentTab === 'help-import'"></Markdown>
+        <!-- -Config Mod Loader -->
+        <Markdown :content="configModLoaderContentEn" v-if="currentTab === 'help-config-mod-loader'"></Markdown>
         <!-- -Load Mods -->
         <Markdown :content="loadContentEn" v-if="currentTab === 'help-load'"></Markdown>
         <!-- -Config Mods -->
@@ -59,9 +63,20 @@
         <!-- -Multiple games -->
         <Markdown :content="multipleGamesContentEn" v-if="currentTab === 'help-multiple-games'"></Markdown>
         <!-- -Troubleshooting -->
-        <Markdown :content="troubleContentEn" v-if="currentTab === 'help-trouble'"></Markdown>
-        <!-- -Config Mod Loader -->
-        <Markdown :content="configModLoaderContentEn" v-if="currentTab === 'help-config-mod-loader'"></Markdown>
+        <div v-if="currentTab === 'help-trouble'">
+          <Markdown :content="troubleContentEn">
+            <div class="OO-setting-bar" style="height: 50px !important;">
+              <h3> QQ Group </h3>
+              <p> 877012859 </p>
+            </div>
+            <div class="OO-setting-bar">
+              <h3> Discord </h3>
+              <s-button class="OO-button-box" @click="iManager.openUrl('https://discord.gg/4RbjKJuVKS')">
+                join Discord
+              </s-button>
+            </div>
+          </Markdown>
+        </div>
 
         <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
       </div>

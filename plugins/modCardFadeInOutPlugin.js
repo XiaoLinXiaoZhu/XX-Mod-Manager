@@ -100,7 +100,7 @@ module.exports = {
         //-是否启用
         let useModCardFadeInOut = {
             name: 'useModCardFadeInOut',
-            data: true,
+            data: false,
             type: 'boolean',
             displayName: 'Use Mod Card Fade In Out',
             description: 'If true, the mod card will fade in and out',

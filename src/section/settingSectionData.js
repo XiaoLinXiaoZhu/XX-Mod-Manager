@@ -209,6 +209,7 @@ function getData() {
         },
         onChange: () => {
             iManager.openNewWindow('firstLoad');
+            iManager.config.firstLoad = true;
         }
     }
     return {

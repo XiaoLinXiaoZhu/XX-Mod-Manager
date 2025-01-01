@@ -110,7 +110,7 @@
     "whatCanIt-1": "通过可视化的卡片 直观地管理mod",
     "whatCanIt-2": "通过设置 保存mod的各种信息",
     "whatCanIt-3": "通过设置 一组预设 来快速切换 不同的mod组合",
-    "whatCanIt-4": "通过设置 自动化功能 来 实现从打开3dmigoto到启动游戏再到自动刷新应用的mod 的 全自动化 (ZZMM中已有的功能，但是还没迁移到XXMM，代码需要重构)",
+    "whatCanIt-4": "通过设置 自动化功能 来 实现从打开3dmigoto到启动游戏再到自动刷新应用的mod 的 全自动化",
     "prerequisites": "先决条件",
     "prerequisites-1": "请确保你已经安装了3dmigoto 或者其他的mod加载器，并且已经成功运行过。如果你还没有安装3dmigoto，请先安装3dmigoto。如果你不明白3dmigoto是什么，请自行搜索。",
     "prerequisites-2": "请注意，本程序只是mod管理器，不是mod加载器，它需要依赖3dmigoto或者其他的mod加载器来加载mod",

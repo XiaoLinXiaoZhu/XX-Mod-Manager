@@ -136,7 +136,7 @@
     "whatCanIt-1": "Intuitively manage mods through visual cards",
     "whatCanIt-2": "Modify the information of your mods with a right click",
     "whatCanIt-3": "Quickly switch through different mods by setting presets",
-    "whatCanIt-4": "By setting the automation function to achieve full automation from opening 3dmigoto to starting the game to automatically refreshing the application mod (a function that already exists in ZZMM, but has not yet been migrated to XXMM, the code needs to be refactored)",
+    "whatCanIt-4": "By setting the automation function to achieve full automation from opening 3dmigoto to starting the game to automatically refreshing the application mod",
     "whatIsThis": "What's this?"
   },
   "gamebanana": "Gamebanana",

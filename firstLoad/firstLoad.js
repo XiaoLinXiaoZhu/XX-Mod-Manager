@@ -44,18 +44,17 @@ vue_app.use(i18n);
 //-==================== 挂载 ====================-//
 
 vue_app.mount('#app-container');
+iManager.on('languageChange', (language) => {
+    // 将语言设置为 imanager 中的语言
+    vue_app.config.globalProperties.$i18n.locale = language;
+    //debug
+    console.log('set language:', language);
+});
+
 iManager.waitInit().then((iManager) => {
 
     // ------------------ 语言切换 ------------------ //
-    iManager.on('languageChange', (language) => {
-        // 将语言设置为 imanager 中的语言
-        vue_app.config.globalProperties.$i18n.locale = language;
-        //debug
-        console.log('set language:', language);
-    });
-
     iManager.trigger('languageChange', iManager.config.language);
-
 
     // ------------------ first load ------------------ //
     // 首次打开时打开 初始化窗口

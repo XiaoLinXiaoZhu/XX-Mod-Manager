@@ -37,34 +37,37 @@ iManager.i18n = i18n;
 //-==================== 挂载 ====================-//
 
 vue_app.mount('#app');
+
+// ------------------ 语言切换 ------------------ //
+iManager.on('languageChange', (language) => {
+    // 将语言设置为 imanager 中的语言
+    vue_app.config.globalProperties.$i18n.locale = language;
+    //debug
+    console.log('set language:', language);
+});
+
+
+// ------------------ first load ------------------ //
+// 首次打开时打开 初始化窗口
+iManager.snack('first load : '+iManager.config.firstLoad);
+iManager.on('wakeUp', () => {
+    iManager.snack('first load : '+iManager.config.firstLoad);
+    console.log('❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️\nfist load:', iManager.config.firstLoad);
+    if (iManager.config.firstLoad) {
+        // debug 
+        console.log('ℹ️ first load');
+        iManager.snack('ℹ️ first load');
+        iManager.openNewWindow('firstLoad');
+    }
+});
+
+// ------------------ 初始化 ------------------ //
 iManager.waitInit().then((iManager) => {
-
-    // ------------------ 语言切换 ------------------ //
-    iManager.on('languageChange', (language) => {
-        // 将语言设置为 imanager 中的语言
-        vue_app.config.globalProperties.$i18n.locale = language;
-        //debug
-        console.log('set language:', language);
-    });
+    // 手动触发一次语言切换事件
     iManager.trigger('languageChange', iManager.config.language);
-
-
-    // ------------------ first load ------------------ //
-    // 首次打开时打开 初始化窗口
-    // iManager.snack('first load : '+iManager.config.firstLoad);
-    iManager.on('wakeUp', () => {
-        if (iManager.config.firstLoad) {
-            // debug 
-            console.log('ℹ️ first load');
-            iManager.snack('first load');
-            iManager.openNewWindow('firstLoad');
-        }
-    });
-
-
-    // 测试 loading
-    // iManager.showDialog('loading-dialog');
 })
+
+
 //-=====================事件监听====================-//
 console.log('main.js');
 
@@ -92,7 +95,8 @@ ipcRenderer.on('snack', (event, message,type = 'info') => {
         case 'info':
             Snackbar.show({
                 text: message,
-                align: 'top'
+                align: 'top',
+                duration: 2000
             })
             break;
         case 'error':

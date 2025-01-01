@@ -90,6 +90,8 @@ ipcMain.handle('get-current-config', async (event) => {
 ipcMain.handle('set-current-config', async (event, config) => {
     const dataPath = app.getPath('userData');
     const filePath = path.join(dataPath, 'config.json');
+    //debug
+    console.log(`set-current-config:${filePath}`, config);
     fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
 });
 
