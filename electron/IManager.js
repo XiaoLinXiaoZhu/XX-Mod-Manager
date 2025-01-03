@@ -1013,7 +1013,8 @@ class IManager {
             }
         });
 
-        // 从 plugins 文件夹中加载插件，其位于 
+        // 从 plugins 文件夹中加载插件，其位于 ,userData/plugins 文件夹中
+        // 这里应该被视为全局插件 作用于所有的 游戏配置
         const userDataPath = await ipcRenderer.invoke('get-user-data-path');
         const pluginPath = path.join(userDataPath, 'plugins');
         if (!fs.existsSync(pluginPath)) {

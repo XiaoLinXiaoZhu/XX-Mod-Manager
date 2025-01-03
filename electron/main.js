@@ -2,8 +2,8 @@
 const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron');
 const path = require('node:path')
 require('./fileSystem.js')
-const setMainWindow = require('./fileSystem.js').setMainWindow
-
+const setMainWindow = require('./fileSystem.js').setMainWindow;
+const setCustomConfigFolder = require('./fileSystem.js').setCustomConfigFolder;
 let currentMainWindow;
 
 let devMode = false;
@@ -17,6 +17,19 @@ console.log('firstpage', firstpage);
 let devTools = false;
 devTools = process.argv.includes('--devTools');
 console.log('devTools', devTools);
+
+let customConfig = false;
+customConfig = process.argv.includes('--customConfig');
+console.log('customConfig', customConfig);
+// customConfig 获取一个配置文件路径
+let customConfigFolder = '';
+if(customConfig){
+  const index = process.argv.indexOf('--customConfig');
+  customConfigFolder = process.argv[index + 1];
+  console.log('customConfigFolder', customConfigFolder);
+
+  setCustomConfigFolder(customConfigFolder);
+}
 
 
 const createWindow = () => {

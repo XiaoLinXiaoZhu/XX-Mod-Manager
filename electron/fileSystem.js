@@ -9,12 +9,21 @@ const isMac = os.platform() === "darwin";
 const isWindows = os.platform() === "win32";
 const isLinux = os.platform() === "linux";
 
-
+//----------------- 变量 -----------------
 let currentMainWindow = null;
-function setMainWindow(mainWindow) {
-    currentMainWindow = mainWindow;
-}
+let ifCustomConfig = false;
+let customConfigFolder = '';
 
+const dataPath = app.getPath('userData');
+const configPath = () => {
+    return (ifCustomConfig) ? path.join(customConfigFolder, 'config.json') : path.join(dataPath, 'config.json');
+}
+const pluginConfigPath = () => {
+    return (ifCustomConfig) ? path.join(customConfigFolder, 'pluginConfig.json') : path.join(dataPath, 'pluginConfig.json');
+}
+const disabledPluginsPath = () => {
+    return (ifCustomConfig) ? path.join(customConfigFolder, 'disabledPlugins.json') : path.join(dataPath, 'disabledPlugins.json');
+}
 
 function snack(message, type = 'info') {
     const mainWindow = currentMainWindow;
@@ -38,7 +47,7 @@ ipcMain.handle('set-imanager', async (event, iManager) => {
     console.log(iManager);
 });
 
-
+//-========================== 内部函数 ==========================
 
 
 
@@ -54,10 +63,16 @@ function readFile(filePath) {
     })
 }
 
-async function getCurrentConfig() {
-    const dataPath = app.getPath('userData');
-    const filePath = path.join(dataPath, 'config.json');
-    console.log(`get-current-config:${filePath}`);
+//-========================== 对外接口 ==========================
+//----------------- 获取变量 -----------------
+ipcMain.handle('get-user-data-path', async (event) => {
+    return app.getPath('userData');
+});
+
+
+//----------------- 配置相关 -----------------
+
+async function getConfig(filePath) {
     if (fs.existsSync(filePath)) {
         const data = await readFile(filePath);
         //debug
@@ -74,27 +89,38 @@ async function getCurrentConfig() {
         }
         fs.writeFileSync(filePath, JSON.stringify(defaultConfig), 'utf-8');
         console.log(`file not exists:${filePath}`);
-        return null;
+        snack('file not exists, create default config');
+        return defaultConfig;
     }
 }
 
-ipcMain.handle('get-user-data-path', async (event) => {
-    return app.getPath('userData');
+async function getCurrentConfig() {
+    return await getConfig(configPath());
 }
-);
+
+async function setConfig(filePath, config) {
+    fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+}
+
+async function setCurrentConfig(config) {
+    await setConfig(configPath(), config);
+}
 
 ipcMain.handle('get-current-config', async (event) => {
-    return await getCurrentConfig();
+    const currentConfigPath = configPath();
+    console.log(`get-current-config:${currentConfigPath}`);
+    return await getConfig(currentConfigPath);
 });
 
 ipcMain.handle('set-current-config', async (event, config) => {
-    const dataPath = app.getPath('userData');
-    const filePath = path.join(dataPath, 'config.json');
-    //debug
-    console.log(`set-current-config:${filePath}`, config);
-    fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf-8');
+    const currentConfigPath = configPath();
+    console.log(`set-current-config:${currentConfigPath}`, config);
+    await setConfig(configPath(), config);
 });
 
+
+//-========================== 对外接口 - 能力 ==========================
+// 读取文件
 ipcMain.handle('getFiles', async (event, dirPath) => {
     if (!fs.existsSync(dirPath)) {
         return {
@@ -241,7 +267,7 @@ ipcMain.handle('get-image', async (event, imagePath) => {
 
 // 这里应该解构设计，渲染进程不再需要操心 当前的配置，mod的img等等
 ipcMain.handle('get-mods-from-current-config', async (event) => {
-    const currentConfig = await getCurrentConfig();
+    const currentConfig = await getConfig(configPath());
     const modSourcePath = currentConfig.modSourcePath;
 
     return fs.existsSync(modSourcePath) ? getMods(modSourcePath) : [];
@@ -387,77 +413,66 @@ ipcMain.handle('get-file-path', async (event, fileName, fileType) => {
 
 //-=========================== 插件 ===========================
 // save-plugin-config
-ipcMain.handle('save-plugin-config', async (event, pluginName, config) => {
-    const dataPath = app.getPath('userData');
-    const filePath = path.join(dataPath, 'pluginConfig.json');
-    if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(filePath, '{}', 'utf-8');
+
+async function savePluginConfig(pluginName, config) {
+    const currentPluginConfigPath = pluginConfigPath();
+
+    // 不存在文件则创建
+    if (!fs.existsSync(currentPluginConfigPath)) {
+        fs.writeFileSync(currentPluginConfigPath, '{}', 'utf-8');
     }
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    // 读取文件，插入新的配置
+    const data = JSON.parse(fs.readFileSync(currentPluginConfigPath, 'utf-8'));
     data[pluginName] = config;
     //debug
-    console.log(`save-plugin-config:${filePath}`, data);
-    fs.writeFileSync(filePath, JSON.stringify(data), 'utf-8');
-});
+    console.log(`save-plugin-config:${currentPluginConfigPath}`, data);
 
-ipcMain.handle('get-plugin-config', async (event, pluginName) => {
-    const dataPath = app.getPath('userData');
-    const filePath = path.join(dataPath, 'pluginConfig.json');
-    if (fs.existsSync(filePath
-    )) {
-        const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    // 保存文件
+    fs.writeFileSync(currentPluginConfigPath, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+async function getPluginConfig(pluginName) {
+    const currentPluginConfigPath = pluginConfigPath();
+    if (fs.existsSync(currentPluginConfigPath)) {
+        const data = JSON.parse(fs.readFileSync(currentPluginConfigPath, 'utf-8'));
         return data[pluginName];
     }
     return null;
+}
+
+async function saveDisabledPlugins(disabledPlugins) {
+    const currentDisabledPluginsPath = disabledPluginsPath();
+    fs.writeFileSync(currentDisabledPluginsPath, JSON.stringify(disabledPlugins, null, 2), 'utf-8');
+}
+
+async function getDisabledPlugins() {
+    const currentDisabledPluginsPath = disabledPluginsPath();
+    if (fs.existsSync(currentDisabledPluginsPath)) {
+        return JSON.parse(fs.readFileSync(currentDisabledPluginsPath, 'utf-8'));
+    }
+    return [];
+}
+
+ipcMain.handle('save-plugin-config', async (event, pluginName, config) => {
+    savePluginConfig(pluginName, config);
+});
+
+ipcMain.handle('get-plugin-config', async (event, pluginName) => {
+    return getPluginConfig(pluginName);
 }
 );
 
 // 保存插件启用状态
 ipcMain.handle('save-disabled-plugins', async (event, disabledPlugins) => {
-    const dataPath = app.getPath('userData');
-    const filePath = path.join(dataPath, 'disabledPlugins.json');
-    fs.writeFileSync(filePath, JSON.stringify(disabledPlugins), 'utf-8');
+    saveDisabledPlugins(disabledPlugins);
 });
 
 // 获取插件启用状态
 ipcMain.handle('get-disabled-plugins', async (event) => {
-    const dataPath = app.getPath('userData');
-    const filePath = path.join(dataPath, 'disabledPlugins.json');
-    if (fs.existsSync(filePath)) {
-        return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-    }
-    return [];
+    return await getDisabledPlugins();
 });
 
 //-=========================== apply ===========================
-
-// ipcMain.handle('apply-mods', async (event, mods) => {
-//     // 删除 未选中的mod 且 存在在modSource文件夹中的mod
-//     fs.readdirSync(modRootDir).forEach(file => {
-//       if (!mods.includes(file) && fs.existsSync(path.join(modSourceDIr, file))) {
-//         // 删除文件夹,包括文件夹内的文件，使用异步方法
-//         fs.rm(path.join(modRootDir, file), { recursive: true, force: true }, (err) => {
-//           if (err) {
-//             //console.log(`failed to delete ${file}: ${err}`);
-//           }
-//         }
-//         );
-//         //fs.rmSync(path.join(modsDir, file), { recursive: true, force: true });
-//       }
-//     });
-
-//     // 复制选中的mod
-//     mods.forEach(mod => {
-//       const src = path.join(modSourceDIr, mod);
-//       const dest = path.join(modRootDir, mod);
-//       if (!fs.existsSync(dest)) {
-//         fs.symlinkSync(src, dest, 'junction', (err) => {
-//           if (err) console.log(err);
-//         });
-//       }
-//     });
-//   });
-
 ipcMain.handle('apply-mods', async (event, mods, modSourcePath, modTargetPath) => {
     fs.readdirSync(modTargetPath).forEach(file => {
         if (!mods.includes(file) && fs.existsSync(path.join(modSourcePath, file))) {
@@ -660,6 +675,14 @@ ipcMain.handle('open-url', async (event, url) => {
 
 
 //-=============================导出=============================
+function setMainWindow(mainWindow) {
+    currentMainWindow = mainWindow;
+}
+function setCustomConfigFolder(path) {
+    ifCustomConfig = true;
+    customConfigFolder = path;
+}
 module.exports = {
-    setMainWindow
+    setMainWindow,
+    setCustomConfigFolder
 }
