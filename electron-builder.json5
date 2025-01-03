@@ -2,7 +2,7 @@
     "appId": "com.xlxz.xx-mod-manager",
     "productName": "XX Mod Manager",
     "icon": "./src/assets/icon.ico",
-    "compression": "store",
+    // "compression": "maximum",
     "directories": {
         "output": "build"
     },
