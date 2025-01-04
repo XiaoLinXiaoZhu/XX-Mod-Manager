@@ -29,7 +29,6 @@ const { ipcRenderer } = require('electron');
 import 'sober'
 import { useTemplateRef, computed, defineProps, onMounted, ref, watch } from 'vue'
 import IManager from '../../electron/IManager';
-import { mod } from 'three/tsl';
 const iManager = new IManager();
 
 const props = defineProps({
