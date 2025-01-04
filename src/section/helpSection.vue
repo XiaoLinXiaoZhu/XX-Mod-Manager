@@ -54,13 +54,13 @@
         <Markdown :content="configModLoaderContentEn" v-if="currentTab === 'help-config-mod-loader'"></Markdown>
         <!-- -Load Mods -->
         <Markdown :content="loadContentEn" v-if="currentTab === 'help-load'"></Markdown>
-        <!-- -Config Mods -->
+        <!-- -Mods Config -->
         <Markdown :content="configContentEn" v-if="currentTab === 'help-config'"></Markdown>
         <!-- -Presets -->
         <Markdown :content="presetContentEn" v-if="currentTab === 'help-preset'"></Markdown>
         <!-- -Automation -->
         <Markdown :content="autoContentEn" v-if="currentTab === 'help-auto'"></Markdown>
-        <!-- -Multiple games -->
+        <!-- -Multi-Game Support -->
         <Markdown :content="multipleGamesContentEn" v-if="currentTab === 'help-multiple-games'"></Markdown>
         <!-- -Troubleshooting -->
         <div v-if="currentTab === 'help-trouble'">
@@ -312,7 +312,7 @@ There are three ways to import mods:
 All methods essentially add the mod folder to the mod source folder, so you need to configure the path of the mod source folder first.
 # After Importing
 1. By directly adding mods to the mod source folder, you need to refresh the program to see the new mods displayed as cards in the mod list.
-2. By dragging the unzipped mod folder or zip file, the program will automatically refresh and open the mod editing page, where you can edit the mod information. For more information, please refer to [Config Mods].
+2. By dragging the unzipped mod folder or zip file, the program will automatically refresh and open the mod editing page, where you can edit the mod information. For more information, please refer to [Mods Config].
 ---
 # Possible Issues
 # Adding mod folder to mod source folder, but not showing in mod list
@@ -327,7 +327,7 @@ The program currently only supports zip files without passwords, which is the mo
 `;
 
 const configModLoaderContentEn =
-  `# Load Mods
+  `# Loading Mods
 This program is just a mod manager, you need to download a game loader to load mods. It can be 3dmigoto, zzmi, xxmi, etc. Below I will introduce how to use this program with common loaders.
 # 3dmigoto Type
 These are unwrapped mod loaders, which I highly recommend. Their advantages are: basic, least problematic, responsive, and no additional features.
@@ -345,7 +345,7 @@ To use this program with these mod loaders, you only need to set the mod source 
 If you want to use the [Auto Open Game and Mod Loader] feature, you need to set the path of the mod loader's exe file to the mod loader path.
 ---
 # XXMI
-XXMI is essentially a 3dmigoto mod loader with a user interface. Its advantage is: it has a user interface and can switch between multiple games.
+XXMI is essentially a 3dmigoto mod loader with a user interface. Its advantage is: it has a user interface and can switch between Multi-Game Support.
 
 To use this program with XXMI, you need to set the mod source folder to the folder specified by XXMI for storing mods. If you want a more convenient experience, it is recommended to:
 1. Set the [Path to the game's exe file] in XXMI to the path of this program.
@@ -443,7 +443,7 @@ If configured correctly, the program will automatically start the mod loader and
 `;
 
 const multipleGamesContentEn =
-  `# Support for Multiple Games
+  `# Support for Multi-Game Support
 Currently only supports mod management for one game
 
 Stay tuned
@@ -478,7 +478,7 @@ iManager.waitInit().then(() => {
 //   if (language.value === 'zh_cn') {
 //     return ['使用【预设】', '导入、配置mod', '自动化', '适配多个游戏', '故障排除'];
 //   } else {
-//     return ['Presets', 'Import Mods', 'Automation', 'Multiple Games', 'Troubleshooting'];
+//     return ['Presets', 'Import Mods', 'Automation', 'Multi-Game Support', 'Troubleshooting'];
 //   }
 // });
 
@@ -499,7 +499,7 @@ const translatedTabs = computed(() => {
   if (language.value === 'zh_cn') {
     return ['名词解释', '导入mod', '配置mod加载器', '加载mod', '配置mod', '预设', '自动化', '适配多个游戏', '故障排除'];
   } else {
-    return ['Explain', 'Import Mods', 'Config Mod Loader', 'Load Mods', 'Config Mods', 'Presets', 'Automation', 'Multiple Games', 'Troubleshooting'];
+    return ['Overview', 'Importing Mods', 'Loader Config', 'Load Mods', 'Mods Config', 'Presets', 'Automation', 'Multi-Game Support', 'Troubleshooting'];
   }
 });
 
