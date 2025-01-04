@@ -116,9 +116,7 @@ app.on('window-all-closed', () => {
 // 在当前文件中你可以引入所有的主进程代码
 // 也可以拆分成几个文件，然后用 require 导入。
 
-
-
-// ipcRenderer.send('open-new-window', 'tapePage');
+//-==================== 新窗口 ====================
 ipcMain.on('open-new-window', (event, arg) => {
   console.log('open-new-window', arg);
 
