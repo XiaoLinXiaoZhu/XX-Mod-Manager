@@ -31,6 +31,13 @@ function snack(message, type = 'info') {
     console.log(`snack:${message} type:${type}`);
     mainWindow.webContents.send('snack', message, type);
 }
+function t_snack(message_ch,message_en, type = 'info') {
+    getConfig(configPath()).then((config) => {
+        const language = config.language;
+        snack((language == 'zh_cn') ? message_ch : message_en, type);
+    });
+}
+
 // 这里为渲染进程提供 读取文件的功能。
 
 // 核心数据
@@ -49,8 +56,6 @@ ipcMain.handle('set-imanager', async (event, iManager) => {
 
 //-========================== 内部函数 ==========================
 
-
-
 function readFile(filePath) {
     return new Promise((resolve, reject) => {
         fs.readFile(filePath, 'utf-8', (err, data) => {
@@ -61,6 +66,31 @@ function readFile(filePath) {
             }
         })
     })
+}
+
+function testPath(name,path,tryfix = false) {
+    if (!path) {
+        t_snack(`${name}路径未定义`,`${name} path not defined`,'error');
+        return false;
+    }
+    if (!fs.existsSync(path) && !tryfix) {
+        t_snack(`${name}路径不存在`,`${name} path not exists`,'error');
+        return false;
+    }
+    if (!fs.existsSync(path) && tryfix) {
+        t_snack(`${name}路径不存在，尝试修复中...`,`${name} path not exists, try to fix...`,'error');
+        fs.mkdirSync(path,{recursive:true});
+        return false;
+    }   
+    return true;
+}
+
+function t_testPath(name_ch,name_en,path,tryfix = false) {
+    // return (getConfig(configPath()).language == 'zh_cn') ? testPath(name_ch,path,tryfix) : testPath(name_en,path,tryfix);
+    getConfig(configPath()).then((config) => {
+        const language = config.language;
+        testPath((language == 'zh_cn') ? name_ch : name_en,path,tryfix);
+    });
 }
 
 //-========================== 对外接口 ==========================
@@ -237,9 +267,10 @@ function creatMod(modPath) {
 }
 function getMods(modSourcePath) {
     const mods = [];
-    if (!fs.existsSync(modSourcePath)) {
-        return mods;
-    }
+
+    // 错误处理
+    if (!t_testPath('模组', 'mod', modSourcePath,false)) return mods;
+
     const modFolders = fs.readdirSync(modSourcePath);
     modFolders.forEach(modFolder => {
         const modPath = path.join(modSourcePath, modFolder);
@@ -300,6 +331,10 @@ ipcMain.handle('set-mod-info', async (modPath, field, value) => {
 //-===========================预设===========================
 function getPresetList(presetPath) {
     const presets = [];
+
+    // 错误处理
+    if (!t_testPath('预设', 'preset', presetPath,false)) return presets;
+
     // preset 以单个json文件存储，里面包含了该 preset 所启用的 mod
     // 这个函数只需要返回 preset 的名称即可
     const presetFiles = fs.readdirSync(presetPath);
@@ -324,13 +359,9 @@ function loadPreset(presetPath, presetName) {
 
 async function savePreset(presetPath, presetName, mods) {
     const presetFilePath = path.join(presetPath, `${presetName}.json`);
-    if (!presetPath) {
-        snack('presetPath is undefined');
-        return;
-    }
-    if (!fs.existsSync(presetPath)) {
-        fs.mkdirSync(presetPath);
-    }
+
+    if (!t_testPath('预设', 'preset', presetPath,true)) return;
+    
     fs.writeFileSync(presetFilePath, JSON.stringify(mods));
     // snack(`Preset ${presetName} saved`);
 }
@@ -339,15 +370,6 @@ ipcMain.handle('get-preset-list', async (event) => {
     const modConfig = await getCurrentConfig();
     const presetPath = modConfig.presetPath;
 
-    // 增加 排障代码
-    if (presetPath == undefined) {
-        snack('presetPath is undefined');
-        return [];
-    }
-    if (!fs.existsSync(presetPath)) {
-        snack('presetPath not exists');
-        return [];
-    }
     return getPresetList(presetPath);
 });
 
