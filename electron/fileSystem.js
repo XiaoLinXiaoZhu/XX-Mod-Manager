@@ -14,6 +14,10 @@ let currentMainWindow = null;
 let ifCustomConfig = false;
 let customConfigFolder = '';
 
+//! 这是非常不健康的方法
+//! 同一个变量需要在多个地方使用，但是又不能直接获取
+let currentLanguage = 'zh_cn';
+
 const dataPath = app.getPath('userData');
 const configPath = () => {
     return (ifCustomConfig) ? path.join(customConfigFolder, 'config.json') : path.join(dataPath, 'config.json');
@@ -93,10 +97,9 @@ function testPath(name,path,tryfix = false) {
 
 function t_testPath(name_ch,name_en,path,tryfix = false) {
     // return (getConfig(configPath()).language == 'zh_cn') ? testPath(name_ch,path,tryfix) : testPath(name_en,path,tryfix);
-    getConfig(configPath()).then((config) => {
-        const language = config.language;
-        testPath((language == 'zh_cn') ? name_ch : name_en,path,tryfix);
-    });
+    const language = currentLanguage;
+    // snack(`testPath:${language} ${name_ch} ${name_en} ${path} ${tryfix}`);
+    return testPath((language == 'zh_cn') ? name_ch : name_en,path,tryfix);
 }
 
 //-========================== 对外接口 ==========================
@@ -118,9 +121,15 @@ ipcMain.handle('get-desktop-path', async (event) => {
 async function getConfig(filePath) {
     if (fs.existsSync(filePath)) {
         const data = await readFile(filePath);
+
+        // 同步一下 language
+        const config = JSON.parse(data);
+
+        currentLanguage = config.language;
+
         //debug
-        console.log(`file exists:${data}`);
-        return JSON.parse(data);
+        console.log(`file exists: `,filePath);
+        return config;
     }
     else {
         const defaultConfig = {
@@ -282,7 +291,10 @@ function getMods(modSourcePath) {
     const mods = [];
 
     // 错误处理
-    if (!t_testPath('模组', 'mod', modSourcePath,false)) return mods;
+    if (!t_testPath('模组', 'mod', modSourcePath,false)){
+        snack('get-mods failed');
+        return mods;
+    }
 
     const modFolders = fs.readdirSync(modSourcePath);
     modFolders.forEach(modFolder => {

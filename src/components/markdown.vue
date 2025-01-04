@@ -98,6 +98,7 @@ const transformMarkdown = (markdown) => {
 }
 
 onMounted(() => {
+    if (props.content)
     transformedContent.value = transformMarkdown(props.content)
 })
 

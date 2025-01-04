@@ -95,6 +95,10 @@ const closeApp = () => {
 const handleBackButtomClick = () => {
     // 将main-container的display设置为none
     // document.querySelector('.main-container').style.display = 'none';
+
+    closeApp();
+    return;
+    // 未来添加返回上一级的功能
     currentSatate.value = 'switch-config';
 
     // 为 modCardSection 增加淡出效果

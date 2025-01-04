@@ -135,7 +135,8 @@
     "congratulate-1": "你已经完成了所有设置，现在可以开始使用本程序了,请关闭本页面",
     "aboutProgramInfo": "本程序由 XLXZ 开发,开源免费,遵循GNU General Public License v3.0。用于管理基于3dmigoto的mod ,理论上来说也可以管理其他游戏的mod(只要是基于3dmigoto的)",
     "aboutProgramInfo-1": "最新版本在gamebanana上发布，如果你有任何问题或者建议，欢迎在github上提出",
-    "thanks": "特别感谢"
+    "thanks": "特别感谢",
+    "switchConfig": "选择 【配置另存为】路径之后点击创建快捷方式，即可在桌面创建一个使用 本地路径而非全局路径的 配置项，从而实现应用于多个游戏\n之后，点击桌面的快捷方式，即可使用 本地配置 启动 xxmm"
   },
   "author": "作者",
   "github": "Github",

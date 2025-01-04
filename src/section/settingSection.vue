@@ -48,41 +48,9 @@
             <!-- -切换配置 -->
             <!-- -在这里你可以选择开启在开始的时候选择配置文件的功能，并且设置配置文件保存位置 -->
             <div v-if="currentTab === 'switch-config'">
-                <h3>
-                    {{ $t('setting.unavailable') }}
-                </h3>
-                <!-- <div class="OO-setting-bar">
-                    <h3 data-translate-key="if-ask-switch-config"> 是否询问切换配置 </h3>
-                    <s-switch id="if-ask-switch-config-switch"></s-switch>
-                </div>
-                <p data-translate-key="if-ask-switch-config-info">
-                    启动程序时是否询问切换配置文件（需要先在下面指定文件夹），以在不同游戏中使用，否则将使用缓存中的配置文件</p>
-                <s-divider></s-divider>
-                <div class="OO-setting-bar">
-                    <h3 data-translate-key="config-dir"> 配置文件夹 </h3>
-                    <s-text-field>
-                        <input type="text" id="set-configRootDir-input">
-                    </s-text-field>
-                </div>
-                <p data-translate-key="config-dir-info">
-                    配置文件夹为存储配置文件的位置，程序将在这里寻找配置文件，配置文件以文件夹形式存储，内部的config.json为配置文件
-                </p>
-                <s-divider></s-divider>
-                <div class="OO-setting-bar">
-                    <h3 data-translate-key="switch-config"> 切换配置 </h3>
-                    <s-button id="switch-config-button" data-translate-key="switch"
-                        onclick="document.getElementById('switch-config-dialog').show()">
-                        切换配置
-                    </s-button>
-                </div>
-                <s-divider></s-divider>
-                <div class="OO-setting-bar">
-                    <h3 data-translate-key="save-config"> 保存配置 </h3>
-                    <s-button id="save-config-button" data-translate-key="save">
-                        保存配置
-                    </s-button>
-                </div>
-                <p data-translate-key="save-config-info"> 保存当前配置到配置文件夹 </p> -->
+                <Markdown :content="$t('firstLoad.switchConfig')"></Markdown>
+                <settingBar :data="changeConfig"></settingBar>
+                <settingBar :data="createShortOfCurrentConfig"></settingBar>
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
 
@@ -218,6 +186,7 @@ const {
 } = getData();
 
 import { useI18n } from 'vue-i18n'
+import Markdown from '../components/markdown.vue';
 const { t, locale } = useI18n()
 
 const tabs = ref(['normal', 'advanced', 'switch-config', 'about', 'plugin']);
@@ -254,6 +223,59 @@ watch(pluginConfig, (newVal) => {
     iManager.pluginConfig = newVal;
     iManager.saveConfig();
 });
+
+
+const changeConfig = {
+    name: 'changeConfig',
+    data: null,
+    type: 'dir',
+    displayName: 'Change Config',
+    description: 'Change Config',
+    t_displayName: {
+        zh_cn: '配置另存为',
+        en: 'Save Config To'
+    },
+    t_description: {
+        zh_cn: '选择配置文件夹',
+        en: 'Select Config Folder'
+    },
+    onChange: (value) => {
+        console.log('changeConfig changed:', value);
+    }
+}
+
+const createShortOfCurrentConfig = {
+    name: 'createShortOfCurrentConfig',
+    data: null,
+    type: 'button',
+    displayName: 'Create Short Of Custom Config',
+    description: 'Create Short Of Custom Config',
+    buttonName: 'Create',
+    t_displayName: {
+        zh_cn: '创建使用本地配置的快捷方式',
+        en: 'Create Short Of Current Config'
+    },
+    t_description: {
+        zh_cn: '创建使用本地配置的快捷方式',
+        en: 'Create Short Of Current Config'
+    },
+    t_buttonName: {
+        zh_cn: '创建快捷方式',
+        en: 'Create Short'
+    },
+    onChange: (value) => {
+        console.log('createShortOfCurrentConfig changed:', changeConfig.data);
+
+
+        iManager.createAppShortCut(changeConfig.data).then(() => {
+            console.log('createShortOfCurrentConfig success');
+        }).catch((err) => {
+            console.log('createShortOfCurrentConfig failed:', err);
+        });
+    }
+}
+
+
 onMounted(async () => {
     //debug
     console.log('settingSection mounted');

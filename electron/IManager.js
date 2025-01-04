@@ -148,6 +148,8 @@ class IManager {
 
     async loadMods() {
         const modSourcePath = this.config.modSourcePath;
+        //debug
+        console.log(`loadMods from ${modSourcePath}`);
         const loadMods = await ipcRenderer.invoke('get-mods', modSourcePath);
 
         if (loadMods == []) {
