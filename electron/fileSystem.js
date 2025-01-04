@@ -78,9 +78,15 @@ function testPath(name,path,tryfix = false) {
         return false;
     }
     if (!fs.existsSync(path) && tryfix) {
-        t_snack(`${name}路径不存在，尝试修复中...`,`${name} path not exists, try to fix...`,'error');
-        fs.mkdirSync(path,{recursive:true});
-        return false;
+        try {
+            fs.mkdirSync(path,{recursive:true});
+            t_snack(`${name}路径不存在，已自动创建`,`${name} path not exists, auto created`,'info');
+        }
+        catch (err) {
+            t_snack(`${name}路径不存在，自动创建失败`,`${name} path not exists, auto create failed`,'error');
+            return false;
+        }
+        return true;
     }   
     return true;
 }
