@@ -105,6 +105,13 @@ ipcMain.handle('get-user-data-path', async (event) => {
     return app.getPath('userData');
 });
 
+ipcMain.handle('get-app-path', async (event) => {
+    return app.getAppPath();
+});
+
+ipcMain.handle('get-desktop-path', async (event) => {
+    return app.getPath('desktop');
+});
 
 //----------------- 配置相关 -----------------
 

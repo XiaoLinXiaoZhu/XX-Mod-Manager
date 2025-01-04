@@ -4,7 +4,6 @@
 
 // 这个类应该 被划分到 渲染进程底下，但是 主进程也应该能够访问到这个类
 const { ipcRenderer, ipcMain } = require('electron');
-const { app } = require('electron');
 
 // import fsProxy from './fsProxy';
 // const fs = new fsProxy();
@@ -363,6 +362,47 @@ class IManager {
             return;
         }
         ipcRenderer.invoke('open-url', url);
+    }
+    
+        // 在桌面创建快捷方式 例如：
+        // start "" "当前exe所在位置" --customConfig "当前配置文件夹"
+        // 起始位置：当前 exe 所在文件夹
+        // 目标位置：桌面
+    async createAppShortCut(configPath) {
+        const { app, shell } = require('electron');
+        const path = require('path');
+
+        const exePath = process.execPath;
+        const exeDir = path.dirname(exePath);
+        const desktopPath = await ipcRenderer.invoke('get-desktop-path');
+        const command = `start "" "${exeDir}" --customConfig "${configPath}"`;
+        console.log(`createAppShortCut from ${exeDir} to ${desktopPath} with command: ${command}`);
+
+        // 创建快捷方式
+
+          
+          // 快捷方式名称和路径
+          const shortcutName = 'XXMM_customConfig.lnk';
+          const shortcutPath = path.join(desktopPath, shortcutName);
+          
+          // 启动参数
+          const args = `--customConfig "${configPath}"`;
+          
+          // 应用程序的根目录
+          try {
+            // 创建快捷方式
+            await shell.writeShortcutLink(shortcutPath, 'create', {
+              target: exePath,
+              args: args,
+              cwd: exeDir, // 设置工作目录为应用程序的根目录
+              icon: exePath, // 可选：设置图标为应用程序图标
+              iconIndex: 0 // 可选：图标索引，通常为0
+            });
+        
+            console.log(`Shortcut created successfully at ${shortcutPath}`);
+          } catch (error) {
+            console.error('Failed to create shortcut:', error);
+          }
     }
 
     //------ 文件拖拽 ------
@@ -997,6 +1037,11 @@ class IManager {
 
         // 因为内置插件可以设置开关，所以说直接加载位于 plugins 文件夹中的插件
         const builtInPluginPath = path.resolve('./plugins');
+        // 错误处理
+        if (!fs.existsSync(builtInPluginPath)) {
+            snack('插件文件夹不存在 '+builtInPluginPath);
+            return;
+        }
         const builtInPlugins = fs.readdirSync(builtInPluginPath);
         builtInPlugins.forEach((pluginName) => {
             if (pluginName.endsWith('.js')) {
