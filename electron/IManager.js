@@ -136,12 +136,20 @@ class IManager {
             }
         }
         //debug
-        if (this.config.presetPath === null) {
-            console.log('presetPath is null');
-        }
-        else if (fs.existsSync(this.config.presetPath) === false) {
-            fs.mkdirSync(this.config.presetPath);
-        }
+        // if (this.config.presetPath === null) {
+        //     console.log('presetPath is null');
+        // }
+        // else if (fs.existsSync(this.config.presetPath) === false) {
+        //     // fs.mkdirSync(this.config.presetPath);
+        //     // 直接创建文件夹有可能它的父文件夹不存在，所以检查一下
+        //     if (!fs.existsSync(path.dirname(this.config.presetPath))) {
+        //         console.log(`presetPath's parent not exists`);
+        //         snack(`preset folder not exists`, 'error');
+        //     }
+        //     else {
+        //         fs.mkdirSync(this.config.presetPath);
+        //     }
+        // }
 
         this.saveConfig();
     }

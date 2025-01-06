@@ -97,7 +97,7 @@ iManager.on('themeChange', (theme) => {
         .easing(Easing.Quadratic.InOut)
         .onUpdate((object) => {
             currentColor.setColor(object.r, object.g, object.b);
-            console.log(`currentColor: ${currentColor.getHexString()}`);
+            // console.log(`currentColor: ${currentColor.getHexString()}`);
         })
         .yoyo(true)
         .repeat(Infinity)
@@ -116,7 +116,7 @@ ColorTween.to({ r: endColor.r, g: endColor.g, b: endColor.b }, colorChangeTime)
     .onUpdate((object) => {
         currentColor.setColor(object.r, object.g, object.b);
         //debug
-        console.log(`currentColor: ${currentColor.getHexString()}`);
+        // console.log(`currentColor: ${currentColor.getHexString()}`);
     })
     .yoyo(true)
     .repeat(Infinity)
