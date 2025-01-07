@@ -162,6 +162,7 @@ defineExpose({
     border-radius: 8px;
     white-space: nowrap;
     overflow: hidden;
+
     position: absolute;
     height: 35px;
     transform: skew(-20deg);

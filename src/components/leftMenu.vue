@@ -12,13 +12,13 @@
 *        down-button: 用于自定义下方按钮
 * -->
 <template>
-    <div class="left-menu OO-box">
+    <div class="left-menu OO-box" >
         <div class="OO-button-box" id="up-button">
             <slot name="up-button">
                 <s-icon type="arrow_drop_up"></s-icon>
             </slot>
         </div>
-        <div ref="containerRef">
+        <div ref="containerRef" style="position: relative; overflow-y: auto; overflow-x: hidden; height: calc(100% - 64px);" >
             
             <div v-for="(tab, index) in tabs" :key="index" :class="['tab', { active: currentTab === tab }]"
                 @click="selectTab(tab,index)">
@@ -76,7 +76,8 @@ const selectTabByName = (tab) => {
 
 const sliderStyle = reactive({
     top: '0px',
-    height: '0px'
+    height: '0px',
+    width: '0px',
 });
 
 
@@ -96,6 +97,7 @@ const updateSlider = (index) => {
     // console.log(`updateSlider: `, selectedTab, index,tabs)
     sliderStyle.top = `${selectedTab.offsetTop}px`;
     sliderStyle.height = `${selectedTab.offsetHeight}px`;
+    sliderStyle.width = `${selectedTab.offsetWidth}px`;
 };
 
 // watch(() => props.tabs, (newTabs) => {
@@ -163,7 +165,7 @@ defineExpose({
 
 .slider {
     position: absolute;
-    width: calc(100% - 20px);
+    width: calc(100%);
     height: 40px;
     background-color: var(--s-color-primary);
     border-radius: 10px;
