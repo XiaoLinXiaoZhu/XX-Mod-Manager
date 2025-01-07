@@ -167,6 +167,9 @@ class IManager {
 
         // 加载 character
         this.data.characterList = new Set(loadMods.map((mod) => mod.character));
+        // 当 currentCharacter 不变时，不会触发 currentCharacterChanged 事件
+        // 但是 characterList 的顺序 是按照从mod中获取的顺序，所以这里需要将其排序一下，默认按照字母排序
+        this.data.characterList = Array.from(this.data.characterList).sort();
         this.data.modList = loadMods;
 
         //debug

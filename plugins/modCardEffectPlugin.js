@@ -1,7 +1,4 @@
 // pluginConfig 是 data 的 数组
-
-const { t_displayName, init } = require("./refreshAfterApplyPlugin");
-
 // data 为一个对象，包含了插件的可配置数据，比如说是否启用，是否显示等等
 // 它会被 解析 之后 在 设置页面 中显示，并且为 插件提供数据
 // 当它发生变化时，会触发 插件的 onChange 方法
@@ -26,9 +23,13 @@ const { t_displayName, init } = require("./refreshAfterApplyPlugin");
 //     }
 // }
 
-//- 这是一个用于控制 卡片淡入淡出 效果的插件，通过覆盖 mod-card 的 css 样式来实现
+//- 这是一个用于控制 卡片 特殊效果的插件
+//-1. 卡片淡入淡出 效果的插件
+//-2. 当卡片被 hover 时，切换 currentCard 的效果
 
-const pluginName = 'modCardFadeInOut';
+
+
+const pluginName = 'modCardEffect';
 
 const fadeOutCss = (animationSpeed) => `
 .mod-item.hidden {
@@ -76,11 +77,36 @@ const modContainerCss = `
 }
 `;
 
+
+function addHoverEffect (document, iManager) {
+    document.querySelectorAll('.mod-item').forEach((item) => {
+        item.addEventListener('mouseover', () => {
+            const modName = item.getAttribute('id');
+            //debug
+            console.log('hoverSwitchCurrentCard:', modName);
+            iManager.setLastClickedModByName(modName);
+        });
+    });
+};
+function removeHoverEffect(document, iManager) {
+    document.querySelectorAll('.mod-item').forEach((item) => {
+        item.removeEventListener('mouseover', () => {
+            const modName = item.getAttribute('id');
+            //debug
+            console.log('hoverSwitchCurrentCard:', modName);
+            iManager.setLastClickedModByName(modName);
+        });
+    }
+    );
+};
+
+
+
 module.exports = {
     name: pluginName,
     t_displayName: {
-        zh_cn: '卡片淡入淡出',
-        en: 'Card Fade In Out'
+        zh_cn: '卡片效果',
+        en: 'Mod Card Effect'
     },
     init(iManager) {
 
@@ -92,6 +118,11 @@ module.exports = {
                 iManager.addCssWithHash(fadeOutCss(fadeOutSpeed));
                 iManager.addCssWithHash(modCardCss(fadeInSpeed));
                 iManager.addCssWithHash(modContainerCss);
+            }
+
+            let hoverSwitchCurrentCard = iManager.getPluginData(pluginName, 'hoverSwitchCurrentCard');
+            if (hoverSwitchCurrentCard) {
+                addHoverEffect(document, iManager);
             }
         });
 
@@ -194,6 +225,55 @@ module.exports = {
             }
         };
         pluginData.push(fadeOutSpeed);
+
+        let divider = {
+            name: 'divider',
+            data: '',
+            type: 'markdown',
+            displayName: 'markdown divider',
+            description: 'markdown divider',
+            t_displayName: {
+                zh_cn: 'markdown divider',
+                en: 'markdown divider'
+            },
+            t_description: {
+                zh_cn: '---',
+                en: '---'
+            },
+            onChange: (value) => {
+                // markdown 类型的数据不会触发 onChange,它只作为展示
+            }
+        };
+        pluginData.push(divider);
+
+        //- 当卡片被 hover 时，切换 currentCard 的效果
+        let hoverSwitchCurrentCard = {
+            name: 'hoverSwitchCurrentCard',
+            data: false,
+            type: 'boolean',
+            displayName: 'Hover Switch Current Card',
+            description: 'If true, the current card will be switched when hover on the mod card',
+            t_displayName: {
+                zh_cn: '鼠标悬停切换当前卡片',
+                en: 'Hover Switch Current Card'
+            },
+            t_description: {
+                zh_cn: '当鼠标悬停在mod卡片上时，左侧的卡片详情会切换到当前卡片',
+                en: 'If true, the details of the current card will be switched when hover on the mod card'
+            },
+            onChange: (value) => {
+                console.log('hoverSwitchCurrentCard changed:', value);
+                if (value) {
+                    addHoverEffect(document, iManager);
+                }
+                else {
+                    removeHoverEffect(document, iManager);
+                }
+
+                hoverSwitchCurrentCard.data = value;
+            }
+        };
+        pluginData.push(hoverSwitchCurrentCard);
 
 
         iManager.registerPluginConfig(pluginName, pluginData);
