@@ -7,6 +7,17 @@
 // 1. 监听 页面初始化
 // 2. 监听 class 的 对象的创建和销毁， 将 items 托管在管理器中
 // 3. 提供一个 update 方法， 用于 执行 class 对应的 更新方法
+
+
+
+//-============ 优化：如果窗口睡眠就停止刷新 ==========
+let isSleep = false;
+import IManager from "../../electron/IManager";
+const iManager = new IManager();
+
+iManager.on('windowFocus',()=>{ isSleep = false;});
+iManager.on('windowSleep',()=>{ isSleep = true;});
+
 class ClassManagerService {
     items = [];
     constructor() {
@@ -38,7 +49,7 @@ class ClassManagerService {
         //debug
 
         // refresh items
-        if (this.items.length === 0) {
+        if (this.items.length === 0 || isSleep){
             return;
         }
         this.items.forEach(item => {
@@ -78,6 +89,8 @@ class ClassManager {
     items = [];
     classType = '';
     classManagerService = ClassManagerService.instance;
+
+    disableOnSleep = true;
 
     constructor(classType) {
         this.classType = classType;

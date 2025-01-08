@@ -1,7 +1,7 @@
 {
   "name": "xx-mods-manager",
   "private": true,
-  "description": "Hello World!",
+  "description": "wtf are these?",
   "main": "./electron/main.js",
   "author": "XLXZ",
   "license": "MIT",

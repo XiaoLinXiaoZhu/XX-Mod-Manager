@@ -7,8 +7,8 @@ const { ipcRenderer, ipcMain } = require('electron');
 
 // import fsProxy from './fsProxy';
 // const fs = new fsProxy();
-
-const path = require('path');
+const pathOsName = 'path'
+const path = require(pathOsName);
 
 // 导入fs
 const fs = require('fs');
@@ -1183,6 +1183,33 @@ ipcRenderer.on('wakeUp', () => {
     snack('🌞wakeUp');
     const iManager = new IManager();
     iManager.trigger('wakeUp');
+});
+
+let sleepTimer = '';
+// 失去焦点10s后进入睡眠模式
+const sleepTimeOutTime = 10000;
+
+ipcRenderer.on('windowBlur', () => {
+    console.log('☁️windowBlur');
+    // snack('☁️windowBlur');
+    const iManager = new IManager();
+    iManager.trigger('windowBlur');
+
+    sleepTimer = setTimeout(()=>{
+        iManager.trigger("windowSleep");
+        snack('💤windowSleep');
+    },sleepTimeOutTime);
+});
+
+ipcRenderer.on('windowFocus', () => {
+    console.log('windowFocus');
+    // snack('windowFocus');
+    const iManager = new IManager();
+    iManager.trigger('windowFocus');
+
+    if(sleepTimer != ''){
+        clearTimeout(sleepTimer);
+    }
 });
 
 export default IManager;

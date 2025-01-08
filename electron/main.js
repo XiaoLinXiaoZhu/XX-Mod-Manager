@@ -52,6 +52,24 @@ const createWindow = () => {
   currentMainWindow = mainWindow;
   setMainWindow(mainWindow);
 
+  //-==================== 监听窗口显隐 ====================
+// currentMainWindow.on("minimize",()=>{
+//   console.debug("window minimize");
+// });
+
+// currentMainWindow.on("restore",()=>{
+//   console.debug("window restore");
+// });
+
+currentMainWindow.on("blur",()=>{
+  console.debug("window blur");
+  currentMainWindow.webContents.send('windowBlur')
+});
+
+currentMainWindow.on("focus",()=>{
+  console.debug("window focus");
+  currentMainWindow.webContents.send('windowFocus')
+});
 
 
   //debug
@@ -85,6 +103,11 @@ const createWindow = () => {
     console.log('main window is ready');
   });
 }
+
+
+
+
+
 
 // 这段程序将会在 Electron 结束初始化
 // 和创建浏览器窗口的时候调用

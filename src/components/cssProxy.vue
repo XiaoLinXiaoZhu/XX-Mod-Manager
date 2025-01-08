@@ -3,15 +3,15 @@
 </template>
 
 <script setup>
-import backButtonImage from '../assets/backButton.png';
 import backgroundImage from '../assets/background.png';
-import IManager from '../../electron/IManager';
-const iManager = new IManager();
-import { watch } from 'vue';
+// import IManager from '../../electron/IManager';
+// const iManager = new IManager();
+import { waitInitIManager } from '../../electron/IManager';
 
-
-iManager.waitInit().then(() => {
-    iManager.on('themeChange', (theme) => {
+let currentTheme = "";
+const changeTheme = (theme) =>{
+        if (currentTheme == theme) return;
+        currentTheme = theme
         const appContainer = document.querySelector('#app-container');
         if (!appContainer) return;
         appContainer.setAttribute('theme', theme);
@@ -21,11 +21,11 @@ iManager.waitInit().then(() => {
         } else {
             appContainer.style.backgroundImage = 'none';
         }
-    });
+}
 
+
+waitInitIManager().then((iManager) =>{
+    iManager.on('themeChange', changeTheme);
     iManager.trigger('themeChange', iManager.config.theme);
-
-    
 });
-
 </script>

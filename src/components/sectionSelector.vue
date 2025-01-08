@@ -1,6 +1,6 @@
 <template>
     <div class="slider-container ">
-        <div class="slider OO-color-gradient OO-pumping" :style="sliderStyle"></div>
+        <div class="slider OO-color-gradient" :style="sliderStyle"></div>
         <div class="section-selector">
             <div 
                 v-for="(sec, index) in sections" 

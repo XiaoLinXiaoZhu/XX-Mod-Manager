@@ -56,7 +56,7 @@ class Color {
 }
 
 // 将上述代码 改为 使用 ClassManager 来管理
-
+let currentTheme = "dark";
 const lightColor ={
     startColor: new Color(0x53727E),
     endColor: new Color(0x0E3F3C)
@@ -79,7 +79,7 @@ currentColor = startColor.clone();
 const colorChangeTime = 2000; // 颜色变化的时间
 
 // 根据 theme 的变化，改变颜色
-iManager.on('themeChange', (theme) => {
+const startColorTweenByTheme = (theme) => {
     if (theme === 'dark') {
         startColor = darkColor.startColor;
         endColor = darkColor.endColor;
@@ -106,22 +106,23 @@ iManager.on('themeChange', (theme) => {
     //清空group
     group.removeAll();
     group.add(ColorTween);
-});
+}
+const startColorTween = () => startColorTweenByTheme(currentTheme);
+
+const stopColorTween = () => {
+    group.removeAll();
+}
+
+
+iManager.on('themeChange', (theme)=>{currentTheme = theme;startColorTweenByTheme(currentTheme);});
+iManager.on('windowFocus',startColorTween);
+iManager.on('windowSleep',stopColorTween)
+
+
 
 let ColorTween = new Tween({ r: startColor.r, g: startColor.g, b: startColor.b })
 //tween 在这两个颜色之间使用 pingPong 模式 ， easing函数为 Easing.Quadratic.InOut
 
-ColorTween.to({ r: endColor.r, g: endColor.g, b: endColor.b }, colorChangeTime)
-    .easing(Easing.Quadratic.InOut)
-    .onUpdate((object) => {
-        currentColor.setColor(object.r, object.g, object.b);
-        //debug
-        // console.log(`currentColor: ${currentColor.getHexString()}`);
-    })
-    .yoyo(true)
-    .repeat(Infinity)
-    .repeatDelay(500)
-    .start();
 
 const group = new Group();
 group.add(ColorTween);
@@ -216,37 +217,37 @@ caperingManager.destroy = function (element) { }
 
 //-========================= OO-pumping ========================
 // 高度和宽度在一定范围内波动的效果
-const pumpingTween = new Tween({ scale: 1 });
-pumpingTween.to({ scale: 1.1 }, 500)
-    .onUpdate((object) => {
-        pumpingManager.items.forEach(item => {
+// const pumpingTween = new Tween({ scale: 1 });
+// pumpingTween.to({ scale: 1.1 }, 500)
+//     .onUpdate((object) => {
+//         pumpingManager.items.forEach(item => {
             
-            const originalX = item.getAttribute('original-x');
-            const originalY = item.getAttribute('original-y');
-            //通过设置shadow来实现放大效果
-            //debug
-            //console.log(`pumping update, scale:${object.scale}`);
-            item.style.boxShadow = `0 0 10 ${100}px ${item.style.backgroundColor}`;
-        });
-        //debug
-        //console.log(`pumping update, scale:${object.scale}`);
-    })
-    .easing(Easing.Quadratic.InOut)
-    .yoyo(true)
-    .repeat(Infinity)
-    .repeatDelay(200)
-    .start();
-const pumpingManager = new ClassManager('OO-pumping');
-pumpingManager.onUpdate = function () {
-    pumpingTween.update();
-}
-pumpingManager.needRefresh = true;
-pumpingManager.onPageInit = function () {}
-pumpingManager.init = function (element) {
-    element.setAttribute('original-x', element.offsetWidth);
-    element.setAttribute('original-y', element.offsetHeight);
-}
-pumpingManager.destroy = function (element) { }
+//             const originalX = item.getAttribute('original-x');
+//             const originalY = item.getAttribute('original-y');
+//             //通过设置shadow来实现放大效果
+//             //debug
+//             //console.log(`pumping update, scale:${object.scale}`);
+//             item.style.boxShadow = `0 0 10 ${100}px ${item.style.backgroundColor}`;
+//         });
+//         //debug
+//         //console.log(`pumping update, scale:${object.scale}`);
+//     })
+//     .easing(Easing.Quadratic.InOut)
+//     .yoyo(true)
+//     .repeat(Infinity)
+//     .repeatDelay(200)
+//     .start();
+// const pumpingManager = new ClassManager('OO-pumping');
+// pumpingManager.onUpdate = function () {
+//     pumpingTween.update();
+// }
+// pumpingManager.needRefresh = true;
+// pumpingManager.onPageInit = function () {}
+// pumpingManager.init = function (element) {
+//     element.setAttribute('original-x', element.offsetWidth);
+//     element.setAttribute('original-y', element.offsetHeight);
+// }
+// pumpingManager.destroy = function (element) { }
 
 
 // console.log('pumpingManager', pumpingManager);
