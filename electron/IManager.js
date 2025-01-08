@@ -888,7 +888,7 @@ class IManager {
     // modsApplied,addMod,addPreset
 
     // 注册事件
-    on(eventName, callback) {
+    async on(eventName, callback) {
         if (!this.eventList[eventName]) {
             this.eventList[eventName] = [];
         }
@@ -903,7 +903,7 @@ class IManager {
     }
 
     // 触发事件
-    trigger(eventName, data) {
+    async trigger(eventName, data) {
         if (this.eventList[eventName]) {
             this.eventList[eventName].forEach((callback) => {
                 callback(data);
