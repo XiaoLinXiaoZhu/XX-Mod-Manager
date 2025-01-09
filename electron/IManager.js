@@ -1195,6 +1195,7 @@ ipcRenderer.on('wakeUp', () => {
 });
 
 let sleepTimer = '';
+let isSleeping = false;
 // 失去焦点10s后进入睡眠模式
 const sleepTimeOutTime = 10000;
 
@@ -1206,13 +1207,17 @@ ipcRenderer.on('windowBlur', () => {
 
     sleepTimer = setTimeout(()=>{
         iManager.trigger("windowSleep");
+        isSleeping = true;
         snack('💤windowSleep');
     },sleepTimeOutTime);
 });
 
 ipcRenderer.on('windowFocus', () => {
     console.log('windowFocus');
-    snack('👀windowFocus');
+    if (isSleeping) {
+        snack('👀windowFocus');
+        isSleeping = false;
+    }
     const iManager = new IManager();
     iManager.trigger('windowFocus');
 
