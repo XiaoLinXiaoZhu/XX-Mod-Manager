@@ -74,7 +74,7 @@ const getModKeySwap = async (iManager, mod) => {
     keyswap = [...new Set(keyswap)]; // 去重
 
     // 3. 添加到 mod 的 keyswap 中
-    // keyswap 的格式 为 ['a','b','c']
+    // keyswap 的格式 和 hotkeys 一样
     // mod 的 hotkeys 格式为
     // hotkeys:[
     //     {
@@ -89,27 +89,50 @@ const getModKeySwap = async (iManager, mod) => {
     // 1. 如果 mod 的 hotkeys 为空，直接添加
     // 2. 如果 mod 的 hotkeys 不为空，只添加新的，不删除已有的
 
+    const t_description = {
+        swap: '切换',
+        Swap: '切换',
+        glow: '发光',
+        Help: '帮助',
+    }
+
+    //! 测试用
+    // 将所有mod的hotkeys清空
+    // mod.hotkeys = [];
+
     keyswap.forEach(key => {
         let flag = false;
+
+        let removeHotkey = [];
+
         mod.hotkeys.forEach(hotkey => {
-            if (hotkey.key === key) {
+            if (hotkey.key === key.key) {
                 flag = true;
             }
+            if (hotkey.description == "未知" || hotkey.description == "unknown") {
+                flag = false;
+                // 将未知项删除
+                removeHotkey.push(hotkey);
+            }
         });
-        let keyDescription = 'unknown';
-        if (iManager.config.language === 'zh_cn') {
-            keyDescription = '未知';
-        }
 
+        // 删除未知项
+        removeHotkey.forEach(r => {
+            mod.hotkeys = mod.hotkeys.filter(h => h !== r);
+        });
+
+        // 如果是中文的话，尝试将 description 转化为中文
+        if (iManager.config.language === 'zh_cn') {
+            key.description = t_description[key.description] || key.description;
+        }
         if (!flag) {
             mod.hotkeys.push({
-                key: key,
-                description: keyDescription
+                key: key.key,
+                description: key.description
             });
         }
     });
-
-    iManager.saveModInfo(mod);
+    return mod;
 };
 
 
@@ -118,13 +141,21 @@ const getSwapkeyFromIni = (iniFilePath) => {
     const lines = fs.readFileSync(iniFilePath, 'utf-8').split('\n');
     let keyswap = [];
     let flag = false;
+    let keyType = "";
     lines.forEach(line => {
         //debug
-        console.log(line);
-        if (line.startsWith('[KeySwap') || line.startsWith('[[KeyGlow')) {
+        // console.log(line);
+        if (line.startsWith('[Key')) {
             flag = true;
+            keyType = line.slice(4, -2);
+
+            //如果keyType开头为Swap，则忽略后面的数字
+            if (keyType.startsWith('Swap')) {
+                keyType = 'Swap';
+            }
+
             //debug
-            console.log(`find [KeySwap]`);
+            console.log(`find [Key] section, keyType: ${keyType}`);
             return;
         }
         if (!flag) {
@@ -150,21 +181,34 @@ const getSwapkeyFromIni = (iniFilePath) => {
             return;
         }
 
-        let add = '';
-        // 因为这里的key是代码，将其转化为单个字符可读性会更好
-        switch (key) {
-            case 'VK_UP': add = '↑'; break;
-            case 'VK_DOWN': add = '↓'; break;
-            case 'VK_LEFT': add = '←'; break;
-            case 'VK_RIGHT': add = '→'; break;
-            case 'VK_RETURN': add = '↵'; break;
-            case 'VK_ESCAPE': add = 'ESC'; break;
-            case 'no_modifiers [': add = '['; break;
-            default: add = key; break;
+        // 替换字典，将代码转化为可读性更好的字符，使用正则表达式
+        const keyDict = {
+            'VK_UP': '↑',
+            'VK_DOWN': '↓',
+            'VK_LEFT': '←',
+            'VK_RIGHT': '→',
+            'VK_RETURN': '↵',
+            'VK_ESCAPE': 'ESC',
+            'VK_F([0-9]+)': 'F$1',
+            'VK_([A-Z])': '$1',
+            'VK_NUMPAD([0-9])': 'Num$1',
+            'no_modifiers': '',
+            'no_alt': '',
+            'no_shift': '',
+            'no_ctrl': '',
         }
 
+        let add = key;
+        for (let key in keyDict) {
+            add = add.replace(new RegExp(key, 'g'), keyDict[key]);
+        }
+
+
         if (!keyswap.includes(add)) {
-            keyswap.push(add);
+            keyswap.push({
+                key: add,
+                description: keyType
+            });
         }
 
         //debug
@@ -189,7 +233,8 @@ module.exports = {
             //debug
             console.log('addMod:', mod);
             if (iManager.getPluginData(pluginName, "ifAddKeySwap")) {
-                getModKeySwap(iManager, mod);
+                const newMod = await getModKeySwap(iManager, mod);
+                iManager.saveModInfo(newMod);
             }
         });
 
@@ -310,16 +355,23 @@ module.exports = {
             onChange: () => {
                 console.log('refreshAllMod clicked');
                 if (iManager.getPluginData(pluginName, "ifRefreshAllMod")) {
+                    iManager.showDialog('loading-dialog');
                     const snackMessage = {
                         en: "refresh all mod",
                         zh_cn: "刷新所有mod"
                     }
                     iManager.t_snack(snackMessage);
-                    iManager.showDialog('loading-dialog');
-                    iManager.data.modList.forEach(mod => {
-                        getModKeySwap(iManager, mod);
+                    iManager.data.modList.forEach(async (mod) => {
+                        const newMod = await getModKeySwap(iManager, mod);
+                        // 不使用saveModInfo，因为saveModInfo会将所有的mod信息都保存一遍，这样会导致卡顿以及其他事件被触发
+                        // 直接写入之后，让用户手动刷新即可
+                        const modFilePath = path.join(iManager.config.modSourcePath, mod.name, 'mod.json');
+                        fs.writeFileSync(modFilePath, JSON.stringify(mod, null, 4));
+
                     });
                     iManager.dismissDialog('loading-dialog');
+
+                    iManager.showDialog('dialog-need-refresh');
                 }
                 else {
                     const snackMessage = {
