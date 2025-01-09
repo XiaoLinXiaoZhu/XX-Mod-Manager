@@ -37,28 +37,25 @@ const getModKeySwap = async (iManager, mod) => {
     const fs = require('fs');
     const path = require('path');
     const modPath = path.join(iManager.config.modSourcePath, mod.name);
-
-    // 1. 寻找文件夹下的第一个 ini 文件
-    let iniFilePath = '';
+    // 1. 寻找文件夹下的所有 ini 文件，忽略 desktop.ini 和以 DISABLED 开头的 ini 文件
+    let iniFilePaths = [];
     const findIniInFolder = (folderPath) => {
         const files = fs.readdirSync(folderPath);
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             const filePath = path.join(folderPath, file);
-            const stat = fs.statSync(filePath
-            );
+            const stat = fs.statSync(filePath);
             if (stat.isDirectory()) {
                 findIniInFolder(filePath);
             } else {
-                if (file.endsWith('.ini')) {
-                    iniFilePath = filePath;
-                    return;
+                if (file.endsWith('.ini') && file !== 'desktop.ini' && !file.startsWith('DISABLED')) {
+                    iniFilePaths.push(filePath);
                 }
             }
         }
     }
     findIniInFolder(modPath);
-    if (!iniFilePath) {
+    if (iniFilePaths.length === 0) {
         //debug
         console.log('In mod 【' + mod.name + '】, no ini file found');
         iManager.snack('In mod 【' + mod.name + '】, no ini file found', 'error');
@@ -66,11 +63,15 @@ const getModKeySwap = async (iManager, mod) => {
     }
 
     //debug
-    console.log('In mod 【' + mod.name + '】,ini file found:', iniFilePath);
-    iManager.snack('In mod 【' + mod.name + '】,ini file found:' + iniFilePath, 'info');
+    console.log('In mod 【' + mod.name + '】, ini files found:', iniFilePaths);
+    iManager.snack('In mod 【' + mod.name + '】, ini files found:' + iniFilePaths.join(', '), 'info');
 
-    // 2. 读取 ini 文件
-    const keyswap = getSwapkeyFromIni(iniFilePath);
+    // 2. 读取所有 ini 文件
+    let keyswap = [];
+    iniFilePaths.forEach(iniFilePath => {
+        keyswap = keyswap.concat(getSwapkeyFromIni(iniFilePath));
+    });
+    keyswap = [...new Set(keyswap)]; // 去重
 
     // 3. 添加到 mod 的 keyswap 中
     // keyswap 的格式 为 ['a','b','c']
