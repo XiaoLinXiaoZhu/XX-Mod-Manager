@@ -1212,7 +1212,7 @@ ipcRenderer.on('windowBlur', () => {
 
 ipcRenderer.on('windowFocus', () => {
     console.log('windowFocus');
-    // snack('windowFocus');
+    snack('👀windowFocus');
     const iManager = new IManager();
     iManager.trigger('windowFocus');
 
