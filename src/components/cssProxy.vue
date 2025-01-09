@@ -28,6 +28,6 @@ waitInitIManager().then((iManager) =>{
     // iManager.on('themeChange', changeTheme);
     changeTheme(iManager.config.theme);
     iManager.trigger('themeChange', iManager.config.theme);
-    setTimeout(iManager.on('themeChange', changeTheme),1);
+    setTimeout(()=>{iManager.on('themeChange', changeTheme);},1);
 });
 </script>
