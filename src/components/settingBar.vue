@@ -61,7 +61,7 @@
 
         <!-- -iconbutton -->
         <s-tooltip style="position: relative;left: 15px;" v-if="data.type === 'iconbutton'">
-            <s-icon-button icon="image" class="OO-icon-button" style="border: 5px solid #0c0c0c;transform: scale(1);"
+            <s-icon-button icon="image" class="OO-icon-button" style="border: 5px solid var(--s-color-surface-container-high);transform: scale(1);"
                 slot="trigger" @click="onChange()">
                 <s-icon v-html="data.icon ? data.icon : defaultIcon">
                 </s-icon>
