@@ -105,7 +105,7 @@ module.exports = {
         //- 手动启动mod加载器的按钮
         let startModLoaderButton = {
             name: 'startModLoader',
-            type: 'button',
+            type: 'iconbutton',
             displayName: 'Start Mod Loader',
             description: 'Start the mod loader manually',
             t_displayName:{
@@ -196,7 +196,7 @@ module.exports = {
         //- 手动启动游戏的按钮
         let startGameButton = {
             name: 'startGame',
-            type: 'button',
+            type: 'iconbutton',
             displayName: 'Start Game',
             description: 'Start the game manually',
             t_displayName:{

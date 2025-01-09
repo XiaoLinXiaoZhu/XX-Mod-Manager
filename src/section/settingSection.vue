@@ -31,18 +31,6 @@
                 <s-divider></s-divider>
                 <settingBar :data="initAllDataButton"></settingBar>
 
-                <h3>
-                    {{ $t('setting.unavailable') }}
-                </h3>
-
-                <!-- <div class="OO-setting-bar">
-                    <h3 data-translate-key="refresh-mod-info-swapkey"> 刷新mod信息中的快捷键 </h3>
-                    <s-button id="refresh-mod-info-swapkey-button" data-translate-key="refresh">
-                        刷新
-                    </s-button>
-                </div> -->
-                <s-divider></s-divider>
-
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
             <!-- -切换配置 -->
@@ -261,7 +249,7 @@ const createShortOfCurrentConfig = {
     },
     t_buttonName: {
         zh_cn: '创建快捷方式',
-        en: 'Create Short'
+        en: 'Create Short Cut'
     },
     onChange: (value) => {
         console.log('createShortOfCurrentConfig changed:', changeConfig.data);

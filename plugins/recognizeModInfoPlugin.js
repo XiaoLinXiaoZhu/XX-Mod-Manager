@@ -180,8 +180,8 @@ const getSwapkeyFromIni = (iniFilePath) => {
 module.exports = {
     name: pluginName,
     t_displayName: {
-        zh_cn: '识别mod信息插件',
-        en: 'Recognize Mod Info Plugin'
+        zh_cn: '识别mod信息',
+        en: 'Recognize Mod Info'
     },
     init(iManager) {
 

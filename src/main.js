@@ -49,7 +49,7 @@ iManager.on('languageChange', (language) => {
 
 // ------------------ first load ------------------ //
 // 首次打开时打开 初始化窗口
-iManager.snack('first load : '+iManager.config.firstLoad);
+// iManager.snack('first load : '+iManager.config.firstLoad);
 iManager.on('wakeUp', () => {
     iManager.snack('first load : '+iManager.config.firstLoad);
     console.log('❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️\nfist load:', iManager.config.firstLoad);

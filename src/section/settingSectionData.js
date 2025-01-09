@@ -191,21 +191,21 @@ function getData() {
     //-------------------- 打开 firstLoad 页面的按钮 ------------------//
     let openFirstLoadButton = {
         name: 'openFirstLoad',
-        type: 'button',
+        type: 'iconbutton',
         displayName: 'Open First Load',
         description: 'Open First Load',
         t_displayName: {
-            zh_cn: '打开 firstLoad 页面',
-            en: 'Open First Load'
+            zh_cn: '新手引导',
+            en: 'New User Guide'
         },
         t_description: {
-            zh_cn: '打开 firstLoad 页面',
-            en: 'Open First Load'
+            zh_cn: '打开 新手引导 页面',
+            en: 'Open New User Guide Page'
         },
-        buttonName: 'Open First Load',
+        buttonName: 'First Load',
         t_buttonName: {
-            zh_cn: '打开 firstLoad 页面',
-            en: 'Open First Load'
+            zh_cn: '打开 新手引导',
+            en: 'Open New User Guide'
         },
         onChange: () => {
             iManager.openNewWindow('firstLoad');

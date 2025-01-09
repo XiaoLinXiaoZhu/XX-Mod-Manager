@@ -261,10 +261,23 @@ const autoContentCn =
 `;
 const multipleGamesContentCn =
   `# 适配多个游戏
-暂时只支持对于一个游戏的mod管理
+通过使用 本地配置 而非 全局配置的方式，允许你创建多组配置，分别为不同的游戏设置mod加载器、mod源文件夹、mod目标文件夹等。
 
-敬请期待
+# 创建本地配置
+1. 打开【设置】页面。
+2. 找到【切换配置】的分页。
+3. 选择【配置另存为】的路径，它应该是一个空的文件夹，之后点击创建快捷方式。
+
+之后，当你通过创建在桌面的快捷方式打开程序时，程序会加载你选择的本地配置，而不是全局配置。
+
+# 进阶用法
+如果你知道基础的命令行知识，使用本地配置实际上是在XXMM启动时提供了启动参数：
+
+'xx mod manager.exe' --customConfig '你的本地配置文件夹路径'
+
+你可以尝试使用bat或者其他程序通过设置启动参数来启动程序，从而在别的应用中实现自动化。
 `;
+
 const troubleContentCn =
   `# 故障排除
 当你遇到问题时，你可以尝试以下方法来解决问题：
@@ -443,10 +456,22 @@ If configured correctly, the program will automatically start the mod loader and
 `;
 
 const multipleGamesContentEn =
-  `# Support for Multi-Game Support
-Currently only supports mod management for one game
+  `# Multi-Game Support
+By using local configuration instead of global configuration, you can create multiple configurations for different games to set mod loaders, mod source folders, mod target folders, etc.
 
-Stay tuned
+# Create Local Configuration
+1. Open the [Settings] page.
+2. Find the [Switch Configuration] page.
+3. Select the path of [Save As], it should be an empty folder, and then click Create Shortcut.
+
+After that, when you open the program by creating a shortcut on the desktop, the program will load the local configuration you selected, instead of the global configuration.
+
+# Advanced Usage
+If you know basic command line knowledge, using local configuration is actually providing startup parameters when XXMM starts:
+
+'xx mod manager.exe' --customConfig 'path to your local configuration folder'
+
+You can try using bat or other programs to start the program by setting startup parameters, so as to achieve automation in other applications.
 `;
 
 const troubleContentEn =
