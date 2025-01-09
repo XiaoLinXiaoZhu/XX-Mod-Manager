@@ -168,5 +168,7 @@ defineExpose({
     transform: skew(-20deg);
     background-color: var(--s-color-primary);
     transition: left 0.3s, width 0.3s;
+
+    will-change: left, width;
 }
 </style>

@@ -170,6 +170,8 @@ defineExpose({
     background-color: var(--s-color-primary);
     border-radius: 10px;
     transition: height 0.3s ease-in-out, top 0.3s;
+
+    will-change: height, top, width;
 }
 
 s-ripple {

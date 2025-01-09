@@ -173,45 +173,45 @@ colorManager2.destroy = function (element) {
 }
 
 //-========================= OO-color-gradient-svg ========================
-const colorManagerSvg = new ClassManager('OO-color-gradient-svg');
-colorManagerSvg.onUpdate = function () {
-    const currentColor = getColor();
-    this.items.forEach(item => {
-        const svg = item.querySelector('svg');
-        const group = svg.querySelector('g');
-        group.setAttribute('fill', `#${currentColor}`);
-    });
-}
-colorManagerSvg.needRefresh = true;
-colorManagerSvg.onPageInit = function () {}
-colorManagerSvg.init = function (element) { }
-colorManagerSvg.destroy = function (element) { }
+// const colorManagerSvg = new ClassManager('OO-color-gradient-svg');
+// colorManagerSvg.onUpdate = function () {
+//     const currentColor = getColor();
+//     this.items.forEach(item => {
+//         const svg = item.querySelector('svg');
+//         const group = svg.querySelector('g');
+//         group.setAttribute('fill', `#${currentColor}`);
+//     });
+// }
+// colorManagerSvg.needRefresh = true;
+// colorManagerSvg.onPageInit = function () {}
+// colorManagerSvg.init = function (element) { }
+// colorManagerSvg.destroy = function (element) { }
 
 
 //-========================= OO-OO-capering ========================
 // 上下浮动的效果
-const caperingTween = new Tween({ y: -1 });
-caperingTween.to({ y: 1 }, 500)
-    .onUpdate((object) => {
-        caperingManager.items.forEach(item => {
-            const k = item.getAttribute('capering-k') || 1;
-            //让其上下浮动，不使用transform
-            const translateY =  object.y * object.y * k;
-            item.style.marginTop = `${translateY }px`;
-        });
-    })
-    .yoyo(true)
-    .repeat(Infinity)
-    .repeatDelay(500)
-    .start();
-const caperingManager = new ClassManager('OO-capering');
-caperingManager.onUpdate = function () {
-    caperingTween.update();
-}
-caperingManager.needRefresh = true;
-caperingManager.onPageInit = function () {}
-caperingManager.init = function (element) { }
-caperingManager.destroy = function (element) { }
+// const caperingTween = new Tween({ y: -1 });
+// caperingTween.to({ y: 1 }, 500)
+//     .onUpdate((object) => {
+//         caperingManager.items.forEach(item => {
+//             const k = item.getAttribute('capering-k') || 1;
+//             //让其上下浮动，不使用transform
+//             const translateY =  object.y * object.y * k;
+//             item.style.marginTop = `${translateY }px`;
+//         });
+//     })
+//     .yoyo(true)
+//     .repeat(Infinity)
+//     .repeatDelay(500)
+//     .start();
+// const caperingManager = new ClassManager('OO-capering');
+// caperingManager.onUpdate = function () {
+//     caperingTween.update();
+// }
+// caperingManager.needRefresh = true;
+// caperingManager.onPageInit = function () {}
+// caperingManager.init = function (element) { }
+// caperingManager.destroy = function (element) { }
 
 // console.log('colorManager', colorManager);
 

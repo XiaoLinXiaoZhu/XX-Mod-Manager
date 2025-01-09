@@ -668,3 +668,11 @@ p {
   animation: slideBackground 5s linear infinite;
   /* 动画持续时间为5秒，线性变化，无限循环 */
 }
+
+/* -颜色渐变类增加一个 willchange */
+.OO-color-gradient {
+  will-change: background-color;
+}
+.OO-color-gradient-word {
+  will-change: color;
+}
