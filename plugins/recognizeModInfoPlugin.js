@@ -29,6 +29,8 @@
 // 1. 开关，是否在导入mod的时候添加keyswap信息
 // 2. 是否启用 刷新所有mod的开关，用于二次确认
 // 3. 按钮，刷新所有mod的keyswap
+const fs = require('fs');
+const path = require('path');
 
 const pluginName = 'recognizeModInfoPlugin';
 
@@ -166,6 +168,9 @@ const getSwapkeyFromIni = (iniFilePath) => {
             return;
         }
         let key = '';
+        // 忽略大小写，去掉空格
+        line = line.toLowerCase().trim();
+
         //匹配 key = xxx 或 key=xxx 或 back = xxx
         if (line.startsWith('key =') && line.length > 6) {
             key = line.slice(6).trim();
@@ -183,18 +188,30 @@ const getSwapkeyFromIni = (iniFilePath) => {
 
         // 替换字典，将代码转化为可读性更好的字符，使用正则表达式
         const keyDict = {
-            'VK_UP': '↑',
-            'VK_DOWN': '↓',
-            'VK_LEFT': '←',
-            'VK_RIGHT': '→',
-            'VK_RETURN': '↵',
-            'VK_ESCAPE': 'ESC',
-            'VK_BACKSPACE': '⌫',
-            'VK_TAB': '⇥',
-            'VK_SPACE': '⎵',
-            'VK_F([0-9]+)': 'F$1',
-            'VK_([A-Z])': '$1',
-            'VK_NUMPAD([0-9])': 'Num$1',
+            'vk_up': '↑',
+            'vk_down': '↓',
+            'vk_left': '←',
+            'vk_right': '→',
+            'vk_return': '↵',
+            'vk_escape': 'esc',
+            'vk_backspace': '⌫',
+            'vk_tab': '⇥',
+            'vk_space': '⎵',
+            'vk_f([0-9]+)': 'f$1',
+            'vk_([a-z])': '$1',
+            'vk_numpad([0-9])': 'num$1',
+            'up': '↑',
+            'down': '↓',
+            'left': '←',
+            'right': '→',
+            'return': '↵',
+            'escape': 'esc',
+            'backspace': '⌫',
+            'tab': '⇥',
+            'space': '⎵',
+            'f([0-9]+)': 'f$1',
+            '([a-z])': '$1',
+            'numpad([0-9])': 'num$1',
             'no_modifiers': '',
             'no_alt': '',
             'no_shift': '',
