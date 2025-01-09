@@ -292,7 +292,7 @@ defineExpose({
     border: 5px solid transparent;
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
-    background-image: linear-gradient(to right, var(--s-color-surface-container-low), var(--s-color-surface-container-low)), linear-gradient(90deg, var(--s-color-primary), #e4d403);
+    background-image: linear-gradient(to right, var(--s-color-surface-container-low), var(--s-color-surface-container-low)), linear-gradient(90deg, var(--s-color-primary), var(--s-color-secondary));
     box-sizing: border-box;
     transform: rotate3d(1, 1, 0, 0deg) scale(0.95);
     border-radius: 0px 32px 0px 32px;

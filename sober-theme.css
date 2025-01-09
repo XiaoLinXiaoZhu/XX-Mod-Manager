@@ -3,7 +3,7 @@ s-page {
   --s-color-on-primary: #ffffff;
   --s-color-primary-container: #6ff6ff;
   --s-color-on-primary-container: #002022;
-  --s-color-secondary: #4a6365;
+  --s-color-secondary: #388c88;
   --s-color-on-secondary: #ffffff;
   --s-color-secondary-container: #4b8787;
   --s-color-on-secondary-container: #051f21;
@@ -38,7 +38,7 @@ s-page {
   --s-color-dark-on-primary: #222122;
   --s-color-dark-primary-container: #0cf4ff;
   --s-color-dark-on-primary-container: #1ff1ff;
-  --s-color-dark-secondary: #00f6ff;
+  --s-color-dark-secondary: #e4d403;
   --s-color-dark-on-secondary: #1b3436;
   --s-color-dark-secondary-container: #c2e500;
   --s-color-dark-on-secondary-container: #d8d5c3;
@@ -51,7 +51,7 @@ s-page {
   --s-color-dark-error-container: #93000a;
   --s-color-dark-on-error-container: #ffb4ab;
   --s-color-dark-background: #18181c;
-  --s-color-dark-on-background: #cdd5c6;
+  --s-color-dark-on-background: #e6ece1;
   --s-color-dark-outline: #cce403;
   --s-color-dark-outline-variant: #303030;
   --s-color-dark-surface: #000000;
