@@ -114,6 +114,15 @@ class IManager {
     async snack(message, type = 'info') {
         snack(message, type);
     }
+    async t_snack(messages,type = 'info'){
+        if (messages[this.config.language] != null){
+            snack(messages[this.config.language],type);
+        }
+        else{
+            const firstMessageKey = Object.keys(messages)[0];
+            snack(messages[firstMessageKey], type);
+        }
+    }
     async loadConfig() {
         const currentConfig = await ipcRenderer.invoke('get-current-config');
         console.log(currentConfig);

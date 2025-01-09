@@ -1,6 +1,6 @@
 <template>
     <!-- -markdown -->
-     <div v-if="data.type === 'markdown'">
+    <div v-if="data.type === 'markdown'">
         <markdown v-if="data.t_description" :content="data.t_description[local] || data.description"></markdown>
         <markdown v-else :content="data.description"></markdown>
     </div>
@@ -25,7 +25,8 @@
             <div v-for="(option, index) in data.options" :key="index" style="margin-left: 3px;">
                 <input type="radio" :name="data.name" :id="option.value" :value="option.value" v-model="data.data">
                 <label :for="option.value">
-                    <s-chip selectable="true" type="default" :id="option.value" @click="onChange(option.value)" :class="{ 'OO-color-gradient': data.data === option.value }">
+                    <s-chip selectable="true" type="default" :id="option.value" @click="onChange(option.value)"
+                        :class="{ 'OO-color-gradient': data.data === option.value }">
                         <p>{{ option.t_value ? option.t_value[local] : option.value }}</p>
                     </s-chip>
                 </label>
@@ -56,6 +57,20 @@
         <s-button @click="onChange()" v-else-if="data.type === 'button'">
             {{ data.t_buttonName ? data.t_buttonName[local] : data.buttonName }}
         </s-button>
+
+
+        <!-- -iconbutton -->
+        <s-tooltip style="position: relative;left: 15px;" v-if="data.type === 'iconbutton'">
+            <s-icon-button icon="image" class="OO-icon-button" style="border: 5px solid #0c0c0c;transform: scale(1);"
+                slot="trigger" @click="onChange()">
+                <s-icon v-html="data.icon ? data.icon : defaultIcon">
+                </s-icon>
+            </s-icon-button>
+
+            <p style="line-height: 1.2;">
+                {{ data.t_buttonName ? data.t_buttonName[local] : data.buttonName }}
+            </p>
+        </s-tooltip>
     </div>
     <div class="OO-setting-bar" v-else>
         <h3 v-if="data.t_displayName">{{ data.t_displayName[local] }}</h3>
@@ -86,6 +101,9 @@ const props = defineProps({
 const data = ref(props.data);
 const local = ref(iManager.config.language);
 const display = ref(true);
+
+// 默认icon
+const defaultIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="m256-240-56-56 384-384H240v-80h480v480h-80v-344L256-240Z"></path></svg>`;
 
 iManager.on('languageChange', (lang) => {
     local.value = lang;
