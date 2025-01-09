@@ -30,7 +30,7 @@
 // 2. 是否启用 刷新所有mod的开关，用于二次确认
 // 3. 按钮，刷新所有mod的keyswap
 
-const pluginName = 'recognizeKeySwapPlugin';
+const pluginName = 'recognizeModInfoPlugin';
 
 
 const getModKeySwap = async (iManager, mod) => {
@@ -180,8 +180,8 @@ const getSwapkeyFromIni = (iniFilePath) => {
 module.exports = {
     name: pluginName,
     t_displayName: {
-        zh_cn: '识别切换键插件',
-        en: 'Recognize Key Swap Plugin'
+        zh_cn: '识别mod信息插件',
+        en: 'Recognize Mod Info Plugin'
     },
     init(iManager) {
 
@@ -215,14 +215,14 @@ module.exports = {
                 en: 'Plugin Description'
             },
             t_description: {
-                zh_cn: `这是一个用于在添加mod时获取并解析切换键的mod,它只用来识别按键，并不能知道按键的具体功能`,
+                zh_cn: `这是一个用于在添加mod时获取并解析切换键的mod,`,
                 en: 'This is a plugin used to get and parse the keyswap mod when adding mod, it is only used to recognize the key, and cannot know the specific function of the key'
             },
             onChange: (value) => {
                 // markdown 类型的数据不会触发 onChange,它只作为展示
             }
         }
-        pluginData.push(pluginDescription);
+        // pluginData.push(pluginDescription);
 
         //- 开关，是否在导入mod的时候添加keyswap信息
         let ifAddKeySwap = {
@@ -236,8 +236,8 @@ module.exports = {
                 en: 'If Add Key Swap'
             },
             t_description: {
-                zh_cn: '开启后，导入mod时添加切换键信息',
-                en: 'If true, add key swap information when importing mod'
+                zh_cn: '开启后，导入mod时添加切换键信息,它只用来识别按键，并不能知道按键的具体功能',
+                en: 'If true, add key swap information when importing mod, it is only used to recognize the key, and cannot know the specific function of the key'
             },
             onChange: (value) => {
                 console.log('ifAddKeySwap changed:', value);
@@ -277,6 +277,12 @@ module.exports = {
             onChange: (value) => {
                 console.log('ifRefreshAllMod changed:', value);
                 ifRefreshAllMod.data = value;
+
+                const snackMessage = {
+                    zh_cn: '刷新全部的mod的切换键可能会需要一些时间，这取决于你的mod数量，请坐和放宽，不要关闭程序',
+                    en: 'Refreshing all mod keyswap may take some time, depending on the number of mods you have, please be patient and do not close the program'
+                }
+                iManager.t_snack(snackMessage);
             }
         }
         pluginData.push(ifRefreshAllMod);
@@ -309,11 +315,11 @@ module.exports = {
                         zh_cn: "刷新所有mod"
                     }
                     iManager.t_snack(snackMessage);
-
+                    iManager.showDialog('loading-dialog');
                     iManager.data.modList.forEach(mod => {
                         getModKeySwap(iManager, mod);
                     });
-
+                    iManager.dismissDialog('loading-dialog');
                 }
                 else {
                     const snackMessage = {
