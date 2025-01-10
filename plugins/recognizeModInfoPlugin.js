@@ -100,7 +100,7 @@ const getModKeySwap = async (iManager, mod) => {
 
     //! 测试用
     // 将所有mod的hotkeys清空
-    // mod.hotkeys = [];
+    mod.hotkeys = [];
 
     keyswap.forEach(key => {
         let flag = false;
@@ -147,6 +147,12 @@ const getSwapkeyFromIni = (iniFilePath) => {
     lines.forEach(line => {
         //debug
         // console.log(line);
+
+        // 忽略以 ; 开头的行
+        if (line.startsWith(';')) {
+            return;
+        }
+
         if (line.startsWith('[Key') || line.startsWith('[key')){
             flag = true;
             keyType = line.slice(4, -2);
@@ -167,19 +173,24 @@ const getSwapkeyFromIni = (iniFilePath) => {
             flag = false;
             return;
         }
+
         let key = '';
         // 忽略大小写，去掉空格
         line = line.toLowerCase().trim();
 
-        //匹配 key = xxx 或 key=xxx 或 back = xxx
-        if (line.startsWith('key =') && line.length > 6) {
+        // 匹配 key = xxx 或 key=xxx 或 back = xxx
+        // 这里的 line 根据 \n 分割后已经去掉了 \n
+        if (line.startsWith('key  =') && line.length > 6) {
             key = line.slice(6).trim();
         }
-        if (line.startsWith('key=') && line.length > 5) {
+        if (line.startsWith('key =') && line.length > 5) {
             key = line.slice(5).trim();
         }
-        if (line.startsWith('back = ') && line.length > 7) {
-            key = line.slice(7).trim();
+        if (line.startsWith('key=') && line.length > 4) {
+            key = line.slice(4).trim();
+        }
+        if (line.startsWith('back =') && line.length > 6) {
+            key = line.slice(6).trim();
         }
 
         if (key === '') {
@@ -213,6 +224,7 @@ const getSwapkeyFromIni = (iniFilePath) => {
             '([a-z])': '$1',
             'numpad([0-9])': 'num$1',
             'no_modifiers': '',
+            'no_decimal': '⌨',
             'no_alt': '',
             'no_shift': '',
             'no_ctrl': '',
