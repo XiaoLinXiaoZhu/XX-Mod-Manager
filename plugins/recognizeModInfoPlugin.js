@@ -147,7 +147,7 @@ const getSwapkeyFromIni = (iniFilePath) => {
     lines.forEach(line => {
         //debug
         // console.log(line);
-        if (line.startsWith('[Key')) {
+        if (line.startsWith('[Key') || line.startsWith('[key')){
             flag = true;
             keyType = line.slice(4, -2);
 
