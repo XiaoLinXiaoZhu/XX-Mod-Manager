@@ -5,7 +5,8 @@
         {{ $t('editDialog.edit-mod-info') }}
       </h3>
 
-      <div id="edit-mod-info-dialog-container" style="display: flex;flex-direction: column;align-items: center;width: 100%;  font-size: 15px;z-index:1">
+      <div id="edit-mod-info-dialog-container"
+        style="display: flex;flex-direction: column;align-items: center;width: 100%;  font-size: 15px;z-index:1">
         <div id="edit-mod-info-dialog-top" style="display: flex;width: 100%;">
           <!-- 展示mod当前名称、图片 -->
           <div class="OO-box"
@@ -50,9 +51,11 @@
             <div class="OO-setting-bar">
               <s-tooltip>
                 <h3 slot="trigger"> {{ $t('editDialog.mod-info-name') }} </h3>
-                <p
+                <horizontalScrollBar class="OO-box OO-shade-box hotkey-container">
+                  <p
                   style="line-height: 1.2; word-wrap: break-word; max-width: 120px; overflow-wrap: break-word; white-space: normal;">
                   {{ $t('editDialog.mod-info-name-tip') }} </p>
+                </horizontalScrollBar>
               </s-tooltip>
 
               <s-button>
@@ -94,22 +97,27 @@
                 <p style="line-height: 1.2;">
                   {{ $t('editDialog.mod-info-hotkeys-tip') }} </p>
               </s-tooltip>
-
               <div style="display: flex;flex-direction: row;align-items: center;justify-content: space-between;">
-                <div v-for="(hotkey, index) in modInfo.hotkeys" :key="index">
-                  <s-tooltip>
-                    <s-chip style="margin: 0px 1px;height: 35px;" slot="trigger">
-                      {{ hotkey.key }}
-                    </s-chip>
-
-                    <p style="line-height: 1.2;">
-                      {{ hotkey.description }} </p>
-                  </s-tooltip>
-                </div>
+                <horizontalScrollBar class="OO-box OO-shade-box hotkey-container">
+                  <div style="display: flex;flex-direction: row;flex-wrap: nowrap;padding: 0 10px;">
+                    <div v-for="(hotkey, index) in modInfo.hotkeys" :key="index">
+                      <s-tooltip>
+                        <div style="margin: 0px 3px;height: 35px;padding: 20px 15px 20px 15px;transform: skew(-20deg);border-radius: 0;" slot="trigger" class="OO-button">
+                          <p style="transform: skew(20deg);">
+                            {{ hotkey.key }}
+                          </p>
+                        </div>
+                        <p style="line-height: 1.2;">
+                          {{ hotkey.description }} </p>
+                      </s-tooltip>
+                    </div>
+                  </div>
+                </horizontalScrollBar>
                 <s-popup align="left">
                   <s-tooltip slot="trigger" style="position: relative;left: 15px;">
                     <s-icon-button icon="image" class="OO-icon-button"
-                      style="border: 5px solid var(--s-color-surface-container-high);transform: scale(1);" slot="trigger">
+                      style="border: 5px solid var(--s-color-surface-container-high);transform: scale(1);"
+                      slot="trigger">
                       <s-icon type="chevron_down"></s-icon>
                     </s-icon-button>
 
@@ -157,10 +165,16 @@
     </template>
 
     <template v-slot:action>
-      <s-button slot="action" type="text" id="dialog-cancel" class="OO-button font-hongmeng" @click="handleCancel" style="margin-left: 20px;
-    margin-right: 20px;"><p>{{ $t('buttons.cancel') }}</p></s-button>
-            <s-button slot="action" type="text" id="preset-add-confirm" class="OO-button font-hongmeng OO-color-gradient" @click="handleSave" style="color: var(--s-color-surface);margin-left: 20px;
-    margin-right: 20px;"> <p>{{ $t('buttons.save') }}</p></s-button>
+      <s-button slot="action" type="text" id="dialog-cancel" class="OO-button font-hongmeng" @click="handleCancel"
+        style="margin-left: 20px;
+    margin-right: 20px;">
+        <p>{{ $t('buttons.cancel') }}</p>
+      </s-button>
+      <s-button slot="action" type="text" id="preset-add-confirm" class="OO-button font-hongmeng OO-color-gradient"
+        @click="handleSave" style="color: var(--s-color-surface);margin-left: 20px;
+    margin-right: 20px;">
+        <p>{{ $t('buttons.save') }}</p>
+      </s-button>
     </template>
 
   </DialogTemplate>
@@ -198,6 +212,7 @@ import { defineProps, defineEmits, onMounted, computed, watch, useTemplateRef } 
 import dialogTemplate from './dialogTemplate.vue';
 import IManager from '../../electron/IManager';
 import DialogTemplate from './dialogTemplate.vue';
+import horizontalScrollBar from '../components/horizontalScrollBar.vue';
 const iManager = new IManager();
 
 // 参数为 字符串类型的 mod，之后通过 iManager.getModInfo(mod) 获取 mod 信息
@@ -340,4 +355,15 @@ const handleSave = () => {
 </script>
 
 
-<style scoped></style>
+<style scoped>
+.hotkey-container {
+  overflow-y: hidden;
+  overflow-x: auto;
+  height: 35px;
+  justify-content: center;
+  align-items: center;
+  max-width: 450px;
+  padding: 0px 0px; 
+  border-radius:  20px; 
+}
+</style>

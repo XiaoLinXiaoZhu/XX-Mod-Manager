@@ -564,7 +564,7 @@ p {
   font-weight: 1000;
 
   p{
-    z-index: 1;
+    z-index: 0;
   }
   
 }
