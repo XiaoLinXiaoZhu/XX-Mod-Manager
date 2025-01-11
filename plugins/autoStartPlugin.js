@@ -78,20 +78,35 @@ module.exports = {
 
         let pluginData = [];
 
+        let markdownModLoader = {
+            name: 'markdownModLoader',
+            data: '',
+            type: 'markdown',   
+            displayName: 'Mod Loader',
+            description: 'The path of the mod loader',
+            t_displayName:{
+                zh_cn:'Mod加载器',
+                en:'Mod Loader'
+            },
+            t_description:{
+                zh_cn:'# 在程序启动时自动启动mod加载器\n请确保mod加载器的路径正确,并且将开关打开。\n你可以通过手动点击按钮测试程序是否正常启动。',
+                en:'# Auto Start Mod Loader on Program Start\nPlease make sure the path of the mod loader is correct and turn on the switch. \nYou can test if the program starts normally by manually clicking the button.'
+            },
+            onChange: (value) => {
+                // markdown 类型的数据不会触发 onChange,它只作为展示
+            }
+        };
+        pluginData.push(markdownModLoader);
+
         //- mod加载器路径
         let modLoaderPath = {
             name: 'modLoaderPath',
             data: '',
             type: 'exePath',
             displayName: 'Mod Loader Path',
-            description: 'The path of the mod loader',
             t_displayName:{
                 zh_cn:'mod加载器路径',
                 en:'Mod Loader Path'
-            },
-            t_description:{
-                zh_cn:'mod加载器的路径',
-                en:'The path of the mod loader'
             },
             onChange: (value) => {
                 console.log('modLoaderPath changed:', value);
@@ -106,15 +121,10 @@ module.exports = {
         let startModLoaderButton = {
             name: 'startModLoader',
             type: 'iconbutton',
-            displayName: 'Start Mod Loader',
-            description: 'Start the mod loader manually',
+            displayName: 'Test Start Mod Loader',
             t_displayName:{
-                zh_cn:'启动mod加载器',
-                en:'Start Mod Loader'
-            },
-            t_description:{
-                zh_cn:'手动启动mod加载器',
-                en:'Start the mod loader manually'
+                zh_cn:'测试启动mod加载器',
+                en:'Test Start Mod Loader'
             },
             buttonName: 'Start Mod Loader',
             t_buttonName:{
@@ -142,14 +152,9 @@ module.exports = {
             data: false,
             type: 'boolean',
             displayName: 'Auto Start Mod Loader',
-            description: 'If true, the mod loader will start automatically',
             t_displayName:{
                 zh_cn:'自动启动mod加载器',
                 en:'Auto Start Mod Loader'
-            },
-            t_description:{
-                zh_cn:'如果为真，mod加载器将自动启动',
-                en:'If true, the mod loader will start automatically'
             },
             onChange: (value) => {
                 // 检查 mod 加载器路径是否存在
@@ -168,6 +173,38 @@ module.exports = {
         };
         pluginData.push(autoStartModLoader);
 
+        let divider = {
+            name: 'divider',
+            data: '',
+            type: 'markdown',
+            displayName: 'Divider',
+            description: '---',
+            t_displayName: {
+                zh_cn: '分割线',
+                en: 'Divider'
+            }
+        }
+        pluginData.push(divider);
+
+        let markdownGame = {
+            name: 'markdownGame',
+            data: '',
+            type: 'markdown',
+            displayName: 'Game',
+            description: 'The path of the game',
+            t_displayName:{
+                zh_cn:'游戏',
+                en:'Game'
+            },
+            t_description:{
+                zh_cn:'# 在程序启动时自动启动游戏\n请确保游戏的路径正确,并且将开关打开。\n你可以通过手动点击按钮测试程序是否正常启动。',
+                en:'# Auto Start Game on Program Start\nPlease make sure the path of the game is correct and turn on the switch. \nYou can test if the program starts normally by manually clicking the button.'
+            },
+            onChange: (value) => {
+                // markdown 类型的数据不会触发 onChange,它只作为展示
+            }
+        };
+        pluginData.push(markdownGame);
 
         //- 游戏路径
         let gamePath = {
@@ -175,14 +212,9 @@ module.exports = {
             data: '',
             type: 'exePath',
             displayName: 'Game Path',
-            description: 'The path of the game',
             t_displayName:{
                 zh_cn:'游戏路径',
                 en:'Game Path'
-            },
-            t_description:{
-                zh_cn:'游戏的路径',
-                en:'The path of the game'
             },
             onChange: (value) => {
                 console.log('gamePath changed:', value);
@@ -197,15 +229,10 @@ module.exports = {
         let startGameButton = {
             name: 'startGame',
             type: 'iconbutton',
-            displayName: 'Start Game',
-            description: 'Start the game manually',
+            displayName: 'Test Start Game',
             t_displayName:{
-                zh_cn:'启动游戏',
-                en:'Start Game'
-            },
-            t_description:{
-                zh_cn:'手动启动游戏',
-                en:'Start the game manually'
+                zh_cn:'测试启动游戏',
+                en:'Test Start Game'
             },
             buttonName: 'Start Game',
             t_buttonName:{
@@ -231,14 +258,9 @@ module.exports = {
             data: false,
             type: 'boolean',
             displayName: 'Auto Start Game',
-            description: 'If true, the game will start automatically',
             t_displayName:{
                 zh_cn:'自动启动游戏',
                 en:'Auto Start Game'
-            },
-            t_description:{
-                zh_cn:'如果为真，游戏将自动启动',
-                en:'If true, the game will start automatically'
             },
             onChange: (value) => {
                 // 检查游戏路径是否存在

@@ -1135,6 +1135,12 @@ class IManager {
         return data.data;
     }
 
+    setPluginData(pluginName, dataName, value) {
+        const pluginData = this.pluginConfig[pluginName];
+        const data = pluginData.find((data) => data.name === dataName);
+        data.onChange(value);
+    }
+
     // // 支持 css 在当前页面的插入/删除
     // addCss(css) {
     //     const style = document.createElement('style');

@@ -91,7 +91,7 @@ module.exports = {
         iManager.on('modsApplied', async () => {
             //debug
             console.log('modsApplied');
-            if (iManager.getPluginData(pluginName, 'refreshAfterApply')) {
+            if (iManager.getPluginData(pluginName, 'ifRefreshAfterApply')) {
                 const result = await refreshInGame(iManager);
                 // Refresh in ZZZ success flag
                 // 0: Failed
@@ -103,7 +103,7 @@ module.exports = {
                 const snackMessage = iManager.config.language === 'zh_cn' ?
                     ['刷新失败', '刷新成功', '找不到进程', '找不到窗口', '找不到mod管理器'][result] :
                     ['Refresh Failed', 'Refresh Success', 'Cannot find the process', 'Cannot find the window', 'Cannot find the mod manager'][result];
-                iManager.snack(refreshAfterApply.t_displayName[iManager.config.language] + " : " +
+                iManager.snack(ifRefreshAfterApply.t_displayName[iManager.config.language] + " : " +
                     snackMessage, result === 1 ? "success" : "error");
             }
         });
@@ -111,8 +111,8 @@ module.exports = {
 
         let pluginData = [];
         //-是否启用
-        let refreshAfterApply = {
-            name: 'refreshAfterApply',
+        let ifRefreshAfterApply = {
+            name: 'ifRefreshAfterApply',
             data: false,
             type: 'boolean',
             displayName: 'Refresh After Apply',
@@ -126,11 +126,11 @@ module.exports = {
                 en: 'If true, the game will be refreshed after applying the mod'
             },
             onChange: (value) => {
-                console.log('refreshAfterApply changed:', value);
-                refreshAfterApply.data = value;
+                console.log('ifRefreshAfterApply changed:', value);
+                ifRefreshAfterApply.data = value;
             }
         };
-        pluginData.push(refreshAfterApply);
+        pluginData.push(ifRefreshAfterApply);
 
         //- 游戏进程名
         let processName = {

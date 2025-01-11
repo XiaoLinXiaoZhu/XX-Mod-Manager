@@ -100,7 +100,7 @@ const getModKeySwap = async (iManager, mod) => {
 
     //! 测试用
     // 将所有mod的hotkeys清空
-    mod.hotkeys = [];
+    // mod.hotkeys = [];
 
     keyswap.forEach(key => {
         let flag = false;
@@ -387,6 +387,9 @@ module.exports = {
             onChange: () => {
                 console.log('refreshAllMod clicked');
                 if (iManager.getPluginData(pluginName, "ifRefreshAllMod")) {
+                    // 将 二次确认 开关关闭
+                    iManager.setPluginData(pluginName, "ifRefreshAllMod", false);
+                    
                     iManager.showDialog('loading-dialog');
                     const snackMessage = {
                         en: "refresh all mod",
@@ -415,6 +418,93 @@ module.exports = {
             }
         }
         pluginData.push(refreshAllMod);
+        pluginData.push(divider);
+
+        // - 开关，清空所有mod的hotkeys 的二次确认开关，用于二次确认
+        let ifClearAllModHotkeys = {
+            name: 'ifClearAllModHotkeys',
+            data: false,
+            type: 'boolean',
+            displayName: 'If Clear All Mod Hotkeys',
+            description: 'If true, clear all mod hotkeys',
+            t_displayName: {
+                zh_cn: '清空所有mod的热键 - 二次确认',
+                en: 'Clear All Mod Hotkeys - Confirm'
+            },
+            t_description: {
+                zh_cn: '你需要先将此开关打开才能清空所有mod的热键',
+                en: 'You need to set this option to true first to clear all mod hotkeys'
+            },
+            onChange: (value) => {
+                console.log('ifClearAllModHotkeys changed:', value);
+                ifClearAllModHotkeys.data = value;
+
+                const snackMessage = {
+                    zh_cn: '清空全部的mod的热键可能会需要一些时间，这取决于你的mod数量，请坐和放宽，不要关闭程序',
+                    en: 'Clearing all mod hotkeys may take some time, depending on the number of mods you have, please be patient and do not close the program'
+                }
+                iManager.t_snack(snackMessage);
+
+                //需要刷新，将value返回
+                return value;
+            }
+        }
+        pluginData.push(ifClearAllModHotkeys);
+
+        //- 按钮，清空所有mod的hotkeys
+        let clearAllModHotkeys = {
+            name: 'clearAllModHotkeys',
+            data: '',
+            type: 'iconbutton',
+            displayName: 'Clear All Mod Hotkeys',
+            description: 'Clear all mod hotkeys',
+            t_displayName: {
+                zh_cn: '清空所有mod的热键',
+                en: 'Clear All Mod Hotkeys'
+            },
+            t_description: {
+                zh_cn: '清空所有mod的热键',
+                en: 'Clear all mod hotkeys'
+            },
+            buttonName: 'clear',
+            t_buttonName: {
+                zh_cn: '清空',
+                en: 'Clear'
+            },
+            onChange: () => {
+                console.log('clearAllModHotkeys clicked');
+                
+                if (iManager.getPluginData(pluginName, "ifClearAllModHotkeys")) {
+                    // 将 二次确认 开关关闭
+                    iManager.setPluginData(pluginName, "ifClearAllModHotkeys", false);  
+
+                    iManager.showDialog('loading-dialog');
+                    const snackMessage = {
+                        en: "clear all mod hotkeys",
+                        zh_cn: "清空所有mod的热键"
+                    }
+                    iManager.t_snack(snackMessage);
+                    iManager.data.modList.forEach(async (mod) => {
+                        mod.hotkeys = [];
+                        const modFilePath = path.join(iManager.config.modSourcePath, mod.name, 'mod.json');
+                        fs.writeFileSync(modFilePath, JSON.stringify(mod, null, 4));
+                    });
+                    iManager.dismissDialog('loading-dialog');
+
+                    iManager.showDialog('dialog-need-refresh');
+                }
+                else {
+                    const snackMessage = {
+                        en: "You need to set 'If Clear All Mod Hotkeys' to true first",
+                        zh_cn: "你需要先将 '清空所有mod的热键 - 二次确认' 保持为开启状态"
+                    }
+                    iManager.t_snack(snackMessage, 'error');
+                }
+            }
+        }
+        pluginData.push(clearAllModHotkeys);
+
+
 
 
         iManager.registerPluginConfig(pluginName, pluginData);

@@ -114,8 +114,11 @@ const emit = defineEmits(['change']);
 const onChange = (value) => {
     emit('change', value, data.value.type, data.value);
     const result = data.value.onChange(value);
+    
     // 如果 result 不为 undefined 则说明， 显示的值需要更新
     if (result !== undefined) {
+        //debug
+        console.log("🤓🤓🤓",result);
         data.value.data = result;
         // 强制更新
         refresh();
@@ -134,7 +137,7 @@ function refresh() {
 }
 
 onMounted(() => {
-    console.log(data.value);
+    // console.log(data.value);
     // 有的设置项是从 iManager 中获取的，所以需要 刷新一下
     data.value.data = data.value.data
 });

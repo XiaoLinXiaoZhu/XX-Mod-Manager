@@ -1,7 +1,7 @@
 <template>
   <DialogTemplate id="edit-mod-dialog" ref="edit-mod-dialog" maxWidth="1000px">
     <template v-slot:content>
-      <h3 style="height: fit-content;margin: -5px 30px 5px 30px;font-size: 26px;" class="font-hongmeng">
+      <h3 style="height: fit-content;margin: -5px 30px 5px 30px;font-size: 26px;z-index:1" class="font-hongmeng">
         {{ $t('editDialog.edit-mod-info') }}
       </h3>
 
@@ -109,7 +109,7 @@
                 <s-popup align="left">
                   <s-tooltip slot="trigger" style="position: relative;left: 15px;">
                     <s-icon-button icon="image" class="OO-icon-button"
-                      style="border: 5px solid #0c0c0c;transform: scale(1);" slot="trigger">
+                      style="border: 5px solid var(--s-color-surface-container-high);transform: scale(1);" slot="trigger">
                       <s-icon type="chevron_down"></s-icon>
                     </s-icon-button>
 
@@ -159,7 +159,7 @@
     <template v-slot:action>
       <s-button slot="action" type="text" id="dialog-cancel" class="OO-button font-hongmeng" @click="handleCancel" style="margin-left: 20px;
     margin-right: 20px;"><p>{{ $t('buttons.cancel') }}</p></s-button>
-            <s-button slot="action" type="text" id="preset-add-confirm" class="OO-button font-hongmeng OO-color-gradient" @click="handleSave" style="color: var(--s-color-dark-surface);margin-left: 20px;
+            <s-button slot="action" type="text" id="preset-add-confirm" class="OO-button font-hongmeng OO-color-gradient" @click="handleSave" style="color: var(--s-color-surface);margin-left: 20px;
     margin-right: 20px;"> <p>{{ $t('buttons.save') }}</p></s-button>
     </template>
 
