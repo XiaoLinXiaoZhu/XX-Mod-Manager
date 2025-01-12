@@ -439,6 +439,15 @@ ipcMain.handle('get-file-path', async (event, fileName, fileType) => {
             ]
         });
     }
+    else if (fileType == 'ini') {
+        result = await dialog.showOpenDialog({
+            title: 'Select ' + fileName,
+            properties: ['openFile'],
+            filters: [
+                { name: fileName, extensions: ['ini'] }
+            ]
+        });
+    }
     else {
         result = await dialog.showOpenDialog({
             title: 'Select ' + fileName,
