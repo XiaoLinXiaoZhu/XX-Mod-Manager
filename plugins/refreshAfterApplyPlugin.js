@@ -128,6 +128,7 @@ module.exports = {
             onChange: (value) => {
                 console.log('ifRefreshAfterApply changed:', value);
                 ifRefreshAfterApply.data = value;
+                // 直接赋值可能会导致插件的数据不同步，所以需要手动更新
             }
         };
         pluginData.push(ifRefreshAfterApply);

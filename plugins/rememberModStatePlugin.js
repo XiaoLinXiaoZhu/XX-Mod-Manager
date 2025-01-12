@@ -45,7 +45,7 @@ const saveModStateToPreset = (iManager, preset) => {
 }
 
 const loadModStateFromPreset = (iManager, preset) => {
-    let modStatePath = iManager.getPluginData(pluginName, 'modStatePath').data;
+    let modStatePath = iManager.getPluginData(pluginName, 'modStatePath');
     let presetPath = iManager.config.presetPath;
     let presetFile = path.join(presetPath, `${preset}.ini`);
     if (!fs.existsSync(presetFile)) {
@@ -107,10 +107,16 @@ module.exports = {
                 en: 'Introduction'
             },
             t_description: {
-                zh_cn: '本插件会将mod的切换状态和预设一起保存，切换预设的时候，mod的状态也会被保存\n\n' +
-                    '注意：如果记住mod状态的话，需要设置mod状态文件路径。\n其一般位于3dmigoto的同目录下，或者core文件夹内，名称为d3dx_user.ini',
-                en: 'This plugin will save the mod switch state with the preset, and the mod state will be saved when switching the preset\n\n' +
-                    'Note: If you want to remember the mod state, you need to set the mod state file path, which is generally located in the same directory as 3dmigoto, or in the core folder, named d3dx_user.ini'
+                zh_cn: '因为 3dmigoto 对于 对于d3dx_user.ini 只在启动时加载一次，而后不再加载，所以说本插件并没有能够实现预期的效果\n\n' +
+                '尽管本插件能够将mod状态保存到预设中，但是在切换预设后，mod状态并不会被加载，除非重启游戏和3dmigoto\n' +
+                '如果想要实现预期的效果，只能够修改mod的ini文件，通过替换mod的ini文件对于状态控制的变量来实现\n' +
+                '但是这是极度“侵入性”的操作，可能会导致mod的功能失效，所以我并不打算使用这种方法\n\n' +
+                '如果你有更好的方法，欢迎告诉我',
+                en: 'Because 3dmigoto only loads d3dx_user.ini once at startup, and then no longer loads, so this plugin does not achieve the expected effect\n\n' +
+                'Although this plugin can save the mod state to the preset, the mod state will not be loaded after switching the preset, unless the game and 3dmigoto are restarted\n' +
+                'If you want to achieve the expected effect, you can only modify the ini file of the mod, and replace the variable for state control of the mod with the ini file\n' +
+                'But this is an extremely "intrusive" operation, which may cause the mod to fail, so I do not intend to use this method\n\n' +
+                'If you have a better way, please let me know'
             }
         };
         pluginData.push(markdown);
@@ -127,8 +133,8 @@ module.exports = {
                 en: 'Mod State Path'
             },
             t_description: {
-                zh_cn: '保存mod状态的文件路径',
-                en: 'The path of the file to save mod state'
+                zh_cn: '保存mod状态的文件路径，一般位于3dmigoto的同目录下，或者core文件夹中，名为d3dx_user.ini',
+                en: 'The path of the file to save mod state, generally located in the same directory as 3dmigoto, or in the core folder, named d3dx_user.ini'
             },
             onChange: (value) => {
                 console.log('modStatePath changed:', value);
@@ -140,7 +146,7 @@ module.exports = {
         //- 是否记住mod状态
         let ifRememberModState = {
             name: 'ifRememberModState',
-            data: true,
+            data: false,
             type: 'boolean',
             displayName: 'Remember Mod State',
             description: 'If true, the mod state will be remembered',

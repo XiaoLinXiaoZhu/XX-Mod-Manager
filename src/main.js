@@ -86,6 +86,13 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded' + nodeVersion);
 })
 
+//-=======禁用 tab 切换焦点=======-//
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+        e.preventDefault();
+    }
+})
+
 
 
 //-======================== snack ========================-//
