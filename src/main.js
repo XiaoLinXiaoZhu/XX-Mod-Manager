@@ -140,9 +140,9 @@ window.addEventListener('unload', function (event) {
     };
 
     //! 如果在这里保存配置，会导致 firstLoad 窗口更改的配置被覆盖，需要增加一个判断
-    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     // debug
     console.log('unload');
+
     if (iManager.config.firstLoad) return;
 
     console.log('save config');
@@ -152,9 +152,17 @@ window.addEventListener('unload', function (event) {
 
 window.onbeforeunload = function (e) {
     // console.log('onbeforeunload');
+
+    iManager.config.lastUsedPreset = iManager.temp.currentPreset;
+
+    console.log('window unload');
+
     if (iManager.config.firstLoad) return;
+
+    console.log('save config');
     iManager.saveConfig();
     iManager.savePluginConfig();
-    // e.returnValue = false;
-    // return false;
+
+    // e.returnValue = "你确定要离开吗？";
+    // return "你确定要离开吗？";
 };

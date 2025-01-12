@@ -103,6 +103,28 @@ function getData() {
             iManager.setTheme(value);
         }
     }
+
+    //-------------------- 是否使用上次使用的预设 ------------------//
+    let ifStartWithLastPresetData = {
+        name: 'ifStartWithLastPreset',
+        data: iManager.config.ifStartWithLastPreset,
+        type: 'boolean',
+        displayName: 'Start With Last Preset',
+        description: 'Whether to start with the last preset used',
+        t_displayName: {
+            zh_cn: '使用上次预设',
+            en: 'Start With Last Preset'
+        },
+        t_description: {
+            zh_cn: '程序启动时是否使用上次使用的预设',
+            en: 'Whether to use the last preset used when the program starts'
+        },
+        onChange: (value) => {
+            console.log('ifStartWithLastPreset changed:', value);
+            iManager.setConfig('ifStartWithLastPreset', value);
+        }
+    }
+
     //-------------------- 模组目标文件夹 ------------------//
     let modTargetPathData = {
         name: 'modTargetPath',
@@ -213,7 +235,7 @@ function getData() {
         }
     }
     return {
-        languageData, themeData, modTargetPathData, modSourcePathData, presetPathData, initAllDataButton, openFirstLoadButton
+        languageData, themeData, ifStartWithLastPresetData,modTargetPathData, modSourcePathData, presetPathData, initAllDataButton, openFirstLoadButton
     }
 }
 

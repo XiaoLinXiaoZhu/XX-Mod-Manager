@@ -83,126 +83,12 @@ function handlePresetAddButtonClicked() {
 //-============================== Compact Mode ==============================
 //#region Compact Mode
 const compactMode = ref(false);
-const enterCompactMode = (item) => {
-    item.animate([
-        { height: '350px' },
-        { height: '150px' }
-    ], {
-        duration: 300,
-        easing: 'ease-in-out',
-        iterations: 1
-    });
-    //item下的slot=headline，slot=text，slot=subhead的div元素会缓缓上移
-    //获取这些元素
-    //遍历子元素，匹配slot属性
-    item.childNodes.forEach(child => {
-        if (child.slot == 'headline') {
-            child.animate([
-                { paddingTop: '200px' },
-                { paddingTtop: '0px' }
-            ], {
-                duration: 300,
-                easing: 'ease-in-out',
-                iterations: 1
-            });
-        }
-        if (child.slot == 'image') {
-            //获取slot下的img元素
-            const img = child.querySelector('img');
-            img.animate([
-                { opacity: 1, filter: 'blur(0px)' },
-                { opacity: 0.2, filter: 'blur(5px)' }
-            ], {
-                duration: 300,
-                easing: 'ease-in-out',
-                iterations: 1
-            });
-        }
-    });
-};
-const exitCompactMod = (item) => {
-    item.animate([
-        { height: '150px' },
-        { height: '350px' }
-    ], {
-        duration: 300,
-        easing: 'ease-in-out',
-        iterations: 1
-    });
 
-    //item下的slot=headline，slot=text，slot=subhead的div元素会缓缓下移
-    //获取这些元素
-    //遍历子元素，匹配slot属性
-    item.childNodes.forEach(child => {
-        if (child.slot == 'headline' || child.slot == 'subhead' || child.slot == 'text') {
-            child.animate([
-                { transform: 'translateY(-200px)' },
-                { transform: 'translateY(0px)' }
-            ], {
-                duration: 300,
-                easing: 'ease-in-out',
-                iterations: 1
-            });
-        }
-        if (child.slot == 'image') {
-            //获取slot下的img元素
-            const img = child.querySelector('img');
-            img.animate([
-                { opacity: 0.2, filter: 'blur(5px)' },
-                { opacity: 1, filter: 'blur(0px)' }
-            ], {
-                duration: 300,
-                easing: 'ease-in-out',
-                iterations: 1
-            });
-        }
-    });
-}
 function handleCompactButtonClicked() {
     console.log('compact button clicked');
     compactMode.value = !compactMode.value;
     //切换compactMode
     return;
-    let modItems = Array.from(document.querySelectorAll('.mod-item')).map(item => {
-        return {
-            item: item,
-            animated: false
-        };
-    });
-
-    console.log(modItems);
-
-    const compact = (Items) => {
-        Items.forEach(item => {
-            //debug
-            // console.log('item', item,"\n", item.item.inWindow, item.animated, compactMode.value);
-            if (!item.item.inWindow) {
-                return;
-            }
-            if (!item.animated) {
-                if (compactMode.value) {
-                    enterCompactMode(item.item);
-                    //debug
-                    console.log('enter compact mode');
-                }
-                else {
-                    exitCompactMod(item.item);
-                }
-                item.animated = true;
-            }
-        });
-    };
-
-    compact(modItems);
-    // // 在之后的0.4s内，每0.1s 重新调用compact函数
-    // const maxTime = 200;
-    // const dertaTime = 10;
-    // let currentTime = 0;
-    // for (let i = 0; i < maxTime; i += dertaTime) {
-    //     setTimeout(() => {
-    //         compact(modItems);
-    //     }, i);
-    // }
 }
 //#endregion
 
@@ -213,7 +99,7 @@ const currentPreset = ref('default');
 
 function loadPresetList() {
     //console.log('-===== loadPresetList ======');
-    let list = [...iManager.data.presetList];
+    let list = iManager.data.presetList;
     //debug
     console.log('loadPresetList', iManager.data.presetList);
     list.unshift('default');
@@ -260,9 +146,9 @@ function handleApplyButtonClicked() {
 onMounted(() => {
     iManager.waitInit().then(() => {
         loadPresetList();
-        setTimeout(() => {
-            iManager.setCurrentPreset('default');
-        }, 1);  
+        // setTimeout(() => {
+        //     iManager.setCurrentPreset('default');
+        // }, 1);  
         iManager.on("lastClickedModChanged", (mod) => {
             lastClickedMod.value = null;
             setTimeout(() => {

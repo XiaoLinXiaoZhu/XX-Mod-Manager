@@ -28,6 +28,15 @@ const HMC = require(HMC_Name);
 class IManager {
     //-==================== 单例 ====================
     static instance = null;
+    static async getInstance() {
+        if (IManager.instance) {
+            return IManager.instance;
+        }
+        const iManager = new IManager();
+        await iManager.waitInit();
+        return iManager;
+    }
+
     constructor() {
         if (IManager.instance) {
             return IManager.instance;
@@ -83,6 +92,8 @@ class IManager {
         modSourcePath: null, // mod的源路径
         modTargetPath: null, // mod的目标路径
         presetPath: null, // 预设路径
+        ifStartWithLastPreset: true, // 是否启动时使用上次使用的预设
+        lastUsedPreset: null, // 上次使用的预设,如果 ifStartWithLastPreset 为 true，则启动时使用这个预设
         bounds: {
             width: 800,
             height: 600,
@@ -311,6 +322,24 @@ class IManager {
         console.log('✅>> languageChange to', this.config.language);
 
 
+        //------ 如果开启了 ifStartWithLastPreset，则启动时使用上次使用的预设 -----
+        if (this.config.ifStartWithLastPreset) {
+            if (this.config.lastUsedPreset !== null) {
+                //debug
+                console.log('✅>> start with last preset:', this.config.lastUsedPreset);
+                this.setCurrentPreset(this.config.lastUsedPreset);
+            }
+            else {
+                //debug
+                console.log('✅>> start with default preset');
+                this.setCurrentPreset('default');
+            }
+        }
+        else {
+            //debug
+            console.log('✅>> start with default preset');
+            this.setCurrentPreset('default');
+        }
     }
     //-==================== 对外接口 - 状态变更 ====================
     async setLastClickedMod(mod) {
@@ -763,6 +792,9 @@ class IManager {
     }
 
     async saveConfig() {
+        //debug
+        console.log('saveConfig:', this.config);
+
         await ipcRenderer.invoke('set-current-config', this.config);
     }
 
@@ -1185,19 +1217,28 @@ class IManager {
 }
 
 function waitInitIManager() {
+    // return new Promise((resolve, reject) => {
+    //     const iManager = new IManager();
+    //     iManager.waitInit().then(() => {
+    //         resolve(iManager);
+    //     });
+    // });
     return new Promise((resolve, reject) => {
-        const iManager = new IManager();
-        iManager.waitInit().then(() => {
-            resolve(iManager);
+        IManager.getInstance().then((iManager) => {
+            iManager.waitInit().then(() => {
+                resolve(iManager);
+            });
         });
     });
+
 }
 
 ipcRenderer.on('wakeUp', () => {
     console.log('🌞wakeUp');
     snack('🌞wakeUp');
-    const iManager = new IManager();
-    iManager.trigger('wakeUp');
+    waitInitIManager().then((iManager) => {
+        iManager.trigger('wakeUp');
+    });
 });
 
 let sleepTimer = '';

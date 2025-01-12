@@ -10,6 +10,8 @@
                 <s-divider></s-divider>
                 <settingBar :data="themeData"></settingBar>
                 <s-divider></s-divider>
+                <settingBar :data="ifStartWithLastPresetData"></settingBar>
+                <s-divider></s-divider>
                 <settingBar :data="openFirstLoadButton"></settingBar>
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
@@ -166,6 +168,7 @@ import getData from './settingSectionData.js';
 const {
     languageData,
     themeData,
+    ifStartWithLastPresetData,
     modTargetPathData,
     modSourcePathData,
     presetPathData,
@@ -314,7 +317,7 @@ onMounted(async () => {
             // 生成设置界面
             // 生成设置界面的数据
             //debug
-            console.log(`in plugin ${pluginName}, data:`, data);
+            // console.log(`in plugin ${pluginName}, data:`, data);
         }
     }
 

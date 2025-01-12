@@ -93,6 +93,10 @@ const containerRef = useTemplateRef('containerRef');
 const updateSlider = (index) => {
     const tabs = containerRef.value.querySelectorAll('.tab');
     const selectedTab = tabs[index];
+    if (!selectedTab) {
+        console.log(`tab not found: ${index}`);
+        return;
+    }
     //debug
     // console.log(`updateSlider: `, selectedTab, index,tabs)
     sliderStyle.top = `${selectedTab.offsetTop}px`;
@@ -108,10 +112,7 @@ const updateSlider = (index) => {
 
 onMounted(() => {
     // 尝试使得 当前 滑块为第一个选项卡
-    try{updateSlider(0);}
-    catch(e){
-        console.log(e)
-    }
+    updateSlider(0);
 });
 
 defineExpose({
