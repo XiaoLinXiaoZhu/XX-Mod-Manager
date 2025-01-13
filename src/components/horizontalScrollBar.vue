@@ -13,11 +13,9 @@ const props = defineProps({
         default: false
     },
     scrollSpeed: {
-        type: Number,
         default: 1
     },
     dragSpeed: {
-        type: Number,
         default: 1
     }
 });
@@ -30,6 +28,16 @@ onMounted(() => {
     let isDown = false;
     let startX;
     let scrollLeft;
+
+    let scrollSpeed = 1;
+    let dragSpeed = 1;
+    // scrollSpeed 和 dragSpeed 因为 html 有可能会被转化为字符串，所以这里检测类型并转换
+    if (typeof props.scrollSpeed === 'string') {
+        scrollSpeed = parseFloat(props.scrollSpeed);
+    }
+    if (typeof props.dragSpeed === 'string') {
+        dragSpeed = parseFloat(props.dragSpeed);
+    }
 
     scrollBarEl.addEventListener('mousedown', (e) => {
         isDown = true;
@@ -49,14 +57,14 @@ onMounted(() => {
         if (!isDown) return;
         e.preventDefault();
         const x = e.pageX - scrollBarEl.offsetLeft;
-        const walk = (x - startX) * props.dragSpeed;
+        const walk = (x - startX) * dragSpeed;
         scrollBarEl.scrollLeft = scrollLeft - walk;
     });
 
     scrollBarEl.addEventListener('wheel', (e) => {
         e.preventDefault();
-        scrollBarEl.scrollLeft += e.deltaY * props.scrollSpeed;
-    });
+        scrollBarEl.scrollLeft += e.deltaY * scrollSpeed;
+    }, { passive: false });
 });
 </script>
 

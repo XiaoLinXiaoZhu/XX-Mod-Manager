@@ -14,11 +14,16 @@
         <div slot="headline" id="mod-item-headline">{{ props.mod }}</div>
         <div slot="subhead" id="mod-item-subhead">{{ props.character }}</div>
         <div slot="text" id="mod-item-text">
+            <s-scroll-view>
+                <!-- <p id="mod-hotkeys">Hotkeys: {{ displayHotKeys }}</p> -->
+                <p id="mod-item-description">{{ props.description }}</p>
+                <div class="placeholder"></div>
+            </s-scroll-view>
             <horizontalScrollBar class="OO-box OO-shade-box hotkey-container" scrollSpeed=0.1 dragSpeed=1>
                 <div style="display: flex;flex-direction: row;flex-wrap: nowrap;">
                     <div v-for="(hotkey, index) in props.hotKeys" :key="index">
                         <s-tooltip>
-                            <div style="margin: 0px 3px;height: 35px;padding: 20px 5px 20px 5px;transform: skew(-20deg);border-radius: 0;"
+                            <div style="margin: 0px 3px;height: 35px;padding: 20px 5px 20px 5px;transform: skew(-20deg);border-radius: 0;min-width: 35px;align-items: center;justify-content: center;"
                                 slot="trigger" class="OO-button">
                                 <p style="transform: skew(20deg);">
                                     {{ hotkey.key }}
@@ -30,11 +35,6 @@
                     </div>
                 </div>
             </horizontalScrollBar>
-            <s-scroll-view>
-                <!-- <p id="mod-hotkeys">Hotkeys: {{ displayHotKeys }}</p> -->
-                <p id="mod-item-description">{{ props.description }}</p>
-                <div class="placeholder"></div>
-            </s-scroll-view>
         </div>
     </s-card>
 </template>
