@@ -20,9 +20,9 @@ function snack(message, type = 'info') {
     ipcRenderer.send('snack', message, type);
 }
 
-function t_snack(messages,type = 'info'){
+function t_snack(messages, type = 'info') {
     IManager.getInstance().then((iManager) => {
-        iManager.t_snack(messages,type);
+        iManager.t_snack(messages, type);
     });
 }
 
@@ -119,6 +119,7 @@ class IManager {
     // 临时数据，用于存储一些临时的数据
     temp = {
         lastClickedMod: null, // 最后点击的mod，用于显示详情
+        currentMod: null, // 当前mod
         currentCharacter: null, // 当前角色
         currentTab: 'mod', // 当前tab
         currentPreset: "default", // 当前预设
@@ -131,11 +132,11 @@ class IManager {
     async snack(message, type = 'info') {
         snack(message, type);
     }
-    async t_snack(messages,type = 'info'){
-        if (messages[this.config.language] != null){
-            snack(messages[this.config.language],type);
+    async t_snack(messages, type = 'info') {
+        if (messages[this.config.language] != null) {
+            snack(messages[this.config.language], type);
         }
-        else{
+        else {
             const firstMessageKey = Object.keys(messages)[0];
             snack(messages[firstMessageKey], type);
         }
@@ -262,15 +263,6 @@ class IManager {
         }
         dialog.dismiss();
     }
-
-    async setLastClickedModByName(modName) {
-
-        this.temp.lastClickedMod = await this.getModInfo(modName);
-        //debug
-        console.log(`setLastClickedModByName: ${modName}`, this.temp.lastClickedMod);
-        this.trigger('lastClickedModChanged', this.temp.lastClickedMod);
-    }
-
     //-==================== 生命周期 ====================
     // 初始化
     async init() {
@@ -318,9 +310,11 @@ class IManager {
         // lastClickedMod 默认是 第一个mod
         if (this.data.modList.length > 0) {
             //debug
-            this.temp.lastClickedMod = this.data.modList[0];
+            // this.temp.lastClickedMod = this.data.modList[0];
+            // this.trigger('lastClickedMod_Changed', this.temp.lastClickedMod);
+
+            this.setCurrentMod(this.data.modList[0]);
             console.log('✅>> lastClickedMod init', this.temp.lastClickedMod);
-            this.trigger('lastClickedModChanged', this.temp.lastClickedMod);
         }
 
         //------ 切换语言 -----
@@ -353,15 +347,21 @@ class IManager {
     }
     //-==================== 对外接口 - 状态变更 ====================
     async setLastClickedMod(mod) {
+        // 此方法已弃用，当调用的时候，抛出异常
+        console.warn('setLastClickedMod is deprecated');
+        throw new Error('setLastClickedMod is deprecated');
         this.temp.lastClickedMod = mod;
-        this.trigger('lastClickedModChanged', mod);
+        this.trigger('lastClickedMod_Changed', mod);
     }
 
     async setLastClickedModByName(modName) {
+        // 此方法已弃用，当调用的时候，抛出异常
+        console.warn('setLastClickedModByName is deprecated');
+        throw new Error('setLastClickedModByName is deprecated');
         const mod = this.data.modList.find((mod) => mod.name === modName);
         if (mod) {
             this.temp.lastClickedMod = mod;
-            this.trigger('lastClickedModChanged', mod);
+            this.trigger('lastClickedMod_Changed', mod);
         }
     }
 
@@ -388,6 +388,23 @@ class IManager {
         // setTimeout(() => {
         //     this.setCurrentCharacter('selected');
         // }, 200);
+    }
+
+    async setCurrentMod(mod) {
+        this.temp.currentMod = mod;
+        this.trigger('currentModChanged', mod);
+    }
+
+    async setCurrentModByName(modName) {
+        this.temp.currentMod = await this.getModInfo(modName);
+        //debug
+        console.log(`setCurrentModByName: ${modName}`, this.temp.currentMod);
+        this.trigger('currentModChanged', this.temp.currentMod);
+    }
+
+    async toggledModByName(modName) {
+        const mod = await this.getModInfo(modName);
+        this.trigger('toggledMod', mod);
     }
 
     async setWindowBounds() {
@@ -424,11 +441,11 @@ class IManager {
         }
         ipcRenderer.invoke('open-url', url);
     }
-    
-        // 在桌面创建快捷方式 例如：
-        // start "" "当前exe所在位置" --customConfig "当前配置文件夹"
-        // 起始位置：当前 exe 所在文件夹
-        // 目标位置：桌面
+
+    // 在桌面创建快捷方式 例如：
+    // start "" "当前exe所在位置" --customConfig "当前配置文件夹"
+    // 起始位置：当前 exe 所在文件夹
+    // 目标位置：桌面
     async createAppShortCut(configPath) {
         const { app, shell } = require('electron');
         const path = require('path');
@@ -441,29 +458,29 @@ class IManager {
 
         // 创建快捷方式
 
-          
-          // 快捷方式名称和路径
-          const shortcutName = 'XXMM_customConfig.lnk';
-          const shortcutPath = path.join(desktopPath, shortcutName);
-          
-          // 启动参数
-          const args = `--customConfig "${configPath}"`;
-          
-          // 应用程序的根目录
-          try {
+
+        // 快捷方式名称和路径
+        const shortcutName = 'XXMM_customConfig.lnk';
+        const shortcutPath = path.join(desktopPath, shortcutName);
+
+        // 启动参数
+        const args = `--customConfig "${configPath}"`;
+
+        // 应用程序的根目录
+        try {
             // 创建快捷方式
             await shell.writeShortcutLink(shortcutPath, 'create', {
-              target: exePath,
-              args: args,
-              cwd: exeDir, // 设置工作目录为应用程序的根目录
-              icon: exePath, // 可选：设置图标为应用程序图标
-              iconIndex: 0 // 可选：图标索引，通常为0
+                target: exePath,
+                args: args,
+                cwd: exeDir, // 设置工作目录为应用程序的根目录
+                icon: exePath, // 可选：设置图标为应用程序图标
+                iconIndex: 0 // 可选：图标索引，通常为0
             });
-        
+
             console.log(`Shortcut created successfully at ${shortcutPath}`);
-          } catch (error) {
+        } catch (error) {
             console.error('Failed to create shortcut:', error);
-          }
+        }
     }
 
     //------ 文件拖拽 ------
@@ -739,7 +756,8 @@ class IManager {
         this.saveModInfo(modInfo);
 
         // 刷新侧边栏的mod信息
-        this.trigger('lastClickedModChanged', modInfo);
+        // this.trigger('lastClickedMod_Changed', modInfo);
+        this.trigger("currentModChanged", modInfo);
 
         // snack提示
         snack(`Updated cover for ${modInfo}`);
@@ -754,7 +772,7 @@ class IManager {
     }
 
     async savePreset(presetName, data) {
-        await ipcRenderer.invoke('save-preset', presetName, data);
+        ipcRenderer.invoke('save-preset', presetName, data);
     }
 
     async applyMods(modList) {
@@ -934,9 +952,16 @@ class IManager {
     //----------生命周期----------
     // wakeUp,initDone
     //----------状态变更----------
-    // themeChange,lastClickedModChanged,modInfoChanged,currentCharacterChanged,addMod,currentPresetChanged,languageChange,
+    // themeChange,languageChange,
+    // lastClickedModChanged,
+    // modInfoChanged,
+    // currentCharacterChanged,
+    // currentPresetChanged,
     //----------事件节点----------
-    // modsApplied,addMod,addPreset
+    // modsApplied,addMod,addPreset,
+    // toggledMod: 这个事件是在 mod 的开关被切换时触发的，之前和 lastClickedModChanged 一起触发，现在单独触发
+
+    // lastClickedModChanged: 拆分为两个事件，一个是：currentModChanged，一个是：toggledMod
 
     // 注册事件
     async on(eventName, callback) {
@@ -1081,7 +1106,7 @@ class IManager {
         const builtInPluginPath = path.resolve('./plugins');
         // 错误处理
         if (!fs.existsSync(builtInPluginPath)) {
-            snack('插件文件夹不存在 '+builtInPluginPath);
+            snack('插件文件夹不存在 ' + builtInPluginPath);
             return;
         }
         const builtInPlugins = fs.readdirSync(builtInPluginPath);
@@ -1222,11 +1247,11 @@ ipcRenderer.on('windowBlur', () => {
     const iManager = new IManager();
     iManager.trigger('windowBlur');
 
-    sleepTimer = setTimeout(()=>{
+    sleepTimer = setTimeout(() => {
         iManager.trigger("windowSleep");
         isSleeping = true;
         snack('💤windowSleep');
-    },sleepTimeOutTime);
+    }, sleepTimeOutTime);
 });
 
 ipcRenderer.on('windowFocus', () => {
@@ -1238,11 +1263,11 @@ ipcRenderer.on('windowFocus', () => {
     const iManager = new IManager();
     iManager.trigger('windowFocus');
 
-    if(sleepTimer != ''){
+    if (sleepTimer != '') {
         clearTimeout(sleepTimer);
     }
 });
 
 export default IManager;
-export { snack,t_snack,waitInitIManager };
+export { snack, t_snack, waitInitIManager };
 

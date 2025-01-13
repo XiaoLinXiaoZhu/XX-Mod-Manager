@@ -247,7 +247,8 @@ onMounted(async () => {
             await loadMods();
             observeMods();
 
-            iManager.setLastClickedModByName(modInfo.name);
+            // iManager.setLastClickedMod_ByName(modInfo.name);
+            iManager.setCurrentModByName(modInfo.name);
             iManager.setCurrentCharacter(modInfo.character);
         }, 1);
     });
@@ -285,7 +286,8 @@ onMounted(async () => {
         const modItem = event.target.closest('.mod-item');
         if (modItem && modItem.id != iManager.temp.lastClickedMod.name) {
             event.dataTransfer.dropEffect = 'copy';
-            iManager.setLastClickedModByName(modItem.id);
+            // iManager.setLastClickedMod_ByName(modItem.id);
+            iManager.setCurrentModByName(modItem.id);
         }
     });
 

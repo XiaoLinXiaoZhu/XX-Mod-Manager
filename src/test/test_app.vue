@@ -194,7 +194,10 @@ const createShortOfCurrentConfig = {
 
 iManager.waitInit().then(() => {
     loaded.value = true;
-    iManager.on('lastClickedModChanged', (mod) => {
+    // iManager.on('lastClickedModChanged', (mod) => {
+    //     lastClickedMod.value = mod;
+    // });
+    iManager.on('currentModChanged', (mod) => {
         lastClickedMod.value = mod;
     });
 

@@ -146,16 +146,29 @@ function handleApplyButtonClicked() {
 onMounted(() => {
     iManager.waitInit().then(() => {
         loadPresetList();
-        // setTimeout(() => {
-        //     iManager.setCurrentPreset('default');
-        // }, 1);  
-        iManager.on("lastClickedModChanged", (mod) => {
+ 
+        // iManager.on("lastClickedMod_Changed", (mod) => {
+        //     lastClickedMod.value = null;
+        //     setTimeout(() => {
+        //         lastClickedMod.value = mod;
+        //     }, 1);
+        //     //debug
+        //     console.log('set mod info display to', mod.name);
+        //     savePreset();
+        // });
+
+        iManager.on('currentModChanged', (mod) => {
             lastClickedMod.value = null;
             setTimeout(() => {
                 lastClickedMod.value = mod;
             }, 1);
             //debug
             console.log('set mod info display to', mod.name);
+        });
+
+        iManager.on('toggledMod', (mod) => {
+            //debug
+            console.log('toggled mod', mod);
             savePreset();
         });
 

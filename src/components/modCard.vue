@@ -92,7 +92,9 @@ const click = (event) => {
         //debug
         console.log(`click: ${props.mod},current clicked: ${clicked.value},attribute: ${modItemRef.value.getAttribute('clicked')}`);
         //emit('click', props.mod);
-        iManager.setLastClickedModByName(props.mod);
+        // iManager.setLastClickedMod_ByName(props.mod);
+        iManager.setCurrentModByName(props.mod);
+        iManager.toggledModByName(props.mod);
     }
     else {
         playClickAnim(modItemRef.value);
@@ -100,7 +102,8 @@ const click = (event) => {
 }
 
 const openEditModDialog = () => {
-    iManager.setLastClickedModByName(props.mod);
+    // iManager.setLastClickedMod_ByName(props.mod);
+    iManager.setCurrentModByName(props.mod);
     iManager.showDialog('edit-mod-dialog');
 }
 

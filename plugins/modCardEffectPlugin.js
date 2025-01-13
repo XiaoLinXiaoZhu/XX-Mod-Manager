@@ -84,7 +84,8 @@ function addHoverEffect (document, iManager) {
             const modName = item.getAttribute('id');
             //debug
             console.log('hoverSwitchCurrentCard:', modName);
-            iManager.setLastClickedModByName(modName);
+            // iManager.setLastClickedMod_ByName(modName);
+            iManager.setCurrentModByName(modName);
         });
     });
 };
@@ -94,10 +95,10 @@ function removeHoverEffect(document, iManager) {
             const modName = item.getAttribute('id');
             //debug
             console.log('hoverSwitchCurrentCard:', modName);
-            iManager.setLastClickedModByName(modName);
+            // iManager.setLastClickedMod_ByName(modName);
+            iManager.setCurrentModByName(modName);
         });
-    }
-    );
+    });
 };
 
 
