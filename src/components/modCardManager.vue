@@ -25,7 +25,6 @@ import 'sober';
 import chipRadioBar from './chipRadioBar.vue';
 import { ref, onMounted,computed,useTemplateRef,watch } from 'vue';
 import modCard from './modCard.vue';
-import modFilterContainer from '../components/modFilterContainer.vue';
 import { Tween,Group } from "@tweenjs/tween.js";
 import IManager from '../../electron/IManager';
 
