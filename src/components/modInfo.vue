@@ -107,13 +107,10 @@ const setDisplayMod = async (mod) => {
     if (mod == null) {
         return;
     }
-    console.log(`set mod: ${mod.name}`);
-    //modInfo.value = await iManager.getModInfo(mod);
+
     modInfo.value = mod;
-    //debug
-    console.log(`set mod info: ${modInfo.value}`);
-    console.log(modInfo.value);
-    console.log(modInfo.value.hotkeys);
+
+    console.log(`set mod: ${mod.name}, set mod info: ${modInfo.value}, hotkeys: ` ,modInfo.value.hotkeys);
 
     iManager.getImageBase64(modInfo.value.preview).then((imgBase64) => {
         img.value = "data:image/png;base64," + imgBase64;
