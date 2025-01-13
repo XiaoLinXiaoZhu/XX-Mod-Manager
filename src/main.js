@@ -157,6 +157,13 @@ window.addEventListener('unload', function (event) {
 window.onbeforeunload = function (e) {
     // console.log('onbeforeunload');
 
+    iManager.config.bounds = {
+        x: window.screenX,
+        y: window.screenY,
+        width: window.outerWidth,
+        height: window.innerHeight,
+    };
+
     iManager.config.lastUsedPreset = iManager.temp.currentPreset;
 
     console.log('window unload');
@@ -164,8 +171,8 @@ window.onbeforeunload = function (e) {
     if (iManager.config.firstLoad) return;
 
     console.log('save config');
-    iManager.saveConfig();
-    iManager.savePluginConfig();
+    iManager.saveConfigSync();
+    iManager.savePluginConfigSync();
 
     // e.returnValue = "你确定要离开吗？";
     // return "你确定要离开吗？";

@@ -830,6 +830,13 @@ class IManager {
         await ipcRenderer.invoke('set-current-config', this.config);
     }
 
+    // 同步的保存配置
+    saveConfigSync() {
+        //debug
+        console.log('saveConfig:', this.config);
+        ipcRenderer.invoke('set-current-config', this.config);
+    }
+
     async getFilePath(fileName, fileType) {
         const filePath = await ipcRenderer.invoke('get-file-path', fileName, fileType);
         //debug
@@ -1175,6 +1182,21 @@ class IManager {
             console.log('savePluginConfig:', pluginName, localPluginData);
 
             await ipcRenderer.invoke('save-plugin-config', pluginName, localPluginData);
+        }
+    }
+
+    // 同步的保存插件配置
+    savePluginConfigSync() {
+        for (const pluginName in this.pluginConfig) {
+            const pluginData = this.pluginConfig[pluginName];
+            const localPluginData = {};
+            pluginData.forEach((data) => {
+                localPluginData[data.name] = data.data;
+            });
+
+            console.log('savePluginConfig:', pluginName, localPluginData);
+
+            ipcRenderer.invoke('save-plugin-config', pluginName, localPluginData);
         }
     }
 
