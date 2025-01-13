@@ -1,29 +1,19 @@
 <template>
-    <s-chip @click="handleClick" clickable="true" :type="type" :id="props.id" :checked="checked">
-        <p>{{ props.text }}</p>
+    <s-chip clickable="true" :id="props.id">
+        <slot>
+            <p>{{ props.text }}</p>
+        </slot>
     </s-chip>
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, computed } from 'vue';
-
-const emit = defineEmits(['chip-clicked']);
+import {defineProps} from 'vue';
 
 const props = defineProps({
     text: String,
-    id: String,
-    checked: Boolean
+    id: String
 });
 
-const type = computed(() => {
-    // 如果 class 有 active，则 type 为 outlined，否则为 filled-tonal
-    
-    //return !props.checked ? 'outlined' : 'filled-tonal';
-});
-
-const handleClick = () => {
-    emit('chip-clicked');
-};
 </script>
 
 <style scoped>
@@ -59,7 +49,7 @@ s-chip[type=filled-tonal] {
     color: var(--s-color-on-primary);
 }
 
-s-chip[checked="true"] {
+s-chip[checked="true"]{
     color: var(--s-color-on-primary);
 }
 </style>

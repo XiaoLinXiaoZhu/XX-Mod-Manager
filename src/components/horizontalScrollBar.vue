@@ -35,7 +35,7 @@ onMounted(() => {
         if (!isDown) return;
         e.preventDefault();
         const x = e.pageX - scrollBarEl.offsetLeft;
-        const walk = (x - startX) * 3;
+        const walk = (x - startX) ;
         scrollBarEl.scrollLeft = scrollLeft - walk;
     });
 

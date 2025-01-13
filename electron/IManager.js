@@ -20,6 +20,12 @@ function snack(message, type = 'info') {
     ipcRenderer.send('snack', message, type);
 }
 
+function t_snack(messages,type = 'info'){
+    IManager.getInstance().then((iManager) => {
+        iManager.t_snack(messages,type);
+    });
+}
+
 // // 导入 hmc-win32
 const HMC_Name = 'hmc-win32';
 const HMC = require(HMC_Name);
@@ -1068,28 +1074,6 @@ class IManager {
         // 然后调用 init 方法，将 iManager 传递给插件
 
         // 先加载内置的插件
-        // const builtInPlugins = ['testPlugin', 'autoStartPlugin', 'refreshAfterApplyPlugin',"modCardFadeInOutPlugin"];
-        // builtInPlugins.forEach((pluginName) => {
-        //     try {
-        //         // const pluginPath = `./plugins/${pluginName}.js`;
-        //         // const pluginPath = path.join(`./plugins/${pluginName}.js`);
-        //         // console.log(`load builtInPlugin ${pluginName} from ${pluginPath}`);
-        //         // console.log(`Current directory: ${__dirname}`);
-        //         const ResolvedpluginPath = path.resolve(`./plugins/${pluginName}.js`);
-        //         console.log(`Resolved plugin path: ${ResolvedpluginPath}`);
-
-        //         const plugin = require(ResolvedpluginPath);
-        //         this.registerPlugin(plugin);
-        //     }
-        //     catch (e) {
-        //         console.log(`❌plugin ${pluginName} load failed`, e);
-        //         // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
-        //         fs.writeFileSync(`./plugins/lookAtMe`, 'lookAtMe');
-        //         snack(`内置插件 ${pluginName} 加载失败`, 'error');
-        //     }
-        // });
-
-        // 因为内置插件可以设置开关，所以说直接加载位于 plugins 文件夹中的插件
         const builtInPluginPath = path.resolve('./plugins');
         // 错误处理
         if (!fs.existsSync(builtInPluginPath)) {
@@ -1173,18 +1157,7 @@ class IManager {
         data.onChange(value);
     }
 
-    // // 支持 css 在当前页面的插入/删除
-    // addCss(css) {
-    //     const style = document.createElement('style');
-    //     style.innerHTML = css;
-    //     document.head.appendChild(style);
-    // }
-
-    // removeCss(css) {
-    //     const style = document.createElement('style');
-    //     style.innerHTML = css;
-    //     document.head.removeChild(style);
-    // }
+    // 支持 css 在当前页面的插入/删除
     addCssWithHash(css) {
         const hash = this.hashCode(css);
         const existingStyle = document.getElementById(hash);
@@ -1217,12 +1190,6 @@ class IManager {
 }
 
 function waitInitIManager() {
-    // return new Promise((resolve, reject) => {
-    //     const iManager = new IManager();
-    //     iManager.waitInit().then(() => {
-    //         resolve(iManager);
-    //     });
-    // });
     return new Promise((resolve, reject) => {
         IManager.getInstance().then((iManager) => {
             iManager.waitInit().then(() => {
@@ -1230,7 +1197,6 @@ function waitInitIManager() {
             });
         });
     });
-
 }
 
 ipcRenderer.on('wakeUp', () => {
@@ -1274,5 +1240,5 @@ ipcRenderer.on('windowFocus', () => {
 });
 
 export default IManager;
-export { snack, waitInitIManager };
+export { snack,t_snack,waitInitIManager };
 
