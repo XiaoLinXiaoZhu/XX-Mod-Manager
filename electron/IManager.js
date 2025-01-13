@@ -925,6 +925,7 @@ class IManager {
 
         // 刷新 角色列表
         this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
+        this.data.characterList = Array.from(this.data.characterList).sort();
 
         // 本地保存
         const jsonModInfo = JSON.stringify(modInfo);
