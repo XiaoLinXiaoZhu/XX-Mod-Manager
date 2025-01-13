@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 获取 node.js 的版本信息
     const nodeVersion = process.versions.node;
 
-    console.log('DOMContentLoaded' + nodeVersion);
+    // console.log('DOMContentLoaded' + nodeVersion);
 })
 
 window.addEventListener('beforeunload', () => {

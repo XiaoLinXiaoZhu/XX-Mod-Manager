@@ -99,7 +99,7 @@ onMounted(() => {
     }    
         `;
     // editModInfoDialog.shadowRoot.appendChild(editModInfoDialogStyle);
-    console.log(componentRef.value);
+    // console.log(componentRef.value);
     componentRef.value.shadowRoot.appendChild(editModInfoDialogStyle);
 
 });

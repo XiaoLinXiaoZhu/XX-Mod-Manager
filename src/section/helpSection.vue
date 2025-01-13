@@ -538,7 +538,7 @@ onMounted(() => {
   iManager.waitInit().then(() => {
     language.value = iManager.config.language;
     //debug
-    console.log('helpSection onMounted', language.value);
+    // console.log('helpSection onMounted', language.value);
   });
 });
 

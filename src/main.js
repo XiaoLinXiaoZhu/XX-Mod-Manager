@@ -68,11 +68,9 @@ iManager.waitInit().then((iManager) => {
 
 
 //-=====================事件监听====================-//
-console.log('main.js');
+// console.log('main.js');
 
 document.addEventListener('DOMContentLoaded', () => {
-    
-
     // 开启 了 nodeIntegration: true, contextIsolation: false
     // 所以可以直接使用 node.js 的模块
 
@@ -82,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 获取 node.js 的版本信息
     const nodeVersion = process.versions.node;
 
-    console.log('DOMContentLoaded' + nodeVersion);
+    // console.log('DOMContentLoaded' + nodeVersion);
 })
 
 //-=======禁用 tab 切换焦点=======-//

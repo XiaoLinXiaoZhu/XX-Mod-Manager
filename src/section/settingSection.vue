@@ -187,13 +187,13 @@ const translatedTabs = computed(() => {
         //console.log('trying to get plugin name', tab, iManager.plugins[tab],iManager.plugins);
         if (iManager.plugins[tab]) {
             //debug
-            console.log('trying to get plugin name', tab, iManager.plugins[tab], locale.value);
+            // console.log('trying to get plugin name', tab, iManager.plugins[tab], locale.value);
             return iManager.plugins[tab].t_displayName[locale.value] || tab;
         }
         return t(`setting-tab.${tab}`)
     });
     //debug
-    console.log('translatedTabs', tTab);
+    // console.log('translatedTabs', tTab);
     return tTab;
 });
 
@@ -269,7 +269,7 @@ const createShortOfCurrentConfig = {
 
 onMounted(async () => {
     //debug
-    console.log('settingSection mounted');
+    // console.log('settingSection mounted');
     await iManager.waitInit();
 
     //初始化tab

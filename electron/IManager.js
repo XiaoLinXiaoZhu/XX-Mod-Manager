@@ -300,21 +300,22 @@ class IManager {
 
         //调用 start 方法
         setTimeout(() => {
+            
             this.start();
             this.trigger('initDone', this);
-        }, 100);
+        }, 200);
     }
 
     // start 在 init 之后调用，在各个其他页面 绑定好事件之后调用
     async start() {
-        // lastClickedMod 默认是 第一个mod
+        //-------- currentMod 默认是 第一个mod
         if (this.data.modList.length > 0) {
             //debug
             // this.temp.lastClickedMod = this.data.modList[0];
             // this.trigger('lastClickedMod_Changed', this.temp.lastClickedMod);
 
             this.setCurrentMod(this.data.modList[0]);
-            console.log('✅>> lastClickedMod init', this.temp.lastClickedMod);
+            console.log('✅>> lastClickedMod init', this.temp.currentMod);
         }
 
         //------ 切换语言 -----
