@@ -11,6 +11,14 @@ const props = defineProps({
     showScrollbar: {
         type: Boolean,
         default: false
+    },
+    scrollSpeed: {
+        type: Number,
+        default: 1
+    },
+    dragSpeed: {
+        type: Number,
+        default: 1
     }
 });
 
@@ -41,13 +49,13 @@ onMounted(() => {
         if (!isDown) return;
         e.preventDefault();
         const x = e.pageX - scrollBarEl.offsetLeft;
-        const walk = (x - startX);
+        const walk = (x - startX) * props.dragSpeed;
         scrollBarEl.scrollLeft = scrollLeft - walk;
     });
 
     scrollBarEl.addEventListener('wheel', (e) => {
         e.preventDefault();
-        scrollBarEl.scrollLeft += e.deltaY;
+        scrollBarEl.scrollLeft += e.deltaY * props.scrollSpeed;
     });
 });
 </script>

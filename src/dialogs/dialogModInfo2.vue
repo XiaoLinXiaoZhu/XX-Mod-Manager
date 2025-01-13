@@ -98,11 +98,11 @@
                   {{ $t('editDialog.mod-info-hotkeys-tip') }} </p>
               </s-tooltip>
               <div style="display: flex;flex-direction: row;align-items: center;justify-content: space-between;">
-                <horizontalScrollBar class="OO-box OO-shade-box hotkey-container">
+                <horizontalScrollBar class="OO-box OO-shade-box hotkey-container" scollSpeed=0.005 dragSpeed=1>
                   <div style="display: flex;flex-direction: row;flex-wrap: nowrap;padding: 0 10px;">
                     <div v-for="(hotkey, index) in modInfo.hotkeys" :key="index">
                       <s-tooltip>
-                        <div style="margin: 0px 3px;height: 35px;padding: 20px 15px 20px 15px;transform: skew(-20deg);border-radius: 0;" slot="trigger" class="OO-button">
+                        <div style="margin: 0px 3px;height: 35px;padding: 20px 15px 20px 15px;transform: skew(-20deg);border-radius: 0;min-width: 50px" slot="trigger" class="OO-button">
                           <p style="transform: skew(20deg);">
                             {{ hotkey.key }}
                           </p>
@@ -181,16 +181,6 @@
 
   <!-- -取消时再次询问是否保存 -->
   <!-- -提示是否保存更改 -->
-  <!-- <s-dialog id="save-change-dialog">
-    <div slot="headline" data-translate-key="save-change"> 检测到未保存的更改 </div>
-    <div slot="text">
-      <p data-translate-key="dialog-ask-for-save-change"> 是否保存更改？ </p>
-    </div>
-    <s-button slot="action" type="text" id="save-change-ignore" @click="handleCancel"> {{ $t('editDialog.ignore') }}
-    </s-button>
-    <s-button slot="action" type="text" id="save-change-confirm" @click="handleSave"> {{ $t('editDialog.save') }}
-    </s-button>
-  </s-dialog> -->
   <DialogTemplate id="save-change-dialog">
     <template v-slot:content>
       <h2 style="padding: 0;margin: 0;">{{ $t('editDialog.changeNotSave') }}</h2>
@@ -209,7 +199,6 @@
 <script setup>
 import { ref } from 'vue';
 import { defineProps, defineEmits, onMounted, computed, watch, useTemplateRef } from 'vue';
-import dialogTemplate from './dialogTemplate.vue';
 import IManager from '../../electron/IManager';
 import DialogTemplate from './dialogTemplate.vue';
 import horizontalScrollBar from '../components/horizontalScrollBar.vue';
@@ -313,45 +302,6 @@ const handleSave = () => {
   saved = true;
   editModInfoDialog.value.$el.dismiss();
 }
-
-// onMounted(() => {
-//   const editModInfoDialogStyle = document.createElement('style');
-//   editModInfoDialogStyle.innerHTML = `
-//     .container {
-//       width: calc(30% + 400px) !important;
-//       min-width: calc(600px) !important;
-//       max-width: 900px !important;
-//       height: fit-content !important;
-//       min-height: 500px !important;
-//       overflow: hidden !important;
-//       flex:1;
-//       padding-bottom: 30px;
-//     }
-//     .action {
-//       display: none !important;
-//     }
-//     s-scroll-view{
-//       display: none;
-//     }    
-//         `;
-//   // editModInfoDialog.shadowRoot.appendChild(editModInfoDialogStyle);
-//   editModInfoDialog.value.shadowRoot.appendChild(editModInfoDialogStyle);
-
-//   editModInfoDialog.value.addEventListener('dismiss', async () => {
-//     // 如果 modInfo 与 props.mod 不同，则询问是否保存
-//     //debug
-//     if (saved) {
-//       saved = false;
-//       return;
-//     }
-//     console.log('dismiss', JSON.stringify(modInfo.value), JSON.stringify(props.mod));
-//     if (JSON.stringify(modInfo.value) !== JSON.stringify(props.mod)) {
-//       iManager.showDialog('save-change-dialog');
-//     }
-//   });
-// });
-
-
 </script>
 
 
@@ -360,10 +310,9 @@ const handleSave = () => {
   overflow-y: hidden;
   overflow-x: auto;
   height: 35px;
-  justify-content: center;
   align-items: center;
   max-width: 450px;
-  padding: 0px 0px; 
+  padding: 0 10px;
   border-radius:  20px; 
 }
 </style>

@@ -3,20 +3,35 @@
         :character="props.character" @click="click" :compact="props.compactMode"
         @contextmenu.prevent.stop="openEditModDialog">
 
-
         <div slot="image" style="height: 200px;">
             <img id="editDialog-mod-info-image"
                 style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" alt="Mod Image"
-                :src="img" v-if="enteredWindow || !props.lazyLoad" />
+                :src="getImage()" v-if="enteredWindow || !props.lazyLoad || img" />
             <s-skeleton id="editDialog-mod-info-image"
                 style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" v-else />
-            <!-- <img id="editDialog-mod-info-image" style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" alt="Mod Image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" v-else /> -->
         </div>
+
         <div slot="headline" id="mod-item-headline">{{ props.mod }}</div>
         <div slot="subhead" id="mod-item-subhead">{{ props.character }}</div>
         <div slot="text" id="mod-item-text">
+            <horizontalScrollBar class="OO-box OO-shade-box hotkey-container" scrollSpeed=0.1 dragSpeed=1>
+                <div style="display: flex;flex-direction: row;flex-wrap: nowrap;">
+                    <div v-for="(hotkey, index) in props.hotKeys" :key="index">
+                        <s-tooltip>
+                            <div style="margin: 0px 3px;height: 35px;padding: 20px 5px 20px 5px;transform: skew(-20deg);border-radius: 0;"
+                                slot="trigger" class="OO-button">
+                                <p style="transform: skew(20deg);">
+                                    {{ hotkey.key }}
+                                </p>
+                            </div>
+                            <p style="line-height: 1.2;">
+                                {{ hotkey.description }} </p>
+                        </s-tooltip>
+                    </div>
+                </div>
+            </horizontalScrollBar>
             <s-scroll-view>
-                <p id="mod-hotkeys">Hotkeys: {{ displayHotKeys }}</p>
+                <!-- <p id="mod-hotkeys">Hotkeys: {{ displayHotKeys }}</p> -->
                 <p id="mod-item-description">{{ props.description }}</p>
                 <div class="placeholder"></div>
             </s-scroll-view>
@@ -25,10 +40,10 @@
 </template>
 
 <script setup>
-const { ipcRenderer } = require('electron');
 import 'sober'
 import { useTemplateRef, computed, defineProps, onMounted, ref, watch } from 'vue'
-import IManager from '../../electron/IManager';
+import IManager, { snack } from '../../electron/IManager';
+import horizontalScrollBar from './horizontalScrollBar.vue';
 const iManager = new IManager();
 
 const props = defineProps({
@@ -53,6 +68,16 @@ const displayHotKeys = computed(() => {
 })
 
 const img = ref(null);
+
+const getImage = () => {
+    // 直到需要时才加载图片，加载后保存到 img.value
+    if (img.value == null) {
+        iManager.getImageBase64(props.imagePath).then((imageBase64) => {
+            img.value = 'data:image/png;base64,' + imageBase64;
+        });
+    }
+    return img.value;
+}
 
 const clicked = ref(false);
 const modItemRef = useTemplateRef('modItemRef');
@@ -181,14 +206,14 @@ const enterCompactMode = (item) => {
             //获取slot下的img元素
             const img = child.querySelector('img');
             if (img)
-            img.animate([
-                { opacity: 1, filter: 'blur(0px)' },
-                { opacity: 0.2, filter: 'blur(5px)' }
-            ], {
-                duration: 300,
-                easing: 'ease-in-out',
-                iterations: 1
-            });
+                img.animate([
+                    { opacity: 1, filter: 'blur(0px)' },
+                    { opacity: 0.2, filter: 'blur(5px)' }
+                ], {
+                    duration: 300,
+                    easing: 'ease-in-out',
+                    iterations: 1
+                });
         }
     });
 };
@@ -221,14 +246,14 @@ const exitCompactMod = (item) => {
             //获取slot下的img元素
             const img = child.querySelector('img');
             if (img)
-            img.animate([
-                { opacity: 0.2, filter: 'blur(5px)' },
-                { opacity: 1, filter: 'blur(0px)' }
-            ], {
-                duration: 300,
-                easing: 'ease-in-out',
-                iterations: 1
-            });
+                img.animate([
+                    { opacity: 0.2, filter: 'blur(5px)' },
+                    { opacity: 1, filter: 'blur(0px)' }
+                ], {
+                    duration: 300,
+                    easing: 'ease-in-out',
+                    iterations: 1
+                });
         }
     });
 }
@@ -243,7 +268,7 @@ watch(() => props.compactMode, (newVal, oldVal) => {
     // 如果 为 hidden，则不进行动画
     if (modItem.classList.contains('hidden')) {
         return;
-    }   
+    }
     if (modItem.getAttribute('inWindow') != 'true') {
         //如果modItem不在视窗内，则不进行动画
         console.log(`${modItem.id} is not in window: prop inWindow is ${modItem.getAttribute('inWindow')}`);
@@ -260,9 +285,7 @@ watch(() => props.compactMode, (newVal, oldVal) => {
 //==================== init ====================//
 onMounted(() => {
     iManager.waitInit().then(() => {
-        iManager.getImageBase64(props.imagePath).then((imageBase64) => {
-            img.value = "data:image/png;base64," + imageBase64;
-        });
+
     });
 })
 
@@ -281,7 +304,7 @@ defineExpose({
 })
 </script>
 
-<style scoped>
+<style>
 .mod-item.hidden {
     display: none;
 }
@@ -315,6 +338,7 @@ defineExpose({
     will-change: transform;
 
     transition: x, y 0.5s cubic-bezier(.36, -0.64, .34, 1.76);
+
     >div[slot="image"] {
         width: 250px;
         height: 200px;
@@ -357,7 +381,7 @@ defineExpose({
 }
 
 .mod-item .placeholder {
-    height: 30px;
+    height: 80px;
     border: 0;
 }
 
@@ -431,5 +455,21 @@ defineExpose({
     animation-fill-mode: forwards;
     animation-iteration-count: 1;
 } */
+</style>
 
+<style scoped>
+.hotkey-container {
+    overflow-y: hidden;
+    overflow-x: auto;
+    height: 25px;
+    align-items: center;
+    max-width: 450px;
+    padding: 0px 0px;
+    border-radius: 0 20px 0 20px;
+
+    position: absolute;
+    bottom: 5px;
+    left: 10px;
+    right: 5px;
+}
 </style>

@@ -86,7 +86,7 @@ const updateSlider = (index) => {
         return;
     }
     //debug
-    console.log(`updateSlider: `, index, selectedTab, props.tabs[index])
+    // console.log(`updateSlider: `, index, selectedTab, props.tabs[index])
     sliderStyle.top = `${selectedTab.offsetTop}px`;
     sliderStyle.height = `${selectedTab.offsetHeight}px`;
     sliderStyle.width = `${selectedTab.offsetWidth}px`;
@@ -95,10 +95,10 @@ const updateSlider = (index) => {
 
 //-=============== 选项切换 ===============
 const selectTab = (tab, index) => {
+    updateSlider(index);
     if (tab === currentTab.value) return;
     currentTab.value = tab;
     emit('tabChange', tab);
-    updateSlider(index);
 };
 
 const selectTabByName = (tab) => {

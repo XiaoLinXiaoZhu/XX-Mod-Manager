@@ -70,7 +70,7 @@ const sliderStyle = reactive({
 const updateSlider = (index) => {
     const selectedChip = chipButtonRefs.value[props.items[index]];
     //debug
-    console.log(`updateSlider: `, selectedChip)
+    // console.log(`updateSlider: `, selectedChip)
 
     if (!selectedChip) return;
     sliderStyle.width = `${selectedChip.$el.offsetWidth}px`;
