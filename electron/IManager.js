@@ -327,6 +327,10 @@ class IManager {
         this.trigger('languageChange', this.config.language);
         console.log('✅>> languageChange to', this.config.language);
 
+        //------ 切换主题 -----
+        this.trigger('themeChange', this.config.theme);
+        console.log('✅>> themeChange to', this.config.theme);
+
 
         //------ 如果开启了 ifStartWithLastPreset，则启动时使用上次使用的预设 -----
         if (this.config.ifStartWithLastPreset) {

@@ -1,14 +1,20 @@
-<!-- 这是一个水平滚动条，支持使用滚轮左右滚动以及使用鼠标拖动滚动 -->
 <template>
-    <div class="horizontal-scroll-bar" ref="scrollBar">
+    <div :class="['horizontal-scroll-bar', { 'show-scrollbar': showScrollbar }]" ref="scrollBar">
         <slot></slot>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted,useTemplateRef } from 'vue';
+import { ref, onMounted, defineProps } from 'vue';
 
-const scrollBar = useTemplateRef('scrollBar');  
+const props = defineProps({
+    showScrollbar: {
+        type: Boolean,
+        default: false
+    }
+});
+
+const scrollBar = ref(null);
 
 onMounted(() => {
     const scrollBarEl = scrollBar.value;
@@ -35,7 +41,7 @@ onMounted(() => {
         if (!isDown) return;
         e.preventDefault();
         const x = e.pageX - scrollBarEl.offsetLeft;
-        const walk = (x - startX) ;
+        const walk = (x - startX);
         scrollBarEl.scrollLeft = scrollLeft - walk;
     });
 
@@ -60,4 +66,7 @@ onMounted(() => {
     display: none;
 }
 
+.horizontal-scroll-bar.show-scrollbar::-webkit-scrollbar {
+    display: block;
+}
 </style>

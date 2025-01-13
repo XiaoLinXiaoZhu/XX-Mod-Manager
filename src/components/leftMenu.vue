@@ -11,35 +11,46 @@
 * @ Slot: up-button: 用于自定义上方按钮
 *        down-button: 用于自定义下方按钮
 * -->
+
+
+<!-- <div ref="containerRef" style="position: relative; overflow-y: auto; overflow-x: hidden; height: calc(100% - 64px);" >
+    <div v-for="(tab, index) in tabs" :key="index" :class="['tab', { active: currentTab === tab }]"
+        @click="selectTab(tab,index)">
+        <p> {{ translatedTabs[index] || tab }} </p>
+        <s-ripple attached="true"></s-ripple>
+    </div>
+    <div class="slider OO-color-gradient" :style="sliderStyle"></div>
+</div> -->
+
 <template>
-    <div class="left-menu OO-box" >
+    <div class="left-menu OO-box">
         <div class="OO-button-box" id="up-button">
             <slot name="up-button">
                 <s-icon type="arrow_drop_up"></s-icon>
             </slot>
         </div>
-        <div ref="containerRef" style="position: relative; overflow-y: auto; overflow-x: hidden; height: calc(100% - 64px);" >
-            
+
+        <div style="position: relative; overflow-y: auto; overflow-x: hidden; height: calc(100% - 64px);">
             <div v-for="(tab, index) in tabs" :key="index" :class="['tab', { active: currentTab === tab }]"
-                @click="selectTab(tab,index)">
+                @click="selectTab(tab, index)" :ref="setTabRef(tab)">
                 <p> {{ translatedTabs[index] || tab }} </p>
                 <s-ripple attached="true"></s-ripple>
             </div>
             <div class="slider OO-color-gradient" :style="sliderStyle"></div>
         </div>
+
         <div class="placeholder"></div>
+
         <div class="OO-button-box" id="down-button">
             <slot name="down-button">
                 <s-icon type="arrow_drop_down"></s-icon>
             </slot>
         </div>
-
     </div>
 </template>
 
 <script setup>
-import { ref, watch, computed, useTemplateRef,reactive, onMounted } from 'vue';
-
+import { ref, reactive, onMounted } from 'vue';
 const props = defineProps({
     tabs: {
         type: Array,
@@ -53,10 +64,37 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['tabChange']);
-
 const currentTab = ref(props.tabs[0]);
 
-const selectTab = (tab,index) => {
+//-=============== 按钮引用 ===============
+const tabRefs = ref({});
+const setTabRef = (tab) => (el) => {
+    tabRefs.value[tab] = el;
+}
+
+//-=============== 浮动滑块 ===============
+const sliderStyle = reactive({
+    top: '0px',
+    height: '0px',
+    width: '0px',
+});
+
+const updateSlider = (index) => {
+    const selectedTab = tabRefs.value[props.tabs[index]];
+    if (!selectedTab) {
+        console.log(`tab not found: ${index}`);
+        return;
+    }
+    //debug
+    console.log(`updateSlider: `, index, selectedTab, props.tabs[index])
+    sliderStyle.top = `${selectedTab.offsetTop}px`;
+    sliderStyle.height = `${selectedTab.offsetHeight}px`;
+    sliderStyle.width = `${selectedTab.offsetWidth}px`;
+};
+
+
+//-=============== 选项切换 ===============
+const selectTab = (tab, index) => {
     if (tab === currentTab.value) return;
     currentTab.value = tab;
     emit('tabChange', tab);
@@ -73,42 +111,6 @@ const selectTabByName = (tab) => {
     if (index === -1) return;
     updateSlider(index);
 };
-
-const sliderStyle = reactive({
-    top: '0px',
-    height: '0px',
-    width: '0px',
-});
-
-
-// const sliderStyle = computed(() => {
-//     const index = props.tabs.indexOf(currentTab.value);
-//     return {
-//         transform: `translateY(${index * 100}%)`
-//     };
-// });
-const containerRef = useTemplateRef('containerRef');
-
-
-const updateSlider = (index) => {
-    const tabs = containerRef.value.querySelectorAll('.tab');
-    const selectedTab = tabs[index];
-    if (!selectedTab) {
-        console.log(`tab not found: ${index}`);
-        return;
-    }
-    //debug
-    // console.log(`updateSlider: `, selectedTab, index,tabs)
-    sliderStyle.top = `${selectedTab.offsetTop}px`;
-    sliderStyle.height = `${selectedTab.offsetHeight}px`;
-    sliderStyle.width = `${selectedTab.offsetWidth}px`;
-};
-
-// watch(() => props.tabs, (newTabs) => {
-//     if (!newTabs.includes(currentTab.value)) {
-//         currentTab.value = newTabs[0];
-//     }
-// });
 
 onMounted(() => {
     // 尝试使得 当前 滑块为第一个选项卡

@@ -62,13 +62,23 @@ const setChipButtonRef = (index) => (el) => {
 
 const currentItem = ref(props.items[0]);
 
+//-=============== 滑块 ===============
 const sliderStyle = reactive({
     width: '0px',
     left: '0px'
 });
+const updateSlider = (index) => {
+    const selectedChip = chipButtonRefs.value[props.items[index]];
+    //debug
+    console.log(`updateSlider: `, selectedChip)
+
+    if (!selectedChip) return;
+    sliderStyle.width = `${selectedChip.$el.offsetWidth}px`;
+    sliderStyle.left = `${selectedChip.$el.offsetLeft}px`;
+};
 
 
-
+//-=============== 浮动滑块 ===============
 const selectItem = (item, index) => {
     updateSlider(index);
     if (item === currentItem.value) return;
@@ -81,16 +91,6 @@ const selectItemByName = (name) => {
     const index = props.items.indexOf(name);
     if (index === -1) return;
     selectItem(name, index);
-};
-
-const updateSlider = (index) => {
-    const selectedChip = chipButtonRefs.value[props.items[index]];
-    //debug
-    console.log(`updateSlider: `, selectedChip)
-
-    if (!selectedChip) return;
-    sliderStyle.width = `${selectedChip.$el.offsetWidth}px`;
-    sliderStyle.left = `${selectedChip.$el.offsetLeft}px`;
 };
 
 onMounted(() => {
