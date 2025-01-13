@@ -284,7 +284,7 @@ onMounted(async () => {
         event.stopPropagation();
 
         const modItem = event.target.closest('.mod-item');
-        if (modItem && modItem.id != iManager.temp.lastClickedMod.name) {
+        if (modItem && modItem.id != iManager.temp.currentMod.name) {
             event.dataTransfer.dropEffect = 'copy';
             // iManager.setLastClickedMod_ByName(modItem.id);
             iManager.setCurrentModByName(modItem.id);

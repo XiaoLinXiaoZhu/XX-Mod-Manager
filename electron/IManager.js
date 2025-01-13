@@ -315,7 +315,7 @@ class IManager {
             // this.trigger('lastClickedMod_Changed', this.temp.lastClickedMod);
 
             this.setCurrentMod(this.data.modList[0]);
-            console.log('✅>> lastClickedMod init', this.temp.currentMod);
+            console.log('✅>> currentMod init', this.temp.currentMod);
         }
 
         //------ 切换语言 -----
@@ -579,7 +579,8 @@ class IManager {
             // console.log(`handle image drop: ${file.name}`,imageUrl);
             //! updateModCardCover(imageUrl, modItem, mod);
             // 这里的 imageUrl 是一个 base64 字符串，可以直接用于显示图片
-            this.setModPreviewBase64ByName(imageUrl, this.temp.lastClickedMod.name);
+            // this.setModPreviewBase64ByName(imageUrl, this.temp.lastClickedMod.name);
+            this.setModPreviewBase64ByName(imageUrl, this.temp.currentMod.name);
         };
         reader.readAsDataURL(file);
     }
@@ -636,7 +637,8 @@ class IManager {
             this.trigger('addMod', mod);
 
             setTimeout(() => {
-                this.setLastClickedMod(mod);
+                // this.setLastClickedMod(mod);
+                this.setCurrentMod(mod);
                 this.setCurrentCharacter(mod.character);
                 this.showDialog('edit-mod-dialog');
             }, 200);
@@ -692,7 +694,8 @@ class IManager {
         this.trigger('addMod', mod);
 
         setTimeout(() => {
-            this.setLastClickedMod(mod);
+            // this.setLastClickedMod(mod);
+            this.setCurrentMod(mod);
             this.setCurrentCharacter(mod.character);
 
             this.showDialog('edit-mod-dialog');
