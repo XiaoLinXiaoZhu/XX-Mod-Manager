@@ -1,6 +1,5 @@
 import { createApp } from 'vue'
 import './style.css'
-import App from './App.vue'
 import test_app from './test/test_app.vue'
 import 'sober'
 //npm
