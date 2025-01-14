@@ -13,8 +13,11 @@ const path = require(pathOsName);
 // 导入fs
 const fs = require('fs');
 
-// 导入 adm-zip
-const AdmZip = require('adm-zip');
+// // 导入 adm-zip
+// const AdmZip = require('adm-zip');
+// adm-zip 弃用，改为使用 Libarchivejs
+// import {Archive} from 'libarchive.js/main.js';
+
 
 function snack(message, type = 'info') {
     ipcRenderer.send('snack', message, type);
@@ -591,8 +594,19 @@ class IManager {
 
         const reader = new FileReader();
         reader.onload = async (event) => {
+            // const buffer = Buffer.from(event.target.result);
+            // const zip = new AdmZip(buffer);
+            // adm-zip 弃用，改为使用 Libarchivejs
             const buffer = Buffer.from(event.target.result);
-            const zip = new AdmZip(buffer);
+            const zip = await LibarchiveInstance.open(buffer);
+
+            const file = e.currentTarget.files[0];
+
+            const archive = await Archive.open(file);
+            let obj = await archive.extractFiles();
+            
+            console.log(obj);
+            
             const modName = file.name.replace('.zip', '');
             const modPath = path.join(this.config.modSourcePath, modName);
 

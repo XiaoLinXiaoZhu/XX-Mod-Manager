@@ -19,9 +19,9 @@
   },
   "dependencies": {
     "@tweenjs/tween.js": "^25.0.0",
-    "adm-zip": "^0.5.16",
     "concurrently": "^9.1.0",
     "hmc-win32": "^1.4.92",
+    "libarchive.js": "^2.0.2",
     "sober": "^0.6.8",
     "vue": "^3.5.12",
     "vue-i18n": "^10.0.5"

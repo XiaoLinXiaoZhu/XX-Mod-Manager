@@ -128,7 +128,7 @@ const onChange = (value) => {
     // 如果 result 不为 undefined 则说明， 显示的值需要更新
     if (result !== undefined) {
         //debug
-        console.log("🤓🤓🤓",result);
+        console.log("☝️🤓",result);
         data.value.data = result;
         // 强制更新
         refresh();

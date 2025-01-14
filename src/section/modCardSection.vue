@@ -38,9 +38,6 @@
             <s-button @click="handleApplyButtonClicked" id="apply-button" class="OO-color-gradient font-hongmeng OO-button" style="color: var(--s-color-surface);">
                 {{ $t('buttons.apply') }}
             </s-button>
-            <!-- <s-button @click="handleClick" id="apply-button" class="OO-color-gradient font-hongmeng">
-                Open Tape Page
-            </s-button> -->
         </div>
     </div>
 
@@ -58,7 +55,7 @@
 import modCardManager from '../components/modCardManager.vue'
 import leftMenu from '../components/leftMenu.vue';
 import modInfo from '../components/modInfo.vue';
-import { ref, watch, onMounted, useTemplateRef } from 'vue';
+import { ref, onMounted, useTemplateRef } from 'vue';
 import IManager from '../../electron/IManager';
 import fsProxy from '../../electron/fsProxy';
 const iManager = new IManager();

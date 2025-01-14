@@ -21,10 +21,10 @@
 </template>
 
 <script setup>
-import { onMounted, ref, useTemplateRef } from 'vue'
-import IManager from '../../electron/IManager';
+import { ref } from 'vue'
 import dialogTemplate from './dialogTemplate.vue';
-const { ipcRenderer } = require('electron');
+
+import IManager from '../../electron/IManager';
 const iManager = new IManager();
 
 const presetName = ref('');
@@ -41,19 +41,19 @@ function handleAddPreset() {
         if (presetList.includes(presetName.value)) {
             //debug
             console.log("presetName already exists");
-            ipcRenderer.send('snack', t('presetDialog.nameExist'), 'error');
+            iManager.snack(t('presetDialog.nameExist'), 'error');
         }
         else {
             //debug
             console.log("presetName is not exists");
             iManager.addPreset(presetName.value);
-            ipcRenderer.send('snack', t('presetDialog.success'), 'info');
+            iManager.snack(t('presetDialog.success'), 'info');
         }
     }
     else {
         //debug
         console.log("presetName is empty");
-        ipcRenderer.send('snack', t('presetDialog.emptyName'), 'error');
+        iManager.snack(t('presetDialog.emptyName'), 'error');
     }
     //清空输入框
     presetName.value = '';

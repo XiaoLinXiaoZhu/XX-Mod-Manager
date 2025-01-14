@@ -159,9 +159,8 @@
 
 <script setup>
 import leftMenu from '../components/leftMenu.vue';
-import chipButton from '../components/chipButton.vue';
 import settingBar from '../components/settingBar.vue';
-import { computed, h, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import IManager from '../../electron/IManager';
 const iManager = new IManager();
 import getData from './settingSectionData.js';
@@ -305,23 +304,6 @@ onMounted(async () => {
 
     // 为 plugin 添加 tab
     tabs.value.push(...Object.keys(pluginConfig.value));
-    // 生成插件设置界面
-    // 1. 生成插件的设置界面
-    // 2. 生成插件的设置界面的数据
-
-    // 遍历插件数据
-    for (const pluginName in pluginConfig.value) {
-        const plugin = pluginConfig.value[pluginName];
-        // 遍历插件的设置
-        for (const data of plugin) {
-            // 生成设置界面
-            // 生成设置界面的数据
-            //debug
-            // console.log(`in plugin ${pluginName}, data:`, data);
-        }
-    }
-
-
 });
 </script>
 

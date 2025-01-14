@@ -14,7 +14,7 @@
             </div>
         </template> 
         <template v-slot:action>
-            <div/>
+            <div></div>
         </template>
     </dialogTemplate>
 

@@ -86,13 +86,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import IManager from '../../electron/IManager';
+import { ref, computed } from 'vue';
+
 import leftMenu from '../components/leftMenu.vue';
 import Markdown from '../components/markdown.vue';
-const iManager = new IManager();
-import { useI18n } from 'vue-i18n';
-const { t } = useI18n();
+
+import { waitInitIManager } from '../../electron/IManager';
 
 const explainContentCn =
   `# 先决条件
@@ -488,25 +487,6 @@ If you cannot solve the problem, please contact me.
 
 const language = ref('en');
 
-iManager.waitInit().then(() => {
-  language.value = iManager.config.language;
-
-  iManager.on('languageChange', (lang) => {
-    //debug 
-    console.log('helpSection languageChange', lang);
-    language.value = lang;
-  });
-});
-
-// const tabs = ['help-preset', 'help-mod', 'help-auto', 'help-multiple-games', 'help-trouble'];
-// const translatedTabs = computed(() => {
-//   if (language.value === 'zh_cn') {
-//     return ['使用【预设】', '导入、配置mod', '自动化', '适配多个游戏', '故障排除'];
-//   } else {
-//     return ['Presets', 'Import Mods', 'Automation', 'Multi-Game Support', 'Troubleshooting'];
-//   }
-// });
-
 // 重新编排tab内容和顺序
 // 1. 名词解释
 // 2. 导入mod
@@ -517,28 +497,31 @@ iManager.waitInit().then(() => {
 // 7. 自动化
 // 8. 适配多个游戏
 // 9. 故障排除
-
-
 const tabs = ['help-explain', 'help-import', 'help-config-mod-loader', 'help-load', 'help-config', 'help-preset', 'help-auto', 'help-multiple-games', 'help-trouble'];
-const translatedTabs = computed(() => {
-  if (language.value === 'zh_cn') {
-    return ['名词解释', '导入mod', '配置mod加载器', '加载mod', '配置mod', '预设', '自动化', '适配多个游戏', '故障排除'];
-  } else {
-    return ['Overview', 'Importing Mods', 'Loader Config', 'Load Mods', 'Mods Config', 'Presets', 'Automation', 'Multi-Game Support', 'Troubleshooting'];
-  }
-});
 
 const currentTab = ref(tabs[0]);
-
 const handleTabChange = (tab) => {
   currentTab.value = tab;
 };
 
-onMounted(() => {
-  iManager.waitInit().then(() => {
-    language.value = iManager.config.language;
-    //debug
-    // console.log('helpSection onMounted', language.value);
+const translatedTabs = ref(['Overview', 'Importing Mods', 'Loader Config', 'Load Mods', 'Mods Config', 'Presets', 'Automation', 'Multi-Game Support', 'Troubleshooting']);
+const setTranslatedTabs = (language) =>{
+  if (language === 'zh_cn') {
+    translatedTabs.value = ['名词解释', '导入mod', '配置mod加载器', '加载mod', '配置mod', '预设', '自动化', '适配多个游戏', '故障排除'];
+  } else {
+    translatedTabs.value = ['Overview', 'Importing Mods', 'Loader Config', 'Load Mods', 'Mods Config', 'Presets', 'Automation', 'Multi-Game Support', 'Troubleshooting'];
+  }
+}
+
+waitInitIManager().then((iManager) => {
+  language.value = iManager.config.language;
+  setTranslatedTabs(language.value);
+
+  iManager.on('languageChange', (lang) => {
+    //debug 
+    console.log('helpSection languageChange', lang);
+    language.value = lang;
+    setTranslatedTabs(lang);
   });
 });
 

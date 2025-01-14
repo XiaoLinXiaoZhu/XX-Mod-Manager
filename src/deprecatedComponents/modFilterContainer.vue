@@ -47,7 +47,7 @@ const selectItem = (item, index) => {
   //debug
   console.log(`selected ${item.text}`)
   if (item.text === currentCharacter.value) return;
-  
+
   currentCharacter.value = item.text;
   iManager.setCurrentCharacter(item.text);
   updateSlider(index);
@@ -88,30 +88,27 @@ const onMouseMove = (event) => {
   containerRef.value.scrollLeft = scrollLeft.value - walk;
 };
 
-onMounted(() => {
+onMounted(async () => {
   updateSlider(0); // Initialize the slider position
 
-  iManager.waitInit().then((iManager) => {
+  await iManager.waitInit();
+
+  iManager.on('currentCharacterChanged', (character) => {
+    if (character === currentCharacter.value) return;
     //debug
-    console.log(`get iManager: ${iManager}`)
-
-    iManager.on('currentCharacterChanged', (character) => {
-      if (character === currentCharacter.value) return;
-      //debug
-      console.log(`get currentCharacterChanged: ${character}`)
-      currentCharacter.value = character;
-      const index = getFilterItems().findIndex((item) => item === character);
-      console.log(`get index: ${index}`)
-      updateSlider(index);
-    });
-
-    setTimeout(() => {
-      // 语言变化会导致宽度变化，所以 需要刷新一下
-      updateSlider(0);
-      //debug
-      console.log(`✅✅✅✅✅✅✅ get currentCharacter.value: ${currentCharacter.value}`)
-    }, 1);
+    console.log(`get currentCharacterChanged: ${character}`)
+    currentCharacter.value = character;
+    const index = getFilterItems().findIndex((item) => item === character);
+    console.log(`get index: ${index}`)
+    updateSlider(index);
   });
+
+  setTimeout(() => {
+    // 语言变化会导致宽度变化，所以 需要刷新一下
+    updateSlider(0);
+    //debug
+    console.log(`✅✅✅✅✅✅✅ get currentCharacter.value: ${currentCharacter.value}`)
+  }, 1);
 
 });
 

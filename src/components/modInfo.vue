@@ -65,8 +65,6 @@ const iManager = new IManager();
 import fsProxy from '../../electron/fsProxy';
 const fs = new fsProxy();
 
-const { ipcRenderer } = require('electron');
-
 // 导入 i18n 的 t 函数
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
@@ -82,7 +80,7 @@ const emit = defineEmits(['clickEditButton']);
 
 const editMod = () => {
     if (props.mod == null) {
-        ipcRenderer.send('snack', t('no-mod-selected'), 'error');
+        iManager?.snack(t('no-mod-selected'), 'error');
         return;
     }
 
@@ -93,7 +91,7 @@ const editMod = () => {
 const openModFolder = () => {
     //ipcRenderer.send('open-url', props.mod?.url);
     if (props.mod == null) {
-        ipcRenderer.send('snack',t('no-mod-selected'), 'error');
+        iManager?.snack(t('no-mod-selected'), 'error');
         return;
     }
     fs.openDir(iManager.config.modSourcePath + '/' + props.mod.name);
@@ -102,7 +100,6 @@ const openModFolder = () => {
 };
 
 const modInfoRef = useTemplateRef("modInfoRef");
-
 const setDisplayMod = async (mod) => {
     if (mod == null) {
         return;
