@@ -150,5 +150,8 @@
     "emptyName": "预设名称不能为空"
   },
   "mod-image": "Mod图片",
-  "no-mod-selected": "未选择mod"
+  "no-mod-selected": "未选择mod",
+  "dialogEnterPassword": {
+    "title": "请输入密码"
+  }
 }

@@ -31,6 +31,7 @@
     <dialogModInfo2 :mod="lastClickedMod" />
     <dialogLoading />
     <DialogNeedRefresh />
+    <dialogEnterPassword :data="data" />
 </template>
 
 <script setup>
@@ -45,6 +46,7 @@ import CssProxy from '../components/cssProxy.vue';
 import dialogModInfo2 from '../dialogs/dialogModInfo2.vue';
 import helpSection from '../section/helpSection.vue';
 import dialogLoading from '../dialogs/dialogLoading.vue';
+import dialogEnterPassword from '../dialogs/dialogEnterPassword.vue';
 
 import DialogNeedRefresh from '../dialogs/dialogNeedRefresh.vue';
 

@@ -1,7 +1,7 @@
 <template>
     <dialogTemplate id="add-preset-dialog">
         <template v-slot:content>
-            <p data-translate-key="ask-preset-name">{{ $t('presetDialog.requireName') }}</p>
+            <p>{{ $t('presetDialog.requireName') }}</p>
             <div class="OO-setting-bar">
                 <h3>{{ $t('presetDialog.name') }}</h3>
                 <s-text-field v-model="presetName" :placeholder="$t('presetDialog.requireName')" id="preset-name">

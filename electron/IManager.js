@@ -543,7 +543,7 @@ class IManager {
             //     return;
             // }
             // 通过使用 libarchive 处理 压缩文件，它能够支持所有的压缩文件
-            if (file.name.endsWith('.zip') || file.type === 'application/zip' || file.type === 'application/x-compressed' || file.type === 'application/x-tar') {
+            if (file.name.endsWith('.zip') || file.name.endsWith('.rar') || file.name.endsWith('.7z') || file.type === 'application/zip' || file.type === 'application/x-compressed' || file.type === 'application/x-tar' || file.type === 'application/x-gzip') {
                 // debug
                 console.log(`Zip file: ${file.name}`);
                 // 交给 handleArchiveDrop 处理
@@ -601,6 +601,20 @@ class IManager {
         reader.readAsDataURL(file);
     }
 
+    archivePassword = null;
+    async waitForPassword() {
+        this.archivePassword = null;
+        this.showDialog('dialog-enter-password');
+        return new Promise((resolve) => {
+            const interval = setInterval(() => {
+                if (this.archivePassword !== null) {
+                    clearInterval(interval);
+                    resolve(this.archivePassword);
+                }
+            }, 100);
+        });
+    }
+
     // 解压文件到指定目录的函数
     async extractArchive(archivePath, destinationPath) {
         // 使用 libarchive 处理 zip 文件
@@ -610,8 +624,51 @@ class IManager {
         // extractFiles 只是将其解压到内存中，并不会写入到磁盘
         // 通过 extractCallback 可以获取到解压的文件，然后将其写入到磁盘
 
+        const ifEncrypted = await archiveReader.hasEncryptedData();
+
+        if (ifEncrypted) {
+            // snack(`文件加密，无法解压`);
+            // const t_message = {
+            //     zh_cn: `文件加密，无法解压`,
+            //     en: `File is encrypted and cannot be extracted`,
+            // }
+            // t_snack(t_message, 'error');
+            // return false;
+
+            // 如果文件加密，则需要等待用户输入密码
+            const password = await this.waitForPassword();
+            //debug
+            console.log(`get password: ${password}`);
+            snack(`get password ${password}`);
+            if (password === null) {
+                // snack(`密码不能为空`);
+                const t_message = {
+                    zh_cn: `密码不能为空`,
+                    en: `Password cannot be empty`,
+                }
+                t_snack(t_message, 'error');
+                return false;
+            }
+            try {
+                await archiveReader.usePassword(password);
+            }
+            catch (error) {
+                // snack(`密码错误`);
+                const t_message = {
+                    zh_cn: `密码错误`,
+                    en: `Incorrect password`,
+                }
+                t_snack(t_message, 'error');
+                return false;
+            }
+        }
+
         let ifContainChinese = false;
         let ifSuccess = true;
+
+        if (!fs.existsSync(destinationPath)) {
+            fs.mkdirSync(destinationPath);
+        }
 
         const extractCallback = (entry) => {
             // 这里的path莫名其妙会报错，我自己写一个
@@ -624,7 +681,7 @@ class IManager {
                 ifContainChinese = true;
             }
             //debug
-            console.log(`Converted: ${filePath}`, newFilePath);
+            // console.log(`Converted: ${filePath}`, newFilePath);
             const dir = path.dirname(newFilePath);
 
 
@@ -632,10 +689,10 @@ class IManager {
             if (!fs.existsSync(dir) && dir !== '') {
                 fs.mkdirSync(dir, { recursive: true });
                 //debug
-                console.log(`Created folder: ${dir}`);
+                // console.log(`Created folder: ${dir}`);
             }
             //debug
-            console.log(`Extracted: ${filePath}`, entry.file);
+            // console.log(`Extracted: ${filePath}`, entry.file);
 
             // 因为环境的问题，entry.file 是一个 Blob 对象，无法直接写入到磁盘，所以需要将其转换为 Buffer
             try {
@@ -669,7 +726,26 @@ class IManager {
         catch (error) {
             console.error(`Error: ${error}`);
             snack(`Error: ${error}`, 'error');
-            throw new Error(`Error: ${error}`);
+            // 如果有密码可能是密码错误
+            if (ifEncrypted) {
+                // snack(`密码错误`);
+                const t_message = {
+                    zh_cn: `密码错误`,
+                    en: `Incorrect password`,
+                }
+                t_snack(t_message, 'error');
+                return false;
+            }
+            else {
+                // 没有密码可能是压缩包损坏，提示用户尝试手动解压
+                // snack(`压缩包可能损坏，尝试手动解压`);
+                const t_message = {
+                    zh_cn: `压缩包可能损坏，尝试手动解压`,
+                    en: `The archive may be damaged, try to extract it manually`,
+                }
+                t_snack(t_message, 'error');
+                return false;
+            }
         }
 
         // 如果解压出来的文件包含中文，则提示用户
@@ -712,6 +788,7 @@ class IManager {
         }
         return true;
     }
+
     async handleArchiveDrop(file) {
         //debug
         console.log(`handle zip drop: ${file.name}`);
@@ -721,14 +798,10 @@ class IManager {
         const modName = file.name.slice(0, file.name.lastIndexOf('.'));
         const modPath = path.join(this.config.modSourcePath, modName);
         // 创建mod文件夹
-        if (!fs.existsSync(modPath)) {
-            fs.mkdirSync(modPath, { recursive: true });
-        }
-        else {
-            // snack(`Mod ${modName} already exists`,"error");
+        if (fs.existsSync(modPath)) {
             const t_message = {
-                zh_cn: `模组 ${modName} 已经存在`,
-                en: `Mod ${modName} already exists`,
+            zh_cn: `模组 ${modName} 已经存在`,
+            en: `Mod ${modName} already exists`,
             }
             t_snack(t_message, 'error');
             return;
@@ -745,7 +818,7 @@ class IManager {
 
         // 解压后还需要等待文件移动完成
         // 但是回调提供的是异步方法，我们需要知道最后一个文件是否移动完成
-        
+
         if (ifSuccess) {
             // 刷新mod列表
             await this.loadMods();
@@ -767,6 +840,13 @@ class IManager {
                 this.setCurrentCharacter(mod.character);
                 this.showDialog('edit-mod-dialog');
             }, 200);
+        }
+        else {
+            // 解压失败，删除文件夹
+            if (fs.existsSync(modPath)) {
+                fs.rmdirSync(modPath, { recursive: true });
+                console.log(`Deleted folder: ${modPath}`);
+            }
         }
 
     }
