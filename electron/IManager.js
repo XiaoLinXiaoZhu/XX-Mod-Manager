@@ -16,8 +16,12 @@ const fs = require('fs');
 // // 导入 adm-zip
 // const AdmZip = require('adm-zip');
 // adm-zip 弃用，改为使用 Libarchivejs
-// import {Archive} from 'libarchive.js/main.js';
 
+import {Archive} from 'libarchive.js/main.js';
+
+Archive.init({
+    workerUrl: '/node_modules/libarchive.js/dist/worker-bundle.js'
+});
 
 function snack(message, type = 'info') {
     ipcRenderer.send('snack', message, type);
@@ -303,7 +307,7 @@ class IManager {
 
         //调用 start 方法
         setTimeout(() => {
-            
+
             this.start();
             this.trigger('initDone', this);
         }, 200);
@@ -531,13 +535,22 @@ class IManager {
                 this.handleImageDrop(file);
                 return;
             }
-            if (file.name.endsWith('.zip')) {
+            // if (file.name.endsWith('.zip') || file.type === 'application/zip' || file.type === 'application/x-compressed') {
+            //     // debug
+            //     console.log(`Zip file: ${file.name}`);
+            //     // 交给 handleZipDrop 处理
+            //     this.handleZipDrop(file);
+            //     return;
+            // }
+            // 通过使用 libarchive 处理 压缩文件，它能够支持所有的压缩文件
+            if (file.name.endsWith('.zip') || file.type === 'application/zip' || file.type === 'application/x-compressed') {
                 // debug
                 console.log(`Zip file: ${file.name}`);
-                // 交给 handleZipDrop 处理
-                this.handleZipDrop(file);
+                // 交给 handleArchiveDrop 处理
+                this.handleArchiveDrop(file);
                 return;
             }
+
             console.log('File type:', file.type);
             snack('Invalid file type：' + file.type);
         }
@@ -588,25 +601,201 @@ class IManager {
         reader.readAsDataURL(file);
     }
 
-    async handleZipDrop(file) {
+    // 解压文件到指定目录的函数
+    async extractArchive(archivePath, destinationPath) {
+        // 使用 libarchive 处理 zip 文件
+        // 读取文件
+        const archiveReader = await Archive.open(archivePath);
+        // extractFiles(extractCallback?: (entry: { file: File; path: string }) => void): Promise<FilesObject>;
+        // extractFiles 只是将其解压到内存中，并不会写入到磁盘
+        // 通过 extractCallback 可以获取到解压的文件，然后将其写入到磁盘
+
+        let ifContainChinese = false;
+        let ifSuccess = true;
+
+        const extractCallback = (entry) => {
+            const filePath = path.join(destinationPath, entry.path);
+
+            // 当解压出来的文件包含中文时，会被替换为 * ，但是文件夹名不能包含 * ，所以需要将其替换为其他字符
+            // 将 filePath 中的 * 替换为 _
+            const newFilePath = filePath.replace(/\*/g, '_');
+            if (filePath !== newFilePath) {
+                ifContainChinese = true;
+            }
+            //debug
+            console.log(`Converted: ${filePath}`, newFilePath);
+            const dir = path.dirname(newFilePath);
+
+
+            //检查文件夹是否存在，不存在则创建
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+                //debug
+                console.log(`Created folder: ${dir}`);
+            }
+            //debug
+            console.log(`Extracted: ${filePath}`, entry.file);
+
+            // 因为环境的问题，entry.file 是一个 Blob 对象，无法直接写入到磁盘，所以需要将其转换为 Buffer
+            try {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const buffer = Buffer.from(reader.result);
+                    try {
+
+                    fs.writeFileSync(newFilePath, buffer);
+                    }
+                    catch (error) {
+                        console.error(`Error: ${error}`);
+                        ifSuccess = false;
+                        snack(`Error: ${error}`, 'error');
+                        throw new Error(`Error: ${error}`);
+                    }
+                };
+                reader.readAsArrayBuffer(entry.file);
+            }
+            catch (error) {
+                console.error(`Error: ${error}`);
+                snack(`Error: ${error}`, 'error');
+                throw new Error(`Error: ${error}`);
+            }
+        }
+
+        try {
+            const obj = await archiveReader.extractFiles(extractCallback);
+            console.debug(obj);
+        }
+        catch (error) {
+            console.error(`Error: ${error}`);
+            snack(`Error: ${error}`, 'error');
+            throw new Error(`Error: ${error}`);
+        }
+
+        // 如果解压出来的文件包含中文，则提示用户
+        if (ifContainChinese) {
+            // snack(`文件夹名不能包含中文`);
+            const t_message = {
+                zh_cn: `解压后包含特殊字符，如中文，已替换为 _`,
+                en: `Folder name cannot contain special characters, and has been replaced with _`,
+            }
+            t_snack(t_message, 'error');
+        }
+
+        // 如果解压失败，则提示用户
+        if (!ifSuccess) {
+            // snack(`解压失败`);
+            const t_message = {
+                zh_cn: `解压失败,请手动解压`,
+                en: `Extraction failed, please extract manually`,
+            }
+            t_snack(t_message, 'error');
+            
+            // 删除解压的文件
+            setTimeout(() => {
+                fs.rmdirSync(destinationPath, { recursive: true });
+                console.log(`Deleted folder: ${destinationPath}`);
+                this.loadMods();
+            }, 1000);
+            return;
+        }
+        else {
+            // 提示用户
+            // snack(`解压成功`);
+            const t_message = {
+                zh_cn: `模组 ${path.basename(archivePath)} 解压成功`,
+                en: `Mod ${path.basename(archivePath)} extracted successfully`,
+            }
+            t_snack(t_message);
+
+            return;
+            // 刷新mod列表
+            await this.loadMods();
+            const mod = await this.getModInfo(modName);
+
+            // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
+            //debug
+            console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
+
+            if (this.temp.currentCharacter !== null && mod.character === 'Unknown') {
+                mod.character = this.temp.currentCharacter;
+                await this.saveModInfo(mod);
+            }
+            this.trigger('addMod', mod);
+
+            setTimeout(() => {
+                // this.setLastClickedMod(mod);
+                this.setCurrentMod(mod);
+                this.setCurrentCharacter(mod.character);
+                this.showDialog('edit-mod-dialog');
+            }, 200);
+        }
+    }
+    async handleArchiveDrop(file) {
         //debug
         console.log(`handle zip drop: ${file.name}`);
 
+        // 解压到指定位置
+        const modName = file.name.replace('.zip', '');
+        const modPath = path.join(this.config.modSourcePath, modName);
+        // 创建mod文件夹
+        if (!fs.existsSync(modPath)) {
+            fs.mkdirSync(modPath, { recursive: true });
+        }
+        else {
+            // snack(`Mod ${modName} already exists`,"error");
+            const t_message = {
+                zh_cn: `模组 ${modName} 已经存在`,
+                en: `Mod ${modName} already exists`,
+            }
+            t_snack(t_message, 'error');
+            return;
+        }
+
+        this.showDialog('loading-dialog');
+
+        // 解压文件
+        // 使用 libarchive 处理 zip 文件
+        try{
+            //debug
+            console.log(`extracting ${file.name} to ${modPath}`);
+            await this.extractArchive(file, modPath);
+            this.dismissDialog('loading-dialog');
+        }
+        catch (error) {
+            this.dismissDialog('loading-dialog');
+            console.error(`Error: ${error}`);
+            snack(`Error: ${error}`, 'error');
+            return;
+        }
+    }
+
+
+
+    async handleZipDrop(file) {
+        //debug
+        console.log(`handle zip drop: ${file.name}`);
+        //使用 libarchive 处理 zip 文件
+        this.handleArchiveDrop(file);
+
+        return;
         const reader = new FileReader();
         reader.onload = async (event) => {
+            const buffer = Buffer.from(event.target.result);
+
+            console.debug(typeof buffer)
+
+            let archive = new Archive(buffer)
+            archive.extractFiles().then(data => {
+                console.log('data:{}', data);
+            })
+
+
+            return;
             // const buffer = Buffer.from(event.target.result);
             // const zip = new AdmZip(buffer);
             // adm-zip 弃用，改为使用 Libarchivejs
-            const buffer = Buffer.from(event.target.result);
-            const zip = await LibarchiveInstance.open(buffer);
+            const zip = new Archive(buffer);
 
-            const file = e.currentTarget.files[0];
-
-            const archive = await Archive.open(file);
-            let obj = await archive.extractFiles();
-            
-            console.log(obj);
-            
             const modName = file.name.replace('.zip', '');
             const modPath = path.join(this.config.modSourcePath, modName);
 
@@ -622,12 +811,14 @@ class IManager {
             // 将zip文件解压到mod文件夹
             this.showDialog('loading-dialog');
             try {
-                zip.extractAllTo(modPath, true);
+                // zip.extractAllTo(modPath, true);
+                // adm-zip 弃用，改为使用 Libarchivejs
+                // await zip.extractFiles(modPath)
             }
             catch (error) {
                 this.dismissDialog('loading-dialog');
-                console.log(`Error: ${error}`);
-                snack(`Error: ${error}`);
+                console.error(`Error: ${error}`);
+                snack(`Error: ${error}`, 'error');
                 return;
             }
 
