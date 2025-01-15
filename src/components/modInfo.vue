@@ -10,7 +10,7 @@
         </div>
 
         <s-scroll-view class="mod-info-content">
-            <h4> {{ $t('modInfo.hotkeys') }}</h4>
+            <h4 v-if="modInfo && modInfo.hotkeys && modInfo.hotkeys.length > 0"> {{ $t('modInfo.hotkeys') }}</h4>
             <div id="hotkey-container" class="OO-colunm-center">
                 <div v-for="hotkey in modInfo ? modInfo.hotkeys : []" class="hotkey OO-setting-bar OO-shade-box a-little-left" style="margin-bottom: 5px;">
                     <h3>{{ hotkey.description }}</h3>
