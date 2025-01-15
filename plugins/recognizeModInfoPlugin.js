@@ -266,6 +266,12 @@ module.exports = {
             console.log('addMod:', mod);
             if (iManager.getPluginData(pluginName, "ifAddKeySwap")) {
                 const newMod = await getModKeySwap(iManager, mod);
+                if (newMod === undefined) {
+                    return;
+                }
+                if (newMod.hotkeys.length === 0) {
+                    return;
+                }
                 iManager.saveModInfo(newMod);
             }
         });

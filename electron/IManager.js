@@ -17,7 +17,7 @@ const fs = require('fs');
 // const AdmZip = require('adm-zip');
 // adm-zip 弃用，改为使用 Libarchivejs
 
-import {Archive} from 'libarchive.js/main.js';
+import { Archive } from 'libarchive.js/main.js';
 
 Archive.init({
     workerUrl: '/node_modules/libarchive.js/dist/worker-bundle.js'
@@ -543,7 +543,7 @@ class IManager {
             //     return;
             // }
             // 通过使用 libarchive 处理 压缩文件，它能够支持所有的压缩文件
-            if (file.name.endsWith('.zip') || file.type === 'application/zip' || file.type === 'application/x-compressed') {
+            if (file.name.endsWith('.zip') || file.type === 'application/zip' || file.type === 'application/x-compressed' || file.type === 'application/x-tar') {
                 // debug
                 console.log(`Zip file: ${file.name}`);
                 // 交给 handleArchiveDrop 处理
@@ -614,6 +614,7 @@ class IManager {
         let ifSuccess = true;
 
         const extractCallback = (entry) => {
+            // 这里的path莫名其妙会报错，我自己写一个
             const filePath = path.join(destinationPath, entry.path);
 
             // 当解压出来的文件包含中文时，会被替换为 * ，但是文件夹名不能包含 * ，所以需要将其替换为其他字符
@@ -628,7 +629,7 @@ class IManager {
 
 
             //检查文件夹是否存在，不存在则创建
-            if (!fs.existsSync(dir)) {
+            if (!fs.existsSync(dir) && dir !== '') {
                 fs.mkdirSync(dir, { recursive: true });
                 //debug
                 console.log(`Created folder: ${dir}`);
@@ -643,7 +644,7 @@ class IManager {
                     const buffer = Buffer.from(reader.result);
                     try {
 
-                    fs.writeFileSync(newFilePath, buffer);
+                        fs.writeFileSync(newFilePath, buffer);
                     }
                     catch (error) {
                         console.error(`Error: ${error}`);
@@ -689,25 +690,63 @@ class IManager {
                 en: `Extraction failed, please extract manually`,
             }
             t_snack(t_message, 'error');
-            
+
             // 删除解压的文件
             setTimeout(() => {
                 fs.rmdirSync(destinationPath, { recursive: true });
                 console.log(`Deleted folder: ${destinationPath}`);
                 this.loadMods();
             }, 1000);
-            return;
+            return false;
         }
         else {
             // 提示用户
             // snack(`解压成功`);
             const t_message = {
-                zh_cn: `模组 ${path.basename(archivePath)} 解压成功`,
-                en: `Mod ${path.basename(archivePath)} extracted successfully`,
+                zh_cn: `模组 ${path.basename(destinationPath)} 解压成功`,
+                en: `Mod ${path.basename(destinationPath)} extracted successfully`,
             }
             t_snack(t_message);
 
+            return true;
+        }
+        return true;
+    }
+    async handleArchiveDrop(file) {
+        //debug
+        console.log(`handle zip drop: ${file.name}`);
+
+        // 解压到指定位置
+        // modName 是文件名，不包含后缀
+        const modName = file.name.slice(0, file.name.lastIndexOf('.'));
+        const modPath = path.join(this.config.modSourcePath, modName);
+        // 创建mod文件夹
+        if (!fs.existsSync(modPath)) {
+            fs.mkdirSync(modPath, { recursive: true });
+        }
+        else {
+            // snack(`Mod ${modName} already exists`,"error");
+            const t_message = {
+                zh_cn: `模组 ${modName} 已经存在`,
+                en: `Mod ${modName} already exists`,
+            }
+            t_snack(t_message, 'error');
             return;
+        }
+
+        this.showDialog('loading-dialog');
+
+        // 解压文件
+        // 使用 libarchive 处理 zip 文件
+        //debug
+        console.log(`extracting ${file.name} to ${modPath}`);
+        const ifSuccess = await this.extractArchive(file, modPath);
+        this.dismissDialog('loading-dialog');
+
+        // 解压后还需要等待文件移动完成
+        // 但是回调提供的是异步方法，我们需要知道最后一个文件是否移动完成
+        
+        if (ifSuccess) {
             // 刷新mod列表
             await this.loadMods();
             const mod = await this.getModInfo(modName);
@@ -729,44 +768,7 @@ class IManager {
                 this.showDialog('edit-mod-dialog');
             }, 200);
         }
-    }
-    async handleArchiveDrop(file) {
-        //debug
-        console.log(`handle zip drop: ${file.name}`);
 
-        // 解压到指定位置
-        const modName = file.name.replace('.zip', '');
-        const modPath = path.join(this.config.modSourcePath, modName);
-        // 创建mod文件夹
-        if (!fs.existsSync(modPath)) {
-            fs.mkdirSync(modPath, { recursive: true });
-        }
-        else {
-            // snack(`Mod ${modName} already exists`,"error");
-            const t_message = {
-                zh_cn: `模组 ${modName} 已经存在`,
-                en: `Mod ${modName} already exists`,
-            }
-            t_snack(t_message, 'error');
-            return;
-        }
-
-        this.showDialog('loading-dialog');
-
-        // 解压文件
-        // 使用 libarchive 处理 zip 文件
-        try{
-            //debug
-            console.log(`extracting ${file.name} to ${modPath}`);
-            await this.extractArchive(file, modPath);
-            this.dismissDialog('loading-dialog');
-        }
-        catch (error) {
-            this.dismissDialog('loading-dialog');
-            console.error(`Error: ${error}`);
-            snack(`Error: ${error}`, 'error');
-            return;
-        }
     }
 
 
@@ -1146,12 +1148,24 @@ class IManager {
     }
 
     printModInfo(modInfo) {
+        if (modInfo === undefined) {
+            console.log('modInfo is undefined');
+            return;
+        }
         console.log('save-mod-info:');
         for (const key in modInfo) {
             console.log(`${key}:${modInfo[key]}`);
         }
         // hotkeys 为 [{},{}],将其 每个键值对打印出来
         console.log('hotkeys:');
+        if (modInfo.hotkeys === undefined) {
+            console.log('hotkeys is undefined');
+            return;
+        }
+        if (modInfo.hotkeys.length === 0) {
+            console.log('hotkeys is empty');
+            return;
+        }
         modInfo.hotkeys.forEach((hotkey, index) => {
             console.log(`hotkey${index}:`);
             for (const key in hotkey) {
