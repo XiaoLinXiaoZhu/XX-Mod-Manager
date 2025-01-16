@@ -3,10 +3,10 @@
         :character="props.character" @click="click" :compact="props.compactMode"
         @contextmenu.prevent.stop="openEditModDialog">
 
-        <div slot="image" style="height: 200px;">
+        <div slot="image" style="height: 200px;" v-if="ifDisplayImage">
             <img id="editDialog-mod-info-image"
                 style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" alt="Mod Image"
-                :src="getImage()" v-if="enteredWindow || !props.lazyLoad || img" />
+                :src="getImage" v-if="!props.lazyLoad || enteredWindow || img != null">
             <s-skeleton id="editDialog-mod-info-image"
                 style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" v-else />
         </div>
@@ -67,9 +67,21 @@ const displayHotKeys = computed(() => {
     }).join(', ');
 })
 
+const ifDisplayImage = ref(true);
+
 const img = ref(null);
 
-const getImage = () => {
+// const getImage = () => {
+//     // 直到需要时才加载图片，加载后保存到 img.value
+//     if (img.value == null) {
+//         iManager.getImageBase64(props.imagePath).then((imageBase64) => {
+//             img.value = 'data:image/png;base64,' + imageBase64;
+//         });
+//     }
+//     return img.value;
+// }
+
+const getImage = computed(() => {
     // 直到需要时才加载图片，加载后保存到 img.value
     if (img.value == null) {
         iManager.getImageBase64(props.imagePath).then((imageBase64) => {
@@ -77,7 +89,19 @@ const getImage = () => {
         });
     }
     return img.value;
-}
+})
+
+iManager.on('addMod',(mod)=>{
+    // 在mod 添加的时候，检查一下 图片是否正常刷新
+    //debug
+    console.log(`modItem ${props.mod} received addMod event`,enteredWindow.value,props.lazyLoad,img.value == null);
+    //! 这里是临时的解决方案，应该在图片加载失败的时候，重新加载图片
+    // ifDisplayImage.value = false;
+    
+    // setTimeout(() => {
+    //     ifDisplayImage.value = true;
+    // }, 1);
+})
 
 const clicked = ref(false);
 const modItemRef = useTemplateRef('modItemRef');
@@ -293,9 +317,6 @@ onMounted(() => {
 })
 
 const enterWindow = () => {
-    //debug
-    const modItem = modItemRef.value;
-    // console.log(`modItem ${modItem.id} inWindow:${modItem.getAttribute('inWindow')}`);
     enteredWindow.value = true;
 }
 
