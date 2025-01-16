@@ -152,6 +152,8 @@
   "mod-image": "Mod Image",
   "no-mod-selected": "No mod selected",
   "dialogEnterPassword": {
-    "title": "Please Enter Password"
+    "title": "Please Enter Password",
+    "cancel": "Cancel entering password and exit decompression",
+    "confirm": "Confirm Password:"
   }
 }

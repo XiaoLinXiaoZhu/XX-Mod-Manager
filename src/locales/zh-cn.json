@@ -152,6 +152,8 @@
   "mod-image": "Mod图片",
   "no-mod-selected": "未选择mod",
   "dialogEnterPassword": {
-    "title": "请输入密码"
+    "title": "请输入密码",
+    "cancel": "取消输入密码，退出解压",
+    "confirm": "确认密码："
   }
 }

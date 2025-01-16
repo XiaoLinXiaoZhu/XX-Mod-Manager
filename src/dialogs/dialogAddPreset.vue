@@ -11,9 +11,14 @@
         </template>
         <template v-slot:action>
             <s-button slot="action" type="text" id="dialog-cancel" class="OO-button font-hongmeng" style="    margin-left: 20px;
-    margin-right: 20px;"><p>{{ $t('buttons.cancel') }}</p></s-button>
-            <s-button slot="action" type="text" id="preset-add-confirm" @click="handleAddPreset" class="OO-button font-hongmeng OO-color-gradient" style="color: var(--s-color-dark-surface);margin-left: 20px;
-    margin-right: 20px;"> <p>{{ $t('buttons.confirm') }}</p></s-button>
+    margin-right: 20px;">
+                <p>{{ $t('buttons.cancel') }}</p>
+            </s-button>
+            <s-button slot="action" type="text" id="preset-add-confirm" @click="handleAddPreset"
+                class="OO-button font-hongmeng OO-color-gradient" style="color: var(--s-color-dark-surface);margin-left: 20px;
+    margin-right: 20px;">
+                <p>{{ $t('buttons.confirm') }}</p>
+            </s-button>
         </template>
     </dialogTemplate>
 
