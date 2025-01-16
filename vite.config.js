@@ -11,11 +11,12 @@ export default defineConfig({
           isCustomElement: tag => tag.startsWith('s-')
         }
       }
-    })
+    }),
   ],
   server: {
     port: 3000
   },
+  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.ttf','**/*.wasm'],
   build: {
     outDir: 'dist',
     emptyOutDir: true,
@@ -23,8 +24,15 @@ export default defineConfig({
       input: {
         main: 'index.html',
         firstLoad: 'firstLoad/index.html',
-      }
+      },
+      output: {
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && assetInfo.name.endsWith('.wasm')) {
+            return 'assets/[name].[ext]'; // 保持文件名不变
+          }
+          return 'assets/[name]-[hash].[ext]';
+        },
+      },
     }
-  },
-  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.ttf', '**/*.woff2'], // 确保添加所有静态资源类型
+  }
 })

@@ -3,9 +3,6 @@
     "productName": "XX Mod Manager",
     "icon": "./src/assets/icon.ico",
     // "compression": "maximum",
-    "asarUnpack": [
-        "node_modules/libarchive.js/**/*",
-    ],
     "directories": {
         "output": "build"
     },

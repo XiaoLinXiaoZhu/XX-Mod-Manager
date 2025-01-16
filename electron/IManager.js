@@ -19,7 +19,12 @@ const fs = require('fs');
 
 
 // 导入 libarchivejs
-import { Archive } from "libarchive.js/dist/libarchive.js";
+let Archive = window.Archive;
+// import Archive from 'libarchive.js';
+import ArchiveWASM from './lib/libarchive.wasm?url';
+import workerBound from './lib/worker-bundle.js?url';
+
+
 
 function snack(message, type = 'info') {
     ipcRenderer.send('snack', message, type);
@@ -49,6 +54,7 @@ class IManager {
     }
 
     constructor() {
+        Archive = window.Archive;
         if (IManager.instance) {
             return IManager.instance;
         }
