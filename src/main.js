@@ -66,7 +66,6 @@ iManager.waitInit().then((iManager) => {
     iManager.trigger('languageChange', iManager.config.language);
 })
 
-
 //-=====================事件监听====================-//
 // console.log('main.js');
 

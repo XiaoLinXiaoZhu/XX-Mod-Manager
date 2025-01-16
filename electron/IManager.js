@@ -17,11 +17,9 @@ const fs = require('fs');
 // const AdmZip = require('adm-zip');
 // adm-zip 弃用，改为使用 Libarchivejs
 
-import { Archive } from 'libarchive.js/main.js';
 
-Archive.init({
-    workerUrl: '/node_modules/libarchive.js/dist/worker-bundle.js'
-});
+// 导入 libarchivejs
+import { Archive } from "libarchive.js/dist/libarchive.js";
 
 function snack(message, type = 'info') {
     ipcRenderer.send('snack', message, type);
@@ -623,6 +621,8 @@ class IManager {
         // extractFiles(extractCallback?: (entry: { file: File; path: string }) => void): Promise<FilesObject>;
         // extractFiles 只是将其解压到内存中，并不会写入到磁盘
         // 通过 extractCallback 可以获取到解压的文件，然后将其写入到磁盘
+
+        console.debug(archiveReader,archiveReader.workerUrl);
 
         const ifEncrypted = await archiveReader.hasEncryptedData();
 

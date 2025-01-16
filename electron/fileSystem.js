@@ -601,16 +601,16 @@ function saveModInfo(modSourcePath, jsonModInfo) {
 
 
 function printModInfo(modInfo) {
-    console.log('save-mod-info:');
+    console.log(`--------------save-mod-info --------------`);
     for (const key in modInfo) {
         console.log(`${key}:${modInfo[key]}`);
     }
     // hotkeys 为 [{},{}],将其 每个键值对打印出来
     console.log('hotkeys:');
     modInfo.hotkeys.forEach((hotkey, index) => {
-        console.log(`hotkey${index}:`);
+        console.log(`-->${index}:`);
         for (const key in hotkey) {
-            console.log(`${key}:${hotkey[key]}`);
+            console.log(`    ${key}:${hotkey[key]}`);
         }
     });
 }

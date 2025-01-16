@@ -31,7 +31,7 @@
     <dialogModInfo2 :mod="lastClickedMod" />
     <dialogLoading />
     <DialogNeedRefresh />
-    <dialogEnterPassword :data="data" />
+    <dialogEnterPassword/>
 </template>
 
 <script setup>
