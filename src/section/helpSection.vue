@@ -93,6 +93,11 @@ import Markdown from '../components/markdown.vue';
 
 import { waitInitIManager } from '../../electron/IManager';
 
+import img_description from '../assets/description.png';
+import img_description1 from '../assets/description1.png';
+import img_description2 from '../assets/description2.png';
+import img_description3 from '../assets/description3.png';
+
 const explainContentCn =
   `# 先决条件
 请确保你已经安装了3dmigoto 或者其他的mod加载器，并且已经成功运行过。如果你还没有安装3dmigoto，请先安装3dmigoto。如果你不明白3dmigoto是什么，请自行搜索。
@@ -103,8 +108,22 @@ const explainContentCn =
 【mod加载器】 会读取 【mod 目标文件夹】 中的mod，然后加载到游戏中。
 ---
 # 在使用之前，让我们进行一些名词解释
-请注意，下述三个文件夹不能相同，否则会导致程序无法正常运行
-如果你还是无法理解，可以先将其设置为空的文件夹，观察程序的运行效果，然后再进行设置。
+请注意，下述三个文件夹不能相同，否则会导致程序无法正常运行:
+- MOD目标文件夹
+- MOD来源文件夹
+- 预设文件夹
+如果你在阅读之后还是无法理解，可以先将其设置为空的文件夹，观察程序的运行效果，然后再进行设置。
+
+我会用图片来表示以便于你更好的理解：<br>
+  <img src="../src/assets/description1.png" alt="description" style="width: 80%;height: auto;">
+因此，Mod文件的推导逻辑其实是这样的。
+  <img src="../src/assets/description3.png" alt="description" style="width: 80%;height: auto;">
+如果你不能够理解上面的图示，下面是一个更直观的：
+假设我们现在要给小可琳穿一件“皇帝的新衣”，那么：
+  <img src="../src/assets/description2.png" alt="description" style="width: 80%;height: auto;">
+“mod目标文件夹”用于存放现在正在使用的Mod
+“mod来源文件夹”用于存放所有的Mod
+---
 # mod 目标文件夹
 这是你的 模组加载器 实际加载的文件夹：
 - 对于ZZMI来说，就是ZZMI的Mods文件夹；
@@ -125,12 +144,12 @@ const importContentCn =
 程序有三种方式导入mod：
 1. 将mod文件夹添加到 mod源文件夹 中，程序会从源文件夹中读取mod文件夹。
 2. 将解压了的mod文件夹 拖拽到程序中，程序会自动将mod文件夹添加到 mod源文件夹 中。
-3. 将 无密码的zip 压缩文件 拖拽到程序中，程序会自动解压并将mod文件夹添加到 mod源文件夹 中。
+3. 将 压缩文件 拖拽到程序中，程序会自动解压并将mod文件夹添加到 mod源文件夹 中,如果压缩文件有密码，程序会弹出输入密码的窗口，请输入密码，之后程序会自动解压并将mod文件夹添加到 mod源文件夹 中。
 
 所有的方式本质上都是将mod文件夹添加到 mod源文件夹 中，你需要先配置好 mod源文件夹 的路径。
 # 导入后的现象
 1. 通过直接将mod添加到 mod源文件夹 中，需要刷新程序之后才能看到新的mod以卡片的形式展示在mod列表中。
-2. 通过拖拽解压后的mod文件夹或者无密码的zip文件，程序会自动刷新，并且会打开mod编辑页面，你可以在这里对mod的信息进行编辑，更多信息请查看【配置mod】。
+2. 通过拖拽解压后的mod文件夹或者压缩包文件，程序会自动刷新，并且会打开mod编辑页面，你可以在这里对mod的信息进行编辑，更多信息请查看【配置mod】。
 ---
 # 可能遇到的问题
 # 将mod文件夹添加到mod源文件夹中，但是mod列表中没有显示
@@ -139,9 +158,9 @@ const importContentCn =
 3. 请尝试重新打开程序
 如果以上方法都无法解决问题，请转到【故障排除】。
 # 拖拽压缩包后，程序弹出警告
-1. 请检查压缩包是否有密码。
-2. 请检查压缩包是否为zip格式。
-程序目前只支持无密码的zip格式压缩包，这也是最常见的mod压缩格式，如果你的mod是其他格式，请先解压后再导入。
+1. 请检查压缩包是否完整，程序不支持分片压缩包。
+2. 请检查压缩包是否有密码，密码是否输入正确。
+
 `;
 const configModLoaderContentCn =
   `# 加载mod
@@ -163,13 +182,25 @@ const configModLoaderContentCn =
 ---
 # XXMI
 XXMI 本质上是一个拥有用户界面的 经过封装的 3dmigoto mod加载器。它的优点是：拥有用户界面，可以在多个游戏之间切换。
+因为本程序实际上只是代理了Mods文件夹，通过动态调整mod文件夹内部的文件来实现mod的加载，所以说，你只需要将 mod目标文件夹 设置为 mod加载器的Mods文件夹即可。而mod源文件夹则是你实际用来存放mod的文件夹，它可以在任意位置。
 
-想要 使用本程序配合 XXMI，你需要将 mod来源文件夹 设置为 XXMI 说明的 存放mod的文件夹。如果你还想要拥有更便捷的使用体验，建议：
-1. 将 XXMI 【启动游戏的exe文件路径】 设置为 【本程序的路径】。
-2. 启用本程序的 【自动打开游戏和mod加载器】 的 自动打开游戏部分，并且设置【启动游戏的exe文件路径】为【实际游戏的exe文件路径】。
+为了得到更好的体验，我们可以 在 xxmi 中配置 启动游戏时，也一并启动 本程序，这有两种方式：
+# 用 XXMI 拉起 XXMM
+1. 打开 XXMI Launcher
+2. 选择游戏
+3. 点击设置（齿轮图标）
+4. 在 高级设置（advanced） 中，开启 run pre-launch , 并设置 pre-launch path 为 本程序的路径, 注意要加上英文双引号，并且取消勾选等待（wait）选项
+5. 一定要 取消勾选等待（wait）选项
 
-这样，当你在XXMI中点击开始游戏时，XXMI会启动 mod加载器和本程序，之后再由本程序启动游戏。此时XXMI的mod加载器能够正常加载mod，且本程序能够 动态控制mod的启用/禁用 以及 在游戏内刷新mod。
+这样，当你在XXMI中点击开始游戏时，XXMI会启动、mod加载器、游戏以及本程序
+# 用 本程序 拉起 XXMI
+1. 打开 本程序
+2. 打开 设置 页面
+3. 找到 自动启动插件 的配置项
+4. 设置 mod加载器 为 XXMI 的exe文件路径
+5. 点击 启动mod加载器 的按钮，测试能否正常启动mod加载器
 
+这样，当你每次打开本程序时，程序会自动启动mod加载器，然后你可以通过XXMI来启动游戏。
 `;
 
 const loadContentCn =
@@ -291,7 +322,7 @@ const troubleContentCn =
 
 const explainContentEn =
   `# Prerequisites
-Please make sure you have 3dmigoto or other mod loader installed and running successfully. \nIf you haven't installed 3dmigoto yet, please install 3dmigoto first. \nIf you don't understand what 3dmigoto is, please search it yourself.
+Please make sure you have 3dmigoto or other mod loader installed and running successfully. If you haven't installed 3dmigoto yet, please install 3dmigoto first. If you don't understand what 3dmigoto is, please search it yourself.
 Please note that this program is only a mod manager, not a mod loader. It needs to rely on 3dmigoto or other mod loaders to load mods.
 
 First, you need to understand how this program manages mods:
@@ -299,15 +330,31 @@ It creates virtual links from the mods stored in the [mod source folder] to the 
 The [mod loader] reads the mods in the [mod target folder] and loads them into the game.
 ---
 # Before using it, let us explain some terms
-Please note that the following three folders cannot be the same, otherwise the program will not run properly.
+Please note that the following three folders cannot be the same, otherwise the program will not run properly:
+- Mod Target Folder
+- Mod Source Folder
+- Preset Folder
 If you still don't understand, you can set it to an empty folder first, observe the program's operation, and then set it up.
+
+I will use pictures to help you understand better:<br>
+  <img src="../src/assets/description1.png" alt="description" style="width: 80%;height: auto;">
+Therefore, the logic of mod file derivation is actually like this.
+  <img src="../src/assets/description3.png" alt="description" style="width: 80%;height: auto;">
+If you cannot understand the above diagram, here is a more intuitive one:
+Suppose we want to dress Klee in the "Emperor's New Clothes", then:
+  <img src="../src/assets/description2.png" alt="description" style="width: 80%;height: auto;">
+The "mod target folder" is used to store the mods currently in use.
+The "mod source folder" is used to store all the mods.
+---
 # Mod Target Folder
-This is the folder actually loaded by your module loader. For ZZMI, it is the ZZMI Mods folder; for XXMI, it is the XXMI internal folder /zzz/Mods.
-This program implements mod loading by proxying the Mods folder, and dynamically adjusts the files inside the mod folder to implement mod loading, so please do not add any files in the mod target folder! \nJust add your mod to the mod source folder.
-# Source Folder
-This is the folder where this program reads mods, and the folder where you should store mods. \nIt should be set to an empty folder anywhere, you will then need to add your mod to this folder
+This is the folder actually loaded by your mod loader:
+- For ZZMI, it is the ZZMI Mods folder;
+- For XXMI, it is the XXMI internal folder /zzz/Mods
+This program implements mod loading by proxying the Mods folder, and dynamically adjusts the files inside the mod folder to implement mod loading, so please do not add any files in the mod target folder! Just add your mod to the mod source folder.
+# Mod Source Folder
+This is the folder where this program reads mods, and the folder where you should store mods. It should be set to an empty folder anywhere, you will then need to add your mod to this folder
 # Preset Folder
-This is the folder used by this program to store mod presets. The program will store a set of mod configurations here. After the configuration, you will quickly switch between different mod combinations through the preset function. \nIt should be set to an empty folder anywhere
+This is the folder used by this program to store mod presets. The program will store a set of mod configurations here. After the configuration, you will quickly switch between different mod combinations through the preset function. It should be set to an empty folder anywhere
 # About this program
 # Operating principle
 This program implements mod loading by proxying the Mods folder, and dynamically adjusts the files inside the mod folder to implement mod loading.
@@ -319,7 +366,7 @@ const importContentEn =
 There are three ways to import mods:
 1. Add the mod folder to the mod source folder, and the program will read the mod folder from the source folder.
 2. Drag the unzipped mod folder into the program, and the program will automatically add the mod folder to the mod source folder.
-3. Drag a zip file without a password into the program, and the program will automatically unzip and add the mod folder to the mod source folder.
+3. Drag a zip file into the program, and the program will automatically unzip and add the mod folder to the mod source folder. If the zip file has a password, the program will prompt you to enter the password, and then automatically unzip and add the mod folder to the mod source folder.
 
 All methods essentially add the mod folder to the mod source folder, so you need to configure the path of the mod source folder first.
 # After Importing
@@ -333,9 +380,8 @@ All methods essentially add the mod folder to the mod source folder, so you need
 3. Try reopening the program.
 If the above methods do not solve the problem, please refer to [Troubleshooting].
 # Warning after dragging zip file
-1. Check if the zip file has a password.
-2. Check if the zip file is in zip format.
-The program currently only supports zip files without passwords, which is the most common mod compression format. If your mod is in another format, please unzip it first before importing.
+1. Check if the zip file is complete, the program does not support split zip files.
+2. Check if the zip file has a password, and if the password is entered correctly.
 `;
 
 const configModLoaderContentEn =
@@ -357,13 +403,26 @@ To use this program with these mod loaders, you only need to set the mod source 
 If you want to use the [Auto Open Game and Mod Loader] feature, you need to set the path of the mod loader's exe file to the mod loader path.
 ---
 # XXMI
-XXMI is essentially a 3dmigoto mod loader with a user interface. Its advantage is: it has a user interface and can switch between Multi-Game Support.
+XXMI is essentially a 3dmigoto mod loader with a user interface. Its advantage is: it has a user interface and can switch between multiple games.
+Because this program actually just proxies the Mods folder and dynamically adjusts the files inside the mod folder to implement mod loading, you only need to set the mod target folder to the Mods folder of the mod loader. The mod source folder is the folder you actually use to store mods, and it can be anywhere.
 
-To use this program with XXMI, you need to set the mod source folder to the folder specified by XXMI for storing mods. If you want a more convenient experience, it is recommended to:
-1. Set the [Path to the game's exe file] in XXMI to the path of this program.
-2. Enable the [Auto Open Game and Mod Loader] feature of this program and set the [Path to the game's exe file] to the actual game's exe file path.
+For a better experience, we can configure XXMI to start this program when launching the game, there are two ways:
+# Use XXMI to launch XXMM
+1. Open XXMI Launcher
+2. Select the game
+3. Click settings (gear icon)
+4. In the advanced settings, enable run pre-launch, and set the pre-launch path to the path of this program, be sure to add double quotes and uncheck the wait option
+5. Be sure to uncheck the wait option
 
-This way, when you click start game in XXMI, XXMI will start the mod loader and this program, and then this program will start the game. At this time, XXMI's mod loader can load mods normally, and this program can dynamically control the enable/disable of mods and refresh mods in the game.
+This way, when you click start game in XXMI, XXMI will start the mod loader, the game, and this program
+# Use this program to launch XXMI
+1. Open this program
+2. Open the settings page
+3. Find the configuration item for auto-start plugin
+4. Set the mod loader to the exe file path of XXMI
+5. Click the button to start the mod loader and test if it can start the mod loader normally
+
+This way, every time you open this program, it will automatically start the mod loader, and then you can use XXMI to start the game.
 `;
 
 const loadContentEn =
