@@ -9,6 +9,8 @@ const { ipcRenderer} = require('electron');
 import IManager, { snack } from '../electron/IManager'
 const iManager = new IManager();
 
+import { XManager } from '../helper/XManager'
+
 //-====================入口文件====================-//
 const vue_app = createApp(test_app);
 

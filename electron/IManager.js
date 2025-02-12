@@ -25,7 +25,12 @@ import ArchiveWASM from './lib/libarchive.wasm?url';
 import workerBound from './lib/worker-bundle.js?url';
 
 
-
+/**
+ * snackbar 提示
+ * @param {string} message 提示信息
+ * @param {string} type 提示类型
+ * @returns {void}
+*/
 function snack(message, type = 'info') {
     ipcRenderer.send('snack', message, type);
 }
@@ -277,8 +282,6 @@ class IManager {
     //-==================== 生命周期 ====================
     // 初始化
     async init() {
-        // 将 imanage 的 实例 传递给 主进程
-
         //debug
         console.log('✅>> init IManager');
         // 加载配置
