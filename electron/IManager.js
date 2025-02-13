@@ -1157,6 +1157,8 @@ class IManager {
     getPluginData = IPluginLoader.GetPluginData;
     setPluginData = IPluginLoader.SetPluginData;
     registerPluginConfig = IPluginLoader.RegisterPluginConfig;
+    savePluginConfigSync = IPluginLoader.SaveAllPluginConfigSync;
+    savePluginConfig = IPluginLoader.SaveAllPluginConfig;
 
     // 支持 css 在当前页面的插入/删除
     addCssWithHash(css) {

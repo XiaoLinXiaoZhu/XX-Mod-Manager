@@ -139,10 +139,6 @@ class IPluginLoader {
             console.log(tt.get());
             t_snack(tt, SnackType.info);
             return false;
-        } else {
-            // debug
-            const tt = new TranslatedText(`🚀plugin ${plugin.name} registered`, `🚀插件 ${plugin.name} 已注册`);
-            console.log(tt.get(), plugin,this.disabledPluginNames);
         }
 
         if (plugin.init !== undefined) {
@@ -246,7 +242,7 @@ class IPluginLoader {
             if (file.endsWith('.js')) {
                 try {
                     const plugin: IPlugin = require(path.join(pluginPath, file)) as unknown as IPlugin;
-                    this.RegisterPlugin(plugin, enviroment);
+                    IPluginLoader.RegisterPlugin(plugin, enviroment);
                 }
                 catch (e) {
                     const tt = new TranslatedText(`❌plugin ${file} load failed`, `❌插件 ${file} 加载失败`);
@@ -259,7 +255,7 @@ class IPluginLoader {
         });
 
         //debug 打印所有插件
-        console.log(Object.keys(this.plugins));
+        console.log(Object.keys(IPluginLoader.plugins));
     }
 
     //-===================== 插件配置 =====================
@@ -311,8 +307,8 @@ class IPluginLoader {
     static SaveAllPluginConfigSync() {
         //弹出窗口，询问是否保存配置
         alert('SaveAllPluginConfigSync');
-        for (const pluginName in this.pluginConfig) {
-            const pluginData = this.pluginConfig[pluginName];
+        for (const pluginName in IPluginLoader.pluginConfig) {
+            const pluginData = IPluginLoader.pluginConfig[pluginName];
             const pluginDataToSave = {};
             pluginData.forEach((data) => {
                 pluginDataToSave[data.name] = data.data;
@@ -324,13 +320,17 @@ class IPluginLoader {
 
     //-===================== 插件接口 =====================
     static GetPluginData(pluginName: string, dataName: string) {
-        const pluginData = this.pluginConfig[pluginName];
+        // 检查是否有本地配置
+        if (IPluginLoader.pluginConfig[pluginName] === undefined) {
+            return undefined;
+        }
+        const pluginData = IPluginLoader.pluginConfig[pluginName];
         const data = pluginData.find((data) => data.name === dataName);
         return data ? data.data : undefined;
     }
 
     static SetPluginData(pluginName: string, dataName: string, value: any) {
-        const pluginData = this.pluginConfig[pluginName];
+        const pluginData = IPluginLoader.pluginConfig[pluginName];
         const data = pluginData.find((data) => data.name === dataName);
         if (data && data.onChange) {
             data.onChange(value);

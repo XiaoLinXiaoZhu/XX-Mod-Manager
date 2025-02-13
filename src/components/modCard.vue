@@ -1,6 +1,6 @@
 <template>
-    <s-card ref="modItemRef" class="mod-item" :clicked=clicked clickable="true" :id="props.mod" inWindow="none"
-        :character="props.character" @click="click" :compact="props.compactMode"
+    <s-card ref="modItemRef" class="mod-item" :clicked=clicked clickable="true" :id="props.modRef.name" inWindow="none"
+        :character="props.modRef.character" @click="click" :compact="props.compactMode"
         @contextmenu.prevent.stop="openEditModDialog">
 
         <div slot="image" style="height: 200px;" v-if="ifDisplayImage">
@@ -11,17 +11,17 @@
                 style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" v-else />
         </div>
 
-        <div slot="headline" id="mod-item-headline">{{ props.mod }}</div>
-        <div slot="subhead" id="mod-item-subhead">{{ props.character }}</div>
+        <div slot="headline" id="mod-item-headline">{{ props.modRef.name }}</div>
+        <div slot="subhead" id="mod-item-subhead">{{ props.modRef.character }}</div>
         <div slot="text" id="mod-item-text">
             <s-scroll-view>
                 <!-- <p id="mod-hotkeys">Hotkeys: {{ displayHotKeys }}</p> -->
-                <p id="mod-item-description">{{ props.description }}</p>
+                <p id="mod-item-description">{{ props.modRef.description }}</p>
                 <div class="placeholder"></div>
             </s-scroll-view>
             <horizontalScrollBar class="OO-box OO-shade-box hotkey-container" scrollSpeed=0.1 dragSpeed=1>
                 <div style="display: flex;flex-direction: row;flex-wrap: nowrap;">
-                    <div v-for="(hotkey, index) in props.hotKeys" :key="index">
+                    <div v-for="(hotkey, index) in props.modRef.hotkeys" :key="index">
                         <s-tooltip>
                             <div style="margin: 0px 3px;height: 35px;padding: 20px 5px 20px 5px;transform: skew(-20deg);border-radius: 0;min-width: 35px;align-items: center;justify-content: center;"
                                 slot="trigger" class="OO-button">
@@ -47,62 +47,34 @@ import { snack } from '../../helper/SnackHelper';
 import horizontalScrollBar from './horizontalScrollBar.vue';
 const iManager = new IManager();
 import { EventSystem } from '../../helper/EventSystem';
+import { ModData } from '../../helper/ModHelper';   
 
 const props = defineProps({
-    mod: String,
-    character: String,
-    description: String,
-    imagePath: String,
+    modRef: ModData,
     lazyLoad: Boolean,
     compactMode: Boolean,
-    hotKeys: {
-        type: Array,
-        default: () => []
-    }
 })
 const enteredWindow = ref(false);
-
-const displayHotKeys = computed(() => {
-    // hotKeys: [{key: 'Ctrl', description: 'description'}]
-    return props.hotKeys.map((hotKey) => {
-        return `${hotKey.key}: ${hotKey.description}`;
-    }).join(', ');
-})
 
 const ifDisplayImage = ref(true);
 
 const img = ref(null);
 
-// const getImage = () => {
-//     // 直到需要时才加载图片，加载后保存到 img.value
-//     if (img.value == null) {
-//         iManager.getImageBase64(props.imagePath).then((imageBase64) => {
-//             img.value = 'data:image/png;base64,' + imageBase64;
-//         });
-//     }
-//     return img.value;
-// }
-
 const getImage = computed(() => {
     // 直到需要时才加载图片，加载后保存到 img.value
     if (img.value == null) {
-        iManager.getImageBase64(props.imagePath).then((imageBase64) => {
-            img.value = 'data:image/png;base64,' + imageBase64;
-        });
+        props.modRef.getPreviewBase64(true).then((imageBase64) => {
+            img.value = imageBase64;
+        }).catch((err) => {
+            console.error(err);
+            snack('Failed to load image');
+        }); 
     }
     return img.value;
 })
 
 EventSystem.on('addMod',(mod)=>{
-    // 在mod 添加的时候，检查一下 图片是否正常刷新
-    //debug
     console.log(`modItem ${props.mod} received addMod event`,enteredWindow.value,props.lazyLoad,img.value == null);
-    //! 这里是临时的解决方案，应该在图片加载失败的时候，重新加载图片
-    // ifDisplayImage.value = false;
-    
-    // setTimeout(() => {
-    //     ifDisplayImage.value = true;
-    // }, 1);
 })
 
 const clicked = ref(false);
@@ -128,8 +100,7 @@ const click = (event) => {
 }
 
 const openEditModDialog = () => {
-    // iManager.setLastClickedMod_ByName(props.mod);
-    iManager.setCurrentModByName(props.mod);
+    iManager.setCurrentMod(props.modRef);
     iManager.showDialog('edit-mod-dialog');
 }
 
@@ -312,11 +283,6 @@ watch(() => props.compactMode, (newVal, oldVal) => {
 })
 
 //==================== init ====================//
-onMounted(() => {
-    iManager.waitInit().then(() => {
-
-    });
-})
 
 const enterWindow = () => {
     enteredWindow.value = true;
