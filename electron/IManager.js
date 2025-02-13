@@ -26,6 +26,7 @@ import workerBound from './lib/worker-bundle.js?url';
 
 
 import { EventSystem } from '../helper/EventSystem';
+import { IPluginLoader } from '../helper/PluginLoader';
 
 /**
  * snackbar 提示
@@ -70,10 +71,6 @@ class IManager {
         this.plugins = {};
 
         this.HMC = HMC
-
-        // 支持 插件 功能
-        this.plugins = {};
-        this.pluginConfig = {};
 
         // 初始化
         this.init();
@@ -300,10 +297,8 @@ class IManager {
         console.log('✅>> loadPresets done');
 
         // 加载插件
-        await this.loadDisabledPlugins();
-        await this.loadPlugins();
+        await IPluginLoader.Init(this);
         console.log('✅>> loadPlugins done');
-
 
         //debug
         console.log('✅>> init IManager done');
@@ -1282,218 +1277,11 @@ class IManager {
 
 
     //-===================== 插件 =====================
-    plugins = {};
-    disabledPluginNames = [];
-    pluginConfig = {};
-
-    disablePlugin(pluginName) {
-        this.disabledPluginNames.push(pluginName);
-        this.trigger('pluginDisabled', pluginName);
-        this.saveDisabledPlugins();
-    }
-
-    enablePlugin(pluginName) {
-        this.disabledPluginNames = this.disabledPluginNames.filter((name) => name !== pluginName);
-        this.trigger('pluginEnabled', pluginName);
-        this.saveDisabledPlugins();
-    }
-
-    togglePlugin(pluginName) {
-        if (this.disabledPluginNames.includes(pluginName)) {
-            this.enablePlugin(pluginName);
-        }
-        else {
-            this.disablePlugin(pluginName);
-        }
-    }
-
-    //是否启用的这个状态应该保存在本地
-    //这样每次打开软件的时候，都会根据这个状态来加载插件
-    async saveDisabledPlugins() {
-        ipcRenderer.invoke('save-disabled-plugins', this.disabledPluginNames);
-    }
-
-    async loadDisabledPlugins() {
-        this.disabledPluginNames = await ipcRenderer.invoke('get-disabled-plugins');
-        // this.trigger('disabledPluginsLoaded', disabledPluginNames);
-        //debug
-        console.log('disabledPluginNames:', this.disabledPluginNames);
-    }
-
-    registerPlugin(plugin) {
-        //debug
-        this.plugins[plugin.name] = plugin;
-
-        if (this.disabledPluginNames.includes(plugin.name)) {
-            //debug
-            console.log(`⛔plugin ${plugin.name} disabled`);
-            snack(`插件 ${plugin.name} 已禁用`);
-            return;
-        }
-
-        if (typeof plugin.init === 'function') {
-            plugin.init(this);
-        }
-
-        // 尝试加载 插件的本地配置
-        ipcRenderer.invoke('get-plugin-config', plugin.name).then((localPluginData) => {
-            //debug
-            console.log(`ℹ️loadPluginConfig ${plugin.name}`, localPluginData);
-            if (localPluginData) {
-                //debug
-                console.log(`❇️plugin ${plugin.name} loaded with local data`, localPluginData);
-                // 这里的 localPluginData 只包含 pluginData的 data，而不包含其他的属性，所以只需要将data赋值为localPluginData
-                this.pluginConfig[plugin.name].forEach((data) => {
-                    data.data = localPluginData[data.name];
-                });
-            }
-        }
-        );
-
-        //debug
-        console.log(`▶️plugin ${plugin.name} loaded`, plugin);
-    }
-
-    registerPluginConfig(pluginName, pluginConfig) {
-        // 如果 pluginConfig 不存在，则创建一个新的数组，否则将 pluginConfig 添加到 pluginConfig 中
-        if (this.pluginConfig[pluginName] === undefined) {
-            this.pluginConfig[pluginName] = pluginConfig;
-        }
-        else {
-            this.pluginConfig[pluginName] = this.pluginConfig[pluginName].concat(pluginConfig);
-        }
-
-        //debug
-        console.log(`registerPluginConfig ${pluginName}`, pluginConfig);
-        // pluginConfig 是 data 的 数组
-
-        // data 为一个对象，包含了插件的可配置数据，比如说是否启用，是否显示等等
-        // 它会被 解析 之后 在 设置页面 中显示，并且为 插件提供数据
-        // 当它发生变化时，会触发 插件的 onChange 方法
-
-        // data 的格式为
-        // {
-        //     name: 'ifAblePlugin',
-        //     data: true,
-        //     type: 'boolean',
-        //     displayName: 'If Able Plugin',
-        //     description: 'If true, the plugin will be enabled',
-        //     t_displayName:{
-        //         zh_cn:'是否启用插件',
-        //         en:'Enable Plugin'
-        //     },
-        //     t_description:{
-        //         zh_cn:'如果为真，插件将被启用',
-        //         en:'If true, the plugin will be enabled'
-        //     },
-        //     onChange: (value) => {
-        //         console.log('ifAblePlugin changed:', value);
-        //     }
-        // }
-    }
-
-    async loadPlugins() {
-        // 插件为 一个 js 文件，通过 require 引入
-        // 然后调用 init 方法，将 iManager 传递给插件
-
-        // 先加载内置的插件
-        const builtInPluginPath = path.resolve('./plugins');
-        // 错误处理
-        if (!fs.existsSync(builtInPluginPath)) {
-            snack('插件文件夹不存在 ' + builtInPluginPath);
-            return;
-        }
-        const builtInPlugins = fs.readdirSync(builtInPluginPath);
-        builtInPlugins.forEach((pluginName) => {
-            if (pluginName.endsWith('.js')) {
-                try {
-                    const plugin = require(path.join(builtInPluginPath, pluginName));
-                    this.registerPlugin(plugin);
-                }
-                catch (e) {
-                    console.log(`❌plugin ${pluginName} load failed`, e);
-                    // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
-                    fs.writeFileSync(`./plugins/lookAtMe`, 'lookAtMe');
-                    snack(`内置插件 ${pluginName} 加载失败`, 'error');
-                }
-            }
-        });
-
-        // 从 plugins 文件夹中加载插件，其位于 ,userData/plugins 文件夹中
-        // 这里应该被视为全局插件 作用于所有的 游戏配置
-        const userDataPath = await ipcRenderer.invoke('get-user-data-path');
-        const pluginPath = path.join(userDataPath, 'plugins');
-        if (!fs.existsSync(pluginPath)) {
-            fs.mkdirSync(pluginPath);
-        }
-        const files = fs.readdirSync(pluginPath);
-        files.forEach((file) => {
-            if (file.endsWith('.js')) {
-                try {
-                    const plugin = require(path.join(pluginPath, file));
-                    this.registerPlugin(plugin);
-                }
-                catch (e) {
-                    console.log(`❌plugin ${file} load failed`, e);
-                    snack(`插件 ${file} 加载失败`, 'error');
-
-                    // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
-                    fs.writeFileSync(`./plugins/lookAtMe`, 'lookAtMe');
-                }
-            }
-        });
-
-        //debug 打印所有插件
-        console.log(this.plugins);
-    }
-
-    // 将 插件的 配置 本地化 存储
-    async savePluginConfig() {
-        // pluginConfig 里面存储了 所有插件的配置 pluginData
-        // 每个 pluginData 是一个 数组 ，包含了 插件的配置
-        // 但是我们不需要保存 pluginData里面的所有数据，比如说显示名称，描述，onChange等，只需要保存 data
-        // data 是一个对象，包含了 插件的配置数据
-
-        for (const pluginName in this.pluginConfig) {
-            const pluginData = this.pluginConfig[pluginName];
-            const localPluginData = {};
-            pluginData.forEach((data) => {
-                localPluginData[data.name] = data.data;
-            });
-
-            console.log('savePluginConfig:', pluginName, localPluginData);
-
-            await ipcRenderer.invoke('save-plugin-config', pluginName, localPluginData);
-        }
-    }
-
-    // 同步的保存插件配置
-    savePluginConfigSync() {
-        for (const pluginName in this.pluginConfig) {
-            const pluginData = this.pluginConfig[pluginName];
-            const localPluginData = {};
-            pluginData.forEach((data) => {
-                localPluginData[data.name] = data.data;
-            });
-
-            console.log('savePluginConfig:', pluginName, localPluginData);
-
-            ipcRenderer.invoke('save-plugin-config', pluginName, localPluginData);
-        }
-    }
-
     //----------插件接口----------
-    getPluginData(pluginName, dataName) {
-        const pluginData = this.pluginConfig[pluginName];
-        const data = pluginData.find((data) => data.name === dataName);
-        return data.data;
-    }
-
-    setPluginData(pluginName, dataName, value) {
-        const pluginData = this.pluginConfig[pluginName];
-        const data = pluginData.find((data) => data.name === dataName);
-        data.onChange(value);
-    }
+    // 改为使用 IPluginLoader 的接口
+    getPluginData = IPluginLoader.GetPluginData;
+    setPluginData = IPluginLoader.SetPluginData;
+    registerPluginConfig = IPluginLoader.RegisterPluginConfig;
 
     // 支持 css 在当前页面的插入/删除
     addCssWithHash(css) {

@@ -179,16 +179,23 @@ import { useI18n } from 'vue-i18n'
 import Markdown from '../components/markdown.vue';
 const { t, locale } = useI18n()
 
+import { IPluginLoader } from '../../helper/PluginLoader.ts';
+
 const tabs = ref(['normal', 'advanced', 'switch-config', 'about', 'plugin']);
 const translatedTabs = computed(() => {
     const tTab = tabs.value.map((tab) => {
         // 如果 是 插件的 tab ，则尝试获取 plugin.t_displayName
         //console.log('trying to get plugin name', tab, iManager.plugins[tab],iManager.plugins);
-        if (iManager.plugins[tab]) {
+        // if (iManager.plugins[tab]) {
+        //     //debug
+        //     // console.log('trying to get plugin name', tab, iManager.plugins[tab], locale.value);
+        //     return iManager.plugins[tab].t_displayName[locale.value] || tab;
+        // }
+        if (IPluginLoader.plugins[tab]) {
             //debug
             // console.log('trying to get plugin name', tab, iManager.plugins[tab], locale.value);
-            return iManager.plugins[tab].t_displayName[locale.value] || tab;
-        }
+            return IPluginLoader.plugins[tab].t_displayName[locale.value] || tab;
+        }   
         return t(`setting-tab.${tab}`)
     });
     //debug
@@ -275,8 +282,10 @@ onMounted(async () => {
     currentTab.value = tabs.value[0];
 
     // 挂载插件的额外设置
-    plugins.value = iManager.plugins;
-    pluginConfig.value = iManager.pluginConfig;
+    // plugins.value = iManager.plugins;
+    // pluginConfig.value = iManager.pluginConfig;
+    plugins.value = IPluginLoader.plugins;
+    pluginConfig.value = IPluginLoader.pluginConfig; 
     console.log('pluginConfig', pluginConfig);
     // pluginConfig 是 一组 plungeName:pluginData 的键值对
     // 每个 pluginData 是一个 数组，数组中的每个元素是一个data对象，data对象包含了插件的设置

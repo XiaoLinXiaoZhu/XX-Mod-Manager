@@ -162,9 +162,9 @@ class XManager {
 
         // 加载插件
         // await this.loadDisabledPlugins();
-        await IPluginLoader.loadDisabledPlugins();
+        await IPluginLoader.LoadDisabledPlugins();
         // await this.loadPlugins();
-        await IPluginLoader.loadPlugins(this);
+        await IPluginLoader.LoadPlugins(this);
         console.log('✅>> loadPlugins done');
 
 

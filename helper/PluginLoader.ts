@@ -61,17 +61,35 @@ interface IPlugin {
 
 
 class IPluginLoader {
-    public static plugins: IPlugin[] = [];
+    public static plugins: { [key: string]: IPlugin } = {};
     public static disabledPluginNames: string[] = [];
     public static pluginConfig: { [key: string]: IPluginData[] } = {};
+    public static enviroment: any;
 
     //-============= 自身初始化 =============-//
     public static clearAllPlugins() {
-        IPluginLoader.plugins = [];
+        IPluginLoader.plugins = {};
         IPluginLoader.disabledPluginNames = [];
         IPluginLoader.pluginConfig = {};
     }
 
+    public static async Init(env: any) {
+        IPluginLoader.enviroment = env;
+
+        // 加载禁用的插件
+        IPluginLoader.LoadDisabledPlugins();
+        // 加载所有插件 
+        IPluginLoader.LoadPlugins(env);
+        // debug
+        console.log('IPluginLoader init finished');
+    }
+
+    static async LoadDisabledPlugins() {
+        IPluginLoader.disabledPluginNames = await ipcRenderer.invoke('get-disabled-plugins');
+        // this.trigger('disabledPluginsLoaded', disabledPluginNames);
+        // debug
+        console.log('disabledPluginNames:', IPluginLoader.disabledPluginNames);
+    }
 
     //-============= 方法 =============-//
 
@@ -102,13 +120,6 @@ class IPluginLoader {
         ipcRenderer.invoke('save-disabled-plugins', IPluginLoader.disabledPluginNames);
     }
 
-    static async loadDisabledPlugins() {
-        IPluginLoader.disabledPluginNames = await ipcRenderer.invoke('load-disabled-plugins');
-        // this.trigger('disabledPluginsLoaded', disabledPluginNames);
-        // debug
-        console.log('disabledPluginNames:', IPluginLoader.disabledPluginNames);
-    }
-
     //-============= 插件注册 =============-//
 
     /** @function
@@ -118,22 +129,15 @@ class IPluginLoader {
      * 这里使用 enviroment 是为了 避免循环引用
      * @returns {boolean}
      */
-    static registerPlugin(plugin: IPlugin, enviroment: any): boolean {
-        IPluginLoader.plugins.push(plugin);
+    static RegisterPlugin(plugin: IPlugin, enviroment: any): boolean {
+        IPluginLoader.plugins[plugin.name] = plugin;
 
-        if (IPluginLoader.disabledPluginNames.includes(plugin.constructor.name)) {
+        if (IPluginLoader.disabledPluginNames.includes(plugin.name)) {
             // debug
             const tt = new TranslatedText(`⛔plugin ${plugin.name} disabled`, `⛔插件 ${plugin.name} 已禁用`);
             console.log(tt.get());
             t_snack(tt, SnackType.info);
             return false;
-        }
-
-        // 检测是否有本地配置
-        if (IPluginLoader.pluginConfig[plugin.constructor.name]) {
-            // debug
-            const tt = new TranslatedText(`🔧plugin ${plugin.name} loaded with local data`, `🔧插件 ${plugin.name} 使用本地数据启动`);
-            console.log(tt.get(), IPluginLoader.pluginConfig[plugin.constructor.name]);
         }
 
         if (plugin.init !== undefined) {
@@ -145,6 +149,19 @@ class IPluginLoader {
             console.log(tt.get());
         }
 
+        // 检测是否有本地配置
+        ipcRenderer.invoke('get-plugin-config', plugin.name).then((localPluginData) => {
+            if (localPluginData) {
+                IPluginLoader.pluginConfig[plugin.name].forEach((data) => {
+                    if (localPluginData[data.name] !== undefined) {
+                        data.data = localPluginData[data.name];
+                    }
+                });
+                // debug
+                const tt = new TranslatedText(`🔧plugin ${plugin.name} loaded with local data`, `🔧插件 ${plugin.name} 使用本地数据启动`);
+                console.log(tt.get(), IPluginLoader.pluginConfig[plugin.name]);
+            }
+        });
         return true;
     }
 
@@ -157,7 +174,7 @@ class IPluginLoader {
      */
     static initializePlugin(plugin: IPlugin, enviroment: any): boolean {
         try {
-            plugin.init.call(enviroment);
+            plugin.init(enviroment);
         } catch (error) {
             const tt = new TranslatedText(`❌plugin ${plugin.name} initialization failed: ${error.message}`, `❌插件 ${plugin.name} 初始化失败: ${error.message}`);
             console.error(tt.get(), error);
@@ -167,7 +184,7 @@ class IPluginLoader {
         return true;
     }
 
-    static registerPluginConfig(pluginName: string, pluginConfig: IPluginData[]) {
+    static RegisterPluginConfig(pluginName: string, pluginConfig: IPluginData[]) {
         // 如果 pluginConfig 不存在，则创建一个新的数组，否则将 pluginConfig 添加到 pluginConfig 中
         if (IPluginLoader.pluginConfig[pluginName] === undefined) {
             IPluginLoader.pluginConfig[pluginName] = pluginConfig;
@@ -177,7 +194,7 @@ class IPluginLoader {
         }
 
         // debug
-        const tt = new TranslatedText(`🔧plugin ${pluginName} config registered`, `🔧插件 ${pluginName} 配置已注册`);
+        const tt = new TranslatedText(`👻plugin ${pluginName} config registered`, `👻插件 ${pluginName} 配置已注册`);
         console.log(tt.get(), IPluginLoader.pluginConfig[pluginName]);
     }
 
@@ -186,7 +203,7 @@ class IPluginLoader {
      * @param {any} enviroment - 应当是XManager的实例，或者IManager的实例
      * 这里使用 enviroment 是为了 避免循环引用
      */
-    static async loadPlugins(enviroment: any) {
+    static async LoadPlugins(enviroment: any) {
         // 插件为 一个 js 文件，通过 require 引入
         // 然后调用 init 方法，将 iManager 传递给插件
 
@@ -200,7 +217,7 @@ class IPluginLoader {
             if (pluginName.endsWith('.js')) {
                 try {
                     const plugin: IPlugin = require(path.join(builtInPluginPath, pluginName)) as unknown as IPlugin;
-                    IPluginLoader.registerPlugin(plugin, enviroment);
+                    IPluginLoader.RegisterPlugin(plugin, enviroment);
                 }
                 catch (e) {
                     // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
@@ -224,7 +241,7 @@ class IPluginLoader {
             if (file.endsWith('.js')) {
                 try {
                     const plugin: IPlugin = require(path.join(pluginPath, file)) as unknown as IPlugin;
-                    this.registerPlugin(plugin, enviroment);
+                    this.RegisterPlugin(plugin, enviroment);
                 }
                 catch (e) {
                     const tt = new TranslatedText(`❌plugin ${file} load failed`, `❌插件 ${file} 加载失败`);
@@ -237,7 +254,7 @@ class IPluginLoader {
         });
 
         //debug 打印所有插件
-        console.log(this.plugins);
+        console.log(Object.keys(this.plugins));
     }
 
     //-===================== 插件配置 =====================
@@ -287,25 +304,27 @@ class IPluginLoader {
      * 一般用于程序退出时保存配置
     */
     static SaveAllPluginConfigSync() {
+        //弹出窗口，询问是否保存配置
+        alert('SaveAllPluginConfigSync');
         for (const pluginName in this.pluginConfig) {
             const pluginData = this.pluginConfig[pluginName];
-            const localPluginData = {};
+            const pluginDataToSave = {};
             pluginData.forEach((data) => {
-                localPluginData[data.name] = data.data;
+                pluginDataToSave[data.name] = data.data;
             });
-            console.log('savePluginConfig:', pluginName, localPluginData);
-            ipcRenderer.invoke('save-plugin-config', pluginName, localPluginData);
+            console.log('savePluginConfig:', pluginName, pluginDataToSave);
+            ipcRenderer.invoke('save-plugin-config', pluginName, pluginDataToSave);
         }
     }
 
     //-===================== 插件接口 =====================
-    static getPluginData(pluginName:string, dataName:string){
+    static GetPluginData(pluginName: string, dataName: string) {
         const pluginData = this.pluginConfig[pluginName];
         const data = pluginData.find((data) => data.name === dataName);
         return data ? data.data : undefined;
     }
 
-    static setPluginData(pluginName:string, dataName:string, value:any){
+    static SetPluginData(pluginName: string, dataName: string, value: any) {
         const pluginData = this.pluginConfig[pluginName];
         const data = pluginData.find((data) => data.name === dataName);
         if (data && data.onChange) {
@@ -313,10 +332,6 @@ class IPluginLoader {
         }
     }
 }
-
-
-
-
 
 
 
