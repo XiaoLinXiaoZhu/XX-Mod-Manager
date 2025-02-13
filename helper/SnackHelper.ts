@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+const { ipcRenderer} = require('electron');
 import { TranslatedText } from "./Language";   
 
 
@@ -11,11 +11,11 @@ enum SnackType {
 }
 
 function snack(message: string, type: SnackType) {
-    ipcRenderer.send('snack', message, type);
+    // ipcRenderer.send('snack', message, type);
 }
 
 function t_snack(message: TranslatedText, type: SnackType) {
-    snack(message.get(), type);
+    // snack(message.get(), type);
 }
 
 

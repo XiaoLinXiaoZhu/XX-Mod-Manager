@@ -1,5 +1,5 @@
 //-===================== 插件 =====================
-import { ipcRenderer, IpcRenderer } from "electron";
+const { ipcRenderer} = require('electron');
 import { EventType, EventSystem } from "./EventSystem";
 import { TranslatedText } from "./Language";
 import { SnackType, t_snack } from "./SnackHelper";
