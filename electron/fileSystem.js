@@ -2,6 +2,8 @@ const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron');
 const path = require('node:path')
 const fs = require('fs');
 const os = require('os');
+
+import { ModData } from '../helper/ModHelper';
 //-==================== 核心变量 =====================
 
 //----------------- 状态 -----------------

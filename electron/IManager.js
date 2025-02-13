@@ -29,6 +29,8 @@ import { EventType, EventSystem } from '../helper/EventSystem';
 import { IPluginLoader } from '../helper/PluginLoader';
 // 导入 PathHelper
 import { PathHelper } from '../helper/PathHelper';
+// 导入 ModHelper
+import { ModData } from '../helper/ModHelper';
 
 // // 导入 hmc-win32
 const HMC_Name = 'hmc-win32';
@@ -191,10 +193,15 @@ class IManager {
         // 当 currentCharacter 不变时，不会触发 currentCharacterChanged 事件
         // 但是 characterList 的顺序 是按照从mod中获取的顺序，所以这里需要将其排序一下，默认按照字母排序
         this.data.characterList = Array.from(this.data.characterList).sort();
-        this.data.modList = loadMods;
+
+
+        // this.data.modList = loadMods;
+        // 将 mod 转换为 ModData, 并且保存到 data 中
+        this.data.modList = loadMods.map((mod) => ModData.fromJson(mod).setModSourcePath(modSourcePath));
 
         //debug
         console.log(loadMods);
+        console.log(this.data.modList);
         console.log(this.data.characterList);
         return loadMods;
     }
@@ -356,11 +363,6 @@ class IManager {
         // 此方法已弃用，当调用的时候，抛出异常
         console.warn('setLastClickedModByName is deprecated');
         throw new Error('setLastClickedModByName is deprecated');
-        const mod = this.data.modList.find((mod) => mod.name === modName);
-        if (mod) {
-            this.temp.lastClickedMod = mod;
-            this.trigger('lastClickedMod_Changed', mod);
-        }
     }
 
     async setCurrentCharacter(character) {
@@ -1028,6 +1030,8 @@ class IManager {
         }
         //debug
         console.log(`update mod card cover of`, modInfo);
+        return modInfo.setPreviewBase64(previewBase64,this.config.modSourcePath);
+
         const imageExt = previewBase64.split(';')[0].split('/')[1];
         const modImageName = `preview.${imageExt}`;
         const modImageDest = path.join(this.config.modSourcePath, modName, modImageName)
@@ -1220,30 +1224,8 @@ class IManager {
     }
 
     printModInfo(modInfo) {
-        if (modInfo === undefined) {
-            console.log('modInfo is undefined');
-            return;
-        }
-        console.log('save-mod-info:');
-        for (const key in modInfo) {
-            console.log(`${key}:${modInfo[key]}`);
-        }
-        // hotkeys 为 [{},{}],将其 每个键值对打印出来
-        console.log('hotkeys:');
-        if (modInfo.hotkeys === undefined) {
-            console.log('hotkeys is undefined');
-            return;
-        }
-        if (modInfo.hotkeys.length === 0) {
-            console.log('hotkeys is empty');
-            return;
-        }
-        modInfo.hotkeys.forEach((hotkey, index) => {
-            console.log(`hotkey${index}:`);
-            for (const key in hotkey) {
-                console.log(`${key}:${hotkey[key]}`);
-            }
-        });
+        console.log(ModData.fromJson(modInfo).print());
+        return;
     }
 
     async moveAllFiles(sourcePath, targetPath) {
