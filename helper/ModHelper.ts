@@ -51,6 +51,19 @@ class ModData {
             hotkeys: this.hotkeys
         };
     }
+    public copy(): ModData {    
+        return new ModData(
+            this.name,
+            this.character,
+            this.description,
+            this.url,
+            this.preview,
+            this.hotkeys
+        ).setModSourcePath(this.modSourcePath);
+    }
+    public equals(modData: ModData): boolean {
+        return JSON.stringify(this.toJson()) === JSON.stringify(modData.toJson());
+    }
 
     public print(): string {
         let hotkeysString = "";
@@ -68,8 +81,19 @@ class ModData {
         else if (!fs.existsSync(this.modSourcePath)) {
             throw new Error("ModData.setPreviewBase64: modSourcePath does not exist");  
         }
-    }   
-    public async setPreviewBase64(previewBase64: string) {
+    }
+    public async setPreviewByPath(previewPath: string) {
+        await this.checkModSourcePath();
+        const modSourcePath = this.modSourcePath;
+
+        // 将 previewPath 的 文件 复制到 modSourcePath 的 preview 文件夹下，并且将 mod 的 preview 属性设置为 previewPath，然后保存
+        const previeFileName = path.basename(previewPath);
+        const previewDest = path.join(modSourcePath, this.name, previeFileName);
+        fs.copyFileSync(previewPath, previewDest);
+        this.preview = previewDest;
+    }
+
+    public async setPreviewByBase64(previewBase64: string) {
         // 检查是否有 modSourcePath
         await this.checkModSourcePath();
 
@@ -83,10 +107,6 @@ class ModData {
 
         //debug
         this.preview = imageDest;
-        this.saveModInfo();
-
-        // 刷新侧边栏的mod信息
-        EventSystem.trigger(EventType.currentModChanged, this);
 
         // snack提示
         snack(`Updated cover for ${this.name}`, SnackType.info);
@@ -95,15 +115,60 @@ class ModData {
         return imageDest;
     }
 
+    //-========== 编辑mod信息 ===========
+    public editModInfo(newModData: ModData) {
+        this.name = newModData.name;
+        this.character = newModData.character;
+        this.description = newModData.description;
+        this.url = newModData.url;
+        this.preview = newModData.preview;
+        this.hotkeys = newModData.hotkeys;
+
+        return this;
+    }
+
+
+    public async addHotkey(key: string, description: string) {
+        if (!key && !description) {
+            console.log("ModData.addHotkey: key and description are required");
+            return;
+        }
+        this.hotkeys.push({key, description});
+    }
+    public async removeHotkey(key: string) {
+        if (key === undefined) {
+            console.log("ModData.removeHotkey: key is required");
+            return;
+        }
+        const index = this.hotkeys.findIndex((hotkey) => hotkey.key === key);
+        if (index !== -1) {
+            this.hotkeys.splice(index, 1);
+        }
+    }
+
+    //-========== 保存mod信息 ===========
     public async saveModInfo() {
         await this.checkModSourcePath();
         const modSourcePath = this.modSourcePath;
-        
+
         //这里的 modInfo 是一个对象，不能直接传递给主进程
         //所以需要将 modInfo 转化为 json
         const jsonModInfo = JSON.stringify(this.toJson(), null, 4);
         await ipcRenderer.invoke('save-mod-info', modSourcePath, jsonModInfo);
+    }
+
+    //-========== 获取mod信息 ===========
+    public async getPreviewBase64() {
+        // await this.checkModSourcePath();
+        const data = await ipcRenderer.invoke('get-image', this.preview);
+        return data;  
+    }
+
+    public async triggerChanged(){
         EventSystem.trigger(EventType.modInfoChanged, this);
+    }
+    public async triggerCurrentModChanged(){    
+        EventSystem.trigger(EventType.currentModChanged, this);
     }
 }
 

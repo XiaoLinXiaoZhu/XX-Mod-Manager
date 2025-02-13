@@ -302,6 +302,15 @@ class IManager {
         console.log('✅>> init IManager done');
         this.inited = true;
 
+        //----------------- 事件监听 -----------------
+        EventSystem.on(EventType.modInfoChanged, async (mod) => {
+            // mod 信息发生变化，需要同步变化
+
+            // characterList 变化
+            this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
+            this.data.characterList = Array.from(this.data.characterList).sort();
+        });
+
         //ipcRenderer.invoke('set-imanager', this);
         // 这样 传递的数据 会被序列化，导致 无法传递 函数
         // 并且 不能够 同步，因为实际上传递的是复制的数据，而不是引用
@@ -852,79 +861,7 @@ class IManager {
         console.log(`handle zip drop: ${file.name}`);
         //使用 libarchive 处理 zip 文件
         this.handleArchiveDrop(file);
-
         return;
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-            const buffer = Buffer.from(event.target.result);
-
-            console.debug(typeof buffer)
-
-            let archive = new Archive(buffer)
-            archive.extractFiles().then(data => {
-                console.log('data:{}', data);
-            })
-
-
-            return;
-            // const buffer = Buffer.from(event.target.result);
-            // const zip = new AdmZip(buffer);
-            // adm-zip 弃用，改为使用 Libarchivejs
-            const zip = new Archive(buffer);
-
-            const modName = file.name.replace('.zip', '');
-            const modPath = path.join(this.config.modSourcePath, modName);
-
-            // 创建mod文件夹
-            if (!fs.existsSync(modPath)) {
-                fs.mkdirSync(modPath, { recursive: true });
-            }
-            else {
-                snack(`Mod ${modName} already exists`);
-                return;
-            }
-
-            // 将zip文件解压到mod文件夹
-            this.showDialog('loading-dialog');
-            try {
-                // zip.extractAllTo(modPath, true);
-                // adm-zip 弃用，改为使用 Libarchivejs
-                // await zip.extractFiles(modPath)
-            }
-            catch (error) {
-                this.dismissDialog('loading-dialog');
-                console.error(`Error: ${error}`);
-                snack(`Error: ${error}`, 'error');
-                return;
-            }
-
-            // 关闭加载对话框
-            this.dismissDialog('loading-dialog');
-            // 提示用户
-            snack(`Mod ${modName} added successfully`);
-
-            // 刷新mod列表
-            await this.loadMods();
-            const mod = await this.getModInfo(modName);
-
-            // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
-            //debug
-            console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
-
-            if (this.temp.currentCharacter !== null && mod.character === 'Unknown') {
-                mod.character = this.temp.currentCharacter;
-                await this.saveModInfo(mod);
-            }
-            this.trigger('addMod', mod);
-
-            setTimeout(() => {
-                // this.setLastClickedMod(mod);
-                this.setCurrentMod(mod);
-                this.setCurrentCharacter(mod.character);
-                this.showDialog('edit-mod-dialog');
-            }, 200);
-        };
-        reader.readAsArrayBuffer(file);
     }
 
     async handleFolderDrop(item) {
@@ -1030,26 +967,15 @@ class IManager {
         }
         //debug
         console.log(`update mod card cover of`, modInfo);
-        return modInfo.setPreviewBase64(previewBase64,this.config.modSourcePath);
+        const modImageDest = modInfo.setPreviewByBase64(previewBase64,this.config.modSourcePath);
 
-        const imageExt = previewBase64.split(';')[0].split('/')[1];
-        const modImageName = `preview.${imageExt}`;
-        const modImageDest = path.join(this.config.modSourcePath, modName, modImageName)
-        fs.writeFileSync(modImageDest, previewBase64.split(',')[1], 'base64');
+        // 保存到本地
+        modInfo.saveModInfo();
 
-        //debug
-        modInfo.preview = modImageDest;
-        // ipcRenderer.invoke('set-mod-info', mod, modInfo);
-        this.saveModInfo(modInfo);
+        // 触发事件
+        modInfo.triggerChanged();
+        modInfo.triggerCurrentModChanged();
 
-        // 刷新侧边栏的mod信息
-        // this.trigger('lastClickedMod_Changed', modInfo);
-        this.trigger("currentModChanged", modInfo);
-
-        // snack提示
-        snack(`Updated cover for ${modInfo}`);
-
-        // 返回 图片的路径
         return modImageDest;
     }
 
@@ -1199,6 +1125,9 @@ class IManager {
     }
 
     async saveModInfo(modInfo) {
+        // 该方法已弃用，当调用的时候，抛出异常
+        console.warn('saveModInfo is deprecated，data.modList 是同步的，保存到本地请使用 ModInfo.saveModInfo()');
+        return;
         //这里的 modInfo 是一个对象，不能直接传递给主进程
         //所以需要将 modInfo 转化为 json
         this.printModInfo(modInfo);
