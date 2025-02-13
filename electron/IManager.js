@@ -3,46 +3,26 @@
 // 这样的话，方便将所有非核心功能 转化为 插件，方便管理和拓展
 
 // 这个类应该 被划分到 渲染进程底下，但是 主进程也应该能够访问到这个类
-const { ipcRenderer, ipcMain } = require('electron');
+const { ipcRenderer } = require('electron');
 
-// import fsProxy from './fsProxy';
-// const fs = new fsProxy();
 const pathOsName = 'path'
 const path = require(pathOsName);
 
 // 导入fs
 const fs = require('fs');
 
-// // 导入 adm-zip
-// const AdmZip = require('adm-zip');
-// adm-zip 弃用，改为使用 Libarchivejs
-
-
 // 导入 libarchivejs
 let Archive = window.Archive;
 // import Archive from 'libarchive.js';
+// 下面两个变量是为了解决 vite 打包时，无法正确导入 wasm 文件的问题
 import ArchiveWASM from './lib/libarchive.wasm?url';
 import workerBound from './lib/worker-bundle.js?url';
 
 
 import { EventSystem } from '../helper/EventSystem';
 import { IPluginLoader } from '../helper/PluginLoader';
-
-/**
- * snackbar 提示
- * @param {string} message 提示信息
- * @param {string} type 提示类型
- * @returns {void}
-*/
-function snack(message, type = 'info') {
-    ipcRenderer.send('snack', message, type);
-}
-
-function t_snack(messages, type = 'info') {
-    IManager.getInstance().then((iManager) => {
-        iManager.t_snack(messages, type);
-    });
-}
+import { TranslatedText, setCurrentLanguage } from '../helper/Language';
+import { snack,t_snack, SnackType } from '../helper/SnackHelper';
 
 // // 导入 hmc-win32
 const HMC_Name = 'hmc-win32';
@@ -285,9 +265,20 @@ class IManager {
         // 加载配置
         await this.loadConfig();
         console.log('✅>> loadConfig done');
+
+        //-=============== 优先进行页面初始化 ===============-//
         //------ 设置窗口大小 -----
         await this.setWindowBounds();
         console.log('✅>> setWindowBounds done');
+        //------ 切换语言 -----
+        this.trigger('languageChange', this.config.language);
+        setCurrentLanguage(this.config.language);
+        console.log('✅>> languageChange to', this.config.language);
+        //------ 切换主题 -----
+        this.trigger('themeChange', this.config.theme);
+        console.log('✅>> themeChange to', this.config.theme);
+
+
         // 加载mod
         await this.loadMods();
         console.log('✅>> loadMods done');
@@ -327,14 +318,6 @@ class IManager {
             this.setCurrentMod(this.data.modList[0]);
             console.log('✅>> currentMod init', this.temp.currentMod);
         }
-
-        //------ 切换语言 -----
-        this.trigger('languageChange', this.config.language);
-        console.log('✅>> languageChange to', this.config.language);
-
-        //------ 切换主题 -----
-        this.trigger('themeChange', this.config.theme);
-        console.log('✅>> themeChange to', this.config.theme);
 
 
         //------ 如果开启了 ifStartWithLastPreset，则启动时使用上次使用的预设 -----
@@ -627,7 +610,7 @@ class IManager {
         // extractFiles 只是将其解压到内存中，并不会写入到磁盘
         // 通过 extractCallback 可以获取到解压的文件，然后将其写入到磁盘
 
-        console.debug(archiveReader,archiveReader.workerUrl);
+        console.debug(archiveReader, archiveReader.workerUrl);
 
         const ifEncrypted = await archiveReader.hasEncryptedData();
 
@@ -805,8 +788,8 @@ class IManager {
         // 创建mod文件夹
         if (fs.existsSync(modPath)) {
             const t_message = {
-            zh_cn: `模组 ${modName} 已经存在`,
-            en: `Mod ${modName} already exists`,
+                zh_cn: `模组 ${modName} 已经存在`,
+                en: `Mod ${modName} already exists`,
             }
             t_snack(t_message, 'error');
             return;
@@ -1264,15 +1247,17 @@ class IManager {
     }
 
     //-==================== 事件管理 ====================
-    // 注册事件
-    async on(eventName, callback) {
-        EventSystem.on(eventName, callback)
-    }
+    // // 注册事件
+    // async on(eventName, callback) {
+    //     EventSystem.on(eventName, callback)
+    // }
 
-    // 触发事件
-    async trigger(eventName, data) {
-        EventSystem.trigger(eventName, data)    
-    }
+    // // 触发事件
+    // async trigger(eventName, data) {
+    //     EventSystem.trigger(eventName, data)    
+    // }
+    on = EventSystem.on;
+    trigger = EventSystem.trigger;
 
 
 

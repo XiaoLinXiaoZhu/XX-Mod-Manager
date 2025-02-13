@@ -41,17 +41,21 @@ class EventSystem {
     private static eventMap = new Map<EventType, Function[]>(); // 事件映射表
 
     static async on(event: EventType, callback: Function) {
-        if (!this.eventMap.has(event)) {
-            this.eventMap.set(event, []);
+        // 防止 eventMap 不存在 
+        if (!EventSystem.eventMap) {
+            EventSystem.eventMap = new Map<EventType, Function[]>();
         }
-        this.eventMap.get(event)?.push(callback);
+        if (!EventSystem.eventMap.has(event)) {
+            EventSystem.eventMap.set(event, []);
+        }
+        EventSystem.eventMap.get(event)?.push(callback);
         // debug
-        // console.log('eventMap:', this.eventMap);
+        // console.log('eventMap:', EventSystem.eventMap);
     }
 
     static async off(event: EventType, callback: Function) {
-        if (this.eventMap.has(event)) {
-            let callbacks = this.eventMap.get(event);
+        if (EventSystem.eventMap.has(event)) {
+            let callbacks = EventSystem.eventMap.get(event);
             if (callbacks) {
                 let index = callbacks.indexOf(callback);
                 if (index !== -1) {
@@ -62,8 +66,8 @@ class EventSystem {
     }
 
     static async trigger(event: EventType, ...args: any[]) {
-        if (this.eventMap.has(event)) {
-            let callbacks = this.eventMap.get(event);
+        if (EventSystem.eventMap.has(event)) {
+            let callbacks = EventSystem.eventMap.get(event);
             if (callbacks) {
                 for (let callback of callbacks) {
                     callback(...args);
@@ -73,8 +77,8 @@ class EventSystem {
     }
 
     static async triggerSync(event: EventType, ...args: any[]) {
-        if (this.eventMap.has(event)) {
-            let callbacks = this.eventMap.get(event);
+        if (EventSystem.eventMap.has(event)) {
+            let callbacks = EventSystem.eventMap.get(event);
             if (callbacks) {
                 for (let callback of callbacks) {
                     await callback(...args);
@@ -84,7 +88,7 @@ class EventSystem {
     }
 
     static async clearAllEvents() {
-        this.eventMap.clear();
+        EventSystem.eventMap.clear();
     }
 }
 

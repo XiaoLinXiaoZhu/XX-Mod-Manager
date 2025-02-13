@@ -43,6 +43,15 @@ class TranslatedText {
     public get() {
         return this.getText(currentLanguage);
     }
+
+    public static fromObject(obj: any) {
+        if (obj.en && obj.zh_cn) {
+            return new TranslatedText(obj.en, obj.zh_cn);
+        } else {
+            console.error('TranslatedText.fromObject error: obj is invalid', obj);
+            return new TranslatedText('', '');
+        }
+    }
 }
 
 

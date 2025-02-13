@@ -54,7 +54,14 @@ module.exports = {
         en: 'Test Plugin'
     },
     init(iManager) {
-        iManager.snack('Auto Start Plugin Loaded from' + __dirname);
+        iManager.t_snack({
+            zh_cn: '测试插件从该路径加载：' + __dirname,
+            en: 'Test Plugin loaded from path: ' + __dirname    
+        });
+        iManager.t_snack({
+            zh_cn: '测试插件用以展示插件功能，提供插件编写参考，对于普通用户，你可以在设置>插件中关闭该插件，以取消该插件的显示。',  
+            en: 'Test Plugin is used to show the function of the plugin, provide reference for plugin writing, for ordinary users, you can close the plugin in settings>plugin to cancel the display of the plugin.'      
+        });
 
         let pluginData = [];
 
