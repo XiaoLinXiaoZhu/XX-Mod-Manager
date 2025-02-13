@@ -15,7 +15,7 @@ enum SnackType {
  * @param {string} message
  * @param {SnackType} type 
  */
-function snack(message: string, type: SnackType = SnackType.info) {
+async function snack(message: string, type: SnackType = SnackType.info) {
     ipcRenderer.send('snack', message, type);
 }
 
@@ -24,7 +24,7 @@ function snack(message: string, type: SnackType = SnackType.info) {
  * @param {TranslatedText} message
  * @param {SnackType} type
  */
-function t_snack(message: TranslatedText, type: SnackType = SnackType.info) {
+async function t_snack(message: TranslatedText, type: SnackType = SnackType.info) {
     // 检查是否为 TranslatedText    
     if (!message || typeof message !== 'object' || !message.get) {
         message  = TranslatedText.fromObject(message);

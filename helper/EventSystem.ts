@@ -35,6 +35,7 @@ enum EventType {
     //----------插件相关----------
     pluginEnabled = 'pluginEnabled',
     pluginDisabled = 'pluginDisabled',
+    currentTabChanged = "currentTabChanged",
 }
 
 class EventSystem {

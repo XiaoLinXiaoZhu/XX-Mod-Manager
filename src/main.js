@@ -6,7 +6,7 @@ import 'sober'
 import 'sober/style/scroll-view.css'
 import { Snackbar } from 'sober'
 const { ipcRenderer} = require('electron');
-import IManager, { snack } from '../electron/IManager'
+import IManager from '../electron/IManager'
 const iManager = new IManager();
 
 import { EventSystem } from '../helper/EventSystem'

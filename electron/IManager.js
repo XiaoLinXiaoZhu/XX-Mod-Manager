@@ -14,15 +14,21 @@ const fs = require('fs');
 // 导入 libarchivejs
 let Archive = window.Archive;
 // import Archive from 'libarchive.js';
-// 下面两个变量是为了解决 vite 打包时，无法正确导入 wasm 文件的问题
+//! 下面两个变量是为了解决 vite 打包时，无法正确导入 wasm 文件的问题
 import ArchiveWASM from './lib/libarchive.wasm?url';
 import workerBound from './lib/worker-bundle.js?url';
 
 
-import { EventSystem } from '../helper/EventSystem';
+// 导入 Language
+import { Language, TranslatedText, setCurrentLanguage } from '../helper/Language';
+// 导入 SnackHelper
+import { t_snack, SnackType, snack } from '../helper/SnackHelper';
+// 导入 EventSystem
+import { EventType, EventSystem } from '../helper/EventSystem';
+// 导入 PluginLoader
 import { IPluginLoader } from '../helper/PluginLoader';
-import { TranslatedText, setCurrentLanguage } from '../helper/Language';
-import { snack,t_snack, SnackType } from '../helper/SnackHelper';
+// 导入 PathHelper
+import { PathHelper } from '../helper/PathHelper';
 
 // // 导入 hmc-win32
 const HMC_Name = 'hmc-win32';
@@ -123,18 +129,12 @@ class IManager {
 
 
     //-==================== 内部方法 ====================
-    async snack(message, type = 'info') {
-        snack(message, type);
-    }
-    async t_snack(messages, type = 'info') {
-        if (messages[this.config.language] != null) {
-            snack(messages[this.config.language], type);
-        }
-        else {
-            const firstMessageKey = Object.keys(messages)[0];
-            snack(messages[firstMessageKey], type);
-        }
-    }
+    // async snack(message, type = 'info') {
+    //     snack(message, type);
+    // }
+    snack = snack;
+    t_snack = t_snack;
+    
     async loadConfig() {
         const currentConfig = await ipcRenderer.invoke('get-current-config');
         console.log(currentConfig);
@@ -311,7 +311,7 @@ class IManager {
         //-------- 再次切换一次 语言和主题，因为有些页面可能在 init 之后才加载，所以需要再次切换一次
         this.trigger('languageChange', this.config.language);
         setCurrentLanguage(this.config.language);
-        this.trigger('themeChange', this.config.theme); 
+        this.trigger('themeChange', this.config.theme);
 
         //-------- currentMod 默认是 第一个mod
         if (this.data.modList.length > 0) {
@@ -1251,15 +1251,6 @@ class IManager {
     }
 
     //-==================== 事件管理 ====================
-    // // 注册事件
-    // async on(eventName, callback) {
-    //     EventSystem.on(eventName, callback)
-    // }
-
-    // // 触发事件
-    // async trigger(eventName, data) {
-    //     EventSystem.trigger(eventName, data)    
-    // }
     on = EventSystem.on;
     trigger = EventSystem.trigger;
 
@@ -1362,5 +1353,5 @@ ipcRenderer.on('windowFocus', () => {
 });
 
 export default IManager;
-export { snack, t_snack, waitInitIManager };
+export {waitInitIManager };
 

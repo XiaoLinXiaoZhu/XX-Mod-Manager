@@ -3,8 +3,8 @@
 // 这样的话，方便将所有非核心功能 转化为 插件，方便管理和拓展
 
 // 这个类应该 被划分到 渲染进程底下，但是 主进程也应该能够访问到这个类
-
 const { ipcRenderer } = require('electron');
+
 const fs = require('fs');
 let pathOsName = () => { return 'path' };
 const path = require(pathOsName());
@@ -26,7 +26,8 @@ import { EventType, EventSystem } from './EventSystem';
 import { IPluginLoader } from './PluginLoader';
 // 导入 PathHelper
 import { PathHelper } from './PathHelper';
-
+// 导入 ModHelper
+import { ModData } from './ModHelper';
 
 
 
@@ -53,11 +54,10 @@ class XManager {
         }
 
         XManager.instance = this;
-
+        this.HMC = HMC;
         // 初始化
         this.init();
     }
-
 
     //-===================== 核心数据 ======================-//
     // 核心数据，可以后面慢慢扩充，现在只将必要的数据放在这里
@@ -71,7 +71,7 @@ class XManager {
     // 从本地加载的配置项
     public config = {
         firstLoad: true, // 是否第一次加载
-        language: 'zh_cn', // 语言
+        language: 'zh_cn' as Language, // 语言
         theme: 'dark', // 主题
         modSourcePath: null, // mod的源路径
         modTargetPath: null, // mod的目标路径
@@ -89,7 +89,7 @@ class XManager {
     // 程序运行时的数据
     // dataPath = ''; // 数据路径
     public data = {
-        modList: [], // mod列表
+        modList: [] as ModData[], // mod列表
         presetList: [], // 预设列表
         characterList: [], // 角色列表
     };
@@ -97,16 +97,12 @@ class XManager {
     // 临时数据，用于存储一些临时的数据
     public temp = {
         lastClickedMod: null, // 最后点击的mod，用于显示详情
-        currentMod: null, // 当前mod
+        currentMod: null as unknown as ModData, // 当前mod
         currentCharacter: null, // 当前角色
         currentTab: 'mod', // 当前tab
         currentPreset: "default", // 当前预设
         wakeUped: false, // 是否 在唤醒状态
     };
-
-    // 插件 和 插件配置
-    public plugins = {};
-    public pluginConfig = {};
 
 
     //-===================== 初始化 ======================-//
@@ -132,26 +128,32 @@ class XManager {
             presetList: [],
             characterList: []
         };
-        this.plugins = {};
+
         EventSystem.clearAllEvents();
-
-        this.HMC = HMC
-
-        // 清空所有插件
         IPluginLoader.clearAllPlugins();
     }
 
-    private async init() {
+    async init() {
         this.clearInit();
 
-        //debug
-        console.log('✅>> init IManager');
+        console.log('✅>> init XManager');
         // 加载配置
         await this.loadConfig();
         console.log('✅>> loadConfig done');
+
+        //-=============== 优先进行页面初始化 ===============-//
         //------ 设置窗口大小 -----
         await this.setWindowBounds();
         console.log('✅>> setWindowBounds done');
+        //------ 切换语言 -----
+        EventSystem.trigger(EventType.languageChange, this.config.language);
+        setCurrentLanguage(this.config.language);
+        console.log('✅>> languageChange to', this.config.language);
+        //------ 切换主题 -----
+        EventSystem.trigger(EventType.themeChange, this.config.theme);
+        console.log('✅>> themeChange to', this.config.theme);
+
+
         // 加载mod
         await this.loadMods();
         console.log('✅>> loadMods done');
@@ -161,46 +163,40 @@ class XManager {
         console.log('✅>> loadPresets done');
 
         // 加载插件
-        // await this.loadDisabledPlugins();
-        await IPluginLoader.LoadDisabledPlugins();
-        // await this.loadPlugins();
-        await IPluginLoader.LoadPlugins(this);
+        await IPluginLoader.Init(this);
         console.log('✅>> loadPlugins done');
-
 
         //debug
         console.log('✅>> init IManager done');
         this.inited = true;
 
+        //ipcRenderer.invoke('set-imanager', this);
+        // 这样 传递的数据 会被序列化，导致 无法传递 函数
+        // 并且 不能够 同步，因为实际上传递的是复制的数据，而不是引用
+
         //调用 start 方法
         setTimeout(() => {
-
-            this.start();
-            // this.trigger('initDone', this);
             EventSystem.trigger(EventType.initDone, this);
+            this.start();
         }, 200);
     }
 
-    private async start() {
+    // start 在 init 之后调用，在各个其他页面 绑定好事件之后调用
+    async start() {
+        //-------- 再次切换一次 语言和主题，因为有些页面可能在 init 之后才加载，所以需要再次切换一次
+        EventSystem.trigger(EventType.languageChange, this.config.language);
+        setCurrentLanguage(this.config.language);
+        EventSystem.trigger(EventType.themeChange, this.config.theme);
+
         //-------- currentMod 默认是 第一个mod
         if (this.data.modList.length > 0) {
             //debug
             // this.temp.lastClickedMod = this.data.modList[0];
-            // this.trigger('lastClickedMod_Changed', this.temp.lastClickedMod);
+            // EventSystem.trigger(EventType.lastClickedMod_Changed, this.temp.lastClickedMod);
 
-            //! this.setCurrentMod(this.data.modList[0]);
+            this.setCurrentMod(this.data.modList[0]);
             console.log('✅>> currentMod init', this.temp.currentMod);
         }
-
-        //------ 切换语言 -----
-        // this.trigger('languageChange', this.config.language);
-        EventSystem.trigger(EventType.languageChange, this.config.language);
-        console.log('✅>> languageChange to', this.config.language);
-
-        //------ 切换主题 -----
-        // this.trigger('themeChange', this.config.theme);
-        EventSystem.trigger(EventType.themeChange, this.config.theme);
-        console.log('✅>> themeChange to', this.config.theme);
 
 
         //------ 如果开启了 ifStartWithLastPreset，则启动时使用上次使用的预设 -----
@@ -208,20 +204,81 @@ class XManager {
             if (this.config.lastUsedPreset !== null) {
                 //debug
                 console.log('✅>> start with last preset:', this.config.lastUsedPreset);
-                //! this.setCurrentPreset(this.config.lastUsedPreset);
+                this.setCurrentPreset(this.config.lastUsedPreset);
             }
             else {
                 //debug
                 console.log('✅>> start with default preset');
-                //!this.setCurrentPreset('default');
+                this.setCurrentPreset('default');
             }
         }
         else {
             //debug
             console.log('✅>> start with default preset');
-            //!this.setCurrentPreset('default');
+            this.setCurrentPreset('default');
         }
     }
+
+    //-===================== 对外接口 状态变更 ======================-//
+        async setLastClickedMod(mod) {
+            // 此方法已弃用，当调用的时候，抛出异常
+            console.warn('setLastClickedMod is deprecated');
+            throw new Error('setLastClickedMod is deprecated');
+            this.temp.lastClickedMod = mod;
+            EventSystem.trigger(EventType.lastClickedModChanged, mod);
+        }
+    
+        async setLastClickedModByName(modName) {
+            // 此方法已弃用，当调用的时候，抛出异常
+            console.warn('setLastClickedModByName is deprecated');
+            throw new Error('setLastClickedModByName is deprecated');
+        }
+    
+        async setCurrentCharacter(character) {
+            this.temp.currentCharacter = character;
+            EventSystem.trigger(EventType.currentCharacterChanged, character);
+            //debug
+            console.log(`currentCharacterChanged: ${character}`);
+        }
+    
+        async setCurrentTab(tab) {
+            this.temp.currentTab = tab;
+            EventSystem.trigger(EventType.currentTabChanged, tab);
+    
+            //debug
+            console.log(`currentTabChanged: ${tab}`);
+        }
+    
+        async setCurrentPreset(presetName) {
+            this.temp.currentPreset = presetName;
+            EventSystem.trigger(EventType.currentPresetChanged, presetName);
+    
+            // 这个功能放到插件里面实现，不是核心功能
+            // setTimeout(() => {
+            //     this.setCurrentCharacter('selected');
+            // }, 200);
+        }
+    
+        async setCurrentMod(mod) {
+            this.temp.currentMod = mod;
+            EventSystem.trigger(EventType.currentModChanged, mod);
+        }
+    
+        async setCurrentModByName(modName) {
+            const modInfo = await this.getModInfo(modName);
+            if (!modInfo) {
+                throw new Error(`Mod with name ${modName} not found`);
+            }
+            this.temp.currentMod = modInfo;
+            //debug
+            console.log(`setCurrentModByName: ${modName}`, this.temp.currentMod);
+            EventSystem.trigger(EventType.currentModChanged, this.temp.currentMod);
+        }
+    
+        async toggledModByName(modName) {
+            const mod = await this.getModInfo(modName);
+            EventSystem.trigger(EventType.toggledMod, mod);
+        }
 
     //-===================== 加载配置 ======================-//
     async loadConfig() {

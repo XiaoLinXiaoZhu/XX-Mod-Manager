@@ -42,7 +42,8 @@
 <script setup>
 import 'sober'
 import { useTemplateRef, computed, defineProps, onMounted, ref, watch } from 'vue'
-import IManager, { snack } from '../../electron/IManager';
+import IManager from '../../electron/IManager';
+import { snack } from '../../helper/SnackHelper';
 import horizontalScrollBar from './horizontalScrollBar.vue';
 const iManager = new IManager();
 import { EventSystem } from '../../helper/EventSystem';
