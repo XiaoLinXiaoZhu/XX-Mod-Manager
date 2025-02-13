@@ -1312,7 +1312,11 @@ function waitInitIManager() {
 
 ipcRenderer.on('wakeUp', () => {
     console.log('🌞wakeUp');
-    snack('🌞wakeUp');
+    // snack('🌞wakeUp');
+    t_snack({
+        zh_cn: '🌞程序正常启动~',
+        en: '🌞Program is waking up~',
+    })
     waitInitIManager().then((iManager) => {
         iManager.trigger('wakeUp');
     });
@@ -1324,26 +1328,29 @@ let isSleeping = false;
 const sleepTimeOutTime = 10000;
 
 ipcRenderer.on('windowBlur', () => {
-    console.log('☁️windowBlur');
-    // snack('☁️windowBlur');
-    const iManager = new IManager();
-    iManager.trigger('windowBlur');
+    const tt = new TranslatedText("☁️windowBlur", "☁️窗口失去焦点");
+    console.log(tt.get());
+    t_snack(tt);
+    EventSystem.trigger('windowBlur');
 
     sleepTimer = setTimeout(() => {
-        iManager.trigger("windowSleep");
+        // iManager.trigger("windowSleep");
+        EventSystem.trigger('windowSleep');
         isSleeping = true;
-        snack('💤windowSleep');
+        const tt2 = new TranslatedText("💤windowSleep", "💤窗口休眠");
+        console.log(tt2.get());
+        t_snack(tt2);
     }, sleepTimeOutTime);
 });
 
 ipcRenderer.on('windowFocus', () => {
-    console.log('windowFocus');
+    const tt = new TranslatedText("👀windowFocus", "👀窗口获得焦点");
+    console.log(tt.get());
     if (isSleeping) {
-        snack('👀windowFocus');
+        t_snack(tt);
         isSleeping = false;
     }
-    const iManager = new IManager();
-    iManager.trigger('windowFocus');
+    EventSystem.trigger('windowFocus');
 
     if (sleepTimer != '') {
         clearTimeout(sleepTimer);
