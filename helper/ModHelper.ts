@@ -158,9 +158,12 @@ class ModData {
     }
 
     //-========== 获取mod信息 ===========
-    public async getPreviewBase64() {
+    public async getPreviewBase64(ifWithHeader: boolean = false) {
         // await this.checkModSourcePath();
         const data = await ipcRenderer.invoke('get-image', this.preview);
+        if (ifWithHeader) {
+            return "data:image/png;base64," + data;
+        }
         return data;  
     }
 

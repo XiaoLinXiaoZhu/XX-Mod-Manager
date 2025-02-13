@@ -272,8 +272,7 @@ const handleSelectImage = async () => {
 
 const handleCancel = async () => {
   tempModInfo.value = props.mod.copy();
-  const imgBase64 = await props.mod.getPreviewBase64();
-  img.value = "data:image/png;base64," + imgBase64;
+  img.value = await props.mod.getPreviewBase64(true);
 }
 
 const handleSave = () => {
