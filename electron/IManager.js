@@ -158,21 +158,6 @@ class IManager {
                 snack(`Loading config error: ${error}`);
             }
         }
-        //debug
-        // if (this.config.presetPath === null) {
-        //     console.log('presetPath is null');
-        // }
-        // else if (fs.existsSync(this.config.presetPath) === false) {
-        //     // fs.mkdirSync(this.config.presetPath);
-        //     // 直接创建文件夹有可能它的父文件夹不存在，所以检查一下
-        //     if (!fs.existsSync(path.dirname(this.config.presetPath))) {
-        //         console.log(`presetPath's parent not exists`);
-        //         snack(`preset folder not exists`, 'error');
-        //     }
-        //     else {
-        //         fs.mkdirSync(this.config.presetPath);
-        //     }
-        // }
 
         this.saveConfig();
     }
@@ -200,9 +185,12 @@ class IManager {
         this.data.modList = loadMods.map((mod) => ModData.fromJson(mod).setModSourcePath(modSourcePath));
 
         //debug
-        console.log(loadMods);
-        console.log(this.data.modList);
-        console.log(this.data.characterList);
+        // console.log(loadMods);
+        // console.log(this.data.modList);
+        // console.log(this.data.characterList);
+
+        // debug,成功加载 n 个 mod，总共 m 个 角色
+        console.log(`成功加载 ${loadMods.length} 个 mod，总共 ${this.data.characterList.length} 个 角色`);
         return loadMods;
     }
 
@@ -275,7 +263,7 @@ class IManager {
 
         //-=============== 优先进行页面初始化 ===============-//
         //------ 设置窗口大小 -----
-        await this.setWindowBounds();
+        this.setWindowBounds();
         console.log('✅>> setWindowBounds done');
         //------ 切换语言 -----
         this.trigger('languageChange', this.config.language);
@@ -310,10 +298,6 @@ class IManager {
             this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
             this.data.characterList = Array.from(this.data.characterList).sort();
         });
-
-        //ipcRenderer.invoke('set-imanager', this);
-        // 这样 传递的数据 会被序列化，导致 无法传递 函数
-        // 并且 不能够 同步，因为实际上传递的是复制的数据，而不是引用
 
         //调用 start 方法
         setTimeout(() => {

@@ -226,6 +226,8 @@ const tempModInfo = ref({
 
 const editModInfoDialog = useTemplateRef('edit-mod-dialog');
 const img = ref(null);
+
+// 需要显示的mod发生变化时，更新 临时mod信息
 watch(() => props.mod, async (newVal) => {
   console.log('mod changed', newVal);
   // 检查newVal 的类型，应当为 ModData 类型，如果不是则尝试转化为 ModData 类型
@@ -276,7 +278,7 @@ const handleCancel = async () => {
 
 const handleSave = () => {
   //debug
-  console.log('modInfo.value', tempModInfo.value);
+  console.log('saved', saved,`equals`,props.mod.equals(tempModInfo.value));
   // 保存修改的 mod 信息
 
   if (props.mod.equals(tempModInfo.value)) {
@@ -285,28 +287,29 @@ const handleSave = () => {
   }
 
   // 处理 图片 更改
+  let needChangePreview = false;
   if (props.mod.preview !== tempModInfo.value.preview) {
-    // 当图片更改时，将新图片保存到本地 对应的文件夹下，并且将新的路径保存到 modInfo 中
-    // debug
-    console.log(`change preview of ${tempModInfo.value.name} to ${tempModInfo.value.preview}`);
-    iManager.changePreview(tempModInfo.value.name, tempModInfo.value.preview);
+    needChangePreview = true;
   }
 
   // 保存修改的 mod 信息
   const savedMod = props.mod.editModInfo(tempModInfo.value);
-  iManager.setCurrentMod(savedMod);
 
+  if (needChangePreview) {
+    props.mod.setPreviewByPath(tempModInfo.value.preview);
+  }
+  tempModInfo.value = savedMod.copy();
   saved = true;
-  editModInfoDialog.value.$el.dismiss();
 
-  // props.mod = modInfo.value;
-  // iManager.saveModInfo(modInfo.value);
+  savedMod.saveModInfo();
 
+  savedMod.triggerChanged();
+  savedMod.triggerCurrentModChanged();
 }
 
 onMounted(() => {
-
   editModInfoDialog.value.$el.addEventListener('dismiss', () => {
+    console.log('dismiss','props.mod',props.mod,'tempModInfo',tempModInfo.value,saved);
     if (!saved && !props.mod.equals(tempModInfo.value)) {
       iManager.showDialog('save-change-dialog');
     }
