@@ -9,7 +9,7 @@ const { ipcRenderer} = require('electron');
 import IManager, { snack } from '../electron/IManager'
 const iManager = new IManager();
 
-import { XManager } from '../helper/XManager'
+import { EventSystem } from '../helper/EventSystem'
 
 //-====================入口文件====================-//
 const vue_app = createApp(test_app);
@@ -40,7 +40,7 @@ iManager.i18n = i18n;
 vue_app.mount('#app');
 
 // ------------------ 语言切换 ------------------ //
-iManager.on('languageChange', (language) => {
+EventSystem.on('languageChange', (language) => {
     // 将语言设置为 imanager 中的语言
     vue_app.config.globalProperties.$i18n.locale = language;
     //debug
@@ -51,7 +51,7 @@ iManager.on('languageChange', (language) => {
 // ------------------ first load ------------------ //
 // 首次打开时打开 初始化窗口
 // iManager.snack('first load : '+iManager.config.firstLoad);
-iManager.on('wakeUp', () => {
+EventSystem.on('wakeUp', () => {
     iManager.snack('first load : '+iManager.config.firstLoad);
     console.log('❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️\nfist load:', iManager.config.firstLoad);
     if (iManager.config.firstLoad) {
@@ -65,7 +65,7 @@ iManager.on('wakeUp', () => {
 // ------------------ 初始化 ------------------ //
 iManager.waitInit().then((iManager) => {
     // 手动触发一次语言切换事件
-    iManager.trigger('languageChange', iManager.config.language);
+    EventSystem.trigger('languageChange', iManager.config.language);
 })
 
 //-=====================事件监听====================-//

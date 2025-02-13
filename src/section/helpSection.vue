@@ -86,12 +86,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 
 import leftMenu from '../components/leftMenu.vue';
 import Markdown from '../components/markdown.vue';
-
-import { waitInitIManager } from '../../electron/IManager';
+import { EventType,EventSystem } from '../../helper/EventSystem'; 
 
 const explainContentCn =
   `# 先决条件
@@ -513,16 +512,13 @@ const setTranslatedTabs = (language) =>{
   }
 }
 
-waitInitIManager().then((iManager) => {
-  language.value = iManager.config.language;
-  setTranslatedTabs(language.value);
-
-  iManager.on('languageChange', (lang) => {
+onMounted(() => {
+  EventSystem.on(EventType.languageChange, (lang) => {
     //debug 
     console.log('helpSection languageChange', lang);
     language.value = lang;
     setTranslatedTabs(lang);
-  });
+});
 });
 
 </script>

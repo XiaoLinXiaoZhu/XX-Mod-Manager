@@ -1,19 +1,13 @@
 <template>
     <div id="mod-card-manager" class="OO-box" ref="modCardManagerRef">
-        <chipRadioBar class="characterFilter" :items="characters"  @itemChange="handleFilterChange" :translatedItems="translateCharacters" ref="characterFilterRef"/>
+        <chipRadioBar class="characterFilter" :items="characters" @itemChange="handleFilterChange"
+            :translatedItems="translateCharacters" ref="characterFilterRef" />
         <s-scroll-view style="overflow-x:hidden;overflow-y: auto;border-radius: 0 0 10px 10px;">
             <div class="refresh-placeholder" ref="refreshPlaceholderRef"></div>
             <div id="mod-container" :compact="compactMode" ref="modContainerRef">
-                <modCard v-for="mod in mods" :key="mod.name" 
-                    :mod="mod.name" 
-                    :character="mod.character"
-                    :description="mod.description"
-                    :hotKeys="mod.hotkeys"
-                    :lazyLoad=true
-                    :imagePath="mod.preview"
-                    :compactMode="compactMode"
-                    :ref="setModCardRef(mod.name)"
-                />
+                <modCard v-for="mod in mods" :key="mod.name" :mod="mod.name" :character="mod.character"
+                    :description="mod.description" :hotKeys="mod.hotkeys" :lazyLoad=true :imagePath="mod.preview"
+                    :compactMode="compactMode" :ref="setModCardRef(mod.name)" />
             </div>
             <div class="placeholder"></div>
         </s-scroll-view>
@@ -23,10 +17,11 @@
 <script setup>
 import 'sober';
 import chipRadioBar from './chipRadioBar.vue';
-import { ref, onMounted,computed,useTemplateRef,watch } from 'vue';
+import { ref, onMounted, computed, useTemplateRef, watch } from 'vue';
 import modCard from './modCard.vue';
-import { Tween,Group } from "@tweenjs/tween.js";
+import { Tween, Group } from "@tweenjs/tween.js";
 import IManager from '../../electron/IManager';
+import { EventType, EventSystem } from '../../helper/EventSystem';
 
 const iManager = new IManager();
 
@@ -132,7 +127,7 @@ async function changeFilter(character) {
 
 
 async function loadPreset(presetName) {
-    const mods =await iManager.loadPreset(presetName);
+    const mods = await iManager.loadPreset(presetName);
     //遍历modCardRefs，如果 满足 mods.includes(mod.name) ^ mod.clicked 则调用click
     for (const [key, value] of Object.entries(modCardRefs.value)) {
         if (!value) continue;
@@ -141,9 +136,9 @@ async function loadPreset(presetName) {
             value.click();
         }
     }
-        
+
     //debug
-    console.log('loadPreset',presetName);
+    console.log('loadPreset', presetName);
     // handleFilterChange('已选择');
 };
 
@@ -152,11 +147,11 @@ const modContainerRef = useTemplateRef('modContainerRef');
 // 监控 compactMode 变量，为其的 grid-auto-rows 添加过渡效果
 let isAnimating = false;
 // 两个动画效果：从 350px 到 150px，从 150px 到 350px
-const compactAnimation = new Tween({height: 350}).to({height: 150}, 200).onComplete(isAnimating = false);
+const compactAnimation = new Tween({ height: 350 }).to({ height: 150 }, 200).onComplete(isAnimating = false);
 compactAnimation.onUpdate((object) => {
     modContainerRef.value.style.gridAutoRows = `${object.height}px`;
 });
-const expandAnimation = new Tween({height: 150}).to({height: 350}, 200).onComplete(isAnimating = false);
+const expandAnimation = new Tween({ height: 150 }).to({ height: 350 }, 200).onComplete(isAnimating = false);
 expandAnimation.onUpdate((object) => {
     modContainerRef.value.style.gridAutoRows = `${object.height}px`;
 });
@@ -180,8 +175,8 @@ watch(() => props.compactMode, (newVal) => {
 
 function updateAnimate() {
     if (!isAnimating) return;
-	requestAnimationFrame(updateAnimate)
-	animate.update()
+    requestAnimationFrame(updateAnimate)
+    animate.update()
 }
 
 // 定义 observer 变量
@@ -189,7 +184,7 @@ const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         const modItem = entry.target;
         // 如果元素在视口内，则使其inWindow属性为true
-        
+
         // 这里时一个优化，卡片默认不加载图片，直到 enterWindow 为 true 时才加载图片
         if (modItem.getAttribute('inWindow') == 'none') {
             //debug
@@ -206,14 +201,14 @@ const observer = new IntersectionObserver((entries) => {
 
         modItem.inWindow = entry.isIntersecting;
         modItem.setAttribute('inWindow', entry.isIntersecting);
-        
+
         //debug
         //console.log(`modItem ${modItem.id} inWindow:${modItem.inWindow}`);
     });
-    }, {
-        root: null, // 使用视口作为根
-        rootMargin: '1000px 0px 1000px 0px', // 扩展视口边界
-        threshold: 0 // 只要元素进入视口就触发回调
+}, {
+    root: null, // 使用视口作为根
+    rootMargin: '1000px 0px 1000px 0px', // 扩展视口边界
+    threshold: 0 // 只要元素进入视口就触发回调
 });
 
 // 在 loadMods 方法中为每个 mod-item 添加 observer
@@ -231,52 +226,6 @@ onMounted(async () => {
     await loadMods();
     observeMods();
     refreshPlaceholderRef.value.style.height = '0px';
-
-    if (iManager.config.language == 'zh_cn') {
-        translateCharacters.value = ['全部', '已选择'];
-    } else {
-        translateCharacters.value = ['All', 'Selected'];
-    }
-
-    iManager.on('modInfoChanged', (modInfo) => {
-        //debug
-        console.log('get modInfoChanged');
-        mods.value =  null;
-        characters.value = null;
-        setTimeout(async () => {
-            await loadMods();
-            observeMods();
-
-            // iManager.setLastClickedMod_ByName(modInfo.name);
-            iManager.setCurrentModByName(modInfo.name);
-            iManager.setCurrentCharacter(modInfo.character);
-        }, 1);
-    });
-
-
-    // ! on addMod event, reload mods
-    iManager.on('addMod', () => {
-        //debug
-        console.log('get addMod');
-        mods.value =  null;
-        setTimeout(() => {
-            loadMods();
-            observeMods();
-        }, 1);
-    });
-
-    iManager.on('currentCharacterChanged', (character) => {
-        if (currentCharacter.value == character) return;
-        currentCharacter.value = character;
-
-        characterFilterRef.value.selectItemByName(character);
-
-        changeFilter(character);
-    });
-
-    iManager.on('currentPresetChanged', (preset) => {
-        loadPreset(preset);
-    });
 
     // 接受文件拖拽事件，可以直接通过拖拽文件到窗口中导入 mod，或者拖拽图片到窗口中为 mod 添加预览图
     modCardManagerRef.value.addEventListener('dragover', (event) => {
@@ -299,7 +248,53 @@ onMounted(async () => {
     });
 });
 
+EventSystem.on(EventType.languageChange, (language) => {
+    if (language == 'zh_cn') {
+        translateCharacters.value = ['全部', '已选择'];
+    } else {
+        translateCharacters.value = ['All', 'Selected'];
+    }
+});
 
+EventSystem.on('modInfoChanged', (modInfo) => {
+    //debug
+    console.log('get modInfoChanged');
+    mods.value = null;
+    characters.value = null;
+    setTimeout(async () => {
+        await loadMods();
+        observeMods();
+
+        // iManager.setLastClickedMod_ByName(modInfo.name);
+        iManager.setCurrentModByName(modInfo.name);
+        iManager.setCurrentCharacter(modInfo.character);
+    }, 1);
+});
+
+
+// ! on addMod event, reload mods
+EventSystem.on('addMod', () => {
+    //debug
+    console.log('get addMod');
+    mods.value = null;
+    setTimeout(() => {
+        loadMods();
+        observeMods();
+    }, 1);
+});
+
+EventSystem.on('currentCharacterChanged', (character) => {
+    if (currentCharacter.value == character) return;
+    currentCharacter.value = character;
+
+    characterFilterRef.value.selectItemByName(character);
+
+    changeFilter(character);
+});
+
+EventSystem.on('currentPresetChanged', (preset) => {
+    loadPreset(preset);
+});
 
 defineExpose({
     loadPreset

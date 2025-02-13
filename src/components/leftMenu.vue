@@ -104,12 +104,18 @@ const selectTab = (tab, index) => {
 const selectTabByName = (tab) => {
     if (tab === currentTab.value) return;
     currentTab.value = tab;
+    
+    setTimeout(() => {
+        const index = props.tabs.indexOf(tab);
+        if (index === -1) {
+            console.log(`tab not found: ${tab}`);
+            return;
+        }
+        updateSlider(index);
+        
+    }, 0);
+
     emit('tabChange', tab);
-    const index = props.tabs.indexOf(tab);
-    //debug
-    console.log(`selectTabByName: `, tab, index)
-    if (index === -1) return;
-    updateSlider(index);
 };
 
 onMounted(() => {

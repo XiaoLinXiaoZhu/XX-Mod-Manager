@@ -301,14 +301,18 @@ class IManager {
 
         //调用 start 方法
         setTimeout(() => {
-
-            this.start();
             this.trigger('initDone', this);
+            this.start();
         }, 200);
     }
 
     // start 在 init 之后调用，在各个其他页面 绑定好事件之后调用
     async start() {
+        //-------- 再次切换一次 语言和主题，因为有些页面可能在 init 之后才加载，所以需要再次切换一次
+        this.trigger('languageChange', this.config.language);
+        setCurrentLanguage(this.config.language);
+        this.trigger('themeChange', this.config.theme); 
+
         //-------- currentMod 默认是 第一个mod
         if (this.data.modList.length > 0) {
             //debug
@@ -1318,7 +1322,7 @@ ipcRenderer.on('wakeUp', () => {
         en: '🌞Program is waking up~',
     })
     waitInitIManager().then((iManager) => {
-        iManager.trigger('wakeUp');
+        EventSystem.trigger('wakeUp');
     });
 });
 
@@ -1334,7 +1338,7 @@ ipcRenderer.on('windowBlur', () => {
     EventSystem.trigger('windowBlur');
 
     sleepTimer = setTimeout(() => {
-        // iManager.trigger("windowSleep");
+        // EventSystem.trigger("windowSleep");
         EventSystem.trigger('windowSleep');
         isSleeping = true;
         const tt2 = new TranslatedText("💤windowSleep", "💤窗口休眠");

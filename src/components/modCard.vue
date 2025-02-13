@@ -45,6 +45,7 @@ import { useTemplateRef, computed, defineProps, onMounted, ref, watch } from 'vu
 import IManager, { snack } from '../../electron/IManager';
 import horizontalScrollBar from './horizontalScrollBar.vue';
 const iManager = new IManager();
+import { EventSystem } from '../../helper/EventSystem';
 
 const props = defineProps({
     mod: String,
@@ -91,7 +92,7 @@ const getImage = computed(() => {
     return img.value;
 })
 
-iManager.on('addMod',(mod)=>{
+EventSystem.on('addMod',(mod)=>{
     // 在mod 添加的时候，检查一下 图片是否正常刷新
     //debug
     console.log(`modItem ${props.mod} received addMod event`,enteredWindow.value,props.lazyLoad,img.value == null);

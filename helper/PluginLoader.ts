@@ -74,12 +74,13 @@ class IPluginLoader {
     }
 
     public static async Init(env: any) {
+        await IPluginLoader.clearAllPlugins(); // 清空所有插件    
         IPluginLoader.enviroment = env;
 
         // 加载禁用的插件
-        IPluginLoader.LoadDisabledPlugins();
+        await IPluginLoader.LoadDisabledPlugins();
         // 加载所有插件 
-        IPluginLoader.LoadPlugins(env);
+        await IPluginLoader.LoadPlugins(env);
         // debug
         console.log('IPluginLoader init finished');
     }
@@ -138,6 +139,10 @@ class IPluginLoader {
             console.log(tt.get());
             t_snack(tt, SnackType.info);
             return false;
+        } else {
+            // debug
+            const tt = new TranslatedText(`🚀plugin ${plugin.name} registered`, `🚀插件 ${plugin.name} 已注册`);
+            console.log(tt.get(), plugin,this.disabledPluginNames);
         }
 
         if (plugin.init !== undefined) {

@@ -74,14 +74,15 @@ import { ref, onMounted, useTemplateRef } from 'vue';
 import IManager from '../../electron/IManager';
 import fsProxy from '../../electron/fsProxy';
 const iManager = new IManager();
-const fs = new fsProxy();
+const fsproxy = new fsProxy();
+import { EventType, EventSystem } from '../../helper/EventSystem';
 
 //-============================== 事件处理 ==============================
 const lastClickedMod = ref(null);
 
 function handlePresetManageButtonClicked() {
     console.log('preset manage button clicked');
-    fs.openDir(iManager.config.presetPath);
+    fsproxy.openDir(iManager.config.presetPath);
     iManager.showDialog('dialog-need-refresh');
 }
 
@@ -124,7 +125,7 @@ function loadPresetList() {
     presets.value = list;
 }
 
-iManager.on('addPreset', (preset) => {
+EventSystem.on('addPreset', (preset) => {
     //debug
     console.log('addPreset', preset);
     loadPresetList();
@@ -160,39 +161,42 @@ function handleApplyButtonClicked() {
     });
 }
 
+EventSystem.on(EventType.initDone, (iManager) => {
+    let list = iManager.data.presetList;
+    //debug
+    console.log('loadPresetList', iManager.data.presetList);
+    list.unshift('default');
+    //debug
+    presets.value = list;
+    // loadPresetList();
+});
+EventSystem.on('currentModChanged', (mod) => {
+    lastClickedMod.value = null;
+    setTimeout(() => {
+        lastClickedMod.value = mod;
+    }, 1);
+    //debug
+    console.log('set mod info display to', mod.name);
+});
+
+EventSystem.on('toggledMod', (mod) => {
+    //debug
+    console.log('toggled mod', mod);
+    savePreset();
+});
+
+EventSystem.on('currentPresetChanged', (preset) => {
+    // debug
+    console.log('111111111111111111current preset changed to', preset,presets.value);
+    presetSelectorRef.value.selectTabByName(preset);
+});
 onMounted(() => {
-    iManager.waitInit().then(() => {
-        loadPresetList();
+    // iManager.waitInit().then(() => {
+    //     loadPresetList();
 
-        // iManager.on("lastClickedMod_Changed", (mod) => {
-        //     lastClickedMod.value = null;
-        //     setTimeout(() => {
-        //         lastClickedMod.value = mod;
-        //     }, 1);
-        //     //debug
-        //     console.log('set mod info display to', mod.name);
-        //     savePreset();
-        // });
 
-        iManager.on('currentModChanged', (mod) => {
-            lastClickedMod.value = null;
-            setTimeout(() => {
-                lastClickedMod.value = mod;
-            }, 1);
-            //debug
-            console.log('set mod info display to', mod.name);
-        });
 
-        iManager.on('toggledMod', (mod) => {
-            //debug
-            console.log('toggled mod', mod);
-            savePreset();
-        });
-
-        iManager.on('currentPresetChanged', (preset) => {
-            presetSelectorRef.value.selectTabByName(preset);
-        });
-    });
+    // });
 });
 </script>
 

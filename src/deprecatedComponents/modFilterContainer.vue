@@ -16,6 +16,7 @@ import { waitInitIManager } from '../../electron/IManager';
 const { t } = useI18n()
 import IManager from '../../electron/IManager';
 const iManager = new IManager();
+import { EventSystem } from '../../helper/EventSystem';
 
 const props = defineProps({
   filterItems: Array,
@@ -88,12 +89,7 @@ const onMouseMove = (event) => {
   containerRef.value.scrollLeft = scrollLeft.value - walk;
 };
 
-onMounted(async () => {
-  updateSlider(0); // Initialize the slider position
-
-  await iManager.waitInit();
-
-  iManager.on('currentCharacterChanged', (character) => {
+EventSystem.on('currentCharacterChanged', (character) => {
     if (character === currentCharacter.value) return;
     //debug
     console.log(`get currentCharacterChanged: ${character}`)
@@ -103,14 +99,9 @@ onMounted(async () => {
     updateSlider(index);
   });
 
-  setTimeout(() => {
-    // 语言变化会导致宽度变化，所以 需要刷新一下
-    updateSlider(0);
-    //debug
+onMounted(async () => {
     console.log(`✅✅✅✅✅✅✅ get currentCharacter.value: ${currentCharacter.value}`)
   }, 1);
-
-});
 
 watch(currentCharacter, (newVal, oldVal) => {
   const filterItems = getFilterItems();

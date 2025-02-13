@@ -12,11 +12,10 @@
 
 //-============ 优化：如果窗口睡眠就停止刷新 ==========
 let isSleep = false;
-import IManager from "../../electron/IManager";
-const iManager = new IManager();
+import { EventSystem } from "../../helper/EventSystem";
 
-iManager.on('windowFocus',()=>{ isSleep = false;});
-iManager.on('windowSleep',()=>{ isSleep = true;});
+EventSystem.on('windowFocus',()=>{ isSleep = false;});
+EventSystem.on('windowSleep',()=>{ isSleep = true;});
 
 class ClassManagerService {
     items = [];

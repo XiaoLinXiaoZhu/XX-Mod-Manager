@@ -109,16 +109,16 @@
                 </div>
                 <div class="OO-box OO-shade-box" style="margin: 10px 0;">
                     <h3> {{ $t('setting.pluginList') }} </h3>
-                    <div class="OO-setting-bar" v-for="(pluginData, pluginName) in plugins" :key="pluginName">
-                        <h3 v-if="pluginData.t_displayName">{{ pluginData.t_displayName[locale] }}</h3>
-                        <h3 v-else>{{ pluginName }}</h3>
-                        <!-- -如果iManager.disabledPluginNames 中包含 pluginName，则显示为 false，否则显示为 true -->
-                        <s-switch class="OO-color-gradient-word" :checked="!iManager.disabledPluginNames.includes(pluginName)"
-                            @change="iManager.togglePlugin(pluginName)">
-                        </s-switch>
-                    </div>
                 </div>
-
+                <div class="OO-setting-bar" v-for="(pluginData, pluginName) in plugins" :key="pluginName">
+                    <h3 v-if="pluginData.t_displayName">{{ pluginData.t_displayName[locale] }}</h3>
+                    <h3 v-else>{{ pluginName }}</h3>
+                    <!-- -如果iManager.disabledPluginNames 中包含 pluginName，则显示为 false，否则显示为 true -->
+                    <s-switch class="OO-color-gradient-word"
+                        :checked="!IPluginLoader.disabledPluginNames.includes(pluginName)"
+                        @change="IPluginLoader.togglePlugin(pluginName)">
+                    </s-switch>
+                </div>
 
             </div>
             <!-- -这里后面提供 各个插件的设置 -->
@@ -185,17 +185,9 @@ const tabs = ref(['normal', 'advanced', 'switch-config', 'about', 'plugin']);
 const translatedTabs = computed(() => {
     const tTab = tabs.value.map((tab) => {
         // 如果 是 插件的 tab ，则尝试获取 plugin.t_displayName
-        //console.log('trying to get plugin name', tab, iManager.plugins[tab],iManager.plugins);
-        // if (iManager.plugins[tab]) {
-        //     //debug
-        //     // console.log('trying to get plugin name', tab, iManager.plugins[tab], locale.value);
-        //     return iManager.plugins[tab].t_displayName[locale.value] || tab;
-        // }
         if (IPluginLoader.plugins[tab]) {
-            //debug
-            // console.log('trying to get plugin name', tab, iManager.plugins[tab], locale.value);
             return IPluginLoader.plugins[tab].t_displayName[locale.value] || tab;
-        }   
+        }
         return t(`setting-tab.${tab}`)
     });
     //debug
@@ -274,8 +266,6 @@ const createShortOfCurrentConfig = {
 
 
 onMounted(async () => {
-    //debug
-    // console.log('settingSection mounted');
     await iManager.waitInit();
 
     //初始化tab
@@ -285,8 +275,10 @@ onMounted(async () => {
     // plugins.value = iManager.plugins;
     // pluginConfig.value = iManager.pluginConfig;
     plugins.value = IPluginLoader.plugins;
-    pluginConfig.value = IPluginLoader.pluginConfig; 
-    console.log('pluginConfig', pluginConfig);
+    pluginConfig.value = IPluginLoader.pluginConfig;
+    // console.log('pluginConfig', pluginConfig);
+
+
     // pluginConfig 是 一组 plungeName:pluginData 的键值对
     // 每个 pluginData 是一个 数组，数组中的每个元素是一个data对象，data对象包含了插件的设置
     // 每个 data 对象包含了以下属性
