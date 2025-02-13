@@ -340,4 +340,4 @@ class IPluginLoader {
 
 
 
-export { IPlugin, IPluginLoader };
+export { IPlugin, IPluginLoader, IPluginData, IPluginDataTypes, ITranslatedText, IPluginOption }

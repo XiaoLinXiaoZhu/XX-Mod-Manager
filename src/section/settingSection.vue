@@ -107,8 +107,10 @@
                 <div class="OO-setting-bar">
                     <h3> {{ $t('setting.managePlugin') }} </h3>
                 </div>
+                <settingBar :data="refreshDuleToPlugin" v-if="toggledPlugin"></settingBar>
                 <div class="OO-box OO-shade-box" style="margin: 10px 0;">
                     <h3> {{ $t('setting.pluginList') }} </h3>
+                    <p> {{ $t('setting.pluginListInfo') }} </p>
                 </div>
                 <div class="OO-setting-bar" v-for="(pluginData, pluginName) in plugins" :key="pluginName">
                     <h3 v-if="pluginData.t_displayName">{{ pluginData.t_displayName[locale] }}</h3>
@@ -116,10 +118,11 @@
                     <!-- -如果iManager.disabledPluginNames 中包含 pluginName，则显示为 false，否则显示为 true -->
                     <s-switch class="OO-color-gradient-word"
                         :checked="!IPluginLoader.disabledPluginNames.includes(pluginName)"
-                        @change="IPluginLoader.togglePlugin(pluginName)">
+                        @change="handePluginToggle(pluginName)">
                     </s-switch>
                 </div>
 
+                
             </div>
             <!-- -这里后面提供 各个插件的设置 -->
             <div v-for="(pluginData, pluginName) in pluginConfig" :key="pluginName">
@@ -206,12 +209,49 @@ const handleTabChange = (tab) => {
 
 const plugins = ref({});
 const pluginConfig = ref({});
+const toggledPlugin = ref(false);
 watch(pluginConfig, (newVal) => {
     //debug
     console.log('===pluginConfig changed:', newVal);
     iManager.pluginConfig = newVal;
     iManager.saveConfig();
 });
+
+const handePluginToggle = (pluginName) => {
+    console.log('handePluginToggle:', pluginName);
+    IPluginLoader.togglePlugin(pluginName);
+    toggledPlugin.value = true;
+}
+
+const refreshDuleToPlugin = {
+    name: 'refreshDuleToPlugin',
+    data: false,
+    type: 'iconbutton',
+    displayName: 'Refresh to apply plugin',
+    description: 'Application needs to be refreshed to apply plugin changes',
+    buttonName: 'Refresh',
+    t_displayName: {
+        zh_cn: '刷新以应用更改',
+        en: 'Refresh to apply plugin'
+    },
+    t_description: {
+        zh_cn: '应用更改需要刷新',
+        en: 'Application needs to be refreshed to apply plugin changes'
+    },
+    t_buttonName: {
+        zh_cn: '刷新',
+        en: 'Refresh'
+    },
+    icon: `                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                            <path
+                                d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z">
+                            </path>
+                        </svg>`,
+    onChange: (value) => {
+        const { ipcRenderer } = require('electron');
+        ipcRenderer.send('refresh-main-window');
+    }
+}
 
 
 const changeConfig = {

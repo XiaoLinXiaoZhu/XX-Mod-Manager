@@ -49,7 +49,8 @@
     "movedToPlugin": "The following functions are moved to plugins to continue to be provided",
     "managePlugin": "Plug-in management",
     "pluginList": "Plugin list",
-    "showDetail": "show configuration"
+    "showDetail": "show configuration",
+    "pluginListInfo": "After closing the plugin, the plugin will not be loaded the next time it is loaded."
   },
   "modInfo": {
     "emptyTitle": "Click on a mod card to view detailed information",
