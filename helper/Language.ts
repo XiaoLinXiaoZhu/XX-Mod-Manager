@@ -18,22 +18,22 @@ function setCurrentLanguage(language: Language) {
  * @param {string} cnText - 中文文本
  */
 class TranslatedText {
-    public enText : string;
-    public cnText : string;
+    public en : string;
+    public zh_cn : string;
 
     constructor(enText: string, cnText: string) {
-        this.enText = enText;
-        this.cnText = cnText;
+        this.en = enText;
+        this.zh_cn = cnText;
     }
 
     public getText(language: Language) {
         if (language === 'en') {
-            return this.enText;
+            return this.en;
         } else if (language === 'zh_cn') {
-            return this.cnText;
+            return this.zh_cn;
         }
 
-        return this.enText;
+        return this.en;
     }
 
     /** @function

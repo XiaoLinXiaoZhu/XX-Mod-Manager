@@ -7,7 +7,7 @@ const fs = require('fs');
  * @desc 用来提供便捷的路径操作，比如路径检查等。
  */
 class PathHelper {
-    constructor () {
+    constructor() {
         throw new Error("PathHelper can't be instantiated");
     }
 
@@ -18,9 +18,9 @@ class PathHelper {
      * @param {boolean} [snackError] - 是否弹出 snack 错误提示
      * @param {TranslatedText} [dirName] - 目录的名称
      * @returns {boolean} 是否存在
-     */ 
+     */
     static CheckDir(dir: string, createIfNotExist: boolean = false, snackError: boolean = true, dirName: TranslatedText) {
-        let resoult = 1; 
+        let resoult = 1;
         // 检查dir是否不为空且为string
         if (!dir || typeof dir !== 'string') {
             resoult = 0;
@@ -43,7 +43,7 @@ class PathHelper {
 
         if (resoult < 0) {
             // snack 错误提示
-            let tt : TranslatedText = new  TranslatedText("Unknown Error", "未知错误");
+            let tt: TranslatedText = new TranslatedText("Unknown Error", "未知错误");
             switch (resoult) {
                 case 0:
                     tt = new TranslatedText(`❌[${dirName.get() || ""}] dir is invalid: ${dir}`, `❌[${dirName.get() || ""}] 目录无效: ${dir}`);

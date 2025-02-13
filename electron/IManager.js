@@ -25,6 +25,8 @@ import ArchiveWASM from './lib/libarchive.wasm?url';
 import workerBound from './lib/worker-bundle.js?url';
 
 
+import { EventSystem } from '../helper/EventSystem';
+
 /**
  * snackbar 提示
  * @param {string} message 提示信息
@@ -66,7 +68,6 @@ class IManager {
         IManager.instance = this;
         this.data = {};
         this.plugins = {};
-        this.eventList = {};
 
         this.HMC = HMC
 
@@ -1268,44 +1269,17 @@ class IManager {
     }
 
     //-==================== 事件管理 ====================
-    // 所有的事件：
-    //----------生命周期----------
-    // wakeUp,initDone
-    //----------状态变更----------
-    // themeChange,languageChange,
-    // lastClickedModChanged,
-    // modInfoChanged,
-    // currentCharacterChanged,
-    // currentPresetChanged,
-    //----------事件节点----------
-    // modsApplied,addMod,addPreset,
-    // toggledMod: 这个事件是在 mod 的开关被切换时触发的，之前和 lastClickedModChanged 一起触发，现在单独触发
-
-    // lastClickedModChanged: 拆分为两个事件，一个是：currentModChanged，一个是：toggledMod
-
     // 注册事件
     async on(eventName, callback) {
-        if (!this.eventList[eventName]) {
-            this.eventList[eventName] = [];
-        }
-        this.eventList[eventName].push(callback);
-        //debug
-        // console.log(`event ${eventName} registered, all events:`);
-        // let result = '';
-        // for (const key in this.eventList) {
-        //     result += key + ':' + this.eventList[key].length + '\n';
-        // }
-        // console.log(result);
+        EventSystem.on(eventName, callback)
     }
 
     // 触发事件
     async trigger(eventName, data) {
-        if (this.eventList[eventName]) {
-            this.eventList[eventName].forEach((callback) => {
-                callback(data);
-            });
-        }
+        EventSystem.trigger(eventName, data)    
     }
+
+
 
     //-===================== 插件 =====================
     plugins = {};

@@ -45,6 +45,8 @@ class EventSystem {
             this.eventMap.set(event, []);
         }
         this.eventMap.get(event)?.push(callback);
+        // debug
+        // console.log('eventMap:', this.eventMap);
     }
 
     static async off(event: EventType, callback: Function) {

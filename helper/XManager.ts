@@ -324,6 +324,25 @@ class XManager {
         console.log('setWindowBounds:', bounds);
         ipcRenderer.invoke('set-bounds', JSON.stringify(bounds));
     }
+
+    //-====================== 对话框 ======================-//
+    async showDialog(dialogID) {
+        const dialog = document.getElementById(dialogID);
+        if (!dialog) {
+            console.log(`dialog ${dialogID} not found`);
+            return;
+        }
+        (dialog as any).show();
+    }
+
+    async dismissDialog(dialogID) {
+        const dialog = document.getElementById(dialogID);
+        if (!dialog) {
+            console.log(`dialog ${dialogID} not found`);
+            return;
+        }
+        (dialog as any).show();
+    }
 }
 
 

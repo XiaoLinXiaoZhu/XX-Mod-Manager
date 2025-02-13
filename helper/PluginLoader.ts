@@ -1,26 +1,69 @@
 //-===================== 插件 =====================
-const { ipcRenderer} = require('electron');
+const { ipcRenderer } = require('electron');
 import { EventType, EventSystem } from "./EventSystem";
 import { TranslatedText } from "./Language";
+import { PathHelper } from "./PathHelper";
 import { SnackType, t_snack } from "./SnackHelper";
 const pathOsName = 'path'
 const path = require(pathOsName);
 const fs = require('fs');
 
-class IPlugin {
-    public name: string;
-    public constructor() {
-        this.name = this.constructor.name;
-    }
-    public init = () => { };
+
+/** @enum
+ * @desc 用于标记插件数据的类型
+ */
+enum IPluginDataTypes {
+    markdown = 'markdown',
+    boolean = 'boolean',
+    path = 'path',
+    number = 'number',
+    button = 'button',
+    iconbutton = 'iconbutton',
+    select = 'select'
+}
+
+interface ITranslatedText {
+    zh_cn: string;
+    en: string;
+}
+
+interface IPluginOption {
+    value: string;
+    t_value: TranslatedText;
+}
+
+interface IPluginData {
+    name: string;
+    data: any;
+    type: IPluginDataTypes;
+    displayName: string;
+    description: string;
+    t_displayName: TranslatedText;
+    t_description: TranslatedText;
+    onChange?: (value: any) => void;
+
+    //-作为 button 类型的按钮   
+    buttonName?: string;
+    t_buttonName?: TranslatedText;
+
+    //-作为 iconbutton 类型的按钮
+    icon?: string;
+
+    //-作为 select 类型的选项
+    options?: IPluginOption[];
+}
+
+interface IPlugin {
+    name: string;
+    t_displayName: TranslatedText;
+    init: (enviroment) => void;
 }
 
 
 class IPluginLoader {
     public static plugins: IPlugin[] = [];
     public static disabledPluginNames: string[] = [];
-    public static pluginConfig: { [key: string]: any } = {};
-
+    public static pluginConfig: { [key: string]: IPluginData[] } = {};
 
     //-============= 自身初始化 =============-//
     public static clearAllPlugins() {
@@ -28,15 +71,6 @@ class IPluginLoader {
         IPluginLoader.disabledPluginNames = [];
         IPluginLoader.pluginConfig = {};
     }
-
-
-
-
-
-
-
-
-
 
 
     //-============= 方法 =============-//
@@ -70,10 +104,12 @@ class IPluginLoader {
 
     static async loadDisabledPlugins() {
         IPluginLoader.disabledPluginNames = await ipcRenderer.invoke('load-disabled-plugins');
+        // this.trigger('disabledPluginsLoaded', disabledPluginNames);
         // debug
         console.log('disabledPluginNames:', IPluginLoader.disabledPluginNames);
     }
 
+    //-============= 插件注册 =============-//
 
     /** @function
      * @desc 注册一个插件
@@ -131,6 +167,20 @@ class IPluginLoader {
         return true;
     }
 
+    static registerPluginConfig(pluginName: string, pluginConfig: IPluginData[]) {
+        // 如果 pluginConfig 不存在，则创建一个新的数组，否则将 pluginConfig 添加到 pluginConfig 中
+        if (IPluginLoader.pluginConfig[pluginName] === undefined) {
+            IPluginLoader.pluginConfig[pluginName] = pluginConfig;
+        }
+        else {
+            IPluginLoader.pluginConfig[pluginName] = IPluginLoader.pluginConfig[pluginName].concat(pluginConfig);
+        }
+
+        // debug
+        const tt = new TranslatedText(`🔧plugin ${pluginName} config registered`, `🔧插件 ${pluginName} 配置已注册`);
+        console.log(tt.get(), IPluginLoader.pluginConfig[pluginName]);
+    }
+
     /** @function
      * @desc 加载所有插件
      * @param {any} enviroment - 应当是XManager的实例，或者IManager的实例
@@ -142,20 +192,15 @@ class IPluginLoader {
 
         // 先加载内置的插件
         const builtInPluginPath = path.resolve('./plugins');
-        // 错误处理
-        if (!fs.existsSync(builtInPluginPath)) {
-            // snack('插件文件夹不存在 ' + builtInPluginPath);
-            const tt = new TranslatedText(`❌plugin folder not found: ${builtInPluginPath}`, `❌插件文件夹不存在: ${builtInPluginPath}`);
-            console.error(tt.get());
-            t_snack(tt, SnackType.error);
+        if (!PathHelper.CheckDir(builtInPluginPath, false, true, new TranslatedText('plugin folder', '插件文件夹'))) {
             return;
         }
         const builtInPlugins = fs.readdirSync(builtInPluginPath);
         builtInPlugins.forEach((pluginName) => {
             if (pluginName.endsWith('.js')) {
                 try {
-                    const plugin = require(path.join(builtInPluginPath, pluginName));
-                    this.registerPlugin(plugin, enviroment);
+                    const plugin: IPlugin = require(path.join(builtInPluginPath, pluginName)) as unknown as IPlugin;
+                    IPluginLoader.registerPlugin(plugin, enviroment);
                 }
                 catch (e) {
                     // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
@@ -171,14 +216,14 @@ class IPluginLoader {
         // 这里应该被视为全局插件 作用于所有的 游戏配置
         const userDataPath = await ipcRenderer.invoke('get-user-data-path');
         const pluginPath = path.join(userDataPath, 'plugins');
-        if (!fs.existsSync(pluginPath)) {
-            fs.mkdirSync(pluginPath);
+        if (!PathHelper.CheckDir(pluginPath, true, true, new TranslatedText('global plugin folder', '全局插件文件夹'))) {
+            return
         }
         const files = fs.readdirSync(pluginPath);
         files.forEach((file) => {
             if (file.endsWith('.js')) {
                 try {
-                    const plugin = require(path.join(pluginPath, file));
+                    const plugin: IPlugin = require(path.join(pluginPath, file)) as unknown as IPlugin;
                     this.registerPlugin(plugin, enviroment);
                 }
                 catch (e) {
@@ -194,7 +239,82 @@ class IPluginLoader {
         //debug 打印所有插件
         console.log(this.plugins);
     }
+
+    //-===================== 插件配置 =====================
+    /** @function
+     * @desc 保存单个插件的配置
+     * 保存的配置是 pluginData 里面的 data
+     * data 是一个对象，包含了 插件的配置数据,以{{配置名：配置值}}的形式保存
+     * @param {string} pluginName - 插件名称
+     * @param {IPluginData[]} pluginData - 插件配置
+     * @returns {Promise<void>}
+     * 该方法是异步的，不会阻塞主线程
+    */
+    static async SavePluginConfig(pluginName: string, pluginData: IPluginData[]) {
+        // pluginConfig 里面存储了 所有插件的配置 pluginData
+        // 每个 pluginData 是一个 数组 ，包含了 插件的配置
+        // 但是我们不需要保存 pluginData里面的所有数据，比如说显示名称，描述，onChange等，只需要保存 data
+        // data 是一个对象，包含了 插件的配置数据
+
+        const pluginDataToSave = {};
+        pluginData.forEach((data) => {
+            pluginDataToSave[data.name] = data.data;
+        });
+
+        // debug
+        const tt = new TranslatedText(`🔧plugin ${pluginName} config saved`, `🔧插件 ${pluginName} 配置已保存`
+        );
+        console.log(tt.get(), pluginName, pluginDataToSave);
+        ipcRenderer.invoke('save-plugin-config', pluginName, pluginDataToSave);
+    }
+
+    /** @function   
+     * @desc 保存所有插件的配置
+     * 保存的配置是 pluginData 里面的 data  
+     * data 是一个对象，包含了 插件的配置数据,以{{配置名：配置值}}的形式保存
+    */
+    static async SaveAllPluginConfig() {
+        for (const pluginName in IPluginLoader.pluginConfig) {
+            IPluginLoader.SavePluginConfig(pluginName, IPluginLoader.pluginConfig[pluginName]);
+        }
+    }
+
+    /** @function
+     * @desc 保存所有插件的配置，同步版本
+     * 保存的配置是 pluginData 里面的 data  
+     * data 是一个对象，包含了 插件的配置数据,以{{配置名：配置值}}的形式保存
+     * 该方法是同步的，会阻塞主线程
+     * 一般用于程序退出时保存配置
+    */
+    static SaveAllPluginConfigSync() {
+        for (const pluginName in this.pluginConfig) {
+            const pluginData = this.pluginConfig[pluginName];
+            const localPluginData = {};
+            pluginData.forEach((data) => {
+                localPluginData[data.name] = data.data;
+            });
+            console.log('savePluginConfig:', pluginName, localPluginData);
+            ipcRenderer.invoke('save-plugin-config', pluginName, localPluginData);
+        }
+    }
+
+    //-===================== 插件接口 =====================
+    static getPluginData(pluginName:string, dataName:string){
+        const pluginData = this.pluginConfig[pluginName];
+        const data = pluginData.find((data) => data.name === dataName);
+        return data ? data.data : undefined;
+    }
+
+    static setPluginData(pluginName:string, dataName:string, value:any){
+        const pluginData = this.pluginConfig[pluginName];
+        const data = pluginData.find((data) => data.name === dataName);
+        if (data && data.onChange) {
+            data.onChange(value);
+        }
+    }
 }
+
+
 
 
 
