@@ -6,9 +6,7 @@
         <div slot="image" style="height: 200px;" v-if="ifDisplayImage">
             <img id="editDialog-mod-info-image"
                 style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" alt="Mod Image"
-                :src="img" v-if="!props.lazyLoad || enteredWindow || img != null">
-            <s-skeleton id="editDialog-mod-info-image"
-                style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" v-else />
+                :src="img || !lazyLoad ? img : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D'" @load="enterWindow" />
         </div>
 
         <div slot="headline" id="mod-item-headline">{{ props.modRef.name }}</div>
@@ -66,13 +64,14 @@ const ifDisplayImage = ref(true);
 const img = ref(null);
 
 const getImage = async () => {
+    // return 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
     // 直到需要时才加载图片，加载后保存到 img.value
     // 检查 props.modRef 是否存在
     if (props.lazyLoad) {
         if (props.modRef.preview == null) {
             //如果没有预览图片，则不显示图片
             ifDisplayImage.value = false;
-            return "NO_PREVIEW";
+            return '';
         }
         ifDisplayImage.value = true;
         return await props.modRef.getPreviewBase64(true);   
@@ -81,6 +80,13 @@ const getImage = async () => {
         return await props.modRef.getPreviewBase64(true);
     }
 }
+
+onMounted(() => {
+    //加载图片
+    props.modRef.getPreviewBase64(true).then((res) => {
+        img.value = res;
+    });
+})  
 
 EventSystem.on('addMod',(mod)=>{
     console.log(`modItem ${props.mod} received addMod event`,enteredWindow.value,props.lazyLoad,img.value == null);

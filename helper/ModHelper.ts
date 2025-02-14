@@ -52,14 +52,6 @@ class ModData {
             // this.modPreviewBase64 = "";
             this.modPreviewBase64WithHeader.clear();
         });
-
-        // 偷偷把图片的base64缓存起来
-        if(this.preview){
-            this.getPreviewBase64(true);
-        }
-        // setTimeout(async () => {
-
-        // }, 0);
     }
 
     setModSourcePath(modSourcePath: string) {

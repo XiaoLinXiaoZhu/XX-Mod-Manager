@@ -5,7 +5,7 @@
         <s-scroll-view style="overflow-x:hidden;overflow-y: auto;border-radius: 0 0 10px 10px;">
             <div class="refresh-placeholder" ref="refreshPlaceholderRef"></div>
             <div id="mod-container" :compact="compactMode" ref="modContainerRef">
-                <modCard v-for="mod in mods" :modRef="mod" :lazyLoad=true :compactMode="compactMode" :ref="setModCardRef(mod.name)" />
+                <modCard v-for="mod in mods" :modRef="mod" :lazyLoad=ture :compactMode="compactMode" :ref="setModCardRef(mod.name)" />
             </div>
             <div class="placeholder"></div>
         </s-scroll-view>
@@ -29,7 +29,7 @@ const props = defineProps({
 });
 
 // 定义 mods 变量
-const mods = ref(null);
+const mods = ref([]);
 const characters = ref(['all', 'selected']);
 const translateCharacters = ref(['全部', '已选择']);
 const characterFilterRef = useTemplateRef('characterFilterRef');
@@ -37,9 +37,11 @@ const currentCharacter = ref('all');
 
 // 定义 loadMods 方法
 const loadMods = async () => {
-    // mods.value = iManager.data.modList
     characters.value = ['all', 'selected', ...iManager.data.characterList];
     currentCharacter.value = 'all';
+
+    mods.value = iManager.data.modList
+
     // 检查是否选择了预设，如果选择了预设，则加载预设
     if (iManager.temp.currentPreset && iManager.temp.currentPreset != 'default') {
         await loadPreset(iManager.temp.currentPreset);
