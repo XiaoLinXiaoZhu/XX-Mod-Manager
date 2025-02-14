@@ -43,11 +43,13 @@
 import 'sober'
 import { useTemplateRef, computed, defineProps, onMounted, ref, watch } from 'vue'
 import IManager from '../../electron/IManager';
-import { snack } from '../../helper/SnackHelper';
-import horizontalScrollBar from './horizontalScrollBar.vue';
 const iManager = new IManager();
+
+import horizontalScrollBar from './horizontalScrollBar.vue';
+
 import { EventSystem, EventType } from '../../helper/EventSystem';
 import { ModData } from '../../helper/ModHelper';   
+import { DialogHelper,DialogID } from '../../helper/DialogHelper';
 
 const props = defineProps({
     modRef: {
@@ -136,7 +138,8 @@ const click = (event) => {
 
 const openEditModDialog = () => {
     iManager.setCurrentMod(props.modRef);
-    iManager.showDialog('edit-mod-dialog');
+    // iManager.showDialog('edit-mod-dialog');
+    DialogHelper.showDialog(DialogID.editModDialog);
 }
 
 function playClickAnim(modItem, event = null, rect = null) {

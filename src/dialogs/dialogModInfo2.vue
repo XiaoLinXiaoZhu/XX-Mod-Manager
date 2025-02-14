@@ -229,7 +229,7 @@ const img = ref(null);
 
 // 需要显示的mod发生变化时，更新 临时mod信息
 watch(() => props.mod, async (newVal) => {
-  console.log('mod changed', newVal);
+  console.log('[dialogModInfo2] watch props.mod changed', newVal.name);
   // 检查newVal 的类型，应当为 ModData 类型，如果不是则尝试转化为 ModData 类型
   if (!newVal instanceof ModData) {
     console.error('mod is not a ModData instance');

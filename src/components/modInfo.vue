@@ -1,8 +1,8 @@
 <template>
     <div class="mod-info-card OO-box" ref="modInfoRef">
-        <div class="mod-title">{{ modInfo ? modInfo.name : $t('modInfo.emptyTitle') }}</div>
+        <div class="mod-title">{{ props.mod ? props.mod.name : $t('modInfo.emptyTitle') }}</div>
         <div class="mod-character OO-color-gradient">
-            <p> {{ modInfo ? modInfo.character : $t('modInfo.emptyCharacter') }}</p>
+            <p> {{ props.mod ? props.mod.character : $t('modInfo.emptyCharacter') }}</p>
         </div>
         <div class="mod-image">
             <img style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;"
@@ -10,9 +10,9 @@
         </div>
 
         <s-scroll-view class="mod-info-content">
-            <h4 v-if="modInfo && modInfo.hotkeys && modInfo.hotkeys.length > 0"> {{ $t('modInfo.hotkeys') }}</h4>
+            <h4 v-if="props.mod && props.mod.hotkeys && props.mod.hotkeys.length > 0"> {{ $t('modInfo.hotkeys') }}</h4>
             <div id="hotkey-container" class="OO-colunm-center">
-                <div v-for="hotkey in modInfo ? modInfo.hotkeys : []" class="hotkey OO-setting-bar OO-shade-box a-little-left" style="margin-bottom: 5px;">
+                <div v-for="hotkey in props.mod ? props.mod.hotkeys : []" class="hotkey OO-setting-bar OO-shade-box a-little-left" style="margin-bottom: 5px;">
                     <h3>{{ hotkey.description }}</h3>
                     <h3>{{ hotkey.key }}</h3>
                 </div>
@@ -23,7 +23,7 @@
             <div class="OO-box OO-shade-box a-little-left" id="mod-info-description">
 
                 <p id="mod-description" style="white-space: normal;">
-                    {{ modInfo ? modInfo.description : $t('modInfo.emptyDescription') }}
+                    {{ props.mod ? props.mod.description : $t('modInfo.emptyDescription') }}
                 </p>
             </div>
             <div class="placeholder"></div>
@@ -59,64 +59,52 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, useTemplateRef, onMounted, ref, watch } from 'vue';
-import IManager from '../../electron/IManager';
-const iManager = new IManager();
+import { defineProps, ref, watch } from 'vue';
 import fsProxy from '../../electron/fsProxy';
-const fs = new fsProxy();
-
+const fsproxy = new fsProxy();
+import { ModData } from '../../helper/ModHelper';
+import { snack } from '../../helper/SnackHelper';
+import { DialogID , DialogHelper } from '../../helper/DialogHelper';
 // 导入 i18n 的 t 函数
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 const props = defineProps({
-    mod: Object,
+    mod: {
+        type: ModData,
+        default: null
+    }
 });
-
-const modInfo = ref(null);
 const img = ref(null);
 
-const emit = defineEmits(['clickEditButton']);
+watch(() => props.mod, (newMod) => {
+    if (newMod == null) {
+        img.value = null;
+        return;
+    }
+    newMod.getPreviewBase64(true).then((base64) => {
+        img.value = base64;
+    }); 
+});
+
+// const emit = defineEmits(['clickEditButton']);
 
 const editMod = () => {
     if (props.mod == null) {
-        iManager?.snack(t('no-mod-selected'), 'error');
+        snack(t('no-mod-selected'), 'error');
         return;
     }
-
-    iManager.showDialog('edit-mod-dialog');
-    //emit('clickEditButton');
+    DialogHelper.showDialog(DialogID.editModDialog);
 };
 
-const openModFolder = () => {
+const openModFolder = async () => {
     //ipcRenderer.send('open-url', props.mod?.url);
     if (props.mod == null) {
-        iManager?.snack(t('no-mod-selected'), 'error');
+        snack(t('no-mod-selected'), 'error');
         return;
     }
-    fs.openDir(iManager.config.modSourcePath + '/' + props.mod.name);
-    
-
+    fsproxy.openDir(await props.mod.getModPath());
 };
-
-const modInfoRef = useTemplateRef("modInfoRef");
-const setDisplayMod = async (mod) => {
-    if (mod == null) {
-        return;
-    }
-
-    modInfo.value = mod;
-
-    console.log(`set mod: ${mod.name}, set mod info: ${modInfo.value}, hotkeys: ` ,modInfo.value.hotkeys);
-
-    iManager.getImageBase64(modInfo.value.preview).then((imgBase64) => {
-        img.value = "data:image/png;base64," + imgBase64;
-    });
-};
-
-watch(() => props.mod, (newMod) => {
-    setDisplayMod(newMod);
-});
 
 </script>
 

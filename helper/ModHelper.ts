@@ -200,6 +200,18 @@ class ModData {
         this.modPreviewBase64 = data;
         return ifWithHeader ? "data:image/png;base64," + data : data;
     }
+    
+    public async getModPath() {
+        await this.checkModSourcePath();
+        return path.join(this.modSourcePath, this.name);
+    }
+
+
+
+
+
+
+    //-========== 触发事件 ===========
     public async triggerChanged(){
         EventSystem.trigger(EventType.modInfoChanged, this);
     }

@@ -23,7 +23,7 @@
         </leftMenu>
         <modCardManager id="mod-card-manager" :compactMode="compactMode" ref="modCardManagerRef">
         </modCardManager>
-        <modInfo :mod="lastClickedMod"></modInfo>
+        <modInfo :mod="displayModRef"></modInfo>
     </div>
 
     <div class="bottom">
@@ -70,7 +70,7 @@
 import modCardManager from '../components/modCardManager.vue'
 import leftMenu from '../components/leftMenu.vue';
 import modInfo from '../components/modInfo.vue';
-import { ref, onMounted, useTemplateRef } from 'vue';
+import { ref, onMounted, useTemplateRef,watch } from 'vue';
 import IManager from '../../electron/IManager';
 import fsProxy from '../../electron/fsProxy';
 const iManager = new IManager();
@@ -78,7 +78,11 @@ const fsproxy = new fsProxy();
 import { EventType, EventSystem } from '../../helper/EventSystem';
 
 //-============================== 事件处理 ==============================
-const lastClickedMod = ref(null);
+const displayModRef = ref(iManager.temp.lastClickedMod);
+EventSystem.on('currentModChanged', (mod) => {
+    displayModRef.value = mod;  
+    console.log('set mod info display to', mod.name);
+});
 
 function handlePresetManageButtonClicked() {
     console.log('preset manage button clicked');
@@ -170,14 +174,14 @@ EventSystem.on(EventType.initDone, (iManager) => {
     presets.value = list;
     // loadPresetList();
 });
-EventSystem.on('currentModChanged', (mod) => {
-    lastClickedMod.value = null;
-    setTimeout(() => {
-        lastClickedMod.value = mod;
-    }, 1);
-    //debug
-    console.log('set mod info display to', mod.name);
-});
+// EventSystem.on('currentModChanged', (mod) => {
+//     lastClickedMod.value = null;
+//     setTimeout(() => {
+//         lastClickedMod.value = mod;
+//     }, 1);
+//     //debug
+//     console.log('set mod info display to', mod.name);
+// });
 
 EventSystem.on('toggledMod', (mod) => {
     //debug

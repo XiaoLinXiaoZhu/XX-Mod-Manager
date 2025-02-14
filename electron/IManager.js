@@ -31,6 +31,8 @@ import { IPluginLoader } from '../helper/PluginLoader';
 import { PathHelper } from '../helper/PathHelper';
 // 导入 ModHelper
 import { ModData } from '../helper/ModHelper';
+// 导入 DialogHelper
+import { DialogID ,DialogHelper } from '../helper/DialogHelper';
 
 // // 导入 hmc-win32
 const HMC_Name = 'hmc-win32';
@@ -230,23 +232,8 @@ class IManager {
         return data;
     }
 
-    async showDialog(dialogID) {
-        const dialog = document.getElementById(dialogID);
-        if (!dialog) {
-            console.log(`dialog ${dialogID} not found`);
-            return;
-        }
-        dialog.show();
-    }
-
-    async dismissDialog(dialogID) {
-        const dialog = document.getElementById(dialogID);
-        if (!dialog) {
-            console.log(`dialog ${dialogID} not found`);
-            return;
-        }
-        dialog.dismiss();
-    }
+    showDialog = DialogHelper.showDialog;
+    dismissDialog = DialogHelper.dismissDialog;
     //-==================== 生命周期 ====================
     // 初始化
     async init() {
