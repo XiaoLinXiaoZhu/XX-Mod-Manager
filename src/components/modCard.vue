@@ -6,7 +6,7 @@
         <div slot="image" style="height: 200px;" v-if="ifDisplayImage">
             <img id="editDialog-mod-info-image"
                 style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" alt="Mod Image"
-                :src="img || !lazyLoad ? img : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D'" @load="enterWindow" />
+                :src="img || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D'" @load="enterWindow" />
         </div>
 
         <div slot="headline" id="mod-item-headline">{{ props.modRef.name }}</div>
@@ -81,12 +81,12 @@ const getImage = async () => {
     }
 }
 
-onMounted(() => {
-    //加载图片
-    props.modRef.getPreviewBase64(true).then((res) => {
-        img.value = res;
-    });
-})  
+// onMounted(() => {
+//     //加载图片
+//     props.modRef.getPreviewBase64(true).then((res) => {
+//         img.value = res;
+//     });
+// })  
 
 EventSystem.on('addMod',(mod)=>{
     console.log(`modItem ${props.mod} received addMod event`,enteredWindow.value,props.lazyLoad,img.value == null);
@@ -95,9 +95,9 @@ EventSystem.on('addMod',(mod)=>{
 //==================== init ====================//
 
 const enterWindow = async () => {
+    // console.log(`modItem ${props.mod} enterWindow: lazyLoad, img loaded`);
     enteredWindow.value = true;
     if (props.lazyLoad && img.value == null) {
-        //如果是懒加载模式，且图片未加载，则加载图片
         img.value = await getImage();
     }
 }

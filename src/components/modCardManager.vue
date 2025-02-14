@@ -5,7 +5,7 @@
         <s-scroll-view style="overflow-x:hidden;overflow-y: auto;border-radius: 0 0 10px 10px;">
             <div class="refresh-placeholder" ref="refreshPlaceholderRef"></div>
             <div id="mod-container" :compact="compactMode" ref="modContainerRef">
-                <modCard v-for="mod in mods" :modRef="mod" :lazyLoad=ture :compactMode="compactMode" :ref="setModCardRef(mod.name)" />
+                <modCard v-for="mod in mods" :modRef="mod" :lazyLoad=true :compactMode="compactMode" :ref="setModCardRef(mod.name)" />
             </div>
             <div class="placeholder"></div>
         </s-scroll-view>
