@@ -4,6 +4,23 @@ const { ipcRenderer } = require('electron');
 
 import { EventType,EventSystem } from "./EventSystem";
 import { SnackType,snack,t_snack } from "./SnackHelper";
+
+
+class ImageBase64 {
+    private base64WithHeader: string = "";
+    public get = () => this.base64WithHeader;
+    public set = (base64WithHeader: string) => this.base64WithHeader = base64WithHeader;
+
+    public withoutHeader = () => this.base64WithHeader.split(',')[1];
+    public getExt = () => this.base64WithHeader.split(";")[0].split("/")[1];
+    public clear = () => this.base64WithHeader = "";
+    public isEmpty = () => this.base64WithHeader === "";
+
+    constructor(base64WithHeader: string) {
+        this.base64WithHeader = base64WithHeader;
+    }
+}
+
 class ModData {
     public name: string;
     public character: string;
@@ -14,7 +31,8 @@ class ModData {
 
     private modSourcePath: string = ""; // mod的源路径
     private oldPreview = ""; // 旧的预览图的路径
-    public modPreviewBase64: string = ""; // mod的预览图的base64
+    // public modPreviewBase64: string = ""; // mod的预览图的base64，不包含头部
+    public modPreviewBase64WithHeader: ImageBase64 = new ImageBase64(""); // mod的预览图的base64，包含头部
     constructor(name: string, character: string, description: string, url: string, preview: string, hotkeys: {key: string;description: string;}[]) {
         this.name = name;
         this.character = character;
@@ -25,12 +43,14 @@ class ModData {
 
         this.modSourcePath = "";
         this.oldPreview = "";
-        this.modPreviewBase64 = "";
+        // this.modPreviewBase64 = "";
+        this.modPreviewBase64WithHeader = new ImageBase64("");
 
         // 当进入休眠状态时，清空缓存
-        EventSystem.on(EventType.windowSleep, () => {
+        EventSystem.on(EventType.windowSleep, async() => {
             this.oldPreview = "";
-            this.modPreviewBase64 = "";
+            // this.modPreviewBase64 = "";
+            this.modPreviewBase64WithHeader.clear();
         });
     }
 
@@ -94,6 +114,7 @@ class ModData {
             throw new Error("ModData.setPreviewBase64: modSourcePath does not exist");  
         }
     }
+
     public async setPreviewByPath(previewPath: string) {
         await this.checkModSourcePath();
         const modSourcePath = this.modSourcePath;
@@ -106,7 +127,8 @@ class ModData {
 
         // 清除旧的预览图
         this.oldPreview = "";
-        this.modPreviewBase64 = "";
+        // this.modPreviewBase64 = "";
+        this.modPreviewBase64WithHeader.clear();
     }
 
     public async setPreviewByBase64(previewBase64: string) {
@@ -114,19 +136,17 @@ class ModData {
         await this.checkModSourcePath();
 
         const modSourcePath = this.modSourcePath;
+        this.modPreviewBase64WithHeader.set(previewBase64);
 
-        const imageExt = previewBase64.split(";")[0].split("/")[1];
-        const modImageName = `preview.${imageExt}`;
-        const imageDest = path.join(modSourcePath, this.name, modImageName)
+        const imageDest = path.join(modSourcePath, this.name, `preview.${this.modPreviewBase64WithHeader.getExt()}`);
 
-        fs.writeFileSync(imageDest, previewBase64.split(',')[1], 'base64');
+        fs.writeFileSync(imageDest, this.modPreviewBase64WithHeader.withoutHeader(), 'base64');
 
         //debug
         this.preview = imageDest;
 
-        // 下次获取预览图时，直接返回这个base64，但是要注意去掉头部
+        // 下次获取预览图时，直接返回这个base64
         this.oldPreview = imageDest;
-        this.modPreviewBase64 = previewBase64.split(',')[1];
 
         // snack提示
         snack(`Updated cover for ${this.name}`, SnackType.info);
@@ -145,7 +165,8 @@ class ModData {
         this.hotkeys = newModData.hotkeys;
 
         this.oldPreview = "";
-        this.modPreviewBase64 = "";
+        // this.modPreviewBase64 = "";
+        this.modPreviewBase64WithHeader.clear();
 
         return this;
     }
@@ -182,23 +203,16 @@ class ModData {
 
     //-========== 获取mod信息 ===========
     public async getPreviewBase64(ifWithHeader: boolean = false) {
-        // await this.checkModSourcePath();
-        // const data = await ipcRenderer.invoke('get-image', this.preview);
-        // if (ifWithHeader) {
-        //     return "data:image/png;base64," + data;
-        // }
-        // return data;  
-
+        // 优化,改为使用ImageBase64类
         if(!this.preview){
             return "";
         }
-        if(this.preview === this.oldPreview && this.modPreviewBase64){
-            return ifWithHeader ? "data:image/png;base64," + this.modPreviewBase64 : this.modPreviewBase64;
+        if(this.preview === this.oldPreview && !this.modPreviewBase64WithHeader.isEmpty()){
+            return ifWithHeader ? this.modPreviewBase64WithHeader.get() : this.modPreviewBase64WithHeader.withoutHeader();
         }
         this.oldPreview = this.preview;
-        const data = await ipcRenderer.invoke('get-image', this.preview);
-        this.modPreviewBase64 = data;
-        return ifWithHeader ? "data:image/png;base64," + data : data;
+        this.modPreviewBase64WithHeader.set("data:image/png;base64," + await ipcRenderer.invoke('get-image', this.preview));
+        return ifWithHeader ? this.modPreviewBase64WithHeader.get() : this.modPreviewBase64WithHeader.withoutHeader();
     }
     
     public async getModPath() {

@@ -86,18 +86,6 @@ EventSystem.on('addMod',(mod)=>{
     console.log(`modItem ${props.mod} received addMod event`,enteredWindow.value,props.lazyLoad,img.value == null);
 })
 
-// EventSystem.on(EventType.windowSleep,()=>{
-//     enteredWindow.value = false;
-//     if (props.lazyLoad){
-//         ifDisplayImage.value = false; 
-//     }
-// })
-
-// EventSystem.on(EventType.windowWake,()=>{
-//     enteredWindow.value = true;
-//     ifDisplayImage.value = true;
-// })
-
 //==================== init ====================//
 
 const enterWindow = async () => {
@@ -107,10 +95,6 @@ const enterWindow = async () => {
         img.value = await getImage();
     }
 }
-
-onMounted(()=>{
-
-})
 
 
 //===================== 动画效果 =====================//

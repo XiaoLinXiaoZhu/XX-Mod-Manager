@@ -373,7 +373,7 @@ class IManager {
     async setCurrentModByName(modName) {
         this.temp.currentMod = await this.getModInfo(modName);
         //debug
-        console.log(`setCurrentModByName: ${modName}`, this.temp.currentMod,this.hashCode(this.temp.currentMod.print()));
+        console.log(`setCurrentModByName: ${modName}`, this.temp.currentMod,this.hashCode(this.temp.currentMod));
         this.trigger('currentModChanged', this.temp.currentMod);
     }
 
