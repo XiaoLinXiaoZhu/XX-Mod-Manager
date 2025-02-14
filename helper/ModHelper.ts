@@ -14,7 +14,7 @@ class ModData {
 
     private modSourcePath: string = ""; // mod的源路径
     private oldPreview = ""; // 旧的预览图的路径
-    private modPreviewBase64: string = ""; // mod的预览图的base64
+    public modPreviewBase64: string = ""; // mod的预览图的base64
     constructor(name: string, character: string, description: string, url: string, preview: string, hotkeys: {key: string;description: string;}[]) {
         this.name = name;
         this.character = character;

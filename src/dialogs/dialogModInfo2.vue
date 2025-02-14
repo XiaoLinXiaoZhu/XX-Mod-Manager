@@ -292,7 +292,7 @@ const handleSave = () => {
   }
 
   // 保存修改的 mod 信息
-  const savedMod = props.mod.editModInfo(tempModInfo.value);
+  props.mod.editModInfo(tempModInfo.value);
 
   if (needChangePreview) {
     props.mod.setPreviewByPath(tempModInfo.value.preview);
@@ -302,13 +302,13 @@ const handleSave = () => {
     props.mod.setPreviewByBase64(img.value);
   }
 
-  tempModInfo.value = savedMod.copy();
+  tempModInfo.value = props.mod.copy();
   saved = true;
 
-  savedMod.saveModInfo();
-  
-  savedMod.triggerChanged();
-  savedMod.triggerCurrentModChanged();
+  props.mod.saveModInfo();
+
+  props.mod.triggerChanged();
+  props.mod.triggerCurrentModChanged();
 }
 
 let changdPreviewByPaste = false;

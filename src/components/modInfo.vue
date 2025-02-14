@@ -6,7 +6,7 @@
         </div>
         <div class="mod-image">
             <img style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;"
-                alt="t('mod-image')" :src="img? img : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D'" />
+                alt="t('mod-image')" :src="img" />
         </div>
 
         <s-scroll-view class="mod-info-content">
@@ -67,6 +67,7 @@ import { snack } from '../../helper/SnackHelper';
 import { DialogID , DialogHelper } from '../../helper/DialogHelper';
 // 导入 i18n 的 t 函数
 import { useI18n } from 'vue-i18n';
+import { EventSystem, EventType } from '../../helper/EventSystem';
 const { t } = useI18n();
 
 const props = defineProps({
@@ -75,7 +76,7 @@ const props = defineProps({
         default: null
     }
 });
-const img = ref(null);
+const img = ref('data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D');
 
 watch(() => props.mod, (newMod) => {
     if (newMod == null) {
@@ -85,6 +86,10 @@ watch(() => props.mod, (newMod) => {
     newMod.getPreviewBase64(true).then((base64) => {
         img.value = base64;
     }); 
+});
+
+watch(() => props.mod?.modPreviewBase64, (base64) => {
+    img.value = "data:image/png;base64," + base64;
 });
 
 // const emit = defineEmits(['clickEditButton']);
