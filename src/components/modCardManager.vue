@@ -5,9 +5,7 @@
         <s-scroll-view style="overflow-x:hidden;overflow-y: auto;border-radius: 0 0 10px 10px;">
             <div class="refresh-placeholder" ref="refreshPlaceholderRef"></div>
             <div id="mod-container" :compact="compactMode" ref="modContainerRef">
-                <modCard v-for="mod in mods" :modRef="mod" :key="mod.name" :mod="mod.name" :character="mod.character"
-                    :description="mod.description" :hotKeys="mod.hotkeys" :lazyLoad=true :imagePath="mod.preview"
-                    :compactMode="compactMode" :ref="setModCardRef(mod.name)" />
+                <modCard v-for="mod in mods" :modRef="mod" :lazyLoad=true :compactMode="compactMode" :ref="setModCardRef(mod.name)" />
             </div>
             <div class="placeholder"></div>
         </s-scroll-view>
@@ -62,9 +60,7 @@ const setModCardRef = (name) => (el) => {
 // 定义 handleFilterChange 方法
 const handleFilterChange = (character) => {
     currentCharacter.value = character;
-
     changeFilter(character);
-
     iManager.setCurrentCharacter(character);
 };
 
