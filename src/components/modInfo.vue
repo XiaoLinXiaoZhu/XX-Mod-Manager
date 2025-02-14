@@ -6,7 +6,7 @@
         </div>
         <div class="mod-image">
             <img style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;"
-                alt="t('mod-image')" :src="img" />
+                :alt="t('mod-image')" :src="img" />
         </div>
 
         <s-scroll-view class="mod-info-content">
@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import { defineProps, ref, watch } from 'vue';
+import { computed, defineProps, ref, watch } from 'vue';
 import fsProxy from '../../electron/fsProxy';
 const fsproxy = new fsProxy();
 import { ModData } from '../../helper/ModHelper';
@@ -77,7 +77,6 @@ const props = defineProps({
     }
 });
 const img = ref('data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D');
-
 watch(() => props.mod, (newMod) => {
     if (newMod == null) {
         img.value = null;
@@ -85,11 +84,17 @@ watch(() => props.mod, (newMod) => {
     }
     newMod.getPreviewBase64(true).then((base64) => {
         img.value = base64;
-    }); 
+    });
 });
 
-watch(() => props.mod?.modPreviewBase64, (base64) => {
-    img.value = "data:image/png;base64," + base64;
+EventSystem.on(EventType.modInfoChanged,(mod) => {
+    if (mod.name == props.mod.name) {
+        setTimeout(() => {
+            props.mod.getPreviewBase64(true).then((base64) => {
+                img.value = base64;
+            });
+        }, 1);
+    }
 });
 
 // const emit = defineEmits(['clickEditButton']);

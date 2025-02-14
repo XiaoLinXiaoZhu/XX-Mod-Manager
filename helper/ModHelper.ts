@@ -125,7 +125,7 @@ class ModData {
         this.preview = imageDest;
 
         // 下次获取预览图时，直接返回这个base64，但是要注意去掉头部
-        this.oldPreview = imageDest;    
+        this.oldPreview = imageDest;
         this.modPreviewBase64 = previewBase64.split(',')[1];
 
         // snack提示

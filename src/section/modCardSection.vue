@@ -81,7 +81,8 @@ import { EventType, EventSystem } from '../../helper/EventSystem';
 const displayModRef = ref(iManager.temp.lastClickedMod);
 EventSystem.on('currentModChanged', (mod) => {
     displayModRef.value = mod;  
-    console.log('set mod info display to', mod.name);
+    //debug
+    console.log('set mod info display to', mod,iManager.hashCode(mod.print()));
 });
 
 function handlePresetManageButtonClicked() {

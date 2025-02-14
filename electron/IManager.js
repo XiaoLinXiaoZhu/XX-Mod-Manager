@@ -373,7 +373,7 @@ class IManager {
     async setCurrentModByName(modName) {
         this.temp.currentMod = await this.getModInfo(modName);
         //debug
-        console.log(`setCurrentModByName: ${modName}`, this.temp.currentMod);
+        console.log(`setCurrentModByName: ${modName}`, this.temp.currentMod,this.hashCode(this.temp.currentMod.print()));
         this.trigger('currentModChanged', this.temp.currentMod);
     }
 
@@ -502,13 +502,6 @@ class IManager {
                 this.handleImageDrop(file);
                 return;
             }
-            // if (file.name.endsWith('.zip') || file.type === 'application/zip' || file.type === 'application/x-compressed') {
-            //     // debug
-            //     console.log(`Zip file: ${file.name}`);
-            //     // 交给 handleZipDrop 处理
-            //     this.handleZipDrop(file);
-            //     return;
-            // }
             // 通过使用 libarchive 处理 压缩文件，它能够支持所有的压缩文件
             if (file.name.endsWith('.zip') || file.name.endsWith('.rar') || file.name.endsWith('.7z') || file.type === 'application/zip' || file.type === 'application/x-compressed' || file.type === 'application/x-tar' || file.type === 'application/x-gzip') {
                 // debug
@@ -933,7 +926,7 @@ class IManager {
         }
         //debug
         console.log(`update mod card cover of`, modInfo);
-        const modImageDest = modInfo.setPreviewByBase64(previewBase64, this.config.modSourcePath);
+        const modImageDest = modInfo.setPreviewByBase64(previewBase64);
 
         // 保存到本地
         modInfo.saveModInfo();
