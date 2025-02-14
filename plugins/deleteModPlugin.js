@@ -138,18 +138,18 @@ module.exports = {
     },
     init(iManager){
 
-        iManager.waitInit().then(() => {
-            // debug
-            const ifAble = iManager.getPluginData(pluginName, 'ifAblePlugin')
-            iManager.t_snack({
-                zh_cn: '删除mod插件 从 '+__dirname + ' 加载 启用状态: '+ (ifAble? '是':'否'),
-                en: 'deleteModPlugin Loaded from '+__dirname + ' ifAble:'+ifAble
-            }, 'info');
-            if (ifAble) {
-                addDeleteButton(iManager);
-            }
-        }
-        );
+        // iManager.waitInit().then(() => {
+        //     // debug
+        //     const ifAble = iManager.getPluginData(pluginName, 'ifAblePlugin')
+        //     iManager.t_snack({
+        //         zh_cn: '删除mod插件 从 '+__dirname + ' 加载 启用状态: '+ (ifAble? '是':'否'),
+        //         en: 'deleteModPlugin Loaded from '+__dirname + ' ifAble:'+ifAble
+        //     }, 'info');
+        //     if (ifAble) {
+        //         addDeleteButton(iManager);
+        //     }
+        // }
+        // );
 
 
 
