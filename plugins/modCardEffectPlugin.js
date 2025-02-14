@@ -259,7 +259,7 @@ module.exports = {
                 en: 'Hover Switch Current Card'
             },
             t_description: {
-                zh_cn: '当鼠标悬停在mod卡片上时，左侧的卡片详情会切换到当前卡片',
+                zh_cn: '当鼠标悬停在mod卡片上时，右侧的卡片详情会切换到当前卡片',
                 en: 'If true, the details of the current card will be switched when hover on the mod card'
             },
             onChange: (value) => {

@@ -101,13 +101,13 @@ function addDeleteButton(iManager){
 
     // 单击时弹出提示
     deleteButton.onclick = () => {
-        const modName = document.getElementById('edit-mod-name')?.innerHTML || 'error';
+        const modName = document.getElementById('edit-mod-name').innerHTML;
         iManager.snack('双击以删除mod: '+modName, 'info');
     }
 
     // 双击时删除mod
     deleteButton.ondblclick = () => {
-        const modName = document.getElementById('edit-mod-name')?.innerHTML || 'error';
+        const modName = document.getElementById('edit-mod-name').innerHTML;
         deleteMod(iManager, modName);
     }
 
@@ -138,24 +138,21 @@ module.exports = {
     },
     init(iManager){
 
-        // iManager.waitInit().then(() => {
-        //     // debug
-        //     const ifAble = iManager.getPluginData(pluginName, 'ifAblePlugin')
-        //     iManager.t_snack({
-        //         zh_cn: '删除mod插件 从 '+__dirname + ' 加载 启用状态: '+ (ifAble? '是':'否'),
-        //         en: 'deleteModPlugin Loaded from '+__dirname + ' ifAble:'+ifAble
-        //     }, 'info');
-        //     if (ifAble) {
-        //         addDeleteButton(iManager);
-        //     }
-        // }
-        // );
+        iManager.waitInit().then(() => {
+            // debug
+            const ifAble = iManager.getPluginData(pluginName, 'ifAblePlugin')
+            iManager.snack('deleteModPlugin Loaded from '+__dirname + ' ifAble:'+ifAble);
+            if (ifAble) {
+                addDeleteButton(iManager);
+            }
+        }
+        );
 
 
 
         let pluginData = [];
 
-        let markdown  = {
+        let markdown = {
             name: 'markdown',
             data: '',
             type: 'markdown',
@@ -221,4 +218,4 @@ module.exports = {
 
         iManager.registerPluginConfig(pluginName, pluginData);
     }
-};
+}

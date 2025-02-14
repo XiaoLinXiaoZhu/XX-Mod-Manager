@@ -110,20 +110,38 @@ module.exports = {
 
 
         let pluginData = [];
+
+        //-MD介绍
+        let markdown = {
+            name: 'markdown',
+            data: '',
+            type: 'markdown',
+            displayName: 'Refresh After Apply',
+            description: 'Refresh the game after applying the mod',
+            t_displayName: {
+                zh_cn: '应用后刷新',
+                en: 'Refresh After Apply'
+            },
+            t_description: {
+                zh_cn: '# 在应用mod之后自动在游戏中应用mod\n通常在变更mod之后，需要手动按F10或者别的快捷键来使得Mod生效\n这个插件可以自动帮你刷新游戏\n_\n点击应用时，程序会自动刷新游戏',
+                en: '# Refresh the game after applying the mod\nUsually after changing the mod, you need to manually press F10 or other shortcut keys to make the Mod take effect\nThis plugin can automatically help you refresh the game\n\nWhen you click Apply, the program will automatically refresh the game'
+            },
+            onChange: (value) => {
+                // markdown 类型的数据不会触发 onChange,它只作为展示
+            }
+        };
+        pluginData.push(markdown);
+
+
         //-是否启用
         let ifRefreshAfterApply = {
             name: 'ifRefreshAfterApply',
             data: false,
             type: 'boolean',
             displayName: 'Refresh After Apply',
-            description: 'If true, the game will be refreshed after applying the mod',
             t_displayName: {
-                zh_cn: '应用后刷新',
+                zh_cn: '启用 应用后刷新',
                 en: 'Refresh After Apply'
-            },
-            t_description: {
-                zh_cn: '如果为真，应用mod后游戏将被刷新',
-                en: 'If true, the game will be refreshed after applying the mod'
             },
             onChange: (value) => {
                 console.log('ifRefreshAfterApply changed:', value);
