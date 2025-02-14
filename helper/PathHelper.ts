@@ -20,31 +20,31 @@ class PathHelper {
      * @returns {boolean} 是否存在
      */
     static CheckDir(dir: string, createIfNotExist: boolean = false, snackError: boolean = true, dirName: TranslatedText) {
-        let resoult = 1;
+        let result = 1;
         // 检查dir是否不为空且为string
         if (!dir || typeof dir !== 'string') {
-            resoult = 0;
+            result = 0;
         }
         else if (!fs.existsSync(dir)) {
             if (createIfNotExist) {
                 fs.mkdirSync(dir, { recursive: true });
             } else {
-                resoult = -1;
+                result = -1;
             }
         }
 
         // 检查是否为文件夹
-        if (resoult === 1) {
+        if (result === 1) {
             let stat = fs.statSync(dir);
             if (!stat.isDirectory()) {
-                resoult = -2;
+                result = -2;
             }
         }
 
-        if (resoult < 0) {
+        if (result < 0) {
             // snack 错误提示
             let tt: TranslatedText = new TranslatedText("Unknown Error", "未知错误");
-            switch (resoult) {
+            switch (result) {
                 case 0:
                     tt = new TranslatedText(`❌[${dirName.get() || ""}] dir is invalid: ${dir}`, `❌[${dirName.get() || ""}] 目录无效: ${dir}`);
                     break;
@@ -63,7 +63,7 @@ class PathHelper {
             }
         }
 
-        return resoult === 1;
+        return result === 1;
     }
 }
 
