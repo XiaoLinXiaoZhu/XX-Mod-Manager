@@ -1210,9 +1210,10 @@ ipcRenderer.on('wakeUp', () => {
         zh_cn: '🌞程序正常启动~',
         en: '🌞Program is waking up~',
     })
-    waitInitIManager().then((iManager) => {
-        EventSystem.trigger('wakeUp');
-    });
+    EventSystem.trigger('wakeUp');
+    // waitInitIManager().then((iManager) => {
+    //     EventSystem.trigger('wakeUp');
+    // });
 });
 
 let sleepTimer = '';
