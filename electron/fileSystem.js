@@ -2,8 +2,6 @@ const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron');
 const path = require('node:path')
 const fs = require('fs');
 const os = require('os');
-
-import { ModData } from '../helper/ModHelper';
 //-==================== 核心变量 =====================
 
 //----------------- 状态 -----------------
@@ -121,6 +119,8 @@ ipcMain.handle('get-desktop-path', async (event) => {
 //----------------- 配置相关 -----------------
 
 async function getConfig(filePath) {
+    //debug
+    console.log(`getConfig:${filePath}`);   
     if (fs.existsSync(filePath)) {
         const data = await readFile(filePath);
 

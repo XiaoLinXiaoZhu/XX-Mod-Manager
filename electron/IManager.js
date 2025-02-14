@@ -136,7 +136,7 @@ class IManager {
     // }
     snack = snack;
     t_snack = t_snack;
-    
+
     async loadConfig() {
         const currentConfig = await ipcRenderer.invoke('get-current-config');
         console.log(currentConfig);
@@ -147,6 +147,7 @@ class IManager {
             return;
         }
 
+        console.log('loadConfig:', currentConfig);
         // this.config = currentConfig;
         // 这样会导致 较新的配置项 丢失，所以需要逐个赋值
         for (const key in currentConfig) {
@@ -951,7 +952,7 @@ class IManager {
         }
         //debug
         console.log(`update mod card cover of`, modInfo);
-        const modImageDest = modInfo.setPreviewByBase64(previewBase64,this.config.modSourcePath);
+        const modImageDest = modInfo.setPreviewByBase64(previewBase64, this.config.modSourcePath);
 
         // 保存到本地
         modInfo.saveModInfo();
@@ -1250,5 +1251,5 @@ ipcRenderer.on('windowFocus', () => {
 });
 
 export default IManager;
-export {waitInitIManager };
+export { waitInitIManager };
 

@@ -22,11 +22,6 @@ enum IPluginDataTypes {
     select = 'select'
 }
 
-interface ITranslatedText {
-    zh_cn: string;
-    en: string;
-}
-
 interface IPluginOption {
     value: string;
     t_value: TranslatedText;
@@ -37,10 +32,16 @@ interface IPluginData {
     data: any;
     type: IPluginDataTypes;
     displayName: string;
-    description: string;
-    t_displayName: TranslatedText;
-    t_description: TranslatedText;
+    description?: string;
     onChange?: (value: any) => void;
+
+
+    //-可选项：显示名称，带有翻译
+    t_displayName?: TranslatedText;
+
+    //-可选项：显示描述，带有翻译
+    t_description?: TranslatedText; 
+
 
     //-作为 button 类型的按钮   
     buttonName?: string;
@@ -340,4 +341,4 @@ class IPluginLoader {
 
 
 
-export { IPlugin, IPluginLoader, IPluginData, IPluginDataTypes, ITranslatedText, IPluginOption }
+export { IPlugin, IPluginLoader, IPluginData, IPluginDataTypes, IPluginOption }
