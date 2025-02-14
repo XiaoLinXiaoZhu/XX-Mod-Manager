@@ -181,7 +181,7 @@ EventSystem.on('currentModChanged', (mod) => {
 
 EventSystem.on('toggledMod', (mod) => {
     //debug
-    console.log('toggled mod', mod);
+    console.log('toggled mod', mod.name);
     savePreset();
 });
 

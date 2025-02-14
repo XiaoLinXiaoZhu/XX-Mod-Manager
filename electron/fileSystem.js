@@ -255,6 +255,7 @@ function creatMod(modPath) {
         description: '',
         url: '',
         hotkeys: [],
+        newMod: true,
     }
 
     const modConfigPath = path.join(modPath, 'mod.json');

@@ -126,8 +126,8 @@ const click = (event) => {
         console.log(`click: ${props.mod},current clicked: ${clicked.value},attribute: ${modItemRef.value.getAttribute('clicked')}`);
         //emit('click', props.mod);
         // iManager.setLastClickedMod_ByName(props.mod);
-        iManager.setCurrentModByName(props.mod);
-        iManager.toggledModByName(props.mod);
+        iManager.setCurrentMod(props.modRef);
+        iManager.toggledModByName(props.modRef.name);
     }
     else {
         playClickAnim(modItemRef.value);

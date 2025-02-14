@@ -177,10 +177,17 @@ class IManager {
         // 但是 characterList 的顺序 是按照从mod中获取的顺序，所以这里需要将其排序一下，默认按照字母排序
         this.data.characterList = Array.from(this.data.characterList).sort();
 
+        //如果 loadMods 中的mod 的 newMod 为 true，则将其设置为 false，并触发addMod事件
+        const newMods = loadMods.filter((mod) => mod.newMod);
+        
+
         // this.data.modList = loadMods;
         // 将 mod 转换为 ModData, 并且保存到 data 中
         this.data.modList = await Promise.all(loadMods.map(async (mod) => ModData.fromJson(mod).setModSourcePath(modSourcePath)));
 
+        newMods.forEach((mod) => {
+            this.trigger('addMod', this.data.modList.find((m) => m.name === mod.name));
+        });
         //debug
         // console.log(loadMods);
         // console.log(this.data.modList);
@@ -215,15 +222,6 @@ class IManager {
         const data = this.data.modList.find((mod) => mod.name === modName);
         return data;
     }
-    //- mod的格式
-    // const mod = {
-    //     name: path.basename(modPath),
-    //     character: 'Unknown',
-    //     preview: '',
-    //     description: '',
-    //     url: '',
-    //     hotkeys: [],
-    // }
 
     async getImageBase64(imagePath) {
         //debug
