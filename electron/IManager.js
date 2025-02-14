@@ -266,7 +266,7 @@ class IManager {
         console.log('✅>> loadPresets done');
 
         // 加载插件
-        await IPluginLoader.Init(this);
+        IPluginLoader.Init(this);
         console.log('✅>> loadPlugins done');
 
         //debug

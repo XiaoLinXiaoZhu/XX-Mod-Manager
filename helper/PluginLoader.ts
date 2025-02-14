@@ -131,7 +131,7 @@ class IPluginLoader {
      * 这里使用 enviroment 是为了 避免循环引用
      * @returns {boolean}
      */
-    static RegisterPlugin(plugin: IPlugin, enviroment: any): boolean {
+    static async RegisterPlugin(plugin: IPlugin, enviroment: any): Promise<boolean> {
         IPluginLoader.plugins[plugin.name] = plugin;
 
         if (IPluginLoader.disabledPluginNames.includes(plugin.name)) {
@@ -215,7 +215,7 @@ class IPluginLoader {
             return;
         }
         const builtInPlugins = fs.readdirSync(builtInPluginPath);
-        builtInPlugins.forEach((pluginName) => {
+        builtInPlugins.forEach(async (pluginName) => {
             if (pluginName.endsWith('.js')) {
                 try {
                     const plugin: IPlugin = require(path.join(builtInPluginPath, pluginName)) as unknown as IPlugin;
@@ -239,7 +239,7 @@ class IPluginLoader {
             return
         }
         const files = fs.readdirSync(pluginPath);
-        files.forEach((file) => {
+        files.forEach(async (file) => {
             if (file.endsWith('.js')) {
                 try {
                     const plugin: IPlugin = require(path.join(pluginPath, file)) as unknown as IPlugin;

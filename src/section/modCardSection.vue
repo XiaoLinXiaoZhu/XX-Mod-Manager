@@ -121,7 +121,6 @@ const presets = ref([]);
 const currentPreset = ref('default');
 
 function loadPresetList() {
-    //console.log('-===== loadPresetList ======');
     let list = iManager.data.presetList;
     //debug
     console.log('loadPresetList', iManager.data.presetList);
@@ -166,22 +165,9 @@ function handleApplyButtonClicked() {
     });
 }
 
-EventSystem.on(EventType.initDone, (iManager) => {
-    let list = iManager.data.presetList;
-    //debug
-    console.log('loadPresetList', iManager.data.presetList);
-    list.unshift('default');
-    //debug
-    presets.value = list;
-    // loadPresetList();
-});
-// EventSystem.on('currentModChanged', (mod) => {
-//     lastClickedMod.value = null;
-//     setTimeout(() => {
-//         lastClickedMod.value = mod;
-//     }, 1);
-//     //debug
-//     console.log('set mod info display to', mod.name);
+// EventSystem.on(EventType.initDone, (iManager) => {
+
+//     loadPresetList();
 // });
 
 EventSystem.on('toggledMod', (mod) => {
@@ -195,13 +181,11 @@ EventSystem.on('currentPresetChanged', (preset) => {
     console.log('111111111111111111current preset changed to', preset,presets.value);
     presetSelectorRef.value.selectTabByName(preset);
 });
+
 onMounted(() => {
-    // iManager.waitInit().then(() => {
-    //     loadPresetList();
-
-
-
-    // });
+    iManager.waitInit().then(() => {
+        loadPresetList();
+    });
 });
 </script>
 

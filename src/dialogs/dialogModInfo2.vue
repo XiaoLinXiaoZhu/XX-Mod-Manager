@@ -237,9 +237,7 @@ watch(() => props.mod, async (newVal) => {
   }
   if (newVal) {
     tempModInfo.value = newVal.copy();
-
-    const imgBase64 = await newVal?.getPreviewBase64();
-    img.value = "data:image/png;base64," + imgBase64;
+    img.value = await newVal.getPreviewBase64(true);
   }
 });
 

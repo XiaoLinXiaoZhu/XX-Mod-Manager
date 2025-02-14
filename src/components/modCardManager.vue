@@ -37,8 +37,7 @@ const currentCharacter = ref('all');
 
 // 定义 loadMods 方法
 const loadMods = async () => {
-    const loadMods = iManager.data.modList;
-    mods.value = loadMods;
+    // mods.value = iManager.data.modList
     characters.value = ['all', 'selected', ...iManager.data.characterList];
     currentCharacter.value = 'all';
     // 检查是否选择了预设，如果选择了预设，则加载预设
