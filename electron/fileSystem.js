@@ -261,6 +261,8 @@ function creatMod(modPath) {
     const modConfigPath = path.join(modPath, 'mod.json');
 
     if (fs.existsSync(modConfigPath)) {
+        mod.newMod = false;
+
         const modConfig = JSON.parse(fs.readFileSync(modConfigPath, 'utf-8'));
         mod.character = modConfig.character;
         mod.preview = modConfig.preview;

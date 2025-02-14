@@ -181,7 +181,8 @@ class IManager {
 
         //如果 loadMods 中的mod 的 newMod 为 true，则将其设置为 false，并触发addMod事件
         const newMods = loadMods.filter((mod) => mod.newMod);
-        
+        //debug
+        console.log(`newMods:`, newMods);
 
         // this.data.modList = loadMods;
         // 将 mod 转换为 ModData, 并且保存到 data 中

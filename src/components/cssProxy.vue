@@ -7,7 +7,7 @@ import backgroundImage from '../assets/background.png';
 import { EventSystem } from '../../helper/EventSystem';
 
 let currentTheme = "";
-const changeTheme = (theme) =>{
+const changeTheme = async (theme) =>{
     if (currentTheme == theme) return;
     currentTheme = theme
 
