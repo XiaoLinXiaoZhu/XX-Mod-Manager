@@ -162,6 +162,7 @@ class IManager {
         this.saveConfig();
     }
 
+    newMods = [];
     async loadMods() {
         const modSourcePath = this.config.modSourcePath;
         //debug
@@ -180,17 +181,13 @@ class IManager {
         this.data.characterList = Array.from(this.data.characterList).sort();
 
         //如果 loadMods 中的mod 的 newMod 为 true，则将其设置为 false，并触发addMod事件
-        const newMods = loadMods.filter((mod) => mod.newMod);
+        this.newMods = loadMods.filter((mod) => mod.newMod);
         //debug
-        console.log(`newMods:`, newMods);
+        console.log(`newMods:`, this.newMods);
 
         // this.data.modList = loadMods;
         // 将 mod 转换为 ModData, 并且保存到 data 中
         this.data.modList = await Promise.all(loadMods.map(async (mod) => ModData.fromJson(mod).setModSourcePath(modSourcePath)));
-
-        newMods.forEach((mod) => {
-            this.trigger('addMod', this.data.modList.find((m) => m.name === mod.name));
-        });
         //debug
         // console.log(loadMods);
         // console.log(this.data.modList);
@@ -296,6 +293,12 @@ class IManager {
         setCurrentLanguage(this.config.language);
         this.trigger('themeChange', this.config.theme);
 
+        //-------- 如果有新添加的mod，则运行 addMod 事件
+        if (this.newMods.length > 0) {
+            this.newMods.forEach((mod) => {
+                this.trigger('addMod', mod);
+            });
+        }
         //-------- currentMod 默认是 第一个mod
         if (this.data.modList.length > 0) {
             //debug
