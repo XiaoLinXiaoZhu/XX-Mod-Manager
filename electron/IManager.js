@@ -131,9 +131,6 @@ class IManager {
 
 
     //-==================== 内部方法 ====================
-    // async snack(message, type = 'info') {
-    //     snack(message, type);
-    // }
     snack = snack;
     t_snack = t_snack;
 
@@ -180,10 +177,9 @@ class IManager {
         // 但是 characterList 的顺序 是按照从mod中获取的顺序，所以这里需要将其排序一下，默认按照字母排序
         this.data.characterList = Array.from(this.data.characterList).sort();
 
-
         // this.data.modList = loadMods;
         // 将 mod 转换为 ModData, 并且保存到 data 中
-        this.data.modList = loadMods.map((mod) => ModData.fromJson(mod).setModSourcePath(modSourcePath));
+        this.data.modList = await Promise.all(loadMods.map(async (mod) => ModData.fromJson(mod).setModSourcePath(modSourcePath)));
 
         //debug
         // console.log(loadMods);
@@ -1211,9 +1207,6 @@ ipcRenderer.on('wakeUp', () => {
         en: '🌞Program is waking up~',
     })
     EventSystem.trigger('wakeUp');
-    // waitInitIManager().then((iManager) => {
-    //     EventSystem.trigger('wakeUp');
-    // });
 });
 
 let sleepTimer = '';
@@ -1243,6 +1236,7 @@ ipcRenderer.on('windowFocus', () => {
     if (isSleeping) {
         t_snack(tt);
         isSleeping = false;
+        EventSystem.trigger('windowWake');
     }
     EventSystem.trigger('windowFocus');
 

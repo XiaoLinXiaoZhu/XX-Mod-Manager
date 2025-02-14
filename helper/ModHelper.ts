@@ -12,8 +12,9 @@ class ModData {
     public preview: string;
     public hotkeys: {key: string;description: string;}[];
 
-    public modSourcePath: string = ""; // mod的源路径
-
+    private modSourcePath: string = ""; // mod的源路径
+    private oldPreview = ""; // 旧的预览图的路径
+    private modPreviewBase64: string = ""; // mod的预览图的base64
     constructor(name: string, character: string, description: string, url: string, preview: string, hotkeys: {key: string;description: string;}[]) {
         this.name = name;
         this.character = character;
@@ -21,7 +22,18 @@ class ModData {
         this.url = url;
         this.preview = preview;
         this.hotkeys = hotkeys;
+
+        this.modSourcePath = "";
+        this.oldPreview = "";
+        this.modPreviewBase64 = "";
+
+        // 当进入休眠状态时，清空缓存
+        EventSystem.on(EventType.windowSleep, () => {
+            this.oldPreview = "";
+            this.modPreviewBase64 = "";
+        });
     }
+
     setModSourcePath(modSourcePath: string) {
         this.modSourcePath = modSourcePath;
         return this;
@@ -91,6 +103,10 @@ class ModData {
         const previewDest = path.join(modSourcePath, this.name, previeFileName);
         fs.copyFileSync(previewPath, previewDest);
         this.preview = previewDest;
+
+        // 清除旧的预览图
+        this.oldPreview = "";
+        this.modPreviewBase64 = "";
     }
 
     public async setPreviewByBase64(previewBase64: string) {
@@ -108,6 +124,10 @@ class ModData {
         //debug
         this.preview = imageDest;
 
+        // 下次获取预览图时，直接返回这个base64
+        this.oldPreview = imageDest;    
+        this.modPreviewBase64 = previewBase64;
+
         // snack提示
         snack(`Updated cover for ${this.name}`, SnackType.info);
 
@@ -123,6 +143,9 @@ class ModData {
         this.url = newModData.url;
         this.preview = newModData.preview;
         this.hotkeys = newModData.hotkeys;
+
+        this.oldPreview = "";
+        this.modPreviewBase64 = "";
 
         return this;
     }
@@ -160,13 +183,23 @@ class ModData {
     //-========== 获取mod信息 ===========
     public async getPreviewBase64(ifWithHeader: boolean = false) {
         // await this.checkModSourcePath();
-        const data = await ipcRenderer.invoke('get-image', this.preview);
-        if (ifWithHeader) {
-            return "data:image/png;base64," + data;
-        }
-        return data;  
-    }
+        // const data = await ipcRenderer.invoke('get-image', this.preview);
+        // if (ifWithHeader) {
+        //     return "data:image/png;base64," + data;
+        // }
+        // return data;  
 
+        if(!this.preview){
+            return "";
+        }
+        if(this.preview === this.oldPreview && this.modPreviewBase64){
+            return ifWithHeader ? "data:image/png;base64," + this.modPreviewBase64 : this.modPreviewBase64;
+        }
+        this.oldPreview = this.preview;
+        const data = await ipcRenderer.invoke('get-image', this.preview);
+        this.modPreviewBase64 = data;
+        return ifWithHeader ? "data:image/png;base64," + data : data;
+    }
     public async triggerChanged(){
         EventSystem.trigger(EventType.modInfoChanged, this);
     }

@@ -6,7 +6,7 @@
         <div slot="image" style="height: 200px;" v-if="ifDisplayImage">
             <img id="editDialog-mod-info-image"
                 style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" alt="Mod Image"
-                :src="getImage" v-if="!props.lazyLoad || enteredWindow || img != null">
+                :src="img" v-if="!props.lazyLoad || enteredWindow || img != null">
             <s-skeleton id="editDialog-mod-info-image"
                 style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" v-else />
         </div>
@@ -46,11 +46,14 @@ import IManager from '../../electron/IManager';
 import { snack } from '../../helper/SnackHelper';
 import horizontalScrollBar from './horizontalScrollBar.vue';
 const iManager = new IManager();
-import { EventSystem } from '../../helper/EventSystem';
+import { EventSystem, EventType } from '../../helper/EventSystem';
 import { ModData } from '../../helper/ModHelper';   
 
 const props = defineProps({
-    modRef: ModData,
+    modRef: {
+        type: ModData,
+        required: true
+    },
     lazyLoad: Boolean,
     compactMode: Boolean,
 })
@@ -60,23 +63,55 @@ const ifDisplayImage = ref(true);
 
 const img = ref(null);
 
-const getImage = computed(() => {
+const getImage = async () => {
     // 直到需要时才加载图片，加载后保存到 img.value
-    if (img.value == null) {
-        props.modRef.getPreviewBase64(true).then((imageBase64) => {
-            img.value = imageBase64;
-        }).catch((err) => {
-            console.error(err);
-            snack('Failed to load image');
-        }); 
+    // 检查 props.modRef 是否存在
+    if (props.lazyLoad) {
+        if (props.modRef.preview == null) {
+            //如果没有预览图片，则不显示图片
+            ifDisplayImage.value = false;
+            return "NO_PREVIEW";
+        }
+        ifDisplayImage.value = true;
+        return await props.modRef.getPreviewBase64(true);   
     }
-    return img.value;
-})
+    else {
+        return await props.modRef.getPreviewBase64(true);
+    }
+}
 
 EventSystem.on('addMod',(mod)=>{
     console.log(`modItem ${props.mod} received addMod event`,enteredWindow.value,props.lazyLoad,img.value == null);
 })
 
+// EventSystem.on(EventType.windowSleep,()=>{
+//     enteredWindow.value = false;
+//     if (props.lazyLoad){
+//         ifDisplayImage.value = false; 
+//     }
+// })
+
+// EventSystem.on(EventType.windowWake,()=>{
+//     enteredWindow.value = true;
+//     ifDisplayImage.value = true;
+// })
+
+//==================== init ====================//
+
+const enterWindow = async () => {
+    enteredWindow.value = true;
+    if (props.lazyLoad && img.value == null) {
+        //如果是懒加载模式，且图片未加载，则加载图片
+        img.value = await getImage();
+    }
+}
+
+onMounted(()=>{
+
+})
+
+
+//===================== 动画效果 =====================//
 const clicked = ref(false);
 const modItemRef = useTemplateRef('modItemRef');
 const emit = defineEmits(['click'])
@@ -282,11 +317,7 @@ watch(() => props.compactMode, (newVal, oldVal) => {
     }
 })
 
-//==================== init ====================//
 
-const enterWindow = () => {
-    enteredWindow.value = true;
-}
 
 
 defineExpose({
@@ -376,34 +407,6 @@ defineExpose({
     height: 80px;
     border: 0;
 }
-
-/* .mod-item.compact img {
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover;
-    position: absolute;
-    filter: blur(5px);
-    opacity: 0.2;
-}
-
-.mod-item.compact div[slot="image"] {
-    position: absolute;
-    z-index: -1;
-} */
-
-/* .mod-item[compact="true"] {
-    perspective: 500px;
-    width: 250px;
-    height: 200px;
-    margin-bottom: 0px;
-    will-change: transform;
-    transition: x, y 0.5s cubic-bezier(.36, -0.64, .34, 1.76);
-    border-radius: 0px 30px 0px 30px;
-} */
-
-
 .mod-item[compact="true"] {
     width: 250px;
     height: 150px;
@@ -425,28 +428,6 @@ defineExpose({
     position: absolute;
     z-index: -1;
 }
-
-
-
-/* 使用 css 的 animation 实现折叠效果 */
-/* 
-@keyframes identifier {
-    0% {
-        margin-top: 200px;
-        color: red;
-    }
-
-    100% {
-        margin-top: 0px;
-        color: blue;
-    }
-}
-
-.mod-item[compact="true"] #mod-item-headline {
-    animation: identifier 1s ease-in-out;
-    animation-fill-mode: forwards;
-    animation-iteration-count: 1;
-} */
 </style>
 
 <style scoped>

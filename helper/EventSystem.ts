@@ -36,12 +36,21 @@ enum EventType {
     pluginEnabled = 'pluginEnabled',
     pluginDisabled = 'pluginDisabled',
     currentTabChanged = "currentTabChanged",
+    //----------窗口相关----------
+    windowBlur = 'windowBlur',
+    windowFocus = 'windowFocus',
+    windowSleep = 'windowSleep',
+    windowWake = 'windowWake',
 }
 
 class EventSystem {
     private static eventMap = new Map<EventType, Function[]>(); // 事件映射表
 
     static async on(event: EventType, callback: Function) {
+        // 因为会被js调用，所以说需要判断event是否为EventType之一
+        if (!Object.values(EventType).includes(event)) {
+            throw new Error(`EventSystem.on: event ${event} is not a valid EventType`);
+        }
         // 防止 eventMap 不存在 
         if (!EventSystem.eventMap) {
             EventSystem.eventMap = new Map<EventType, Function[]>();
@@ -67,6 +76,10 @@ class EventSystem {
     }
 
     static async trigger(event: EventType, ...args: any[]) {
+        // 因为会被js调用，所以说需要判断event是否为EventType之一
+        if (!Object.values(EventType).includes(event)) {
+            throw new Error(`EventSystem.on: event ${event} is not a valid EventType`);
+        }
         if (EventSystem.eventMap.has(event)) {
             let callbacks = EventSystem.eventMap.get(event);
             if (callbacks) {
