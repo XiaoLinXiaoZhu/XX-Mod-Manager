@@ -24,59 +24,6 @@
 //     }
 // }
 
-interface IPlugin {
-    name: string;
-    t_displayName: ITranslatedText;
-    init: (enviroment: any) => void;
-}
-
-interface ITranslatedText {
-    zh_cn: string;
-    en: string;
-}
-
-enum IPluginDataTypes {
-    markdown = 'markdown',
-    boolean = 'boolean',
-    path = 'path',
-    number = 'number',
-    button = 'button',
-    iconbutton = 'iconbutton',
-    select = 'select'
-}
-
-interface IPluginData {
-    name: string;
-    data: any;
-    type: IPluginDataTypes | string;
-    displayName: string;
-    description?: string;
-    onChange?: (value: any) => void;
-
-
-    //-可选项：显示名称，带有翻译
-    t_displayName?: ITranslatedText;
-
-    //-可选项：显示描述，带有翻译
-    t_description?: ITranslatedText; 
-
-
-    //-作为 button 类型的按钮   
-    buttonName?: string;
-    t_buttonName?: ITranslatedText;
-
-    //-作为 iconbutton 类型的按钮
-    icon?: string;
-
-    //-作为 select 类型的选项
-    options?: IPluginOption[];
-}
-
-interface IPluginOption {
-    value: string;
-    t_value: ITranslatedText;
-}
-
 const fs = require('fs');
 const path = require('path');
 const pluginName = 'deleteModPlugin';
@@ -194,7 +141,10 @@ module.exports = {
         iManager.waitInit().then(() => {
             // debug
             const ifAble = iManager.getPluginData(pluginName, 'ifAblePlugin')
-            iManager.snack('deleteModPlugin Loaded from '+__dirname + ' ifAble:'+ifAble);
+            iManager.t_snack({
+                zh_cn: '删除mod插件 从 '+__dirname + ' 加载 启用状态: '+ (ifAble? '是':'否'),
+                en: 'deleteModPlugin Loaded from '+__dirname + ' ifAble:'+ifAble
+            }, 'info');
             if (ifAble) {
                 addDeleteButton(iManager);
             }
@@ -203,9 +153,9 @@ module.exports = {
 
 
 
-        let pluginData: IPluginData[] = [];
+        let pluginData = [];
 
-        let markdown : IPluginData = {
+        let markdown  = {
             name: 'markdown',
             data: '',
             type: 'markdown',
@@ -225,7 +175,7 @@ module.exports = {
         };
         pluginData.push(markdown);
 
-        let ifAblePlugin : IPluginData= {
+        let ifAblePlugin = {
             name: 'ifAblePlugin',
             data: true,
             type: 'boolean',
@@ -248,7 +198,7 @@ module.exports = {
         pluginData.push(ifAblePlugin);
 
         // 是否使用回收站
-        let useRecycleBin : IPluginData= {
+        let useRecycleBin = {
             name: 'useRecycleBin',
             data: true,
             type: 'boolean',
@@ -271,4 +221,4 @@ module.exports = {
 
         iManager.registerPluginConfig(pluginName, pluginData);
     }
-} as IPlugin;
+};
