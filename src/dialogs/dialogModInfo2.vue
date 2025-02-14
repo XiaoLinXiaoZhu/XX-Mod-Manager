@@ -280,7 +280,7 @@ const handleSave = () => {
   console.log('saved', saved,`equals`,props.mod.equals(tempModInfo.value));
   // 保存修改的 mod 信息
 
-  if (props.mod.equals(tempModInfo.value)) {
+  if (props.mod.equals(tempModInfo.value) && !changdPreviewByPaste) {
     editModInfoDialog.value.$el.dismiss();
     return;
   }
@@ -297,15 +297,21 @@ const handleSave = () => {
   if (needChangePreview) {
     props.mod.setPreviewByPath(tempModInfo.value.preview);
   }
+  // 如果是通过粘贴操作更改的预览图片，则保存到本地
+  if (changdPreviewByPaste) {
+    props.mod.setPreviewByBase64(img.value);
+  }
+
   tempModInfo.value = savedMod.copy();
   saved = true;
 
   savedMod.saveModInfo();
-
+  
   savedMod.triggerChanged();
   savedMod.triggerCurrentModChanged();
 }
 
+let changdPreviewByPaste = false;
 onMounted(() => {
   editModInfoDialog.value.$el.addEventListener('dismiss', () => {
     console.log('dismiss','props.mod',props.mod,'tempModInfo',tempModInfo.value,saved);
@@ -313,6 +319,27 @@ onMounted(() => {
       iManager.showDialog('save-change-dialog');
     }
     saved = false;
+  });
+
+
+  // 监听粘贴操作，如果粘贴的是图片则将其设置为 mod 的预览图片
+  window.addEventListener('paste', async (event) => {
+    //debug
+    console.log('paste',event.clipboardData);
+    const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+    for (const item of items) {
+      if (item.kind === 'file') {
+        const blob = item.getAsFile();
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const imgBase64 = e.target.result;
+          img.value = imgBase64;
+          // tempModInfo.value.preview = imgBase64;
+          changdPreviewByPaste = true;
+        };
+        reader.readAsDataURL(blob);
+      }
+    }
   });
 }); 
 </script>
