@@ -32,7 +32,7 @@ import { PathHelper } from '../helper/PathHelper';
 // 导入 ModHelper
 import { ModData } from '../helper/ModHelper';
 // 导入 DialogHelper
-import { DialogID ,DialogHelper } from '../helper/DialogHelper';
+import { DialogID, DialogHelper } from '../helper/DialogHelper';
 
 // // 导入 hmc-win32
 const HMC_Name = 'hmc-win32';
@@ -231,7 +231,7 @@ class IManager {
     async loadModInfo(modName) {
         const data = await ipcRenderer.invoke('get-mod-info', this.config.modSourcePath, modName);
 
-        if(data == null){
+        if (data == null) {
             const tt = new TranslatedText({
                 zh_cn: `加载mod信息失败`,
                 en: `Failed to load mod info`,
@@ -242,13 +242,17 @@ class IManager {
         }
 
         // 将其转换为 ModData
-        const mod = ModData.fromJson(data);
+        const mod = ModData.fromJson(data).setModSourcePath(this.config.modSourcePath);
 
         // 如果 是新的 mod，则触发 addMod 事件
         if (data.newMod) {
             data.newMod = false;
             EventSystem.trigger('addMod', mod);
         }
+        
+        // 刷新一下characterList
+        this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
+        this.data.characterList = Array.from(this.data.characterList).sort();
 
         return mod;
     }
@@ -407,7 +411,7 @@ class IManager {
     async setCurrentModByName(modName) {
         this.temp.currentMod = await this.getModInfo(modName);
         //debug
-        console.log(`setCurrentModByName: ${modName}`, this.temp.currentMod,this.hashCode(this.temp.currentMod));
+        console.log(`setCurrentModByName: ${modName}`, this.temp.currentMod, this.hashCode(this.temp.currentMod));
         this.trigger('currentModChanged', this.temp.currentMod);
     }
 
@@ -767,7 +771,7 @@ class IManager {
             setTimeout(() => {
                 fs.rmdirSync(destinationPath, { recursive: true });
                 console.log(`Deleted folder: ${destinationPath}`);
-                this.loadMods();
+                // this.loadMods();
             }, 1000);
             return false;
         }
@@ -837,7 +841,7 @@ class IManager {
             //     this.showDialog('edit-mod-dialog');
             // }, 200);
 
-            // 不再需要完全刷新，只需要将新的mod添加到列表中
+            //- 不再需要完全刷新，只需要将新的mod添加到列表中
             // 读取 mod.json    
             const mod = await this.getModInfo(modName);
             console.log(`getModInfo:`, mod);
@@ -898,18 +902,41 @@ class IManager {
         //debug
         console.log(`Copied folder: ${item.fullPath}`);
         // 复制完成后，刷新 modList
-        await this.loadMods();
-        console.log(`❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️`);
+        // await this.loadMods();
+        // console.log(`❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️`);
 
 
-        // 刷新完成后，弹出提示
-        snack(`Added mod ${modName}`);
-        console.log(`ModList:`, this.data.modList);
+        // // 刷新完成后，弹出提示
+        // snack(`Added mod ${modName}`);
+        // console.log(`ModList:`, this.data.modList);
 
 
-        const mod = await this.getModInfo(modName)
+        // const mod = await this.getModInfo(modName)
+        // console.log(`getModInfo:`, mod);
+        // snack(`After Added mod ${modName}`);
+
+        // // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
+        // //debug
+        // console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
+        // if (this.temp.currentCharacter !== null && this.temp.currentCharacter !== 'All' && this.temp.currentCharacter !== 'Selected' && mod.character === 'Unknown') {
+        //     mod.character = this.temp.currentCharacter;
+        //     await mod.saveModInfo();
+        // }
+
+        // this.trigger('addMod', mod);
+
+        // setTimeout(() => {
+        //     // this.setLastClickedMod(mod);
+        //     this.setCurrentMod(mod);
+        //     this.setCurrentCharacter(mod.character);
+
+        //     this.showDialog('edit-mod-dialog');
+        // }, 200);
+
+        //- 不再需要完全刷新，只需要将新的mod添加到列表中
+        // 读取 mod.json    
+        const mod = await this.getModInfo(modName);
         console.log(`getModInfo:`, mod);
-        snack(`After Added mod ${modName}`);
 
         // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
         //debug
@@ -919,15 +946,9 @@ class IManager {
             await mod.saveModInfo();
         }
 
-        this.trigger('addMod', mod);
-
-        setTimeout(() => {
-            // this.setLastClickedMod(mod);
-            this.setCurrentMod(mod);
-            this.setCurrentCharacter(mod.character);
-
-            this.showDialog('edit-mod-dialog');
-        }, 200);
+        this.setCurrentMod(mod);
+        this.setCurrentCharacter(mod.character);
+        this.showDialog('edit-mod-dialog');
     }
 
     async setFilter(character) {
