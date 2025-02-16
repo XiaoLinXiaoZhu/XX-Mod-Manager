@@ -796,7 +796,7 @@ class IManager {
 
             if (this.temp.currentCharacter !== null && mod.character === 'Unknown') {
                 mod.character = this.temp.currentCharacter;
-                await this.saveModInfo(mod);
+                await mod.saveModInfo();
             }
             this.trigger('addMod', mod);
 
@@ -869,7 +869,7 @@ class IManager {
         console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
         if (this.temp.currentCharacter !== null && this.temp.currentCharacter !== 'All' && this.temp.currentCharacter !== 'Selected' && mod.character === 'Unknown') {
             mod.character = this.temp.currentCharacter;
-            await this.saveModInfo(mod);
+            await mod.saveModInfo();
         }
 
         this.trigger('addMod', mod);
@@ -992,7 +992,7 @@ class IManager {
         mod.preview = newPreviewPath;
 
         // 保存
-        this.saveModInfo(mod);
+        mod.saveModInfo();
     }
 
     async saveConfig() {
