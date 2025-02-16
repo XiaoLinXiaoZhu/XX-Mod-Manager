@@ -174,12 +174,6 @@ class IManager {
             return;
         }
 
-        // 加载 character
-        this.data.characterList = new Set(loadMods.map((mod) => mod.character));
-        // 当 currentCharacter 不变时，不会触发 currentCharacterChanged 事件
-        // 但是 characterList 的顺序 是按照从mod中获取的顺序，所以这里需要将其排序一下，默认按照字母排序
-        this.data.characterList = Array.from(this.data.characterList).sort();
-
         //如果 loadMods 中的mod 的 newMod 为 true，则将其设置为 false，并触发addMod事件
         this.newMods = loadMods.filter((mod) => mod.newMod);
         //debug
@@ -188,6 +182,10 @@ class IManager {
         // this.data.modList = loadMods;
         // 将 mod 转换为 ModData, 并且保存到 data 中
         this.data.modList = await Promise.all(loadMods.map(async (mod) => ModData.fromJson(mod).setModSourcePath(modSourcePath)));
+
+        // 刷新 characterList
+        await this.refreshCharacterList();
+
         //debug
         // console.log(loadMods);
         // console.log(this.data.modList);
@@ -196,6 +194,14 @@ class IManager {
         // debug,成功加载 n 个 mod，总共 m 个 角色
         console.log(`成功加载 ${loadMods.length} 个 mod，总共 ${this.data.characterList.length} 个 角色`);
         return loadMods;
+    }
+
+    async refreshCharacterList() {
+        // 加载 character
+        this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
+        // 当 currentCharacter 不变时，不会触发 currentCharacterChanged 事件
+        // 但是 characterList 的顺序 是按照从mod中获取的顺序，所以这里需要将其排序一下，默认按照字母排序
+        this.data.characterList = Array.from(this.data.characterList).sort();
     }
 
     async loadPresets() {
