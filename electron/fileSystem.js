@@ -601,7 +601,7 @@ function saveModInfo(modSourcePath, jsonModInfo) {
     //debug
     console.log(modSourcePath);
     const modConfigPath = path.join(modSourcePath, modInfo.name, 'mod.json');
-    fs.writeFileSync(modConfigPath, JSON.stringify(saveInfo), 'utf-8');
+    fs.writeFileSync(modConfigPath, JSON.stringify(saveInfo, null, 4), 'utf-8');
 }
 
 

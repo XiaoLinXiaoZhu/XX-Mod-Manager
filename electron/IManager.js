@@ -220,7 +220,37 @@ class IManager {
         // const data = await ipcRenderer.invoke('get-mod-info', this.config.modSourcePath, modName);
         // 改为直接从 data 中获取
         const data = this.data.modList.find((mod) => mod.name === modName);
+
+        if (data == null) {
+            return this.loadModInfo(modName);
+        }
+
         return data;
+    }
+
+    async loadModInfo(modName) {
+        const data = await ipcRenderer.invoke('get-mod-info', this.config.modSourcePath, modName);
+
+        if(data == null){
+            const tt = new TranslatedText({
+                zh_cn: `加载mod信息失败`,
+                en: `Failed to load mod info`,
+            });
+            t_snack(tt, SnackType.error);
+            console.error(tt.get(), modName);
+            return null;
+        }
+
+        // 将其转换为 ModData
+        const mod = ModData.fromJson(data);
+
+        // 如果 是新的 mod，则触发 addMod 事件
+        if (data.newMod) {
+            data.newMod = false;
+            EventSystem.trigger('addMod', mod);
+        }
+
+        return mod;
     }
 
     async getImageBase64(imagePath) {
@@ -786,26 +816,43 @@ class IManager {
         // 但是回调提供的是异步方法，我们需要知道最后一个文件是否移动完成
 
         if (ifSuccess) {
-            // 刷新mod列表
-            await this.loadMods();
+            // // 刷新mod列表
+            // await this.loadMods();
+            // const mod = await this.getModInfo(modName);
+
+            // // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
+            // //debug
+            // console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
+
+            // if (this.temp.currentCharacter !== null && mod.character === 'Unknown') {
+            //     mod.character = this.temp.currentCharacter;
+            //     await mod.saveModInfo();
+            // }
+            // this.trigger('addMod', mod);
+
+            // setTimeout(() => {
+            //     // this.setLastClickedMod(mod);
+            //     this.setCurrentMod(mod);
+            //     this.setCurrentCharacter(mod.character);
+            //     this.showDialog('edit-mod-dialog');
+            // }, 200);
+
+            // 不再需要完全刷新，只需要将新的mod添加到列表中
+            // 读取 mod.json    
             const mod = await this.getModInfo(modName);
+            console.log(`getModInfo:`, mod);
 
             // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
             //debug
             console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
-
-            if (this.temp.currentCharacter !== null && mod.character === 'Unknown') {
+            if (this.temp.currentCharacter !== null && this.temp.currentCharacter !== 'All' && this.temp.currentCharacter !== 'Selected' && mod.character === 'Unknown') {
                 mod.character = this.temp.currentCharacter;
                 await mod.saveModInfo();
             }
-            this.trigger('addMod', mod);
 
-            setTimeout(() => {
-                // this.setLastClickedMod(mod);
-                this.setCurrentMod(mod);
-                this.setCurrentCharacter(mod.character);
-                this.showDialog('edit-mod-dialog');
-            }, 200);
+            this.setCurrentMod(mod);
+            this.setCurrentCharacter(mod.character);
+            this.showDialog('edit-mod-dialog');
         }
         else {
             // 解压失败，删除文件夹
