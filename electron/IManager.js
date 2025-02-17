@@ -228,7 +228,7 @@ class IManager {
         const data = this.data.modList.find((mod) => mod.name === modName);
 
         if (data == null) {
-            return this.loadModInfo(modName);
+            return await this.loadModInfo(modName);
         }
 
         return data;
@@ -863,6 +863,8 @@ class IManager {
             this.setCurrentMod(mod);
             this.setCurrentCharacter(mod.character);
             this.showDialog('edit-mod-dialog');
+
+            this.trigger('addMod', mod);
         }
         else {
             // 解压失败，删除文件夹
@@ -955,6 +957,8 @@ class IManager {
         this.setCurrentMod(mod);
         this.setCurrentCharacter(mod.character);
         this.showDialog('edit-mod-dialog');
+
+        this.trigger('addMod', mod);
     }
 
     async setFilter(character) {
