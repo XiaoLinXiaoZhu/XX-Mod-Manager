@@ -49,7 +49,8 @@
     "movedToPlugin": "下面的功能移动到插件继续提供",
     "showDetail": "显示配置",
     "managePlugin": "插件管理",
-    "pluginList": "插件列表"
+    "pluginList": "插件列表",
+    "pluginListInfo": "关闭插件后，在下次加载时将不会加载插件。"
   },
   "modInfo": {
     "emptyTitle": "点击mod卡片以查看详细信息",

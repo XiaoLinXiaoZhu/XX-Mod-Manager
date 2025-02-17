@@ -103,6 +103,7 @@ import { ref, defineProps, computed, defineEmits, onMounted } from 'vue';
 import IManager from '../../electron/IManager';
 import markdown from './markdown.vue';
 const iManager = new IManager();
+import { EventSystem } from '../../helper/EventSystem';
 
 const props = defineProps({
     data: Object,
@@ -115,7 +116,7 @@ const display = ref(true);
 // 默认icon
 const defaultIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="m256-240-56-56 384-384H240v-80h480v480h-80v-344L256-240Z"></path></svg>`;
 
-iManager.on('languageChange', (lang) => {
+EventSystem.on('languageChange', (lang) => {
     local.value = lang;
 });
 

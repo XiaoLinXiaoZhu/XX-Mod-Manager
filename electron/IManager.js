@@ -3,38 +3,36 @@
 // 这样的话，方便将所有非核心功能 转化为 插件，方便管理和拓展
 
 // 这个类应该 被划分到 渲染进程底下，但是 主进程也应该能够访问到这个类
-const { ipcRenderer, ipcMain } = require('electron');
+const { ipcRenderer } = require('electron');
 
-// import fsProxy from './fsProxy';
-// const fs = new fsProxy();
 const pathOsName = 'path'
 const path = require(pathOsName);
 
 // 导入fs
 const fs = require('fs');
 
-// // 导入 adm-zip
-// const AdmZip = require('adm-zip');
-// adm-zip 弃用，改为使用 Libarchivejs
-
-
 // 导入 libarchivejs
 let Archive = window.Archive;
 // import Archive from 'libarchive.js';
+//! 下面两个变量是为了解决 vite 打包时，无法正确导入 wasm 文件的问题
 import ArchiveWASM from './lib/libarchive.wasm?url';
 import workerBound from './lib/worker-bundle.js?url';
 
 
-
-function snack(message, type = 'info') {
-    ipcRenderer.send('snack', message, type);
-}
-
-function t_snack(messages, type = 'info') {
-    IManager.getInstance().then((iManager) => {
-        iManager.t_snack(messages, type);
-    });
-}
+// 导入 Language
+import { Language, TranslatedText, setCurrentLanguage } from '../helper/Language';
+// 导入 SnackHelper
+import { t_snack, SnackType, snack } from '../helper/SnackHelper';
+// 导入 EventSystem
+import { EventType, EventSystem } from '../helper/EventSystem';
+// 导入 PluginLoader
+import { IPluginLoader } from '../helper/PluginLoader';
+// 导入 PathHelper
+import { PathHelper } from '../helper/PathHelper';
+// 导入 ModHelper
+import { ModData } from '../helper/ModHelper';
+// 导入 DialogHelper
+import { DialogID, DialogHelper } from '../helper/DialogHelper';
 
 // // 导入 hmc-win32
 const HMC_Name = 'hmc-win32';
@@ -61,13 +59,8 @@ class IManager {
         IManager.instance = this;
         this.data = {};
         this.plugins = {};
-        this.eventList = {};
 
         this.HMC = HMC
-
-        // 支持 插件 功能
-        this.plugins = {};
-        this.pluginConfig = {};
 
         // 初始化
         this.init();
@@ -140,18 +133,9 @@ class IManager {
 
 
     //-==================== 内部方法 ====================
-    async snack(message, type = 'info') {
-        snack(message, type);
-    }
-    async t_snack(messages, type = 'info') {
-        if (messages[this.config.language] != null) {
-            snack(messages[this.config.language], type);
-        }
-        else {
-            const firstMessageKey = Object.keys(messages)[0];
-            snack(messages[firstMessageKey], type);
-        }
-    }
+    snack = snack;
+    t_snack = t_snack;
+
     async loadConfig() {
         const currentConfig = await ipcRenderer.invoke('get-current-config');
         console.log(currentConfig);
@@ -162,6 +146,7 @@ class IManager {
             return;
         }
 
+        console.log('loadConfig:', currentConfig);
         // this.config = currentConfig;
         // 这样会导致 较新的配置项 丢失，所以需要逐个赋值
         for (const key in currentConfig) {
@@ -173,25 +158,11 @@ class IManager {
                 snack(`Loading config error: ${error}`);
             }
         }
-        //debug
-        // if (this.config.presetPath === null) {
-        //     console.log('presetPath is null');
-        // }
-        // else if (fs.existsSync(this.config.presetPath) === false) {
-        //     // fs.mkdirSync(this.config.presetPath);
-        //     // 直接创建文件夹有可能它的父文件夹不存在，所以检查一下
-        //     if (!fs.existsSync(path.dirname(this.config.presetPath))) {
-        //         console.log(`presetPath's parent not exists`);
-        //         snack(`preset folder not exists`, 'error');
-        //     }
-        //     else {
-        //         fs.mkdirSync(this.config.presetPath);
-        //     }
-        // }
 
         this.saveConfig();
     }
 
+    newMods = [];
     async loadMods() {
         const modSourcePath = this.config.modSourcePath;
         //debug
@@ -203,17 +174,34 @@ class IManager {
             return;
         }
 
+        //如果 loadMods 中的mod 的 newMod 为 true，则将其设置为 false，并触发addMod事件
+        this.newMods = loadMods.filter((mod) => mod.newMod);
+        //debug
+        console.log(`newMods:`, this.newMods);
+
+        // this.data.modList = loadMods;
+        // 将 mod 转换为 ModData, 并且保存到 data 中
+        this.data.modList = await Promise.all(loadMods.map(async (mod) => ModData.fromJson(mod).setModSourcePath(modSourcePath)));
+
+        // 刷新 characterList
+        await this.refreshCharacterList();
+
+        //debug
+        // console.log(loadMods);
+        // console.log(this.data.modList);
+        // console.log(this.data.characterList);
+
+        // debug,成功加载 n 个 mod，总共 m 个 角色
+        console.log(`成功加载 ${loadMods.length} 个 mod，总共 ${this.data.characterList.length} 个 角色`);
+        return loadMods;
+    }
+
+    async refreshCharacterList() {
         // 加载 character
-        this.data.characterList = new Set(loadMods.map((mod) => mod.character));
+        this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
         // 当 currentCharacter 不变时，不会触发 currentCharacterChanged 事件
         // 但是 characterList 的顺序 是按照从mod中获取的顺序，所以这里需要将其排序一下，默认按照字母排序
         this.data.characterList = Array.from(this.data.characterList).sort();
-        this.data.modList = loadMods;
-
-        //debug
-        console.log(loadMods);
-        console.log(this.data.characterList);
-        return loadMods;
     }
 
     async loadPresets() {
@@ -238,17 +226,42 @@ class IManager {
         // const data = await ipcRenderer.invoke('get-mod-info', this.config.modSourcePath, modName);
         // 改为直接从 data 中获取
         const data = this.data.modList.find((mod) => mod.name === modName);
+
+        if (data == null) {
+            return this.loadModInfo(modName);
+        }
+
         return data;
     }
-    //- mod的格式
-    // const mod = {
-    //     name: path.basename(modPath),
-    //     character: 'Unknown',
-    //     preview: '',
-    //     description: '',
-    //     url: '',
-    //     hotkeys: [],
-    // }
+
+    async loadModInfo(modName) {
+        const data = await ipcRenderer.invoke('get-mod-info', this.config.modSourcePath, modName);
+
+        if (data == null) {
+            const tt = new TranslatedText({
+                zh_cn: `加载mod信息失败`,
+                en: `Failed to load mod info`,
+            });
+            t_snack(tt, SnackType.error);
+            console.error(tt.get(), modName);
+            return null;
+        }
+
+        // 将其转换为 ModData
+        const mod = ModData.fromJson(data).setModSourcePath(this.config.modSourcePath);
+
+        // 如果 是新的 mod，则触发 addMod 事件
+        if (data.newMod) {
+            data.newMod = false;
+            EventSystem.trigger('addMod', mod);
+        }
+        
+        // 刷新一下characterList
+        this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
+        this.data.characterList = Array.from(this.data.characterList).sort();
+
+        return mod;
+    }
 
     async getImageBase64(imagePath) {
         //debug
@@ -257,36 +270,30 @@ class IManager {
         return data;
     }
 
-    async showDialog(dialogID) {
-        const dialog = document.getElementById(dialogID);
-        if (!dialog) {
-            console.log(`dialog ${dialogID} not found`);
-            return;
-        }
-        dialog.show();
-    }
-
-    async dismissDialog(dialogID) {
-        const dialog = document.getElementById(dialogID);
-        if (!dialog) {
-            console.log(`dialog ${dialogID} not found`);
-            return;
-        }
-        dialog.dismiss();
-    }
+    showDialog = DialogHelper.showDialog;
+    dismissDialog = DialogHelper.dismissDialog;
     //-==================== 生命周期 ====================
     // 初始化
     async init() {
-        // 将 imanage 的 实例 传递给 主进程
-
         //debug
         console.log('✅>> init IManager');
         // 加载配置
         await this.loadConfig();
         console.log('✅>> loadConfig done');
+
+        //-=============== 优先进行页面初始化 ===============-//
         //------ 设置窗口大小 -----
-        await this.setWindowBounds();
+        this.setWindowBounds();
         console.log('✅>> setWindowBounds done');
+        //------ 切换语言 -----
+        this.trigger('languageChange', this.config.language);
+        setCurrentLanguage(this.config.language);
+        console.log('✅>> languageChange to', this.config.language);
+        //------ 切换主题 -----
+        this.trigger('themeChange', this.config.theme);
+        console.log('✅>> themeChange to', this.config.theme);
+
+
         // 加载mod
         await this.loadMods();
         console.log('✅>> loadMods done');
@@ -296,29 +303,42 @@ class IManager {
         console.log('✅>> loadPresets done');
 
         // 加载插件
-        await this.loadDisabledPlugins();
-        await this.loadPlugins();
+        IPluginLoader.Init(this);
         console.log('✅>> loadPlugins done');
-
 
         //debug
         console.log('✅>> init IManager done');
         this.inited = true;
 
-        //ipcRenderer.invoke('set-imanager', this);
-        // 这样 传递的数据 会被序列化，导致 无法传递 函数
-        // 并且 不能够 同步，因为实际上传递的是复制的数据，而不是引用
+        //----------------- 事件监听 -----------------
+        EventSystem.on(EventType.modInfoChanged, async (mod) => {
+            // mod 信息发生变化，需要同步变化
+
+            // characterList 变化
+            this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
+            this.data.characterList = Array.from(this.data.characterList).sort();
+        });
 
         //调用 start 方法
         setTimeout(() => {
-
-            this.start();
             this.trigger('initDone', this);
+            this.start();
         }, 200);
     }
 
     // start 在 init 之后调用，在各个其他页面 绑定好事件之后调用
     async start() {
+        //-------- 再次切换一次 语言和主题，因为有些页面可能在 init 之后才加载，所以需要再次切换一次
+        this.trigger('languageChange', this.config.language);
+        setCurrentLanguage(this.config.language);
+        this.trigger('themeChange', this.config.theme);
+
+        //-------- 如果有新添加的mod，则运行 addMod 事件
+        if (this.newMods.length > 0) {
+            this.newMods.forEach((mod) => {
+                this.trigger('addMod', mod);
+            });
+        }
         //-------- currentMod 默认是 第一个mod
         if (this.data.modList.length > 0) {
             //debug
@@ -328,14 +348,6 @@ class IManager {
             this.setCurrentMod(this.data.modList[0]);
             console.log('✅>> currentMod init', this.temp.currentMod);
         }
-
-        //------ 切换语言 -----
-        this.trigger('languageChange', this.config.language);
-        console.log('✅>> languageChange to', this.config.language);
-
-        //------ 切换主题 -----
-        this.trigger('themeChange', this.config.theme);
-        console.log('✅>> themeChange to', this.config.theme);
 
 
         //------ 如果开启了 ifStartWithLastPreset，则启动时使用上次使用的预设 -----
@@ -370,11 +382,6 @@ class IManager {
         // 此方法已弃用，当调用的时候，抛出异常
         console.warn('setLastClickedModByName is deprecated');
         throw new Error('setLastClickedModByName is deprecated');
-        const mod = this.data.modList.find((mod) => mod.name === modName);
-        if (mod) {
-            this.temp.lastClickedMod = mod;
-            this.trigger('lastClickedMod_Changed', mod);
-        }
     }
 
     async setCurrentCharacter(character) {
@@ -410,7 +417,7 @@ class IManager {
     async setCurrentModByName(modName) {
         this.temp.currentMod = await this.getModInfo(modName);
         //debug
-        console.log(`setCurrentModByName: ${modName}`, this.temp.currentMod);
+        console.log(`setCurrentModByName: ${modName}`, this.temp.currentMod, this.hashCode(this.temp.currentMod));
         this.trigger('currentModChanged', this.temp.currentMod);
     }
 
@@ -539,13 +546,6 @@ class IManager {
                 this.handleImageDrop(file);
                 return;
             }
-            // if (file.name.endsWith('.zip') || file.type === 'application/zip' || file.type === 'application/x-compressed') {
-            //     // debug
-            //     console.log(`Zip file: ${file.name}`);
-            //     // 交给 handleZipDrop 处理
-            //     this.handleZipDrop(file);
-            //     return;
-            // }
             // 通过使用 libarchive 处理 压缩文件，它能够支持所有的压缩文件
             if (file.name.endsWith('.zip') || file.name.endsWith('.rar') || file.name.endsWith('.7z') || file.type === 'application/zip' || file.type === 'application/x-compressed' || file.type === 'application/x-tar' || file.type === 'application/x-gzip') {
                 // debug
@@ -628,7 +628,7 @@ class IManager {
         // extractFiles 只是将其解压到内存中，并不会写入到磁盘
         // 通过 extractCallback 可以获取到解压的文件，然后将其写入到磁盘
 
-        console.debug(archiveReader,archiveReader.workerUrl);
+        console.debug(archiveReader, archiveReader.workerUrl);
 
         const ifEncrypted = await archiveReader.hasEncryptedData();
 
@@ -777,7 +777,7 @@ class IManager {
             setTimeout(() => {
                 fs.rmdirSync(destinationPath, { recursive: true });
                 console.log(`Deleted folder: ${destinationPath}`);
-                this.loadMods();
+                // this.loadMods();
             }, 1000);
             return false;
         }
@@ -806,8 +806,8 @@ class IManager {
         // 创建mod文件夹
         if (fs.existsSync(modPath)) {
             const t_message = {
-            zh_cn: `模组 ${modName} 已经存在`,
-            en: `Mod ${modName} already exists`,
+                zh_cn: `模组 ${modName} 已经存在`,
+                en: `Mod ${modName} already exists`,
             }
             t_snack(t_message, 'error');
             return;
@@ -826,26 +826,43 @@ class IManager {
         // 但是回调提供的是异步方法，我们需要知道最后一个文件是否移动完成
 
         if (ifSuccess) {
-            // 刷新mod列表
-            await this.loadMods();
+            // // 刷新mod列表
+            // await this.loadMods();
+            // const mod = await this.getModInfo(modName);
+
+            // // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
+            // //debug
+            // console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
+
+            // if (this.temp.currentCharacter !== null && mod.character === 'Unknown') {
+            //     mod.character = this.temp.currentCharacter;
+            //     await mod.saveModInfo();
+            // }
+            // this.trigger('addMod', mod);
+
+            // setTimeout(() => {
+            //     // this.setLastClickedMod(mod);
+            //     this.setCurrentMod(mod);
+            //     this.setCurrentCharacter(mod.character);
+            //     this.showDialog('edit-mod-dialog');
+            // }, 200);
+
+            //- 不再需要完全刷新，只需要将新的mod添加到列表中
+            // 读取 mod.json    
             const mod = await this.getModInfo(modName);
+            console.log(`getModInfo:`, mod);
 
             // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
             //debug
             console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
-
-            if (this.temp.currentCharacter !== null && mod.character === 'Unknown') {
+            if (this.temp.currentCharacter !== null && this.temp.currentCharacter !== 'All' && this.temp.currentCharacter !== 'Selected' && mod.character === 'Unknown') {
                 mod.character = this.temp.currentCharacter;
-                await this.saveModInfo(mod);
+                await mod.saveModInfo();
             }
-            this.trigger('addMod', mod);
 
-            setTimeout(() => {
-                // this.setLastClickedMod(mod);
-                this.setCurrentMod(mod);
-                this.setCurrentCharacter(mod.character);
-                this.showDialog('edit-mod-dialog');
-            }, 200);
+            this.setCurrentMod(mod);
+            this.setCurrentCharacter(mod.character);
+            this.showDialog('edit-mod-dialog');
         }
         else {
             // 解压失败，删除文件夹
@@ -864,79 +881,7 @@ class IManager {
         console.log(`handle zip drop: ${file.name}`);
         //使用 libarchive 处理 zip 文件
         this.handleArchiveDrop(file);
-
         return;
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-            const buffer = Buffer.from(event.target.result);
-
-            console.debug(typeof buffer)
-
-            let archive = new Archive(buffer)
-            archive.extractFiles().then(data => {
-                console.log('data:{}', data);
-            })
-
-
-            return;
-            // const buffer = Buffer.from(event.target.result);
-            // const zip = new AdmZip(buffer);
-            // adm-zip 弃用，改为使用 Libarchivejs
-            const zip = new Archive(buffer);
-
-            const modName = file.name.replace('.zip', '');
-            const modPath = path.join(this.config.modSourcePath, modName);
-
-            // 创建mod文件夹
-            if (!fs.existsSync(modPath)) {
-                fs.mkdirSync(modPath, { recursive: true });
-            }
-            else {
-                snack(`Mod ${modName} already exists`);
-                return;
-            }
-
-            // 将zip文件解压到mod文件夹
-            this.showDialog('loading-dialog');
-            try {
-                // zip.extractAllTo(modPath, true);
-                // adm-zip 弃用，改为使用 Libarchivejs
-                // await zip.extractFiles(modPath)
-            }
-            catch (error) {
-                this.dismissDialog('loading-dialog');
-                console.error(`Error: ${error}`);
-                snack(`Error: ${error}`, 'error');
-                return;
-            }
-
-            // 关闭加载对话框
-            this.dismissDialog('loading-dialog');
-            // 提示用户
-            snack(`Mod ${modName} added successfully`);
-
-            // 刷新mod列表
-            await this.loadMods();
-            const mod = await this.getModInfo(modName);
-
-            // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
-            //debug
-            console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
-
-            if (this.temp.currentCharacter !== null && mod.character === 'Unknown') {
-                mod.character = this.temp.currentCharacter;
-                await this.saveModInfo(mod);
-            }
-            this.trigger('addMod', mod);
-
-            setTimeout(() => {
-                // this.setLastClickedMod(mod);
-                this.setCurrentMod(mod);
-                this.setCurrentCharacter(mod.character);
-                this.showDialog('edit-mod-dialog');
-            }, 200);
-        };
-        reader.readAsArrayBuffer(file);
     }
 
     async handleFolderDrop(item) {
@@ -963,36 +908,53 @@ class IManager {
         //debug
         console.log(`Copied folder: ${item.fullPath}`);
         // 复制完成后，刷新 modList
-        await this.loadMods();
-        console.log(`❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️`);
+        // await this.loadMods();
+        // console.log(`❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️`);
 
 
-        // 刷新完成后，弹出提示
-        snack(`Added mod ${modName}`);
-        console.log(`ModList:`, this.data.modList);
+        // // 刷新完成后，弹出提示
+        // snack(`Added mod ${modName}`);
+        // console.log(`ModList:`, this.data.modList);
 
 
-        const mod = await this.getModInfo(modName)
+        // const mod = await this.getModInfo(modName)
+        // console.log(`getModInfo:`, mod);
+        // snack(`After Added mod ${modName}`);
+
+        // // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
+        // //debug
+        // console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
+        // if (this.temp.currentCharacter !== null && this.temp.currentCharacter !== 'All' && this.temp.currentCharacter !== 'Selected' && mod.character === 'Unknown') {
+        //     mod.character = this.temp.currentCharacter;
+        //     await mod.saveModInfo();
+        // }
+
+        // this.trigger('addMod', mod);
+
+        // setTimeout(() => {
+        //     // this.setLastClickedMod(mod);
+        //     this.setCurrentMod(mod);
+        //     this.setCurrentCharacter(mod.character);
+
+        //     this.showDialog('edit-mod-dialog');
+        // }, 200);
+
+        //- 不再需要完全刷新，只需要将新的mod添加到列表中
+        // 读取 mod.json    
+        const mod = await this.getModInfo(modName);
         console.log(`getModInfo:`, mod);
-        snack(`After Added mod ${modName}`);
 
         // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
         //debug
         console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
         if (this.temp.currentCharacter !== null && this.temp.currentCharacter !== 'All' && this.temp.currentCharacter !== 'Selected' && mod.character === 'Unknown') {
             mod.character = this.temp.currentCharacter;
-            await this.saveModInfo(mod);
+            await mod.saveModInfo();
         }
 
-        this.trigger('addMod', mod);
-
-        setTimeout(() => {
-            // this.setLastClickedMod(mod);
-            this.setCurrentMod(mod);
-            this.setCurrentCharacter(mod.character);
-
-            this.showDialog('edit-mod-dialog');
-        }, 200);
+        this.setCurrentMod(mod);
+        this.setCurrentCharacter(mod.character);
+        this.showDialog('edit-mod-dialog');
     }
 
     async setFilter(character) {
@@ -1042,24 +1004,15 @@ class IManager {
         }
         //debug
         console.log(`update mod card cover of`, modInfo);
-        const imageExt = previewBase64.split(';')[0].split('/')[1];
-        const modImageName = `preview.${imageExt}`;
-        const modImageDest = path.join(this.config.modSourcePath, modName, modImageName)
-        fs.writeFileSync(modImageDest, previewBase64.split(',')[1], 'base64');
+        const modImageDest = modInfo.setPreviewByBase64(previewBase64);
 
-        //debug
-        modInfo.preview = modImageDest;
-        // ipcRenderer.invoke('set-mod-info', mod, modInfo);
-        this.saveModInfo(modInfo);
+        // 保存到本地
+        modInfo.saveModInfo();
 
-        // 刷新侧边栏的mod信息
-        // this.trigger('lastClickedMod_Changed', modInfo);
-        this.trigger("currentModChanged", modInfo);
+        // 触发事件
+        modInfo.triggerChanged();
+        modInfo.triggerCurrentModChanged();
 
-        // snack提示
-        snack(`Updated cover for ${modInfo}`);
-
-        // 返回 图片的路径
         return modImageDest;
     }
 
@@ -1113,7 +1066,7 @@ class IManager {
         mod.preview = newPreviewPath;
 
         // 保存
-        this.saveModInfo(mod);
+        mod.saveModInfo();
     }
 
     async saveConfig() {
@@ -1209,6 +1162,9 @@ class IManager {
     }
 
     async saveModInfo(modInfo) {
+        // 该方法已弃用，当调用的时候，抛出异常
+        console.warn('saveModInfo is deprecated，data.modList 是同步的，保存到本地请使用 ModInfo.saveModInfo()');
+        return;
         //这里的 modInfo 是一个对象，不能直接传递给主进程
         //所以需要将 modInfo 转化为 json
         this.printModInfo(modInfo);
@@ -1234,30 +1190,8 @@ class IManager {
     }
 
     printModInfo(modInfo) {
-        if (modInfo === undefined) {
-            console.log('modInfo is undefined');
-            return;
-        }
-        console.log('save-mod-info:');
-        for (const key in modInfo) {
-            console.log(`${key}:${modInfo[key]}`);
-        }
-        // hotkeys 为 [{},{}],将其 每个键值对打印出来
-        console.log('hotkeys:');
-        if (modInfo.hotkeys === undefined) {
-            console.log('hotkeys is undefined');
-            return;
-        }
-        if (modInfo.hotkeys.length === 0) {
-            console.log('hotkeys is empty');
-            return;
-        }
-        modInfo.hotkeys.forEach((hotkey, index) => {
-            console.log(`hotkey${index}:`);
-            for (const key in hotkey) {
-                console.log(`${key}:${hotkey[key]}`);
-            }
-        });
+        console.log(ModData.fromJson(modInfo).print());
+        return;
     }
 
     async moveAllFiles(sourcePath, targetPath) {
@@ -1265,258 +1199,19 @@ class IManager {
     }
 
     //-==================== 事件管理 ====================
-    // 所有的事件：
-    //----------生命周期----------
-    // wakeUp,initDone
-    //----------状态变更----------
-    // themeChange,languageChange,
-    // lastClickedModChanged,
-    // modInfoChanged,
-    // currentCharacterChanged,
-    // currentPresetChanged,
-    //----------事件节点----------
-    // modsApplied,addMod,addPreset,
-    // toggledMod: 这个事件是在 mod 的开关被切换时触发的，之前和 lastClickedModChanged 一起触发，现在单独触发
+    on = EventSystem.on;
+    trigger = EventSystem.trigger;
 
-    // lastClickedModChanged: 拆分为两个事件，一个是：currentModChanged，一个是：toggledMod
 
-    // 注册事件
-    async on(eventName, callback) {
-        if (!this.eventList[eventName]) {
-            this.eventList[eventName] = [];
-        }
-        this.eventList[eventName].push(callback);
-        //debug
-        // console.log(`event ${eventName} registered, all events:`);
-        // let result = '';
-        // for (const key in this.eventList) {
-        //     result += key + ':' + this.eventList[key].length + '\n';
-        // }
-        // console.log(result);
-    }
-
-    // 触发事件
-    async trigger(eventName, data) {
-        if (this.eventList[eventName]) {
-            this.eventList[eventName].forEach((callback) => {
-                callback(data);
-            });
-        }
-    }
 
     //-===================== 插件 =====================
-    plugins = {};
-    disabledPluginNames = [];
-    pluginConfig = {};
-
-    disablePlugin(pluginName) {
-        this.disabledPluginNames.push(pluginName);
-        this.trigger('pluginDisabled', pluginName);
-        this.saveDisabledPlugins();
-    }
-
-    enablePlugin(pluginName) {
-        this.disabledPluginNames = this.disabledPluginNames.filter((name) => name !== pluginName);
-        this.trigger('pluginEnabled', pluginName);
-        this.saveDisabledPlugins();
-    }
-
-    togglePlugin(pluginName) {
-        if (this.disabledPluginNames.includes(pluginName)) {
-            this.enablePlugin(pluginName);
-        }
-        else {
-            this.disablePlugin(pluginName);
-        }
-    }
-
-    //是否启用的这个状态应该保存在本地
-    //这样每次打开软件的时候，都会根据这个状态来加载插件
-    async saveDisabledPlugins() {
-        ipcRenderer.invoke('save-disabled-plugins', this.disabledPluginNames);
-    }
-
-    async loadDisabledPlugins() {
-        this.disabledPluginNames = await ipcRenderer.invoke('get-disabled-plugins');
-        // this.trigger('disabledPluginsLoaded', disabledPluginNames);
-        //debug
-        console.log('disabledPluginNames:', this.disabledPluginNames);
-    }
-
-    registerPlugin(plugin) {
-        //debug
-        this.plugins[plugin.name] = plugin;
-
-        if (this.disabledPluginNames.includes(plugin.name)) {
-            //debug
-            console.log(`⛔plugin ${plugin.name} disabled`);
-            snack(`插件 ${plugin.name} 已禁用`);
-            return;
-        }
-
-        if (typeof plugin.init === 'function') {
-            plugin.init(this);
-        }
-
-        // 尝试加载 插件的本地配置
-        ipcRenderer.invoke('get-plugin-config', plugin.name).then((localPluginData) => {
-            //debug
-            console.log(`ℹ️loadPluginConfig ${plugin.name}`, localPluginData);
-            if (localPluginData) {
-                //debug
-                console.log(`❇️plugin ${plugin.name} loaded with local data`, localPluginData);
-                // 这里的 localPluginData 只包含 pluginData的 data，而不包含其他的属性，所以只需要将data赋值为localPluginData
-                this.pluginConfig[plugin.name].forEach((data) => {
-                    data.data = localPluginData[data.name];
-                });
-            }
-        }
-        );
-
-        //debug
-        console.log(`▶️plugin ${plugin.name} loaded`, plugin);
-    }
-
-    registerPluginConfig(pluginName, pluginConfig) {
-        // 如果 pluginConfig 不存在，则创建一个新的数组，否则将 pluginConfig 添加到 pluginConfig 中
-        if (this.pluginConfig[pluginName] === undefined) {
-            this.pluginConfig[pluginName] = pluginConfig;
-        }
-        else {
-            this.pluginConfig[pluginName] = this.pluginConfig[pluginName].concat(pluginConfig);
-        }
-
-        //debug
-        console.log(`registerPluginConfig ${pluginName}`, pluginConfig);
-        // pluginConfig 是 data 的 数组
-
-        // data 为一个对象，包含了插件的可配置数据，比如说是否启用，是否显示等等
-        // 它会被 解析 之后 在 设置页面 中显示，并且为 插件提供数据
-        // 当它发生变化时，会触发 插件的 onChange 方法
-
-        // data 的格式为
-        // {
-        //     name: 'ifAblePlugin',
-        //     data: true,
-        //     type: 'boolean',
-        //     displayName: 'If Able Plugin',
-        //     description: 'If true, the plugin will be enabled',
-        //     t_displayName:{
-        //         zh_cn:'是否启用插件',
-        //         en:'Enable Plugin'
-        //     },
-        //     t_description:{
-        //         zh_cn:'如果为真，插件将被启用',
-        //         en:'If true, the plugin will be enabled'
-        //     },
-        //     onChange: (value) => {
-        //         console.log('ifAblePlugin changed:', value);
-        //     }
-        // }
-    }
-
-    async loadPlugins() {
-        // 插件为 一个 js 文件，通过 require 引入
-        // 然后调用 init 方法，将 iManager 传递给插件
-
-        // 先加载内置的插件
-        const builtInPluginPath = path.resolve('./plugins');
-        // 错误处理
-        if (!fs.existsSync(builtInPluginPath)) {
-            snack('插件文件夹不存在 ' + builtInPluginPath);
-            return;
-        }
-        const builtInPlugins = fs.readdirSync(builtInPluginPath);
-        builtInPlugins.forEach((pluginName) => {
-            if (pluginName.endsWith('.js')) {
-                try {
-                    const plugin = require(path.join(builtInPluginPath, pluginName));
-                    this.registerPlugin(plugin);
-                }
-                catch (e) {
-                    console.log(`❌plugin ${pluginName} load failed`, e);
-                    // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
-                    fs.writeFileSync(`./plugins/lookAtMe`, 'lookAtMe');
-                    snack(`内置插件 ${pluginName} 加载失败`, 'error');
-                }
-            }
-        });
-
-        // 从 plugins 文件夹中加载插件，其位于 ,userData/plugins 文件夹中
-        // 这里应该被视为全局插件 作用于所有的 游戏配置
-        const userDataPath = await ipcRenderer.invoke('get-user-data-path');
-        const pluginPath = path.join(userDataPath, 'plugins');
-        if (!fs.existsSync(pluginPath)) {
-            fs.mkdirSync(pluginPath);
-        }
-        const files = fs.readdirSync(pluginPath);
-        files.forEach((file) => {
-            if (file.endsWith('.js')) {
-                try {
-                    const plugin = require(path.join(pluginPath, file));
-                    this.registerPlugin(plugin);
-                }
-                catch (e) {
-                    console.log(`❌plugin ${file} load failed`, e);
-                    snack(`插件 ${file} 加载失败`, 'error');
-
-                    // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
-                    fs.writeFileSync(`./plugins/lookAtMe`, 'lookAtMe');
-                }
-            }
-        });
-
-        //debug 打印所有插件
-        console.log(this.plugins);
-    }
-
-    // 将 插件的 配置 本地化 存储
-    async savePluginConfig() {
-        // pluginConfig 里面存储了 所有插件的配置 pluginData
-        // 每个 pluginData 是一个 数组 ，包含了 插件的配置
-        // 但是我们不需要保存 pluginData里面的所有数据，比如说显示名称，描述，onChange等，只需要保存 data
-        // data 是一个对象，包含了 插件的配置数据
-
-        for (const pluginName in this.pluginConfig) {
-            const pluginData = this.pluginConfig[pluginName];
-            const localPluginData = {};
-            pluginData.forEach((data) => {
-                localPluginData[data.name] = data.data;
-            });
-
-            console.log('savePluginConfig:', pluginName, localPluginData);
-
-            await ipcRenderer.invoke('save-plugin-config', pluginName, localPluginData);
-        }
-    }
-
-    // 同步的保存插件配置
-    savePluginConfigSync() {
-        for (const pluginName in this.pluginConfig) {
-            const pluginData = this.pluginConfig[pluginName];
-            const localPluginData = {};
-            pluginData.forEach((data) => {
-                localPluginData[data.name] = data.data;
-            });
-
-            console.log('savePluginConfig:', pluginName, localPluginData);
-
-            ipcRenderer.invoke('save-plugin-config', pluginName, localPluginData);
-        }
-    }
-
     //----------插件接口----------
-    getPluginData(pluginName, dataName) {
-        const pluginData = this.pluginConfig[pluginName];
-        const data = pluginData.find((data) => data.name === dataName);
-        return data.data;
-    }
-
-    setPluginData(pluginName, dataName, value) {
-        const pluginData = this.pluginConfig[pluginName];
-        const data = pluginData.find((data) => data.name === dataName);
-        data.onChange(value);
-    }
+    // 改为使用 IPluginLoader 的接口
+    getPluginData = IPluginLoader.GetPluginData;
+    setPluginData = IPluginLoader.SetPluginData;
+    registerPluginConfig = IPluginLoader.RegisterPluginConfig;
+    savePluginConfigSync = IPluginLoader.SaveAllPluginConfigSync;
+    savePluginConfig = IPluginLoader.SaveAllPluginConfig;
 
     // 支持 css 在当前页面的插入/删除
     addCssWithHash(css) {
@@ -1562,10 +1257,12 @@ function waitInitIManager() {
 
 ipcRenderer.on('wakeUp', () => {
     console.log('🌞wakeUp');
-    snack('🌞wakeUp');
-    waitInitIManager().then((iManager) => {
-        iManager.trigger('wakeUp');
-    });
+    // snack('🌞wakeUp');
+    t_snack({
+        zh_cn: '🌞程序正常启动~',
+        en: '🌞Program is waking up~',
+    })
+    EventSystem.trigger('wakeUp');
 });
 
 let sleepTimer = '';
@@ -1574,26 +1271,30 @@ let isSleeping = false;
 const sleepTimeOutTime = 10000;
 
 ipcRenderer.on('windowBlur', () => {
-    console.log('☁️windowBlur');
-    // snack('☁️windowBlur');
-    const iManager = new IManager();
-    iManager.trigger('windowBlur');
+    const tt = new TranslatedText("☁️windowBlur", "☁️窗口失去焦点");
+    console.log(tt.get());
+    t_snack(tt);
+    EventSystem.trigger('windowBlur');
 
     sleepTimer = setTimeout(() => {
-        iManager.trigger("windowSleep");
+        // EventSystem.trigger("windowSleep");
+        EventSystem.trigger('windowSleep');
         isSleeping = true;
-        snack('💤windowSleep');
+        const tt2 = new TranslatedText("💤windowSleep", "💤窗口休眠");
+        console.log(tt2.get());
+        t_snack(tt2);
     }, sleepTimeOutTime);
 });
 
 ipcRenderer.on('windowFocus', () => {
-    console.log('windowFocus');
+    const tt = new TranslatedText("👀windowFocus", "👀窗口获得焦点");
+    console.log(tt.get());
     if (isSleeping) {
-        snack('👀windowFocus');
+        t_snack(tt);
         isSleeping = false;
+        EventSystem.trigger('windowWake');
     }
-    const iManager = new IManager();
-    iManager.trigger('windowFocus');
+    EventSystem.trigger('windowFocus');
 
     if (sleepTimer != '') {
         clearTimeout(sleepTimer);
@@ -1601,5 +1302,5 @@ ipcRenderer.on('windowFocus', () => {
 });
 
 export default IManager;
-export { snack, t_snack, waitInitIManager };
+export { waitInitIManager };
 

@@ -61,11 +61,11 @@ function startModLoader(iManager, modLoaderPath) {
 const pluginName = 'autoStartPlugin';
 module.exports = {
     name: pluginName,
-    t_displayName:{
-        zh_cn:'自动启动插件',
-        en:'Auto Start Plugin'
+    t_displayName: {
+        zh_cn: '自动启动插件',
+        en: 'Auto Start Plugin'
     },
-    init(iManager){
+    init(iManager) {
         // iManager.snack('Auto Start Plugin Loaded from '+__dirname);
 
         iManager.on('wakeUp', () => {
@@ -73,24 +73,26 @@ module.exports = {
             if (iManager.getPluginData(pluginName, 'autoStartModLoader')) startModLoader(iManager, iManager.getPluginData(pluginName, 'modLoaderPath'));
             if (iManager.getPluginData(pluginName, 'autoStartGame')) startGame(iManager, iManager.getPluginData(pluginName, 'gamePath'));
         });
-        
+
 
 
         let pluginData = [];
 
+
+
         let markdownModLoader = {
             name: 'markdownModLoader',
             data: '',
-            type: 'markdown',   
+            type: 'markdown',
             displayName: 'Mod Loader',
             description: 'The path of the mod loader',
-            t_displayName:{
-                zh_cn:'Mod加载器',
-                en:'Mod Loader'
+            t_displayName: {
+                zh_cn: 'Mod加载器',
+                en: 'Mod Loader'
             },
-            t_description:{
-                zh_cn:'# 在程序启动时自动启动mod加载器\n请确保mod加载器的路径正确,并且将开关打开。\n你可以通过手动点击按钮测试程序是否正常启动。',
-                en:'# Auto Start Mod Loader on Program Start\nPlease make sure the path of the mod loader is correct and turn on the switch. \nYou can test if the program starts normally by manually clicking the button.'
+            t_description: {
+                zh_cn: '# 在程序启动时自动启动mod加载器\n请确保mod加载器的路径正确,并且将开关打开。\n你可以通过手动点击按钮测试程序是否正常启动。',
+                en: '# Auto Start Mod Loader on Program Start\nPlease make sure the path of the mod loader is correct and turn on the switch. \nYou can test if the program starts normally by manually clicking the button.'
             },
             onChange: (value) => {
                 // markdown 类型的数据不会触发 onChange,它只作为展示
@@ -98,70 +100,22 @@ module.exports = {
         };
         pluginData.push(markdownModLoader);
 
-        //- mod加载器路径
-        let modLoaderPath = {
-            name: 'modLoaderPath',
-            data: '',
-            type: 'exePath',
-            displayName: 'Mod Loader Path',
-            t_displayName:{
-                zh_cn:'mod加载器路径',
-                en:'Mod Loader Path'
-            },
-            onChange: (value) => {
-                console.log('modLoaderPath changed:', value);
-                modLoaderPath.data = value;
-                iManager.snack('modLoaderPath changed:'+value);
-                iManager.savePluginConfig();
-            }
-        };
-        pluginData.push(modLoaderPath);
-
-        //- 手动启动mod加载器的按钮
-        let startModLoaderButton = {
-            name: 'startModLoader',
-            type: 'iconbutton',
-            displayName: 'Test Start Mod Loader',
-            t_displayName:{
-                zh_cn:'测试启动mod加载器',
-                en:'Test Start Mod Loader'
-            },
-            buttonName: 'Start Mod Loader',
-            t_buttonName:{
-                zh_cn:'启动mod加载器',
-                en:'Start Mod Loader'
-            },
-            onChange: () => {
-                // 检查 mod 加载器路径是否存在
-                const modLoaderPath = iManager.getPluginData(pluginName, 'modLoaderPath');
-                if (!modLoaderPath || !fs.existsSync(modLoaderPath)) {
-                    const snackMessage = iManager.config.language === 'zh_cn' ? 'Mod加载器路径未设置或不存在' : 'Mod Loader Path not set or not exist'; 
-                    iManager.snack(snackMessage,"error");
-                    return false;
-                }
-                iManager.startExe(modLoaderPath);
-            }
-        };
-        pluginData.push(startModLoaderButton);
-
-
-
         //- 是否自动启动mod加载器
         let autoStartModLoader = {
             name: 'autoStartModLoader',
             data: false,
             type: 'boolean',
             displayName: 'Auto Start Mod Loader',
-            t_displayName:{
-                zh_cn:'自动启动mod加载器',
-                en:'Auto Start Mod Loader'
+            t_displayName: {
+                zh_cn: '自动启动mod加载器',
+                en: 'Auto Start Mod Loader'
             },
             onChange: (value) => {
                 // 检查 mod 加载器路径是否存在
                 const modLoaderPath = iManager.getPluginData(pluginName, 'modLoaderPath');
                 if (value && !modLoaderPath && !fs.existsSync(modLoaderPath)) {
-                    const snackMessage = iManager.config.language === 'zh_cn' ? 'Mod加载器路径未设置或不存在' : 'Mod Loader Path not set or not exist'; 
-                    iManager.snack(snackMessage,"error");
+                    const snackMessage = iManager.config.language === 'zh_cn' ? 'Mod加载器路径未设置或不存在' : 'Mod Loader Path not set or not exist';
+                    iManager.snack(snackMessage, "error");
                     return false;
                 }
                 console.log('autoStartModLoader changed:', value);
@@ -172,6 +126,55 @@ module.exports = {
             }
         };
         pluginData.push(autoStartModLoader);
+        //- mod加载器路径
+        let modLoaderPath = {
+            name: 'modLoaderPath',
+            data: '',
+            type: 'exePath',
+            displayName: 'Mod Loader Path',
+            t_displayName: {
+                zh_cn: 'mod加载器路径',
+                en: 'Mod Loader Path'
+            },
+            onChange: (value) => {
+                console.log('modLoaderPath changed:', value);
+                modLoaderPath.data = value;
+                iManager.snack('modLoaderPath changed:' + value);
+                iManager.savePluginConfig();
+            }
+        };
+        pluginData.push(modLoaderPath);
+
+        //- 手动启动mod加载器的按钮
+        let startModLoaderButton = {
+            name: 'startModLoader',
+            type: 'iconbutton',
+            displayName: 'Test Start Mod Loader',
+            t_displayName: {
+                zh_cn: '测试启动mod加载器',
+                en: 'Test Start Mod Loader'
+            },
+            buttonName: 'Start Mod Loader',
+            t_buttonName: {
+                zh_cn: '启动mod加载器',
+                en: 'Start Mod Loader'
+            },
+            onChange: () => {
+                // 检查 mod 加载器路径是否存在
+                const modLoaderPath = iManager.getPluginData(pluginName, 'modLoaderPath');
+                if (!modLoaderPath || !fs.existsSync(modLoaderPath)) {
+                    const snackMessage = iManager.config.language === 'zh_cn' ? 'Mod加载器路径未设置或不存在' : 'Mod Loader Path not set or not exist';
+                    iManager.snack(snackMessage, "error");
+                    return false;
+                }
+                iManager.startExe(modLoaderPath);
+            }
+        };
+        pluginData.push(startModLoaderButton);
+
+
+
+
 
         let divider = {
             name: 'divider',
@@ -192,13 +195,13 @@ module.exports = {
             type: 'markdown',
             displayName: 'Game',
             description: 'The path of the game',
-            t_displayName:{
-                zh_cn:'游戏',
-                en:'Game'
+            t_displayName: {
+                zh_cn: '游戏',
+                en: 'Game'
             },
-            t_description:{
-                zh_cn:'# 在程序启动时自动启动游戏\n请确保游戏的路径正确,并且将开关打开。\n你可以通过手动点击按钮测试程序是否正常启动。',
-                en:'# Auto Start Game on Program Start\nPlease make sure the path of the game is correct and turn on the switch. \nYou can test if the program starts normally by manually clicking the button.'
+            t_description: {
+                zh_cn: '# 在程序启动时自动启动游戏\n请确保游戏的路径正确,并且将开关打开。\n你可以通过手动点击按钮测试程序是否正常启动。',
+                en: '# Auto Start Game on Program Start\nPlease make sure the path of the game is correct and turn on the switch. \nYou can test if the program starts normally by manually clicking the button.'
             },
             onChange: (value) => {
                 // markdown 类型的数据不会触发 onChange,它只作为展示
@@ -206,20 +209,45 @@ module.exports = {
         };
         pluginData.push(markdownGame);
 
+
+        //- 是否自动启动游戏
+        let autoStartGame = {
+            name: 'autoStartGame',
+            data: false,
+            type: 'boolean',
+            displayName: 'Auto Start Game',
+            t_displayName: {
+                zh_cn: '自动启动游戏',
+                en: 'Auto Start Game'
+            },
+            onChange: (value) => {
+                // 检查游戏路径是否存在
+                const gamePath = iManager.getPluginData(pluginName, 'gamePath');
+                if (value && !gamePath && !fs.existsSync(gamePath)) {
+                    const snackMessage = iManager.config.language === 'zh_cn' ? '游戏路径未设置或不存在' : 'Game Path not set or not exist';
+                    iManager.snack(snackMessage, "error");
+                    return false;
+                }
+                console.log('autoStartGame changed:', value);
+                autoStartGame.data = value;
+                iManager.savePluginConfig();
+            }
+        }
+        pluginData.push(autoStartGame);
         //- 游戏路径
         let gamePath = {
             name: 'gamePath',
             data: '',
             type: 'exePath',
             displayName: 'Game Path',
-            t_displayName:{
-                zh_cn:'游戏路径',
-                en:'Game Path'
+            t_displayName: {
+                zh_cn: '游戏路径',
+                en: 'Game Path'
             },
             onChange: (value) => {
                 console.log('gamePath changed:', value);
                 gamePath.data = value;
-                iManager.snack('gamePath changed:'+value);
+                iManager.snack('gamePath changed:' + value);
                 iManager.savePluginConfig();
             }
         }
@@ -230,21 +258,21 @@ module.exports = {
             name: 'startGame',
             type: 'iconbutton',
             displayName: 'Test Start Game',
-            t_displayName:{
-                zh_cn:'测试启动游戏',
-                en:'Test Start Game'
+            t_displayName: {
+                zh_cn: '测试启动游戏',
+                en: 'Test Start Game'
             },
             buttonName: 'Start Game',
-            t_buttonName:{
-                zh_cn:'启动游戏',
-                en:'Start Game'
+            t_buttonName: {
+                zh_cn: '启动游戏',
+                en: 'Start Game'
             },
             onChange: () => {
                 // 检查游戏路径是否存在
                 const gamePath = iManager.getPluginData(pluginName, 'gamePath');
                 if (!gamePath || !fs.existsSync(gamePath)) {
-                    const snackMessage = iManager.config.language === 'zh_cn' ? '游戏路径未设置或不存在' : 'Game Path not set or not exist'; 
-                    iManager.snack(snackMessage,"error");
+                    const snackMessage = iManager.config.language === 'zh_cn' ? '游戏路径未设置或不存在' : 'Game Path not set or not exist';
+                    iManager.snack(snackMessage, "error");
                     return false;
                 }
                 iManager.startExe(gamePath);
@@ -252,30 +280,6 @@ module.exports = {
         };
         pluginData.push(startGameButton);
 
-        //- 是否自动启动游戏
-        let autoStartGame = {
-            name: 'autoStartGame',
-            data: false,
-            type: 'boolean',
-            displayName: 'Auto Start Game',
-            t_displayName:{
-                zh_cn:'自动启动游戏',
-                en:'Auto Start Game'
-            },
-            onChange: (value) => {
-                // 检查游戏路径是否存在
-                const gamePath = iManager.getPluginData(pluginName, 'gamePath');
-                if (value && !gamePath && !fs.existsSync(gamePath)) {
-                    const snackMessage = iManager.config.language === 'zh_cn' ? '游戏路径未设置或不存在' : 'Game Path not set or not exist'; 
-                    iManager.snack(snackMessage,"error");
-                    return false;
-                }
-                console.log('autoStartGame changed:', value);
-                autoStartGame.data = value;
-                iManager.savePluginConfig();
-            }
-        }
-        pluginData.push(autoStartGame);
 
         iManager.registerPluginConfig(pluginName, pluginData);
     }

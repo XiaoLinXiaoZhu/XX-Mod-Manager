@@ -4,10 +4,10 @@
 
 <script setup>
 import backgroundImage from '../assets/background.png';
-import { waitInitIManager } from '../../electron/IManager';
+import { EventSystem } from '../../helper/EventSystem';
 
 let currentTheme = "";
-const changeTheme = (theme) =>{
+const changeTheme = async (theme) =>{
     if (currentTheme == theme) return;
     currentTheme = theme
 
@@ -23,11 +23,5 @@ const changeTheme = (theme) =>{
     }
 }
 
-
-waitInitIManager().then((iManager) =>{
-    iManager.on('themeChange', changeTheme);
-    // changeTheme(iManager.config.theme);
-    // iManager.trigger('themeChange', iManager.config.theme);
-    // setTimeout(()=>{iManager.on('themeChange', changeTheme);},1);
-});
+EventSystem.on('themeChange', changeTheme);
 </script>

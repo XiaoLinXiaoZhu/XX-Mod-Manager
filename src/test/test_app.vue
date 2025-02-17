@@ -49,6 +49,7 @@ import dialogLoading from '../dialogs/dialogLoading.vue';
 import dialogEnterPassword from '../dialogs/dialogEnterPassword.vue';
 
 import DialogNeedRefresh from '../dialogs/dialogNeedRefresh.vue';
+import { EventSystem } from '../../helper/EventSystem';
 
 const loaded = ref(false);
 
@@ -80,11 +81,11 @@ const handleBackButtomClick = () => {
 waitInitIManager().then((iManager) => {
     loaded.value = true;
     
-    iManager.on('currentModChanged', (mod) => {
+    EventSystem.on('currentModChanged', (mod) => {
         lastClickedMod.value = mod;
     });
 
-    iManager.on('modInfoChanged', (mod) => {
+    EventSystem.on('modInfoChanged', (mod) => {
         lastClickedMod.value = null;
         setTimeout(() => {
             lastClickedMod.value = mod;

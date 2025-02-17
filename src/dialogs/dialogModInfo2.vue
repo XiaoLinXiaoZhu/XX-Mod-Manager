@@ -15,7 +15,7 @@
             <div class="OO-box OO-shade-box"
               style="width: calc(100% - 40px);padding: 10px 20px;margin:0;border-radius: 15px;">
               <h3 id="editDialog-mod-info-name" style="white-space:normal;word-break:keep-all;height: fit-content;">
-                {{ modInfo ? modInfo.name : "no name" }}</h3>
+                {{ tempModInfo ? tempModInfo.name : "no name" }}</h3>
             </div>
             <p id="editDialog-mod-info-character"
               style="margin-top: 2px;font-size: small;color: gray;height: fit-content;width: fit-content;margin-bottom: 0;padding-bottom: 10px;">
@@ -53,13 +53,13 @@
                 <h3 slot="trigger"> {{ $t('editDialog.mod-info-name') }} </h3>
                 <horizontalScrollBar class="OO-box OO-shade-box hotkey-container">
                   <p
-                  style="line-height: 1.2; word-wrap: break-word; max-width: 120px; overflow-wrap: break-word; white-space: normal;">
-                  {{ $t('editDialog.mod-info-name-tip') }} </p>
+                    style="line-height: 1.2; word-wrap: break-word; max-width: 120px; overflow-wrap: break-word; white-space: normal;">
+                    {{ $t('editDialog.mod-info-name-tip') }} </p>
                 </horizontalScrollBar>
               </s-tooltip>
 
               <s-button>
-                <p id="edit-mod-name"> {{ modInfo ? modInfo.name : "no name" }} </p>
+                <p id="edit-mod-name"> {{ tempModInfo ? tempModInfo.name : "no name" }} </p>
               </s-button>
             </div>
 
@@ -70,7 +70,7 @@
                 <p style="line-height: 1.2;">
                   {{ $t('editDialog.mod-info-character-tip') }} </p>
               </s-tooltip>
-              <s-text-field :value="modInfo.character" @input="modInfo.character = $event.target.value" />
+              <s-text-field :value="tempModInfo.character" @input="tempModInfo.character = $event.target.value" />
             </div>
 
             <!-- -mod链接 -->
@@ -81,8 +81,9 @@
                   {{ $t('editDialog.mod-info-url-tip') }} </p>
               </s-tooltip>
               <div class="OO-s-text-field-container">
-                <s-text-field :value="modInfo.url" @input="modInfo.url = $event.target.value" />
-                <s-icon-button type="filled" slot="start" class="OO-icon-button" @click="iManager.openUrl(modInfo.url)">
+                <s-text-field :value="tempModInfo.url" @input="tempModInfo.url = $event.target.value" />
+                <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                  @click="iManager.openUrl(tempModInfo.url)">
                   <s-icon><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
                       <path d="m256-240-56-56 384-384H240v-80h480v480h-80v-344L256-240Z"></path>
                     </svg></s-icon>
@@ -100,9 +101,11 @@
               <div style="display: flex;flex-direction: row;align-items: center;justify-content: space-between;">
                 <horizontalScrollBar class="OO-box OO-shade-box hotkey-container" scollSpeed=0.005 dragSpeed=1>
                   <div style="display: flex;flex-direction: row;flex-wrap: nowrap;padding: 0 10px;">
-                    <div v-for="(hotkey, index) in modInfo.hotkeys" :key="index">
+                    <div v-for="(hotkey, index) in tempModInfo.hotkeys" :key="index">
                       <s-tooltip>
-                        <div style="margin: 0px 3px;height: 35px;padding: 20px 15px 20px 15px;transform: skew(-20deg);border-radius: 0;min-width: 50px" slot="trigger" class="OO-button">
+                        <div
+                          style="margin: 0px 3px;height: 35px;padding: 20px 15px 20px 15px;transform: skew(-20deg);border-radius: 0;min-width: 50px"
+                          slot="trigger" class="OO-button">
                           <p style="transform: skew(20deg);">
                             {{ hotkey.key }}
                           </p>
@@ -126,7 +129,7 @@
                   </s-tooltip>
 
                   <div class="OO-box OO-shade-box" style="width: 70vb;height: fit-content;overflow: hidden;">
-                    <div v-for="(hotkey, index) in modInfo.hotkeys" :key="index" class="hotkey-item OO-setting-bar">
+                    <div v-for="(hotkey, index) in tempModInfo.hotkeys" :key="index" class="hotkey-item OO-setting-bar">
                       <s-text-field :value="hotkey.description" @input="hotkey.description = $event.target.value"
                         style="left: 5px;" />
                       <s-text-field :value="hotkey.key" @change="handleHotkeyInput(hotkey, $event.target.value)" />
@@ -156,7 +159,7 @@
               </s-tooltip>
               <s-text-field class="OO-shade-box"
                 style="min-height: calc(100% - 50px);height: 0px;border-radius: 20px;bottom: 5px;top: 45px;left: 5px;right: 5px;max-width: calc(100% - 10px);width: calc(100% - 10px);"
-                multiLine="true" :value="modInfo.description" @input="modInfo.description = $event.target.value"
+                multiLine="true" :value="tempModInfo.description" @input="tempModInfo.description = $event.target.value"
                 id="edit-mod-description"></s-text-field>
             </div>
           </div>
@@ -202,65 +205,58 @@ import { defineProps, defineEmits, onMounted, computed, watch, useTemplateRef } 
 import IManager from '../../electron/IManager';
 import DialogTemplate from './dialogTemplate.vue';
 import horizontalScrollBar from '../components/horizontalScrollBar.vue';
+import { ModData } from '../../helper/ModHelper';
 const iManager = new IManager();
 
 // 参数为 字符串类型的 mod，之后通过 iManager.getModInfo(mod) 获取 mod 信息
 const props = defineProps({
-  mod: Object
+  mod: ModData,
 });
 
 let saved = false;
 
 // modInfo 为 mod 信息，用于储存临时修改的 mod 信息，最后保存时再将其赋值给 props.mod
-const modInfo = ref({
+const tempModInfo = ref({
   name: 'unknow',
   character: 'unknow',
   preview: '',
   url: '',
   description: 'unknow',
 });
+
 const editModInfoDialog = useTemplateRef('edit-mod-dialog');
 const img = ref(null);
+
+// 需要显示的mod发生变化时，更新 临时mod信息
 watch(() => props.mod, async (newVal) => {
-  //debug
-  console.log('mod changed', newVal);
+  console.log('[dialogModInfo2] watch props.mod changed', newVal.name);
+  // 检查newVal 的类型，应当为 ModData 类型，如果不是则尝试转化为 ModData 类型
+  if (!newVal instanceof ModData) {
+    console.error('mod is not a ModData instance');
+    return;
+  }
   if (newVal) {
-    const imgBase64 = await iManager.getImageBase64(newVal.preview);
-    // modInfo.value = newVal;
-    // 将其转化为 json 再 转化为对象，防止引用传递
-    modInfo.value = JSON.parse(JSON.stringify(newVal));
-    img.value = "data:image/png;base64," + imgBase64;
+    tempModInfo.value = newVal.copy();
+    img.value = await newVal.getPreviewBase64(true);
   }
 });
 
 const handleHotkeyInput = (hotkey, value) => {
   if (value === '') {
     // 删除快捷键
-    const index = modInfo.value.hotkeys.indexOf(hotkey);
-    modInfo.value.hotkeys.splice(index, 1);
+    const index = tempModInfo.value.hotkeys.indexOf(hotkey);
+    tempModInfo.value.hotkeys.splice(index, 1);
     return;
   }
   hotkey.key = value;
 }
 
 const addNewHotkeyByDescription = (description) => {
-  if (description === '') {
-    return;
-  }
-  modInfo.value.hotkeys.push({
-    key: '',
-    description: description
-  });
+  tempModInfo.value.addHotkey("", description);
 }
 
 const addNewHotkeyByHotkey = (key) => {
-  if (key === '') {
-    return;
-  }
-  modInfo.value.hotkeys.push({
-    key: key,
-    description: ''
-  });
+  tempModInfo.value.addHotkey(key, "");
 }
 
 const handleSelectImage = async () => {
@@ -268,40 +264,82 @@ const handleSelectImage = async () => {
   if (imgPath) {
     const imgBase64 = await iManager.getImageBase64(imgPath);
     img.value = "data:image/png;base64," + imgBase64;
-    modInfo.value.preview = imgPath;
+    tempModInfo.value.preview = imgPath;
   }
 }
 
 const handleCancel = async () => {
-  modInfo.value = JSON.parse(JSON.stringify(props.mod));
-  const imgBase64 = await iManager.getImageBase64(modInfo.value.preview);
-
-  img.value = "data:image/png;base64," + imgBase64;
-  editModInfoDialog.value.$el.dismiss();
+  tempModInfo.value = props.mod.copy();
+  img.value = await props.mod.getPreviewBase64(true);
 }
 
 const handleSave = () => {
   //debug
-  console.log('modInfo.value', modInfo.value);
+  console.log('saved', saved,`equals`,props.mod.equals(tempModInfo.value));
   // 保存修改的 mod 信息
 
-  if (props.mod == modInfo.value) {
+  if (props.mod.equals(tempModInfo.value) && !changdPreviewByPaste) {
     editModInfoDialog.value.$el.dismiss();
     return;
   }
 
   // 处理 图片 更改
-  if (props.mod.preview !== modInfo.value.preview) {
-    // 当图片更改时，将新图片保存到本地 对应的文件夹下，并且将新的路径保存到 modInfo 中
-    //debug
-    console.log(`change preview of ${modInfo.value.name} to ${modInfo.value.preview}`);
-    iManager.changePreview(modInfo.value.name, modInfo.value.preview);
+  let needChangePreview = false;
+  if (props.mod.preview !== tempModInfo.value.preview) {
+    needChangePreview = true;
   }
-  props.mod = modInfo.value;
-  iManager.saveModInfo(modInfo.value);
+
+  // 保存修改的 mod 信息
+  props.mod.editModInfo(tempModInfo.value);
+
+  if (needChangePreview) {
+    props.mod.setPreviewByPath(tempModInfo.value.preview);
+  }
+  // 如果是通过粘贴操作更改的预览图片，则保存到本地
+  if (changdPreviewByPaste) {
+    props.mod.setPreviewByBase64(img.value);
+  }
+
+  tempModInfo.value = props.mod.copy();
   saved = true;
-  editModInfoDialog.value.$el.dismiss();
+
+  props.mod.saveModInfo();
+
+  props.mod.triggerChanged();
+  props.mod.triggerCurrentModChanged();
 }
+
+let changdPreviewByPaste = false;
+onMounted(() => {
+  editModInfoDialog.value.$el.addEventListener('dismiss', () => {
+    console.log('dismiss','props.mod',props.mod,'tempModInfo',tempModInfo.value,saved);
+    if (!saved && !props.mod.equals(tempModInfo.value)) {
+      iManager.showDialog('save-change-dialog');
+    }
+    saved = false;
+  });
+
+
+  // 监听粘贴操作，如果粘贴的是图片则将其设置为 mod 的预览图片
+  window.addEventListener('paste', async (event) => {
+    //debug
+    console.log('paste',event.clipboardData);
+    const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+    for (const item of items) {
+      if (item.kind === 'file') {
+        const blob = item.getAsFile();
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const imgBase64 = e.target.result;
+          img.value = imgBase64;
+          // tempModInfo.value.preview = imgBase64;
+          changdPreviewByPaste = true;
+        };
+        reader.readAsDataURL(blob);
+      }
+    }
+  });
+}); 
 </script>
 
 
@@ -313,6 +351,6 @@ const handleSave = () => {
   align-items: center;
   max-width: 450px;
   padding: 0 10px;
-  border-radius:  20px; 
+  border-radius: 20px;
 }
 </style>

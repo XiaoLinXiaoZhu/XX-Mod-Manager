@@ -292,7 +292,8 @@ const handleSave = () => {
     iManager.changePreview(modInfo.value.name, modInfo.value.preview);
   }
   props.mod = modInfo.value;
-  iManager.saveModInfo(modInfo.value);
+  // iManager.saveModInfo(modInfo.value);
+  props.mod.saveModInfo();
   saved = true;
   editModInfoDialog.value.dismiss();
 }

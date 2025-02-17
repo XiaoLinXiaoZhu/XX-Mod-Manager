@@ -141,7 +141,7 @@ module.exports = {
         iManager.waitInit().then(() => {
             // debug
             const ifAble = iManager.getPluginData(pluginName, 'ifAblePlugin')
-            iManager.snack('deleteModPlugin Loaded from '+__dirname + ' ifAble:'+ifAble);
+            // iManager.snack('deleteModPlugin Loaded from '+__dirname + ' ifAble:'+ifAble);
             if (ifAble) {
                 addDeleteButton(iManager);
             }

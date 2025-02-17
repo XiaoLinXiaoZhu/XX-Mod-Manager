@@ -107,19 +107,22 @@
                 <div class="OO-setting-bar">
                     <h3> {{ $t('setting.managePlugin') }} </h3>
                 </div>
+                <settingBar :data="refreshDuleToPlugin" v-if="toggledPlugin"></settingBar>
                 <div class="OO-box OO-shade-box" style="margin: 10px 0;">
                     <h3> {{ $t('setting.pluginList') }} </h3>
-                    <div class="OO-setting-bar" v-for="(pluginData, pluginName) in plugins" :key="pluginName">
-                        <h3 v-if="pluginData.t_displayName">{{ pluginData.t_displayName[locale] }}</h3>
-                        <h3 v-else>{{ pluginName }}</h3>
-                        <!-- -如果iManager.disabledPluginNames 中包含 pluginName，则显示为 false，否则显示为 true -->
-                        <s-switch class="OO-color-gradient-word" :checked="!iManager.disabledPluginNames.includes(pluginName)"
-                            @change="iManager.togglePlugin(pluginName)">
-                        </s-switch>
-                    </div>
+                    <p> {{ $t('setting.pluginListInfo') }} </p>
+                </div>
+                <div class="OO-setting-bar" v-for="(pluginData, pluginName) in plugins" :key="pluginName">
+                    <h3 v-if="pluginData.t_displayName">{{ pluginData.t_displayName[locale] }}</h3>
+                    <h3 v-else>{{ pluginName }}</h3>
+                    <!-- -如果iManager.disabledPluginNames 中包含 pluginName，则显示为 false，否则显示为 true -->
+                    <s-switch class="OO-color-gradient-word"
+                        :checked="!IPluginLoader.disabledPluginNames.includes(pluginName)"
+                        @change="handePluginToggle(pluginName)">
+                    </s-switch>
                 </div>
 
-
+                
             </div>
             <!-- -这里后面提供 各个插件的设置 -->
             <div v-for="(pluginData, pluginName) in pluginConfig" :key="pluginName">
@@ -179,15 +182,14 @@ import { useI18n } from 'vue-i18n'
 import Markdown from '../components/markdown.vue';
 const { t, locale } = useI18n()
 
+import { IPluginLoader } from '../../helper/PluginLoader.ts';
+
 const tabs = ref(['normal', 'advanced', 'switch-config', 'about', 'plugin']);
 const translatedTabs = computed(() => {
     const tTab = tabs.value.map((tab) => {
         // 如果 是 插件的 tab ，则尝试获取 plugin.t_displayName
-        //console.log('trying to get plugin name', tab, iManager.plugins[tab],iManager.plugins);
-        if (iManager.plugins[tab]) {
-            //debug
-            // console.log('trying to get plugin name', tab, iManager.plugins[tab], locale.value);
-            return iManager.plugins[tab].t_displayName[locale.value] || tab;
+        if (IPluginLoader.plugins[tab]) {
+            return IPluginLoader.plugins[tab].t_displayName[locale.value] || tab;
         }
         return t(`setting-tab.${tab}`)
     });
@@ -207,12 +209,49 @@ const handleTabChange = (tab) => {
 
 const plugins = ref({});
 const pluginConfig = ref({});
+const toggledPlugin = ref(false);
 watch(pluginConfig, (newVal) => {
     //debug
     console.log('===pluginConfig changed:', newVal);
     iManager.pluginConfig = newVal;
     iManager.saveConfig();
 });
+
+const handePluginToggle = (pluginName) => {
+    console.log('handePluginToggle:', pluginName);
+    IPluginLoader.togglePlugin(pluginName);
+    toggledPlugin.value = true;
+}
+
+const refreshDuleToPlugin = {
+    name: 'refreshDuleToPlugin',
+    data: false,
+    type: 'iconbutton',
+    displayName: 'Refresh to apply plugin',
+    description: 'Application needs to be refreshed to apply plugin changes',
+    buttonName: 'Refresh',
+    t_displayName: {
+        zh_cn: '刷新以应用更改',
+        en: 'Refresh to apply plugin'
+    },
+    t_description: {
+        zh_cn: '应用更改需要刷新',
+        en: 'Application needs to be refreshed to apply plugin changes'
+    },
+    t_buttonName: {
+        zh_cn: '刷新',
+        en: 'Refresh'
+    },
+    icon: `                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                            <path
+                                d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z">
+                            </path>
+                        </svg>`,
+    onChange: (value) => {
+        const { ipcRenderer } = require('electron');
+        ipcRenderer.send('refresh-main-window');
+    }
+}
 
 
 const changeConfig = {
@@ -267,17 +306,19 @@ const createShortOfCurrentConfig = {
 
 
 onMounted(async () => {
-    //debug
-    // console.log('settingSection mounted');
     await iManager.waitInit();
 
     //初始化tab
     currentTab.value = tabs.value[0];
 
     // 挂载插件的额外设置
-    plugins.value = iManager.plugins;
-    pluginConfig.value = iManager.pluginConfig;
-    console.log('pluginConfig', pluginConfig);
+    // plugins.value = iManager.plugins;
+    // pluginConfig.value = iManager.pluginConfig;
+    plugins.value = IPluginLoader.plugins;
+    pluginConfig.value = IPluginLoader.pluginConfig;
+    // console.log('pluginConfig', pluginConfig);
+
+
     // pluginConfig 是 一组 plungeName:pluginData 的键值对
     // 每个 pluginData 是一个 数组，数组中的每个元素是一个data对象，data对象包含了插件的设置
     // 每个 data 对象包含了以下属性

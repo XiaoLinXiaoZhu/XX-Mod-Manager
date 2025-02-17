@@ -272,7 +272,8 @@ module.exports = {
                 if (newMod.hotkeys.length === 0) {
                     return;
                 }
-                iManager.saveModInfo(newMod);
+                // iManager.saveModInfo(newMod);
+                mod.saveModInfo();
             }
         });
 

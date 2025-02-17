@@ -119,6 +119,8 @@ ipcMain.handle('get-desktop-path', async (event) => {
 //----------------- 配置相关 -----------------
 
 async function getConfig(filePath) {
+    //debug
+    console.log(`getConfig:${filePath}`);   
     if (fs.existsSync(filePath)) {
         const data = await readFile(filePath);
 
@@ -253,11 +255,14 @@ function creatMod(modPath) {
         description: '',
         url: '',
         hotkeys: [],
+        newMod: true,
     }
 
     const modConfigPath = path.join(modPath, 'mod.json');
 
     if (fs.existsSync(modConfigPath)) {
+        mod.newMod = false;
+
         const modConfig = JSON.parse(fs.readFileSync(modConfigPath, 'utf-8'));
         mod.character = modConfig.character;
         mod.preview = modConfig.preview;
@@ -596,7 +601,7 @@ function saveModInfo(modSourcePath, jsonModInfo) {
     //debug
     console.log(modSourcePath);
     const modConfigPath = path.join(modSourcePath, modInfo.name, 'mod.json');
-    fs.writeFileSync(modConfigPath, JSON.stringify(saveInfo), 'utf-8');
+    fs.writeFileSync(modConfigPath, JSON.stringify(saveInfo, null, 4), 'utf-8');
 }
 
 

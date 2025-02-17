@@ -1,27 +1,25 @@
 <template>
-    <s-card ref="modItemRef" class="mod-item" :clicked=clicked clickable="true" :id="props.mod" inWindow="none"
-        :character="props.character" @click="click" :compact="props.compactMode"
+    <s-card ref="modItemRef" class="mod-item" :clicked=clicked clickable="true" :id="props.modRef.name" inWindow="none"
+        :character="props.modRef.character" @click="click" :compact="props.compactMode"
         @contextmenu.prevent.stop="openEditModDialog">
 
         <div slot="image" style="height: 200px;" v-if="ifDisplayImage">
             <img id="editDialog-mod-info-image"
                 style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" alt="Mod Image"
-                :src="getImage" v-if="!props.lazyLoad || enteredWindow || img != null">
-            <s-skeleton id="editDialog-mod-info-image"
-                style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover;" v-else />
+                :src="img || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D'" @load="enterWindow" />
         </div>
 
-        <div slot="headline" id="mod-item-headline">{{ props.mod }}</div>
-        <div slot="subhead" id="mod-item-subhead">{{ props.character }}</div>
+        <div slot="headline" id="mod-item-headline">{{ props.modRef.name }}</div>
+        <div slot="subhead" id="mod-item-subhead">{{ props.modRef.character }}</div>
         <div slot="text" id="mod-item-text">
             <s-scroll-view>
                 <!-- <p id="mod-hotkeys">Hotkeys: {{ displayHotKeys }}</p> -->
-                <p id="mod-item-description">{{ props.description }}</p>
+                <p id="mod-item-description">{{ props.modRef.description }}</p>
                 <div class="placeholder"></div>
             </s-scroll-view>
             <horizontalScrollBar class="OO-box OO-shade-box hotkey-container" scrollSpeed=0.1 dragSpeed=1>
                 <div style="display: flex;flex-direction: row;flex-wrap: nowrap;">
-                    <div v-for="(hotkey, index) in props.hotKeys" :key="index">
+                    <div v-for="(hotkey, index) in props.modRef.hotkeys" :key="index">
                         <s-tooltip>
                             <div style="margin: 0px 3px;height: 35px;padding: 20px 5px 20px 5px;transform: skew(-20deg);border-radius: 0;min-width: 35px;align-items: center;justify-content: center;"
                                 slot="trigger" class="OO-button">
@@ -42,67 +40,70 @@
 <script setup>
 import 'sober'
 import { useTemplateRef, computed, defineProps, onMounted, ref, watch } from 'vue'
-import IManager, { snack } from '../../electron/IManager';
-import horizontalScrollBar from './horizontalScrollBar.vue';
+import IManager from '../../electron/IManager';
 const iManager = new IManager();
 
+import horizontalScrollBar from './horizontalScrollBar.vue';
+
+import { EventSystem, EventType } from '../../helper/EventSystem';
+import { ModData } from '../../helper/ModHelper';   
+import { DialogHelper,DialogID } from '../../helper/DialogHelper';
+
 const props = defineProps({
-    mod: String,
-    character: String,
-    description: String,
-    imagePath: String,
+    modRef: {
+        type: ModData,
+        required: true
+    },
     lazyLoad: Boolean,
     compactMode: Boolean,
-    hotKeys: {
-        type: Array,
-        default: () => []
-    }
 })
 const enteredWindow = ref(false);
-
-const displayHotKeys = computed(() => {
-    // hotKeys: [{key: 'Ctrl', description: 'description'}]
-    return props.hotKeys.map((hotKey) => {
-        return `${hotKey.key}: ${hotKey.description}`;
-    }).join(', ');
-})
 
 const ifDisplayImage = ref(true);
 
 const img = ref(null);
 
-// const getImage = () => {
-//     // 直到需要时才加载图片，加载后保存到 img.value
-//     if (img.value == null) {
-//         iManager.getImageBase64(props.imagePath).then((imageBase64) => {
-//             img.value = 'data:image/png;base64,' + imageBase64;
-//         });
-//     }
-//     return img.value;
-// }
-
-const getImage = computed(() => {
+const getImage = async () => {
+    // return 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
     // 直到需要时才加载图片，加载后保存到 img.value
-    if (img.value == null) {
-        iManager.getImageBase64(props.imagePath).then((imageBase64) => {
-            img.value = 'data:image/png;base64,' + imageBase64;
-        });
+    // 检查 props.modRef 是否存在
+    if (props.lazyLoad) {
+        if (props.modRef.preview == null) {
+            //如果没有预览图片，则不显示图片
+            ifDisplayImage.value = false;
+            return '';
+        }
+        ifDisplayImage.value = true;
+        return await props.modRef.getPreviewBase64(true);   
     }
-    return img.value;
-})
+    else {
+        return await props.modRef.getPreviewBase64(true);
+    }
+}
 
-iManager.on('addMod',(mod)=>{
-    // 在mod 添加的时候，检查一下 图片是否正常刷新
-    //debug
+// onMounted(() => {
+//     //加载图片
+//     props.modRef.getPreviewBase64(true).then((res) => {
+//         img.value = res;
+//     });
+// })  
+
+EventSystem.on('addMod',(mod)=>{
     console.log(`modItem ${props.mod} received addMod event`,enteredWindow.value,props.lazyLoad,img.value == null);
-    //! 这里是临时的解决方案，应该在图片加载失败的时候，重新加载图片
-    // ifDisplayImage.value = false;
-    
-    // setTimeout(() => {
-    //     ifDisplayImage.value = true;
-    // }, 1);
 })
 
+//==================== init ====================//
+
+const enterWindow = async () => {
+    // console.log(`modItem ${props.mod} enterWindow: lazyLoad, img loaded`);
+    enteredWindow.value = true;
+    if (props.lazyLoad && img.value == null) {
+        img.value = await getImage();
+    }
+}
+
+
+//===================== 动画效果 =====================//
 const clicked = ref(false);
 const modItemRef = useTemplateRef('modItemRef');
 const emit = defineEmits(['click'])
@@ -117,8 +118,8 @@ const click = (event) => {
         console.log(`click: ${props.mod},current clicked: ${clicked.value},attribute: ${modItemRef.value.getAttribute('clicked')}`);
         //emit('click', props.mod);
         // iManager.setLastClickedMod_ByName(props.mod);
-        iManager.setCurrentModByName(props.mod);
-        iManager.toggledModByName(props.mod);
+        iManager.setCurrentMod(props.modRef);
+        iManager.toggledModByName(props.modRef.name);
     }
     else {
         playClickAnim(modItemRef.value);
@@ -126,9 +127,9 @@ const click = (event) => {
 }
 
 const openEditModDialog = () => {
-    // iManager.setLastClickedMod_ByName(props.mod);
-    iManager.setCurrentModByName(props.mod);
-    iManager.showDialog('edit-mod-dialog');
+    iManager.setCurrentMod(props.modRef);
+    // iManager.showDialog('edit-mod-dialog');
+    DialogHelper.showDialog(DialogID.editModDialog);
 }
 
 function playClickAnim(modItem, event = null, rect = null) {
@@ -309,16 +310,7 @@ watch(() => props.compactMode, (newVal, oldVal) => {
     }
 })
 
-//==================== init ====================//
-onMounted(() => {
-    iManager.waitInit().then(() => {
 
-    });
-})
-
-const enterWindow = () => {
-    enteredWindow.value = true;
-}
 
 
 defineExpose({
@@ -408,34 +400,6 @@ defineExpose({
     height: 80px;
     border: 0;
 }
-
-/* .mod-item.compact img {
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover;
-    position: absolute;
-    filter: blur(5px);
-    opacity: 0.2;
-}
-
-.mod-item.compact div[slot="image"] {
-    position: absolute;
-    z-index: -1;
-} */
-
-/* .mod-item[compact="true"] {
-    perspective: 500px;
-    width: 250px;
-    height: 200px;
-    margin-bottom: 0px;
-    will-change: transform;
-    transition: x, y 0.5s cubic-bezier(.36, -0.64, .34, 1.76);
-    border-radius: 0px 30px 0px 30px;
-} */
-
-
 .mod-item[compact="true"] {
     width: 250px;
     height: 150px;
@@ -457,28 +421,6 @@ defineExpose({
     position: absolute;
     z-index: -1;
 }
-
-
-
-/* 使用 css 的 animation 实现折叠效果 */
-/* 
-@keyframes identifier {
-    0% {
-        margin-top: 200px;
-        color: red;
-    }
-
-    100% {
-        margin-top: 0px;
-        color: blue;
-    }
-}
-
-.mod-item[compact="true"] #mod-item-headline {
-    animation: identifier 1s ease-in-out;
-    animation-fill-mode: forwards;
-    animation-iteration-count: 1;
-} */
 </style>
 
 <style scoped>
