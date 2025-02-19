@@ -86,6 +86,7 @@ class IManager {
     os = process.platform;
     HMC = null;
     ModData = ModData;
+    TranslatedText = TranslatedText;
 
 
     //-==================== 核心数据 ====================

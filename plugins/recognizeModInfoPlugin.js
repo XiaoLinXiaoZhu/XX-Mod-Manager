@@ -58,15 +58,23 @@ const getModKeySwap = async (iManager, mod) => {
     }
     findIniInFolder(modPath);
     if (iniFilePaths.length === 0) {
-        //debug
-        console.log('In mod 【' + mod.name + '】, no ini file found');
-        iManager.snack('In mod 【' + mod.name + '】, no ini file found', 'error');
+        // 增加双语支持
+        const tt = new iManager.TranslatedText({
+            zh_cn: '在mod【' + mod.name + '】中没有找到ini文件',
+            en: 'No ini file found in mod【' + mod.name + '】'
+        });
+        iManager.t_snack(tt, 'error');
+        console.log(tt.get());
+        
         return;
     }
-
-    //debug
-    console.log('In mod 【' + mod.name + '】, ini files found:', iniFilePaths);
-    iManager.snack('In mod 【' + mod.name + '】, ini files found:' + iniFilePaths.join(', '), 'info');
+    
+    const succsessTT = new iManager.TranslatedText({
+        zh_cn: '在mod【' + mod.name + '】中找到了ini文件',
+        en: 'Found ini files in mod【' + mod.name + '】'
+    });
+    iManager.t_snack(succsessTT, 'info');
+    console.log(succsessTT.get());
 
     // 2. 读取所有 ini 文件
     let keyswap = [];
