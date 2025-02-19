@@ -263,6 +263,9 @@ module.exports = {
 
         iManager.on('addMod', async (mod) => {
             //debug
+            if (mod == undefined) {
+                return;
+            }
             console.log('addMod:', mod);
             if (iManager.getPluginData(pluginName, "ifAddKeySwap")) {
                 const newMod = await getModKeySwap(iManager, mod);

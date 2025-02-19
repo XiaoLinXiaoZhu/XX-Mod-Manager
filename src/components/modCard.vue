@@ -88,9 +88,9 @@ const getImage = async () => {
 //     });
 // })  
 
-EventSystem.on('addMod',(mod)=>{
-    console.log(`modItem ${props.mod} received addMod event`,enteredWindow.value,props.lazyLoad,img.value == null);
-})
+// EventSystem.on('addMod',(mod)=>{
+//     console.log(`modItem ${props.mod} received addMod event`,enteredWindow.value,props.lazyLoad,img.value == null);
+// })
 
 //==================== init ====================//
 

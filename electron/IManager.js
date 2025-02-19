@@ -82,6 +82,10 @@ class IManager {
         return this;
     }
 
+    //-==================== 暴露依赖 ====================
+    os = process.platform;
+    HMC = null;
+    ModData = ModData;
 
 
     //-==================== 核心数据 ====================
@@ -91,9 +95,7 @@ class IManager {
     //     name: null, // 当前配置的名称
     //     path: null, // 当前配置的路径
     // };
-    os = process.platform;
     // 对外暴露的 hmc 对象，使得插件可以直接调用 hmc 的方法
-    HMC = null;
     // 从本地加载的配置项
     config = {
         firstLoad: true, // 是否第一次加载
@@ -202,6 +204,11 @@ class IManager {
         // 当 currentCharacter 不变时，不会触发 currentCharacterChanged 事件
         // 但是 characterList 的顺序 是按照从mod中获取的顺序，所以这里需要将其排序一下，默认按照字母排序
         this.data.characterList = Array.from(this.data.characterList).sort();
+
+        // 如果 currentCharacter 不为空，且 characterList 中不包含 currentCharacter，则将 currentCharacter 设置为 all
+        if (this.temp.currentCharacter !== null && !this.data.characterList.includes(this.temp.currentCharacter)) {
+            this.setCurrentCharacter('all');
+        }
     }
 
     async loadPresets() {
@@ -228,6 +235,7 @@ class IManager {
         const data = this.data.modList.find((mod) => mod.name === modName);
 
         if (data == null) {
+            // 如果 data 为空，则从文件中加载,并且将其添加到 modList 中
             return await this.loadModInfo(modName);
         }
 
@@ -255,6 +263,9 @@ class IManager {
             data.newMod = false;
             EventSystem.trigger('addMod', mod);
         }
+
+        // 将其添加到 modList 中
+        this.data.modList.push(mod);
         
         // 刷新一下characterList
         this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
@@ -303,7 +314,7 @@ class IManager {
         console.log('✅>> loadPresets done');
 
         // 加载插件
-        IPluginLoader.Init(this);
+        await IPluginLoader.Init(this);
         console.log('✅>> loadPlugins done');
 
         //debug

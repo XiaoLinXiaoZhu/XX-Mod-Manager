@@ -47,6 +47,11 @@ const loadMods = async () => {
         await loadPreset(iManager.temp.currentPreset);
     }
 
+    // 检查是否选择了角色，如果选择了角色，则筛选角色
+    if (iManager.temp.currentCharacter && iManager.temp.currentCharacter != 'all') {
+        handleFilterChange(iManager.temp.currentCharacter);
+    }
+
     //debug
     console.log(`❇️❇️❇️❇️❇️❇️❇️\nsuccess load mods, mod count: ${mods.value.length}, character count: ${characters.value.length}`);
 };

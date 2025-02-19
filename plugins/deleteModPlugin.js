@@ -29,6 +29,24 @@ const path = require('path');
 const pluginName = 'deleteModPlugin';
 // 这是一个用来在 编辑mod信息页面 增加一个 删除mod 按钮的插件
 
+function removeModFromList(iManager, modName) {
+    // 不再需要刷新页面，直接删除mod信息
+    // iManager.showDialog('dialog-need-refresh');
+
+    iManager.data.modList = iManager.data.modList.filter((mod) => {
+        return mod.name !== modName;
+    });
+
+    // 刷新角色列表
+    iManager.refreshCharacterList();
+
+    //! 这是不好的做法，应当将事件的调用逻辑单独拎出来
+    //! 现在很多地方都直接调用了事件，这样会导致代码的耦合性很高
+    iManager.trigger('addMod');
+
+    // 使得编辑mod信息页面消失
+    iManager.dismissDialog('edit-mod-dialog');
+}
 function deleteMod(iManager, modName) {
     iManager.snack('删除mod: '+modName, 'error');
 
@@ -47,7 +65,7 @@ function deleteMod(iManager, modName) {
                     console.error(err);
                 } else {
                     iManager.snack('已删除mod: '+modName, 'info');
-                    iManager.showDialog('dialog-need-refresh');
+                    removeModFromList(iManager, modName);
                 }
             });
             return;
@@ -76,7 +94,7 @@ function deleteMod(iManager, modName) {
                 console.error(err);
             } else {
                 iManager.snack('已将mod移动到回收站: '+modName, 'info');
-                iManager.showDialog('dialog-need-refresh');
+                removeModFromList(iManager, modName);
             }
         });
     } else {

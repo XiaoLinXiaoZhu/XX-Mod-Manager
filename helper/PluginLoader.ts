@@ -75,7 +75,7 @@ class IPluginLoader {
     }
 
     public static async Init(env: any) {
-        await IPluginLoader.clearAllPlugins(); // 清空所有插件    
+        IPluginLoader.clearAllPlugins(); // 清空所有插件    
         IPluginLoader.enviroment = env;
 
         // 加载禁用的插件
