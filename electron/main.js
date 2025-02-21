@@ -14,6 +14,10 @@ let firstpage = false;
 firstpage = process.argv.includes('--firstpage');
 console.log('firstpage', firstpage);
 
+let switchConfig = false;
+switchConfig = process.argv.includes('--switchConfig');
+console.log('switchConfig', switchConfig);
+
 let devTools = false;
 devTools = process.argv.includes('--devTools');
 console.log('devTools', devTools);
@@ -83,6 +87,9 @@ currentMainWindow.on("focus",()=>{
     mainWindow.loadURL('http://localhost:3000/')
     if(firstpage){
       mainWindow.loadURL('http://localhost:3000/firstLoad/index.html')
+    }
+    if(switchConfig){
+      mainWindow.loadURL('http://localhost:3000/switchConfig/index.html')
     }
     if(devTools){
       mainWindow.webContents.openDevTools()

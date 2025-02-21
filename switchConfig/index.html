@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>First Load Page</title>
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <link rel="stylesheet" type="text/css" href="../src/style.css" />
+    <link rel="stylesheet" href="../sober-theme.css">
+    <style>
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :not(:defined) {
+            display: none;
+        }
+    </style>
+
+</head>
+
+
+<body>
+    <s-page id="app-container" theme="dark"
+        style="display: flex;justify-content: center;flex-direction: column;flex-wrap: nowrap;align-items: center;align-content: center;">
+    </s-page>
+
+</body>
+
+
+<script type="module" src="switchConfig.js"></script>
+<script type="module" src="../src/js/classManager.js"></script>
+<script type="module" src="../src/js/colorManager.js"></script>
+<script type="module">
+    import 'sober';
+</script>
+
+</html>

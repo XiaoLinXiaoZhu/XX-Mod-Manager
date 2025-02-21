@@ -24,6 +24,7 @@ export default defineConfig({
       input: {
         main: 'index.html',
         firstLoad: 'firstLoad/index.html',
+        switchConfig: 'switchConfig/index.html',
       },
       output: {
         assetFileNames: (assetInfo) => {
