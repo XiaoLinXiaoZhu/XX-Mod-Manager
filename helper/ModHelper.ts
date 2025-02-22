@@ -56,6 +56,11 @@ class ImageHelper {
     }
 }
 
+EventSystem.on(EventType.windowSleep, async() => {
+    ImageHelper.clearImageCache();
+}
+);
+
 class ModData {
     public name: string;
     public character: string;
@@ -86,6 +91,7 @@ class ModData {
             this.oldPreview = "";
             // this.modPreviewBase64 = "";
             this.modPreviewBase64WithHeader.clear();
+            
         });
     }
 
@@ -247,9 +253,9 @@ class ModData {
         this.oldPreview = this.preview;
         if (ifWithHeader){
             // 1s 后 清理缓存
-            setTimeout(() => {
-                ImageHelper.clearImageCache();
-            }, 1000);
+            // setTimeout(() => {
+            //     ImageHelper.clearImageCache();
+            // }, 1000);
             return ImageHelper.getImageUrlFromLocalPath(this.preview);
         }
 
