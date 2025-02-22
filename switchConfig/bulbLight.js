@@ -11,7 +11,7 @@ export function createBulbLight(color, intensity, distance = 0, decay = 2 ) {
         emissiveIntensity: 1,
         color: 0x000000
     });
-    //bulbLight.add(new THREE.Mesh(bulbGeometry, bulbMat));
+    // bulbLight.add(new THREE.Mesh(bulbGeometry, bulbMat));
     bulbLight.position.set(0, 0, 0);
     bulbLight.castShadow = true;
 

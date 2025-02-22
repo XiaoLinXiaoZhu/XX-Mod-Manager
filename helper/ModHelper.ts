@@ -5,11 +5,14 @@ const { ipcRenderer } = require('electron');
 import { EventType,EventSystem } from "./EventSystem";
 import { SnackType,snack,t_snack } from "./SnackHelper";
 
-
+let count = 0;
 class ImageBase64 {
     private base64WithHeader: string = "";
     public get = () => this.base64WithHeader;
-    public set = (base64WithHeader: string) => this.base64WithHeader = base64WithHeader;
+    public set = (base64WithHeader: string) =>{
+        this.base64WithHeader = base64WithHeader;
+        count ++ ;
+    }
 
     public withoutHeader = () => this.base64WithHeader.split(',')[1];
     public getExt = () => this.base64WithHeader.split(";")[0].split("/")[1];
@@ -18,6 +21,38 @@ class ImageBase64 {
 
     constructor(base64WithHeader: string) {
         this.base64WithHeader = base64WithHeader;
+    }
+}
+
+// 每1s打印一次count
+setInterval(() => {
+    console.log(`imageBase64 count: ${count}`);
+}, 1000);
+
+
+class ImageHelper {
+    private static imageCache: {[key: string]: string} = {};
+    public static async getImageBase64(imagePath: string) {
+        return "data:image/png;base64," + await ipcRenderer.invoke('get-image', imagePath);
+    }
+    public static async getImageUrlFromLocalPath(imagePath: string, ifCache: boolean = true) {
+        if (ifCache && this.imageCache[imagePath]) {
+            return this.imageCache[imagePath];
+        }
+        else {
+            const bufffer = fs.readFileSync(imagePath);
+            const blob = new Blob([bufffer], {type: "image/png"});
+            const tempUrl = URL.createObjectURL(blob);
+            this.imageCache[imagePath] = tempUrl;
+            return tempUrl;
+        }
+    }
+    public static async clearImageCache() {
+        // 清空 创建的临时url
+        for (const key in this.imageCache) {
+            URL.revokeObjectURL(this.imageCache[key]);
+        }
+        this.imageCache = {};
     }
 }
 
@@ -210,6 +245,14 @@ class ModData {
             return ifWithHeader ? this.modPreviewBase64WithHeader.get() : this.modPreviewBase64WithHeader.withoutHeader();
         }
         this.oldPreview = this.preview;
+        if (ifWithHeader){
+            // 1s 后 清理缓存
+            setTimeout(() => {
+                ImageHelper.clearImageCache();
+            }, 1000);
+            return ImageHelper.getImageUrlFromLocalPath(this.preview);
+        }
+
         this.modPreviewBase64WithHeader.set("data:image/png;base64," + await ipcRenderer.invoke('get-image', this.preview));
         return ifWithHeader ? this.modPreviewBase64WithHeader.get() : this.modPreviewBase64WithHeader.withoutHeader();
     }

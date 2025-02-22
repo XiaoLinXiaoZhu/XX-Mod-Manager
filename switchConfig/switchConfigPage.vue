@@ -8,9 +8,9 @@
     <div class="main-container">
         <div id="drag-bar" style="position: fixed;width: 100%;height: 30px;-webkit-app-region: drag;">
         </div>
-        <back-btn id="close-btn"></back-btn>
-
+        
         <div id="head-frame">
+            <backButton id="close-btn"></backButton>
             <div id="info-box">
                 <div id="tape-title"></div>
                 <div id="tape-description"></div>
@@ -34,10 +34,11 @@
         <div class="button button-svg" id="prev-btn" style="left: 10px;transform: rotate(180deg);">
         </div>
 
-
         <div id="scene-container">
-            <div id="scene-mask"></div>
+            <div id="scene-mask">
+            </div>
         </div>
+        
 
         <div id="bottom-frame">
         </div>
@@ -47,7 +48,7 @@
 
 <script setup>
 import { Tween, Group, Easing } from '@tweenjs/tween.js';
-
+import backButton from '../src/components/backButton.vue';
 import * as THREE from 'three';
 //-========================后期处理========================
 import { UnrealBloomPass } from 'three/examples/jsm/Addons.js';
@@ -96,7 +97,7 @@ function initLight(scene) {
     scene.add(light);
 
     const helper = new THREE.DirectionalLightHelper(light, 5);
-    //scene.add(helper);
+    // scene.add(helper);
 
 
     // 环境光
@@ -145,7 +146,7 @@ function initScene(scene) {
     // 创建书架背景
     const shelfGeometry = new THREE.BoxGeometry(81.92 / 2, 25.76 / 2, 30); // 书架的深度、宽度、高度
     const textureLoader = new THREE.TextureLoader();
-    const shelfTexture = textureLoader.load('../../src/television.jpg');
+    const shelfTexture = textureLoader.load('../src/assets/tape/television.jpg');
     const shelfMaterial = new THREE.MeshLambertMaterial({ map: shelfTexture });
     shelf = new THREE.Mesh(shelfGeometry, shelfMaterial);
     shelf.position.set(0, 1, -30); // 位置靠近相机后方
@@ -236,7 +237,7 @@ function showLogo() {
     // 将 scene-mask  的 index 设置为 0，使得 logo 在最上层
     document.getElementById('scene-mask').style.zIndex = -1;
 
-    const logoTexture = new THREE.TextureLoader().load('../../src/icon.png');
+    const logoTexture = new THREE.TextureLoader().load('../src/assets/tape/icon.png');
     const logoMaterial = new THREE.MeshBasicMaterial({ map: logoTexture });
     const logoGeometry = new THREE.PlaneGeometry(1, 1);
     const logo = new THREE.Mesh(logoGeometry, logoMaterial);
@@ -279,8 +280,10 @@ function showLogo() {
         scene.remove(ambientLight);
         camera.position.z = 10;
         isShowingLogo = false;
-        sceneContainer.style.zIndex = -1;
+        sceneContainer.style.zIndex = 0;
         document.getElementById('scene-mask').style.zIndex = 1;
+        document.getElementById('head-frame').style.zIndex = 2;
+        document.getElementById('bottom-frame').style.zIndex = 2;
     }, 3500);
 }
 
@@ -288,7 +291,6 @@ function init() {
     // 创建场景
     scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0x111111, 0, 100);
-
 
     // 创建相机
     camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -303,6 +305,13 @@ function init() {
 
     document.getElementById('scene-container').appendChild(renderer.domElement);
 
+    const initDebug = (scene) => {
+        // 创建坐标轴
+        const axesHelper = new THREE.AxesHelper(9999999999999);
+        scene.add(axesHelper);
+
+    };
+    // initDebug(scene);
     initLight(scene);
     initScene(scene);
     initPostProcessing(scene, camera, renderer);
@@ -315,7 +324,6 @@ function init() {
 
     animate();
 }
-
 
 let mouseDown = false;
 let lastMouseX = 0;
@@ -386,7 +394,7 @@ function refreshTapeInfo() {
 async function loadConfigs() {
     //! 以后要改成从本地文件中读取
     // 这里直接返回一个假数据
-    
+
     let result = [];
     const userDatePath = await ipcRenderer.invoke('get-user-data-path');
     const configRootDir = path.join(userDatePath, 'config');

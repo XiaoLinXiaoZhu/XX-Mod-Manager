@@ -1,7 +1,10 @@
 import * as THREE from 'three';
 import { Tween, Easing, Group } from '@tweenjs/tween.js';
 
+
+const { ipcRenderer } = require('electron');
 const fs = require('fs');
+const path = require('path');
 
 const textureLoader = new THREE.TextureLoader();
 
@@ -34,6 +37,26 @@ function createTapeMaterial(frontTexture, sideTexture, backTexture, spineTexture
 }
 
 //-=========================Tape=========================
+
+// 将文件拖入网页时创建的Blob或File对象。
+// var blobs = {'fish.gltf': blob1, 'diffuse.png': blob2, 'normal.png': blob3};
+// var manager = new THREE.LoadingManager();
+
+// 使用URL回调初始化加载管理器。
+// var objectURLs = [];
+// manager.setURLModifier( ( item ) => {
+// 	item = URL.createObjectURL( blobs[ item ] );
+// 	objectURLs.push( item );
+// 	return item;
+// } );
+
+// 像通常一样加载，然后撤消blob URL
+// var loader = new THREE.GLTFLoader( manager );
+// loader.load( 'fish.gltf', (gltf) => {
+// 	scene.add( gltf.scene );
+// 	objectURLs.forEach( ( url ) => URL.revokeObjectURL( url ) );
+// });
+
 
 class Tape {
     //--------------audio----------------
@@ -89,12 +112,25 @@ class Tape {
 
     SetTapeMaterialFromUrl(urls) {
         // 从 路径 加载纹理，如果加载失败则使用默认纹理
-        const frontTexture = fs.existsSync(urls.tape_front) ? textureLoader.load(urls.tape_front) : Tape.defaultfrontTexture;
-        const sideTexture = fs.existsSync(urls.tape_side) ? textureLoader.load(urls.tape_side) : Tape.defaultsideTexture;
-        const backTexture = fs.existsSync(urls.tape_back) ? textureLoader.load(urls.tape_back) : Tape.defaultbackTexture;
-        const spineTexture = fs.existsSync(urls.tape_spine) ? textureLoader.load(urls.tape_spine) : Tape.defaultspineTexture;
+        const objectURLs = [];
+        const createObjectURLFromLocalFile = (absoultePath) => {
+            const blob = new Blob([fs.readFileSync(absoultePath)]);
+            const url = URL.createObjectURL(blob);
+            objectURLs.push(url);
+            return url;
+        }
+
+        const frontTexture = fs.existsSync(urls.tape_front) ? textureLoader.load(createObjectURLFromLocalFile(urls.tape_front)) : Tape.defaultfrontTexture;
+        const sideTexture = fs.existsSync(urls.tape_side) ? textureLoader.load(createObjectURLFromLocalFile(urls.tape_side)) : Tape.defaultsideTexture;
+        const backTexture = fs.existsSync(urls.tape_back) ? textureLoader.load(createObjectURLFromLocalFile(urls.tape_back)) : Tape.defaultbackTexture;
+        const spineTexture = fs.existsSync(urls.tape_spine) ? textureLoader.load(createObjectURLFromLocalFile(urls.tape_spine)) : Tape.defaultspineTexture;
 
         this.SetTapeMaterial(frontTexture, sideTexture, backTexture, spineTexture);
+
+        // 清除创建的 URL
+        setTimeout(() => {
+            objectURLs.forEach(url => URL.revokeObjectURL(url));
+        }, 1000);
     }
 
     //--------------geometry----------------

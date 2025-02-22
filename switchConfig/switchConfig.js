@@ -83,7 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.addEventListener('beforeunload', () => {
     iManager.saveConfig();
-    ipcRenderer.send('refresh-main-window');
 });
 
 //-======================== snackbar ========================-//
