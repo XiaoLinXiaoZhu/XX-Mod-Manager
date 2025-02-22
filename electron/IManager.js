@@ -63,6 +63,11 @@ let g_config = {
         y: -1,
     }
 };
+let g_data = {
+    modList: [],
+    presetList: [],
+    characterList: [],
+};
 
 //-==================== vue 版本的全局变量 ====================//
 import { ref } from 'vue';
@@ -90,6 +95,12 @@ const g_config_vue = {
         x: -1,
         y: -1,
     }),
+};
+
+const g_data_vue = {
+    modList: ref([]),
+    presetList: ref([]),
+    characterList: ref([]),
 };
 
 
@@ -1426,4 +1437,4 @@ ipcRenderer.on('windowFocus', () => {
 });
 
 export default IManager;
-export { waitInitIManager,g_temp,g_temp_vue };
+export { waitInitIManager,g_temp,g_temp_vue,g_config,g_config_vue,g_data,g_data_vue};

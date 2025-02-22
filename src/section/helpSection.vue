@@ -86,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 
 import leftMenu from '../components/leftMenu.vue';
 import Markdown from '../components/markdown.vue';
@@ -542,8 +542,12 @@ If you know some front-end development, you can try pressing Ctrl+Shift+I to ope
 If you cannot solve the problem, please contact me.
 `;
 
+import { g_config_vue } from '../../electron/IManager';
 
-const language = ref('en');
+const language = g_config_vue.language;
+watch(language, (newVal, oldVal) => {
+  setTranslatedTabs(newVal);
+});
 
 // 重新编排tab内容和顺序
 // 1. 名词解释
@@ -572,12 +576,7 @@ const setTranslatedTabs = (language) =>{
 }
 
 onMounted(() => {
-  EventSystem.on(EventType.languageChange, (lang) => {
-    //debug 
-    console.log('helpSection languageChange', lang);
-    language.value = lang;
-    setTranslatedTabs(lang);
-});
+  setTranslatedTabs(language.value);
 });
 
 </script>
