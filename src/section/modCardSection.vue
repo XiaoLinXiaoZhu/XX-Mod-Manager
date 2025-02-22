@@ -72,7 +72,7 @@ import leftMenu from '../components/leftMenu.vue';
 import modInfo from '../components/modInfo.vue';
 import { ref, onMounted, useTemplateRef,watch, computed } from 'vue';
 import IManager from '../../electron/IManager';
-import { g_temp_vue } from '../../electron/IManager';
+import { g_temp_vue , g_config_vue } from '../../electron/IManager';
 import fsProxy from '../../electron/fsProxy';
 const iManager = new IManager();
 const fsproxy = new fsProxy();
@@ -115,7 +115,7 @@ function handleCompactButtonClicked() {
 //-============================= presets ==============================
 //#region presets
 const presets = ref([]);
-const currentPreset = ref('default');
+const currentPreset = g_temp_vue.currentPreset;
 
 function loadPresetList() {
     let list = iManager.data.presetList;
@@ -133,9 +133,7 @@ EventSystem.on('addPreset', (preset) => {
 });
 
 function handlePresetChange(tab) {
-    currentPreset.value = tab;
     console.log('tab changed to', tab);
-
     iManager.setCurrentPreset(tab);
 }
 
@@ -162,11 +160,6 @@ function handleApplyButtonClicked() {
     });
 }
 
-// EventSystem.on(EventType.initDone, (iManager) => {
-
-//     loadPresetList();
-// });
-
 EventSystem.on('toggledMod', (mod) => {
     //debug
     console.log('toggled mod', mod.name);
@@ -175,7 +168,7 @@ EventSystem.on('toggledMod', (mod) => {
 
 EventSystem.on('currentPresetChanged', (preset) => {
     // debug
-    console.log('111111111111111111current preset changed to', preset,presets.value);
+    console.log('current preset changed to', preset,presets.value);
     presetSelectorRef.value.selectTabByName(preset);
 });
 

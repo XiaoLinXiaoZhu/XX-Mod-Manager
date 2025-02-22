@@ -5,7 +5,8 @@
         <s-scroll-view style="overflow-x:hidden;overflow-y: auto;border-radius: 0 0 10px 10px;">
             <div class="refresh-placeholder" ref="refreshPlaceholderRef"></div>
             <div id="mod-container" :compact="compactMode" ref="modContainerRef">
-                <modCard v-for="mod in mods" :modRef="mod" :lazyLoad=true :compactMode="compactMode" :ref="setModCardRef(mod.name)" />
+                <modCard v-for="mod in mods" :modRef="mod" :lazyLoad=true :compactMode="compactMode"
+                    :ref="setModCardRef(mod.name)" />
             </div>
             <div class="placeholder"></div>
         </s-scroll-view>
@@ -18,7 +19,8 @@ import chipRadioBar from './chipRadioBar.vue';
 import { ref, onMounted, computed, useTemplateRef, watch } from 'vue';
 import modCard from './modCard.vue';
 import { Tween, Group } from "@tweenjs/tween.js";
-import IManager from '../../electron/IManager';
+import IManager, { g_data_vue } from '../../electron/IManager';
+import { g_config_vue, g_temp_vue } from '../../electron/IManager';
 import { EventType, EventSystem } from '../../helper/EventSystem';
 
 const iManager = new IManager();
@@ -30,26 +32,40 @@ const props = defineProps({
 
 // 定义 mods 变量
 const mods = ref([]);
-const characters = ref(['all', 'selected']);
-const translateCharacters = ref(['全部', '已选择']);
+
 const characterFilterRef = useTemplateRef('characterFilterRef');
-const currentCharacter = ref('all');
+const currentCharacter = g_temp_vue.currentCharacter;
+
+watch(currentCharacter, (newVal) => {
+    if (newVal) {
+        characterFilterRef.value.selectItemByName(newVal);
+        changeFilter(newVal);
+    }
+});
+
+const characters = computed(() => {
+    const characterList = g_data_vue.characterList;
+    if (!characterList) return [];
+    //debug
+    console.log('get characterList', characterList.value);
+    return ['all', 'selected', ...characterList.value];
+});
+
+const translateCharacters = computed(() => {
+    if (g_config_vue.language.value == 'zh_cn') {
+        return ['全部', '已选择'];
+    } else {
+        return ['All', 'Selected'];
+    }
+});
 
 // 定义 loadMods 方法
 const loadMods = async () => {
     mods.value = iManager.data.modList
 
-    characters.value = ['all', 'selected', ...iManager.data.characterList];
-    currentCharacter.value = 'all';
-
     // 检查是否选择了预设，如果选择了预设，则加载预设
     if (iManager.temp.currentPreset && iManager.temp.currentPreset != 'default') {
         await loadPreset(iManager.temp.currentPreset);
-    }
-
-    // 检查是否选择了角色，如果选择了角色，则筛选角色
-    if (iManager.temp.currentCharacter && iManager.temp.currentCharacter != 'all') {
-        handleFilterChange(iManager.temp.currentCharacter);
     }
 
     //debug
@@ -65,8 +81,6 @@ const setModCardRef = (name) => (el) => {
 
 // 定义 handleFilterChange 方法
 const handleFilterChange = (character) => {
-    currentCharacter.value = character;
-    changeFilter(character);
     iManager.setCurrentCharacter(character);
 };
 
@@ -250,14 +264,6 @@ onMounted(async () => {
     });
 });
 
-EventSystem.on(EventType.languageChange, (language) => {
-    if (language == 'zh_cn') {
-        translateCharacters.value = ['全部', '已选择'];
-    } else {
-        translateCharacters.value = ['All', 'Selected'];
-    }
-});
-
 EventSystem.on('modInfoChanged', (modInfo) => {
     //debug
     console.log('get modInfoChanged');
@@ -265,11 +271,8 @@ EventSystem.on('modInfoChanged', (modInfo) => {
     characters.value = null;
     setTimeout(async () => {
         await loadMods();
-        observeMods();
-
-        // iManager.setLastClickedMod_ByName(modInfo.name);
-        iManager.setCurrentModByName(modInfo.name);
         iManager.setCurrentCharacter(modInfo.character);
+        observeMods();
     }, 1);
 });
 
@@ -283,15 +286,6 @@ EventSystem.on('addMod', () => {
         loadMods();
         observeMods();
     }, 1);
-});
-
-EventSystem.on('currentCharacterChanged', (character) => {
-    if (currentCharacter.value == character) return;
-    currentCharacter.value = character;
-
-    characterFilterRef.value.selectItemByName(character);
-
-    changeFilter(character);
 });
 
 EventSystem.on('currentPresetChanged', (preset) => {

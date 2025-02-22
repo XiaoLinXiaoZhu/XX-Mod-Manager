@@ -25,9 +25,9 @@ class ImageBase64 {
 }
 
 // 每1s打印一次count
-setInterval(() => {
-    console.log(`imageBase64 count: ${count}`);
-}, 1000);
+// setInterval(() => {
+//     console.log(`imageBase64 count: ${count}`);
+// }, 1000);
 
 
 class ImageHelper {

@@ -122,7 +122,6 @@ class IManager {
             return IManager.instance;
         }
         IManager.instance = this;
-        this.data = {};
         this.plugins = {};
 
         this.HMC = HMC
@@ -225,6 +224,13 @@ class IManager {
         set: (target, key, value) => {
             if (target.hasOwnProperty(key)) {
                 target[key] = value;
+                // console.log(`data set: ${key}`, value);
+                // 不保存 modList，因为 modList 是一个对象数组，如果 传来传去，会导致内存占用过大
+                if (key === 'modList') {
+                    return true;
+                }
+                g_data[key] = value;
+                g_data_vue[key].value = value;
                 return true;
             } else {
                 console.error(`Invalid key: ${key}`);
@@ -456,6 +462,9 @@ class IManager {
             // characterList 变化
             this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
             this.data.characterList = Array.from(this.data.characterList).sort();
+        });
+        EventSystem.on(EventType.currentModChanged, (mod) => {
+            this.temp.currentMod = mod;
         });
 
         //调用 start 方法
@@ -957,27 +966,6 @@ class IManager {
         // 但是回调提供的是异步方法，我们需要知道最后一个文件是否移动完成
 
         if (ifSuccess) {
-            // // 刷新mod列表
-            // await this.loadMods();
-            // const mod = await this.getModInfo(modName);
-
-            // // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
-            // //debug
-            // console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
-
-            // if (this.temp.currentCharacter !== null && mod.character === 'Unknown') {
-            //     mod.character = this.temp.currentCharacter;
-            //     await mod.saveModInfo();
-            // }
-            // this.trigger('addMod', mod);
-
-            // setTimeout(() => {
-            //     // this.setLastClickedMod(mod);
-            //     this.setCurrentMod(mod);
-            //     this.setCurrentCharacter(mod.character);
-            //     this.showDialog('edit-mod-dialog');
-            // }, 200);
-
             //- 不再需要完全刷新，只需要将新的mod添加到列表中
             // 读取 mod.json    
             const mod = await this.getModInfo(modName);
@@ -1040,37 +1028,6 @@ class IManager {
 
         //debug
         console.log(`Copied folder: ${item.fullPath}`);
-        // 复制完成后，刷新 modList
-        // await this.loadMods();
-        // console.log(`❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️`);
-
-
-        // // 刷新完成后，弹出提示
-        // snack(`Added mod ${modName}`);
-        // console.log(`ModList:`, this.data.modList);
-
-
-        // const mod = await this.getModInfo(modName)
-        // console.log(`getModInfo:`, mod);
-        // snack(`After Added mod ${modName}`);
-
-        // // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
-        // //debug
-        // console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
-        // if (this.temp.currentCharacter !== null && this.temp.currentCharacter !== 'All' && this.temp.currentCharacter !== 'Selected' && mod.character === 'Unknown') {
-        //     mod.character = this.temp.currentCharacter;
-        //     await mod.saveModInfo();
-        // }
-
-        // this.trigger('addMod', mod);
-
-        // setTimeout(() => {
-        //     // this.setLastClickedMod(mod);
-        //     this.setCurrentMod(mod);
-        //     this.setCurrentCharacter(mod.character);
-
-        //     this.showDialog('edit-mod-dialog');
-        // }, 200);
 
         //- 不再需要完全刷新，只需要将新的mod添加到列表中
         // 读取 mod.json    
@@ -1336,7 +1293,6 @@ class IManager {
     //-==================== 事件管理 ====================
     on = EventSystem.on;
     trigger = EventSystem.trigger;
-
 
 
     //-===================== 插件 =====================

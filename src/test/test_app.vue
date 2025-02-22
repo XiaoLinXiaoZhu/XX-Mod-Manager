@@ -82,13 +82,6 @@ const handleBackButtomClick = () => {
 
 waitInitIManager().then((iManager) => {
     loaded.value = true;
-
-    EventSystem.on('modInfoChanged', (mod) => {
-        currentMod.value = null;
-        setTimeout(() => {
-            currentMod.value = mod;
-        }, 1);
-    });
 });
 </script>
 
