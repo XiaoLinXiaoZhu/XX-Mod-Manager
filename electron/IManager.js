@@ -393,12 +393,16 @@ class IManager {
 
         // 将其转换为 ModData
         const mod = ModData.fromJson(data).setModSourcePath(this.config.modSourcePath);
+        this.setCurrentMod(mod);
 
         // 如果 是新的 mod，则触发 addMod 事件
         if (data.newMod) {
             data.newMod = false;
-            EventSystem.trigger('addMod', mod);
+            await EventSystem.triggerSync('addMod', mod);
         }
+
+        // 延时一下，等待 addMod 事件完成
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         // 将其添加到 modList 中
         this.data.modList.push(mod);
@@ -816,8 +820,10 @@ class IManager {
             fs.mkdirSync(destinationPath);
         }
 
+        let callbackCount = 0;
+        let startCallback = false;
         const extractCallback = (entry) => {
-            // 这里的path莫名其妙会报错，我自己写一个
+            
             const filePath = path.join(destinationPath, entry.path);
 
             // 当解压出来的文件包含中文时，会被替换为 * ，但是文件夹名不能包含 * ，所以需要将其替换为其他字符
@@ -846,8 +852,7 @@ class IManager {
                 reader.onload = () => {
                     const buffer = Buffer.from(reader.result);
                     try {
-
-                        fs.writeFileSync(newFilePath, buffer);
+                        fs.writeFileSync(newFilePath, buffer)
                     }
                     catch (error) {
                         console.error(`Error: ${error}`);
@@ -856,6 +861,17 @@ class IManager {
                         throw new Error(`Error: ${error}`);
                     }
                 };
+                reader.onloadend = () => {
+                    //debug
+                    callbackCount--;
+                    console.log(`onloadend: ${newFilePath}`, callbackCount);
+                }
+                reader.onloadstart = () => {
+                    //debug
+                    callbackCount++;
+                    startCallback = true;
+                    console.log(`onloadstart: ${newFilePath}`, callbackCount);
+                }
                 reader.readAsArrayBuffer(entry.file);
             }
             catch (error) {
@@ -892,6 +908,13 @@ class IManager {
                 t_snack(t_message, 'error');
                 return false;
             }
+        }
+
+        // 等待所有文件解压完成
+        while (callbackCount > 0 || !startCallback) {
+            //debug
+            console.log(`callbackCount: ${callbackCount}`);
+            await new Promise((resolve) => setTimeout(resolve, 10));
         }
 
         // 如果解压出来的文件包含中文，则提示用户
@@ -932,7 +955,6 @@ class IManager {
 
             return true;
         }
-        return true;
     }
 
     async handleArchiveDrop(file) {
@@ -959,7 +981,12 @@ class IManager {
         // 使用 libarchive 处理 zip 文件
         //debug
         console.log(`extracting ${file.name} to ${modPath}`);
+
+        // 记录一下时间
+        const startTime = new Date().getTime();
         const ifSuccess = await this.extractArchive(file, modPath);
+        const endTime = new Date().getTime();
+
         this.dismissDialog('loading-dialog');
 
         // 解压后还需要等待文件移动完成
@@ -974,7 +1001,7 @@ class IManager {
             // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
             //debug
             console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
-            if (this.temp.currentCharacter !== null && this.temp.currentCharacter !== 'All' && this.temp.currentCharacter !== 'Selected' && mod.character === 'Unknown') {
+            if (this.temp.currentCharacter !== null && this.temp.currentCharacter !== 'all' && this.temp.currentCharacter !== 'selected' && mod.character === 'Unknown') {
                 mod.character = this.temp.currentCharacter;
                 await mod.saveModInfo();
             }
@@ -983,6 +1010,7 @@ class IManager {
             this.setCurrentCharacter(mod.character);
             this.showDialog('edit-mod-dialog');
 
+            // 延时0.1s，触发 addMod 事件
             this.trigger('addMod', mod);
         }
         else {

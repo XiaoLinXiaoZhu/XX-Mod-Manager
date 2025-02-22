@@ -285,6 +285,13 @@ module.exports = {
                 }
                 // iManager.saveModInfo(newMod);
                 mod.saveModInfo();
+
+                if(iManager.temp.currentMod.name === mod.name){
+                    // 如果当前mod是新添加的mod，则切换到新添加的mod
+                    // debug
+                    console.log('currentMod:', iManager.temp.currentMod, 'newMod:', newMod);
+                    iManager.setCurrentMod(newMod);
+                }
             }
         });
 
