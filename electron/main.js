@@ -139,6 +139,22 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
 
+// 白屏意味着渲染进程崩溃了，这里可以尝试重启
+app.on('web-contents-created', (e, contents) => {
+  contents.on('crashed', () => {
+    if (!contents.isDestroyed()) {
+      contents.reload();
+    }
+  });
+});
+
+app.on("render-process-gone", (e, webContents, details) => {
+  console.log("render-process-gone", details);
+  if (!webContents.isDestroyed()) {
+    webContents.reload();
+  }
+});
+
 // 在当前文件中你可以引入所有的主进程代码
 // 也可以拆分成几个文件，然后用 require 导入。
 
