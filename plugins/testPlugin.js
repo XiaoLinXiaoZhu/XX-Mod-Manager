@@ -47,6 +47,27 @@ const markdown_cn = `# 测试插件
 ---
 # 配置项展示：
 下面是一些配置项的展示：`;
+const markdown_en = `# Test Plugin
+This is a simple test plugin, used to test the function and display effect of the plugin, for users, you can turn off the plugin in settings-plugin to cancel the display of the plugin.
+# Declare configuration items
+Plugins can display configuration items by declaring data, and users can configure the function of the plugin through the settings page:
+- boolean type data can be controlled by switch
+- number type data can be controlled by input box
+- path type data can be controlled by folder selector
+- select type data can be controlled by selector
+- button type data can trigger events by button
+- markdown type data can display text in markdown format
+
+# Listen for data changes
+Plugins can listen for data changes by declaring the onChange method, which will be triggered when data changes.
+# Save data
+Plugins can manually save data by calling iManager.savePluginConfig() method, of course the program will automatically save data when closing.
+# Event listening
+Plugins can listen for events through the iManager.on() method to implement the function of the plugin.
+---
+# Configuration item display:
+Here are some configuration items display:`;
+
 module.exports = {
     name: pluginName,
     t_displayName: {
@@ -78,7 +99,7 @@ module.exports = {
             },
             t_description: {
                 zh_cn: markdown_cn,
-                en: 'Test Markdown'
+                en: markdown_en
             },
             onChange: (value) => {
                 // markdown 类型的数据不会触发 onChange,它只作为展示

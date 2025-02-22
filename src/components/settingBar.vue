@@ -21,8 +21,9 @@
             v-else-if="data.type === 'number'"></s-text-field>
 
         <!-- -select -->
-        <div v-else-if="data.type === 'select'" style="display: flex;flex-direction:row;">
-            <div v-for="(option, index) in data.options" :key="index" style="margin-left: 3px;">
+        <div v-else-if="data.type === 'select'" style="display: flex;flex-direction:row;max-width: calc(100vw - 600px);overflow: hidden;">
+            <horizontal-scroll-bar>
+                <div v-for="(option, index) in data.options" :key="index" style="margin-left: 3px;">
                 <input type="radio" :name="data.name" :id="option.value" :value="option.value" v-model="data.data">
                 <label :for="option.value">
                     <s-chip selectable="true" type="default" :id="option.value" @click="onChange(option.value)"
@@ -31,6 +32,7 @@
                     </s-chip>
                 </label>
             </div>
+            </horizontal-scroll-bar>
         </div>
 
         <!-- -dir -->
@@ -102,6 +104,7 @@
 import { ref, defineProps, computed, defineEmits, onMounted } from 'vue';
 import IManager from '../../electron/IManager';
 import markdown from './markdown.vue';
+import horizontalScrollBar from './horizontalScrollBar.vue';
 const iManager = new IManager();
 import { EventSystem } from '../../helper/EventSystem';
 

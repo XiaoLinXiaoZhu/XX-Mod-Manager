@@ -165,7 +165,6 @@ class ModData {
         this.hotkeys = newModData.hotkeys;
 
         this.oldPreview = "";
-        // this.modPreviewBase64 = "";
         this.modPreviewBase64WithHeader.clear();
 
         return this;

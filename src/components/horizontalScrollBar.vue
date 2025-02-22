@@ -76,6 +76,7 @@ onMounted(() => {
     white-space: nowrap;
     cursor: grab;
     user-select: none;
+    padding: 0 10px;
 }
 
 .horizontal-scroll-bar::-webkit-scrollbar {
