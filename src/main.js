@@ -63,10 +63,10 @@ EventSystem.on('wakeUp', () => {
 });
 
 // ------------------ 初始化 ------------------ //
-iManager.waitInit().then((iManager) => {
-    // 手动触发一次语言切换事件
-    EventSystem.trigger('languageChange', iManager.config.language);
-})
+// iManager.waitInit().then((iManager) => {
+//     // 手动触发一次语言切换事件
+//     EventSystem.trigger('languageChange', iManager.config.language);
+// })
 
 //-=====================事件监听====================-//
 // console.log('main.js');
@@ -121,39 +121,6 @@ ipcRenderer.on('snack', (event, message,type = 'info') => {
 })
 
 //-======================== 窗口关闭时，保存配置 ========================-//
-
-//! 保存窗口大小,位置,全屏状态
-//! 全屏 状态稍后再说
-// window.addEventListener('unload', function (event) {
-//     // setLoacalStorage('fullscreen', isFullScreen);
-
-
-//     // if (!isFullScreen) {
-//     //     setLoacalStorage('bounds', JSON.stringify({
-//     //         x: window.screenX,
-//     //         y: window.screenY,
-//     //         width: window.outerWidth,
-//     //         height: window.innerHeight,
-//     //     }));
-//     // }
-
-//     iManager.config.bounds = {
-//         x: window.screenX,
-//         y: window.screenY,
-//         width: window.outerWidth,
-//         height: window.innerHeight,
-//     };
-
-//     //! 如果在这里保存配置，会导致 firstLoad 窗口更改的配置被覆盖，需要增加一个判断
-//     // debug
-//     console.log('unload');
-
-//     if (iManager.config.firstLoad) return;
-
-//     console.log('save config');
-//     iManager.saveConfig();
-//     iManager.savePluginConfig();
-// });
 
 window.onbeforeunload = function (e) {
     // console.log('onbeforeunload');
