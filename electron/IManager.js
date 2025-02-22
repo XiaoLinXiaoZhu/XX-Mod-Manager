@@ -38,6 +38,60 @@ import { DialogID, DialogHelper } from '../helper/DialogHelper';
 const HMC_Name = 'hmc-win32';
 const HMC = require(HMC_Name);
 
+//-=================== 全局变量 ===================-//
+let g_temp = {
+    lastClickedMod: null,
+    currentMod: null,
+    currentCharacter: null,
+    currentTab: 'mod',
+    currentPreset: "default",
+    wakeUped: false,
+};
+let g_config = {
+    firstLoad: true,
+    language: 'zh_cn',
+    theme: 'dark',
+    modSourcePath: null,
+    modTargetPath: null,
+    presetPath: null,
+    ifStartWithLastPreset: true,
+    lastUsedPreset: null,
+    bounds: {
+        width: 800,
+        height: 600,
+        x: -1,
+        y: -1,
+    }
+};
+
+//-==================== vue 版本的全局变量 ====================//
+import { ref } from 'vue';
+const g_temp_vue = {
+    lastClickedMod: ref(null),
+    currentMod: ref(null),
+    currentCharacter: ref(null),
+    currentTab: ref('mod'),
+    currentPreset: ref('default'),
+    wakeUped: ref(false),
+};
+
+const g_config_vue = {
+    firstLoad: ref(true),
+    language: ref('zh_cn'),
+    theme: ref('dark'),
+    modSourcePath: ref(null),
+    modTargetPath: ref(null),
+    presetPath: ref(null),
+    ifStartWithLastPreset: ref(true),
+    lastUsedPreset: ref(null),
+    bounds: ref({
+        width: 800,
+        height: 600,
+        x: -1,
+        y: -1,
+    }),
+};
+
 
 class IManager {
     //-==================== 单例 ====================
@@ -98,7 +152,7 @@ class IManager {
     // };
     // 对外暴露的 hmc 对象，使得插件可以直接调用 hmc 的方法
     // 从本地加载的配置项
-    config = {
+    _config = {
         firstLoad: true, // 是否第一次加载
         language: 'zh_cn', // 语言
         theme: 'dark', // 主题
@@ -117,14 +171,14 @@ class IManager {
 
     // 程序运行时的数据
     // dataPath = ''; // 数据路径
-    data = {
+    _data = {
         modList: [], // mod列表
         presetList: [], // 预设列表
         characterList: [], // 角色列表
     };
 
     // 临时数据，用于存储一些临时的数据
-    temp = {
+    _temp = {
         lastClickedMod: null, // 最后点击的mod，用于显示详情
         currentMod: null, // 当前mod
         currentCharacter: null, // 当前角色
@@ -133,6 +187,70 @@ class IManager {
         wakeUped: false, // 是否 在唤醒状态
     };
 
+    //-==================== 设置数据 ====================
+    config = new Proxy(this._config, {
+        set: (target, key, value) => {
+            if (target.hasOwnProperty(key)) {
+                target[key] = value;
+                g_config[key] = value;
+                g_config_vue[key].value = value;
+                return true;
+            } else {
+                console.error(`Invalid key: ${key}`);
+                return false;
+            }
+        },
+        get: (target, key) => {
+            if (target.hasOwnProperty(key)) {
+                return target[key];
+            } else {
+                console.error(`Invalid key: ${key}`);
+                return null;
+            }
+        }
+    });
+
+    data = new Proxy(this._data, {
+        set: (target, key, value) => {
+            if (target.hasOwnProperty(key)) {
+                target[key] = value;
+                return true;
+            } else {
+                console.error(`Invalid key: ${key}`);
+                return false;
+            }
+        },
+        get: (target, key) => {
+            if (target.hasOwnProperty(key)) {
+                return target[key];
+            } else {
+                console.error(`Invalid key: ${key}`);
+                return null;
+            }
+        }
+    });
+
+    temp = new Proxy(this._temp, {
+        set: (target, key, value) => {
+            if (target.hasOwnProperty(key)) {
+                target[key] = value;
+                g_temp[key] = value;
+                g_temp_vue[key].value = value;
+                return true;
+            } else {
+                console.error(`Invalid key: ${key}`);
+                return false;
+            }
+        },
+        get: (target, key) => {
+            if (target.hasOwnProperty(key)) {
+                return target[key];
+            } else {
+                console.error(`Invalid key: ${key}`);
+                return null;
+            }
+        }
+    });
 
 
     //-==================== 内部方法 ====================
@@ -324,8 +442,6 @@ class IManager {
 
         //----------------- 事件监听 -----------------
         EventSystem.on(EventType.modInfoChanged, async (mod) => {
-            // mod 信息发生变化，需要同步变化
-
             // characterList 变化
             this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
             this.data.characterList = Array.from(this.data.characterList).sort();
@@ -353,10 +469,6 @@ class IManager {
         }
         //-------- currentMod 默认是 第一个mod
         if (this.data.modList.length > 0) {
-            //debug
-            // this.temp.lastClickedMod = this.data.modList[0];
-            // this.trigger('lastClickedMod_Changed', this.temp.lastClickedMod);
-
             this.setCurrentMod(this.data.modList[0]);
             console.log('✅>> currentMod init', this.temp.currentMod);
         }
@@ -414,11 +526,6 @@ class IManager {
     async setCurrentPreset(presetName) {
         this.temp.currentPreset = presetName;
         this.trigger('currentPresetChanged', presetName);
-
-        // 这个功能放到插件里面实现，不是核心功能
-        // setTimeout(() => {
-        //     this.setCurrentCharacter('selected');
-        // }, 200);
     }
 
     async setCurrentMod(mod) {
@@ -428,6 +535,7 @@ class IManager {
 
     async setCurrentModByName(modName) {
         this.temp.currentMod = await this.getModInfo(modName);
+
         //debug
         console.log(`setCurrentModByName: ${modName}`, this.temp.currentMod, this.hashCode(this.temp.currentMod));
         this.trigger('currentModChanged', this.temp.currentMod);
@@ -1087,9 +1195,9 @@ class IManager {
 
     async saveConfig() {
         //debug
-        console.log('saveConfig:', this.config);
+        console.log('saveConfig:', this._config);
 
-        await ipcRenderer.invoke('set-current-config', this.config);
+        await ipcRenderer.invoke('set-current-config', this._config);
     }
 
     // 同步的保存配置
@@ -1318,5 +1426,4 @@ ipcRenderer.on('windowFocus', () => {
 });
 
 export default IManager;
-export { waitInitIManager };
-
+export { waitInitIManager,g_temp,g_temp_vue };

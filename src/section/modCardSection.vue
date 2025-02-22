@@ -70,20 +70,17 @@
 import modCardManager from '../components/modCardManager.vue'
 import leftMenu from '../components/leftMenu.vue';
 import modInfo from '../components/modInfo.vue';
-import { ref, onMounted, useTemplateRef,watch } from 'vue';
+import { ref, onMounted, useTemplateRef,watch, computed } from 'vue';
 import IManager from '../../electron/IManager';
+import { g_temp_vue } from '../../electron/IManager';
 import fsProxy from '../../electron/fsProxy';
 const iManager = new IManager();
 const fsproxy = new fsProxy();
 import { EventType, EventSystem } from '../../helper/EventSystem';
 
+const displayModRef = g_temp_vue.currentMod;
+
 //-============================== 事件处理 ==============================
-const displayModRef = ref(iManager.temp.lastClickedMod);
-EventSystem.on('currentModChanged', (mod) => {
-    displayModRef.value = mod;  
-    //debug
-    console.log('set mod info display to', mod,iManager.hashCode(mod.print()));
-});
 
 function handlePresetManageButtonClicked() {
     console.log('preset manage button clicked');

@@ -28,7 +28,7 @@
     
     <CssProxy />
     <dialogAddPreset></dialogAddPreset>
-    <dialogModInfo2 :mod="lastClickedMod" />
+    <dialogModInfo2 :mod="currentMod" />
     <dialogLoading />
     <DialogNeedRefresh />
     <dialogEnterPassword/>
@@ -59,10 +59,12 @@ const loaded = ref(false);
 
 import { waitInitIManager } from '../../electron/IManager';
 
+import { g_temp_vue } from '../../electron/IManager';
+const currentMod = g_temp_vue.currentMod;
+
 const sections = ref(['mod', 'help', 'settings']);
 const currentSection = ref('mod');
 
-const lastClickedMod = ref(null);
 const handleSectionChange = (section) => {
     currentSection.value = section;
     //debug
@@ -80,15 +82,11 @@ const handleBackButtomClick = () => {
 
 waitInitIManager().then((iManager) => {
     loaded.value = true;
-    
-    EventSystem.on('currentModChanged', (mod) => {
-        lastClickedMod.value = mod;
-    });
 
     EventSystem.on('modInfoChanged', (mod) => {
-        lastClickedMod.value = null;
+        currentMod.value = null;
         setTimeout(() => {
-            lastClickedMod.value = mod;
+            currentMod.value = mod;
         }, 1);
     });
 });
