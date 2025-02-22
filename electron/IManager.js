@@ -1037,7 +1037,7 @@ class IManager {
         // 如果 currentCharacter 不为空，且 mod 的 character 为 unknown，则将 mod 的 character 设置为 currentCharacter
         //debug
         console.log(`currentCharacter: ${this.temp.currentCharacter}`, mod.character);
-        if (this.temp.currentCharacter !== null && this.temp.currentCharacter !== 'All' && this.temp.currentCharacter !== 'Selected' && mod.character === 'Unknown') {
+        if (this.temp.currentCharacter !== null && this.temp.currentCharacter !== 'all' && this.temp.currentCharacter !== 'selected' && mod.character === 'Unknown') {
             mod.character = this.temp.currentCharacter;
             await mod.saveModInfo();
         }
@@ -1234,6 +1234,7 @@ class IManager {
 
         this.config.language = language;
         this.trigger('languageChange', language);
+        setCurrentLanguage(language);
         //debug eventList
         console.log(this.eventList);
         this.saveConfig();

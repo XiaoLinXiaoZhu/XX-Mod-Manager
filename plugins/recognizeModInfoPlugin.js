@@ -59,20 +59,20 @@ const getModKeySwap = async (iManager, mod) => {
     findIniInFolder(modPath);
     if (iniFilePaths.length === 0) {
         // 增加双语支持
-        const tt = new iManager.TranslatedText({
-            zh_cn: '在mod【' + mod.name + '】中没有找到ini文件',
-            en: 'No ini file found in mod【' + mod.name + '】'
-        });
+        const tt = new iManager.TranslatedText(
+            en = 'No ini file found in mod【' + mod.name + '】',
+            zh_cn = '在mod【' + mod.name + '】中没有找到ini文件'
+        );
         iManager.t_snack(tt, 'error');
-        console.log(tt.get());
-        
+        console.log(tt.get(), tt);
+
         return;
     }
-    
-    const succsessTT = new iManager.TranslatedText({
-        zh_cn: '在mod【' + mod.name + '】中找到了ini文件',
-        en: 'Found ini files in mod【' + mod.name + '】'
-    });
+
+    const succsessTT = new iManager.TranslatedText(
+        en = 'Found ini files in mod【' + mod.name + '】',
+        zh_cn = '在mod【' + mod.name + '】中找到了ini文件'
+    );
     iManager.t_snack(succsessTT, 'info');
     console.log(succsessTT.get());
 
@@ -161,7 +161,7 @@ const getSwapkeyFromIni = (iniFilePath) => {
             return;
         }
 
-        if (line.startsWith('[Key') || line.startsWith('[key')){
+        if (line.startsWith('[Key') || line.startsWith('[key')) {
             flag = true;
             keyType = line.slice(4, -2);
 
@@ -407,7 +407,7 @@ module.exports = {
                 if (iManager.getPluginData(pluginName, "ifRefreshAllMod")) {
                     // 将 二次确认 开关关闭
                     iManager.setPluginData(pluginName, "ifRefreshAllMod", false);
-                    
+
                     iManager.showDialog('loading-dialog');
                     const snackMessage = {
                         en: "refresh all mod",
@@ -491,10 +491,10 @@ module.exports = {
             },
             onChange: () => {
                 console.log('clearAllModHotkeys clicked');
-                
+
                 if (iManager.getPluginData(pluginName, "ifClearAllModHotkeys")) {
                     // 将 二次确认 开关关闭
-                    iManager.setPluginData(pluginName, "ifClearAllModHotkeys", false);  
+                    iManager.setPluginData(pluginName, "ifClearAllModHotkeys", false);
 
                     iManager.showDialog('loading-dialog');
                     const snackMessage = {

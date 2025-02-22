@@ -68,6 +68,16 @@ const loadMods = async () => {
         await loadPreset(iManager.temp.currentPreset);
     }
 
+    // 检查是否选择了角色，如果选择了角色，则筛选角色
+    // 这里再刷新一次的原因是，因为 mod卡片全部重新加载了之后，之前的筛选就失效了
+    // debug
+    console.log('11111111111111111111currentCharacter', currentCharacter.value);
+    if (currentCharacter.value) {
+        setTimeout(() => {
+            changeFilter(currentCharacter.value);
+        }, 0);
+    }
+
     //debug
     console.log(`❇️❇️❇️❇️❇️❇️❇️\nsuccess load mods, mod count: ${mods.value.length}, character count: ${characters.value.length}`);
 };
@@ -268,16 +278,17 @@ EventSystem.on('modInfoChanged', (modInfo) => {
     //debug
     console.log('get modInfoChanged');
     mods.value = null;
-    characters.value = null;
     setTimeout(async () => {
         await loadMods();
-        iManager.setCurrentCharacter(modInfo.character);
+        if (modInfo){
+            iManager.setCurrentCharacter(modInfo.character);
+        }
         observeMods();
     }, 1);
 });
 
 
-// ! on addMod event, reload mods
+//! on addMod event, reload mods
 EventSystem.on('addMod', () => {
     //debug
     console.log('get addMod');
