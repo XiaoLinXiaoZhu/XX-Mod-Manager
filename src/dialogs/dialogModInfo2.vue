@@ -314,6 +314,7 @@ const handleSave = () => {
 
 let changdPreviewByPaste = false;
 onMounted(() => {
+  // 监听 dialog 的 dismiss 事件，如果未保存则弹出保存更改的 dialog
   editModInfoDialog.value.$el.addEventListener('dismiss', () => {
     console.log('dismiss','props.mod',props.mod,'tempModInfo',tempModInfo.value,saved);
     if (!saved && !props.mod.equals(tempModInfo.value)) {
@@ -322,6 +323,11 @@ onMounted(() => {
     saved = false;
   });
 
+  // 监听 dialog 的 show 事件，再同步一次 tempModInfo
+  editModInfoDialog.value.$el.addEventListener('show',async () => {
+    tempModInfo.value = props.mod.copy();
+    img.value = await props.mod.getPreviewBase64(true);
+  });
 
   // 监听粘贴操作，如果粘贴的是图片则将其设置为 mod 的预览图片
   window.addEventListener('paste', async (event) => {
@@ -342,7 +348,7 @@ onMounted(() => {
       }
     }
   });
-}); 
+});
 </script>
 
 

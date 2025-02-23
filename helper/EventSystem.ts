@@ -45,6 +45,7 @@ enum EventType {
 }
 
 class EventSystem {
+    private static devMode = !false; // 开发模式
     private static eventMap = new Map<EventType, Function[]>(); // 事件映射表
 
     static async on(event: EventType, callback: Function) {
@@ -85,7 +86,7 @@ class EventSystem {
             let callbacks = EventSystem.eventMap.get(event);
             if (callbacks) {
                 //debug
-                console.log('trigger:', event, args,new Error());
+                if (EventSystem.devMode) console.log('trigger:', event, args,new Error());
                 for (let callback of callbacks) {
                     callback(...args);
                 }

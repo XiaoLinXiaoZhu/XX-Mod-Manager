@@ -28,7 +28,7 @@
     
     <CssProxy />
     <dialogAddPreset></dialogAddPreset>
-    <dialogModInfo2 :mod="currentMod" />
+    <dialogModInfo2 :mod="currentMod"/>
     <dialogLoading />
     <DialogNeedRefresh />
     <dialogEnterPassword/>

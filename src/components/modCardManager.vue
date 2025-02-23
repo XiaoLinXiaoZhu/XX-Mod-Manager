@@ -71,7 +71,7 @@ const loadMods = async () => {
     // 检查是否选择了角色，如果选择了角色，则筛选角色
     // 这里再刷新一次的原因是，因为 mod卡片全部重新加载了之后，之前的筛选就失效了
     // debug
-    console.log('currentCharacter', currentCharacter.value, new Error());
+    console.log('changeFilter to currentCharacter:', currentCharacter.value);
     if (currentCharacter.value) {
         setTimeout(() => {
             changeFilter(currentCharacter.value);
@@ -170,7 +170,7 @@ async function loadPreset(presetName) {
 
 EventSystem.on('modInfoChanged', (modInfo) => {
     //debug
-    console.log('get modInfoChanged');
+    console.log('get modInfoChanged, reload display mods');
     mods.value = null;
     setTimeout(async () => {
         await loadMods();
@@ -183,7 +183,7 @@ EventSystem.on('modInfoChanged', (modInfo) => {
 
 EventSystem.on(EventType.modListChanged, () => {
     //debug
-    console.log('get modListChanged');
+    console.log('get modListChanged, reload display mods');
     mods.value = null;
     setTimeout(() => {
         loadMods();

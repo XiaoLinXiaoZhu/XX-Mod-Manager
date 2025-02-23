@@ -112,7 +112,7 @@ class ModData {
         // 释放资源
         ImageHelper.clearImageCache();
 
-        console.log(`🗑️🗑️🗑️ModData ${this.name} is being destroyed`,this.id);
+        // console.log(`🗑️🗑️🗑️ModData ${this.name} is being destroyed`,this.id);
     }
 
     setModSourcePath(modSourcePath: string) {

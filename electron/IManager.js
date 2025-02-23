@@ -403,11 +403,11 @@ class IManager {
         // 如果 是新的 mod，则触发 addMod 事件
         if (data.newMod) {
             data.newMod = false;
-            await EventSystem.triggerSync('addMod', mod);
+            await EventSystem.trigger('addMod', mod);
         }
 
         // 延时一下，等待 addMod 事件完成
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        // await new Promise((resolve) => setTimeout(resolve, 100));
 
         // 将其添加到 modList 中
         this.data.modList.push(mod);
@@ -1013,8 +1013,6 @@ class IManager {
                 await mod.saveModInfo();
             }
 
-            // 触发 addMod 事件
-            this.trigger('addMod', mod);
             this.setCurrentCharacter(mod.character);
 
 
@@ -1066,7 +1064,7 @@ class IManager {
         console.log(`Copied folder: ${item.fullPath}`);
 
         //- 不再需要完全刷新，只需要将新的mod添加到列表中
-        // 读取 mod.json    
+
         const mod = await this.getModInfo(modName);
         console.log(`getModInfo:`, mod);
 
@@ -1080,9 +1078,11 @@ class IManager {
 
         this.setCurrentMod(mod);
         this.setCurrentCharacter(mod.character);
+        
         this.showDialog('edit-mod-dialog');
 
-        this.trigger('addMod', mod);
+        // getModInfo 遇到新的 mod 会触发 addMod 事件，所以这里不需要再次触发
+        // this.trigger('addMod', mod);
     }
 
     async setFilter(character) {
