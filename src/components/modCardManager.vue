@@ -38,9 +38,18 @@ const currentCharacter = g_temp_vue.currentCharacter;
 
 watch(currentCharacter, (newVal) => {
     if (newVal) {
+        //debug
+        console.log('currentCharacter changed:', newVal);
         characterFilterRef.value.selectItemByName(newVal);
         changeFilter(newVal);
     }
+});
+
+// 切换语言的时候，all 和 全部 的长度不一样，所以需要切换
+watch(g_config_vue.language, (newVal) => {
+    setTimeout(() => {
+        characterFilterRef.value.selectItemByName(currentCharacter.value);
+    }, 0);
 });
 
 const characters = computed(() => {

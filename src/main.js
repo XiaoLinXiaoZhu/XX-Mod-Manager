@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import { createApp, watch } from 'vue'
 import './style.css'
 import test_app from './test/test_app.vue'
 import 'sober'
@@ -8,6 +8,7 @@ import { Snackbar } from 'sober'
 const { ipcRenderer} = require('electron');
 import IManager from '../electron/IManager'
 const iManager = new IManager();
+import { g_config_vue } from '../electron/IManager'
 
 import { EventSystem } from '../helper/EventSystem'
 
@@ -40,11 +41,11 @@ iManager.i18n = i18n;
 vue_app.mount('#app');
 
 // ------------------ 语言切换 ------------------ //
-EventSystem.on('languageChange', (language) => {
-    // 将语言设置为 imanager 中的语言
-    vue_app.config.globalProperties.$i18n.locale = language;
-    //debug
-    console.log('set language:', language);
+vue_app.config.globalProperties.$i18n.locale = `zh_cn`;
+const language = g_config_vue.language;
+watch(language, (newVal) => {
+    vue_app.config.globalProperties.$i18n.locale = newVal;
+    console.log('languageChange:', newVal);
 });
 
 

@@ -45,7 +45,7 @@ enum EventType {
 }
 
 class EventSystem {
-    private static devMode = !false; // 开发模式
+    private static devMode = false; // 开发模式
     private static eventMap = new Map<EventType, Function[]>(); // 事件映射表
 
     static async on(event: EventType, callback: Function) {

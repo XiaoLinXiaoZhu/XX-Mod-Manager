@@ -4,13 +4,14 @@ import { Snackbar } from 'sober'
 
 import '../src/style.css'
 
-import { createApp } from 'vue'
+import { createApp, watch } from 'vue'
 import firstLoadPage from './firstLoadPage.vue'
 
 const { ipcRenderer} = require('electron');
 
 import IManager from '../electron/IManager'
 const iManager = new IManager();
+import { g_config_vue } from '../electron/IManager'
 
 //-=================== 旧的导入 ===================-//
 const path = require('path');
@@ -44,17 +45,14 @@ vue_app.use(i18n);
 //-==================== 挂载 ====================-//
 
 vue_app.mount('#app-container');
-iManager.on('languageChange', (language) => {
+
+watch(() => g_config_vue.language, (language) => {
     // 将语言设置为 imanager 中的语言
     vue_app.config.globalProperties.$i18n.locale = language;
-    //debug
     console.log('set language:', language);
-});
+})
 
 iManager.waitInit().then((iManager) => {
-
-    // ------------------ 语言切换 ------------------ //
-    iManager.trigger('languageChange', iManager.config.language);
 
     // ------------------ first load ------------------ //
     // 首次打开时打开 初始化窗口

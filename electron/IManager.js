@@ -476,11 +476,12 @@ class IManager {
             this.temp.currentMod = mod;
         });
 
+
         //调用 start 方法
         setTimeout(() => {
             this.trigger('initDone', this);
             this.start();
-        }, 200);
+        }, 10);
     }
 
     // start 在 init 之后调用，在各个其他页面 绑定好事件之后调用
@@ -501,8 +502,7 @@ class IManager {
             this.setCurrentMod(this.data.modList[0]);
             console.log('✅>> currentMod init', this.temp.currentMod);
         }
-
-
+        
         //------ 如果开启了 ifStartWithLastPreset，则启动时使用上次使用的预设 -----
         if (this.config.ifStartWithLastPreset) {
             if (this.config.lastUsedPreset !== null) {
@@ -521,6 +521,7 @@ class IManager {
             console.log('✅>> start with default preset');
             this.setCurrentPreset('default');
         }
+
     }
     //-==================== 对外接口 - 状态变更 ====================
     async setLastClickedMod(mod) {
@@ -874,13 +875,13 @@ class IManager {
                 reader.onloadend = () => {
                     //debug
                     callbackCount--;
-                    console.log(`onloadend: ${newFilePath}`, callbackCount);
+                    // console.log(`onloadend: ${newFilePath}`, callbackCount);
                 }
                 reader.onloadstart = () => {
                     //debug
                     callbackCount++;
                     startCallback = true;
-                    console.log(`onloadstart: ${newFilePath}`, callbackCount);
+                    // console.log(`onloadstart: ${newFilePath}`, callbackCount);
                 }
                 reader.readAsArrayBuffer(entry.file);
             }

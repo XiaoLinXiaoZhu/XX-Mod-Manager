@@ -93,8 +93,8 @@ class ModData {
         this.id = ModData.idCount;
         ModData.idCount ++;
         //debug
-        const stackTrace = new Error();
-        console.log(`ℹ️ℹ️ℹ️ModData ${this.name} is being created`,this.id,stackTrace)
+        // const stackTrace = new Error();
+        // console.log(`ℹ️ℹ️ℹ️ModData ${this.name} is being created`,this.id,stackTrace)
 
         // 当进入休眠状态时，清空缓存
         EventSystem.on(EventType.windowSleep, async() => {

@@ -1,6 +1,6 @@
 <template>
     <div class="main-container">
-        <leftMenu :tabs="presets" @tabChange="handlePresetChange" ref="presetSelectorRef">
+        <leftMenu :tabs="presets" :translatedTabs="translatedPresets" @tabChange="handlePresetChange" ref="presetSelectorRef">
             <template #up-button>
                 <s-icon type="arrow_drop_up"></s-icon>
             </template>
@@ -72,7 +72,7 @@ import leftMenu from '../components/leftMenu.vue';
 import modInfo from '../components/modInfo.vue';
 import { ref, onMounted, useTemplateRef,watch, computed } from 'vue';
 import IManager from '../../electron/IManager';
-import { g_temp_vue , g_config_vue } from '../../electron/IManager';
+import { g_temp_vue , g_config_vue,g_data_vue } from '../../electron/IManager';
 import fsProxy from '../../electron/fsProxy';
 const iManager = new IManager();
 const fsproxy = new fsProxy();
@@ -114,26 +114,29 @@ function handleCompactButtonClicked() {
 
 //-============================= presets ==============================
 //#region presets
-const presets = ref([]);
+// const presets = ref([]);
+const language = g_config_vue.language;
+const presets = computed(() => {
+    return ['default', ...g_data_vue.presetList.value];
+});
+const translatedPresets = computed(() => {
+    // 根据语言翻译 default
+    //debug
+    console.log('presets changed', language.value);
+    if (language.value === 'zh_cn') {
+        return ['默认预设', ...g_data_vue.presetList.value];
+    } else {
+        return ['default', ...g_data_vue.presetList.value];
+    }
+});
+
+// 这里只做显示切换，真正的功能通过 eventsystem.on('currentPresetChanged') 来实现
 const currentPreset = g_temp_vue.currentPreset;
-
-function loadPresetList() {
-    let list = iManager.data.presetList;
-    //debug
-    console.log('loadPresetList', iManager.data.presetList);
-    list.unshift('default');
-    //debug
-    presets.value = list;
-}
-
-EventSystem.on('addPreset', (preset) => {
-    //debug
-    console.log('addPreset', preset);
-    loadPresetList();
+watch(currentPreset, (newVal, oldVal) => {
+    presetSelectorRef.value.selectTabByName(newVal);
 });
 
 function handlePresetChange(tab) {
-    console.log('tab changed to', tab);
     iManager.setCurrentPreset(tab);
 }
 
@@ -164,18 +167,6 @@ EventSystem.on('toggledMod', (mod) => {
     //debug
     console.log('toggled mod', mod.name);
     savePreset();
-});
-
-EventSystem.on('currentPresetChanged', (preset) => {
-    // debug
-    console.log('current preset changed to', preset,presets.value);
-    presetSelectorRef.value.selectTabByName(preset);
-});
-
-onMounted(() => {
-    iManager.waitInit().then(() => {
-        loadPresetList();
-    });
 });
 </script>
 
