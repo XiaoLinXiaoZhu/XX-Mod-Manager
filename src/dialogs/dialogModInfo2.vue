@@ -216,13 +216,14 @@ const props = defineProps({
 let saved = false;
 
 // modInfo 为 mod 信息，用于储存临时修改的 mod 信息，最后保存时再将其赋值给 props.mod
-const tempModInfo = ref({
-  name: 'unknow',
-  character: 'unknow',
-  preview: '',
+const tempModInfo = ref(ModData.fromJson({
+  name: 'unknown',
+  character: '',
   url: '',
-  description: 'unknow',
-});
+  hotkeys: [],
+  description: '',
+  preview: '',
+}));
 
 const editModInfoDialog = useTemplateRef('edit-mod-dialog');
 const img = ref(null);
@@ -236,6 +237,8 @@ watch(() => props.mod, async (newVal) => {
     return;
   }
   if (newVal) {
+    // 显式销毁之前的 tempModInfo
+    tempModInfo?.value?.destroy();
     tempModInfo.value = newVal.copy();
     img.value = await newVal.getPreviewBase64(true);
   }

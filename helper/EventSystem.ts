@@ -27,6 +27,7 @@ enum EventType {
     currentCharacterChanged = 'currentCharacterChanged',
     currentPresetChanged = 'currentPresetChanged',
     currentModChanged = 'currentModChanged',
+    modListChanged = 'modListChanged',
     //----------事件节点----------
     modsApplied = 'modsApplied',
     addMod = 'addMod',
@@ -83,6 +84,8 @@ class EventSystem {
         if (EventSystem.eventMap.has(event)) {
             let callbacks = EventSystem.eventMap.get(event);
             if (callbacks) {
+                //debug
+                console.log('trigger:', event, args,new Error());
                 for (let callback of callbacks) {
                     callback(...args);
                 }

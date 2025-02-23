@@ -69,6 +69,9 @@ class ModData {
     public preview: string;
     public hotkeys: {key: string;description: string;}[];
 
+    private id = 0; // mod的id
+    private static idCount = 0; // mod的id计数器
+
     private modSourcePath: string = ""; // mod的源路径
     private oldPreview = ""; // 旧的预览图的路径
     // public modPreviewBase64: string = ""; // mod的预览图的base64，不包含头部
@@ -86,6 +89,13 @@ class ModData {
         // this.modPreviewBase64 = "";
         this.modPreviewBase64WithHeader = new ImageBase64("");
 
+        // 为每个mod生成一个id
+        this.id = ModData.idCount;
+        ModData.idCount ++;
+        //debug
+        const stackTrace = new Error();
+        console.log(`ℹ️ℹ️ℹ️ModData ${this.name} is being created`,this.id,stackTrace)
+
         // 当进入休眠状态时，清空缓存
         EventSystem.on(EventType.windowSleep, async() => {
             this.oldPreview = "";
@@ -93,6 +103,16 @@ class ModData {
             this.modPreviewBase64WithHeader.clear();
             
         });
+    }
+    // 析构函数
+    public destroy() {
+        this.modPreviewBase64WithHeader.clear();
+        // this.modPreviewBase64 = "";
+
+        // 释放资源
+        ImageHelper.clearImageCache();
+
+        console.log(`🗑️🗑️🗑️ModData ${this.name} is being destroyed`,this.id);
     }
 
     setModSourcePath(modSourcePath: string) {

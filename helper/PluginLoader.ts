@@ -40,7 +40,7 @@ interface IPluginData {
     t_displayName?: TranslatedText;
 
     //-可选项：显示描述，带有翻译
-    t_description?: TranslatedText; 
+    t_description?: TranslatedText;
 
 
     //-作为 button 类型的按钮   
@@ -307,14 +307,14 @@ class IPluginLoader {
     */
     static SaveAllPluginConfigSync() {
         //弹出窗口，询问是否保存配置
-        alert('SaveAllPluginConfigSync');
+        // alert('SaveAllPluginConfigSync');
         for (const pluginName in IPluginLoader.pluginConfig) {
             const pluginData = IPluginLoader.pluginConfig[pluginName];
             const pluginDataToSave = {};
             pluginData.forEach((data) => {
                 pluginDataToSave[data.name] = data.data;
             });
-            console.log('savePluginConfig:', pluginName, pluginDataToSave);
+            console.log('savePluginConfig:', pluginName, pluginDataToSave, typeof pluginDataToSave);
             ipcRenderer.invoke('save-plugin-config', pluginName, pluginDataToSave);
         }
     }

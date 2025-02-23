@@ -191,7 +191,7 @@ class IManager {
     _temp = {
         lastClickedMod: null, // 最后点击的mod，用于显示详情
         currentMod: null, // 当前mod
-        currentCharacter: null, // 当前角色
+        currentCharacter: 'all', // 当前角色
         currentTab: 'mod', // 当前tab
         currentPreset: "default", // 当前预设
         wakeUped: false, // 是否 在唤醒状态
@@ -227,6 +227,8 @@ class IManager {
                 // console.log(`data set: ${key}`, value);
                 // 不保存 modList，因为 modList 是一个对象数组，如果 传来传去，会导致内存占用过大
                 if (key === 'modList') {
+                    // 如果 modList 变化，则 触发 modListChanged 事件
+                    EventSystem.trigger(EventType.modListChanged, value);
                     return true;
                 }
                 g_data[key] = value;
@@ -250,6 +252,10 @@ class IManager {
     temp = new Proxy(this._temp, {
         set: (target, key, value) => {
             if (target.hasOwnProperty(key)) {
+                if (!value) {
+                    //debug
+                    console.error('WTF,where give me null?');
+                }
                 target[key] = value;
                 g_temp[key] = value;
                 g_temp_vue[key].value = value;
@@ -393,7 +399,6 @@ class IManager {
 
         // 将其转换为 ModData
         const mod = ModData.fromJson(data).setModSourcePath(this.config.modSourcePath);
-        this.setCurrentMod(mod);
 
         // 如果 是新的 mod，则触发 addMod 事件
         if (data.newMod) {
@@ -533,6 +538,11 @@ class IManager {
     }
 
     async setCurrentCharacter(character) {
+        if (character === null) {
+            //debug
+            console.error('character is null');
+            character = 'all';
+        }
         this.temp.currentCharacter = character;
         this.trigger('currentCharacterChanged', character);
         //debug
@@ -989,9 +999,6 @@ class IManager {
 
         this.dismissDialog('loading-dialog');
 
-        // 解压后还需要等待文件移动完成
-        // 但是回调提供的是异步方法，我们需要知道最后一个文件是否移动完成
-
         if (ifSuccess) {
             //- 不再需要完全刷新，只需要将新的mod添加到列表中
             // 读取 mod.json    
@@ -1006,12 +1013,13 @@ class IManager {
                 await mod.saveModInfo();
             }
 
-            this.setCurrentMod(mod);
-            this.setCurrentCharacter(mod.character);
-            this.showDialog('edit-mod-dialog');
-
-            // 延时0.1s，触发 addMod 事件
+            // 触发 addMod 事件
             this.trigger('addMod', mod);
+            this.setCurrentCharacter(mod.character);
+
+
+            this.setCurrentMod(mod);
+            this.showDialog('edit-mod-dialog');
         }
         else {
             // 解压失败，删除文件夹
@@ -1199,8 +1207,8 @@ class IManager {
     // 同步的保存配置
     saveConfigSync() {
         //debug
-        console.log('saveConfig:', this.config);
-        ipcRenderer.invoke('set-current-config', this.config);
+        console.log('saveConfig:', this._config);
+        ipcRenderer.invoke('set-current-config', this._config);
     }
 
     async getFilePath(fileName, fileType) {

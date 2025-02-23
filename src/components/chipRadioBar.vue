@@ -40,8 +40,6 @@ import { ref, reactive, onMounted } from 'vue';
 import chipButton from './chipButton.vue';
 import horizontalScrollBar from './horizontalScrollBar.vue';
 
-import { waitInitIManager } from '../../electron/IManager';
-
 const props = defineProps({
     items: {
         type: Array
@@ -93,13 +91,13 @@ const selectItemByName = (name) => {
     selectItem(name, index);
 };
 
-onMounted(() => {
-    //debug
-    // console.log('onMounted', props.translatedItems, props.items)
-    waitInitIManager().then(() => {
-        updateSlider(0);
-    });
-});
+// onMounted(() => {
+//     //debug
+//     // console.log('onMounted', props.translatedItems, props.items)
+//     waitInitIManager().then(() => {
+//         updateSlider(0);
+//     });
+// });
 
 //-============对外的接口================
 defineExpose({

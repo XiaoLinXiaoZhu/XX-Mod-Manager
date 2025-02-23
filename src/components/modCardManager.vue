@@ -71,7 +71,7 @@ const loadMods = async () => {
     // 检查是否选择了角色，如果选择了角色，则筛选角色
     // 这里再刷新一次的原因是，因为 mod卡片全部重新加载了之后，之前的筛选就失效了
     // debug
-    console.log('11111111111111111111currentCharacter', currentCharacter.value);
+    console.log('currentCharacter', currentCharacter.value, new Error());
     if (currentCharacter.value) {
         setTimeout(() => {
             changeFilter(currentCharacter.value);
@@ -167,6 +167,38 @@ async function loadPreset(presetName) {
     console.log('loadPreset', presetName);
     // handleFilterChange('已选择');
 };
+
+EventSystem.on('modInfoChanged', (modInfo) => {
+    //debug
+    console.log('get modInfoChanged');
+    mods.value = null;
+    setTimeout(async () => {
+        await loadMods();
+        if (modInfo) {
+            iManager.setCurrentCharacter(modInfo.character);
+        }
+        observeMods();
+    }, 1);
+});
+
+EventSystem.on(EventType.modListChanged, () => {
+    //debug
+    console.log('get modListChanged');
+    mods.value = null;
+    setTimeout(() => {
+        loadMods();
+        observeMods();
+    }, 1);
+});
+
+EventSystem.on('currentPresetChanged', (preset) => {
+    loadPreset(preset);
+});
+
+
+
+
+// 定义动画效果
 
 const animate = new Group();
 const modContainerRef = useTemplateRef('modContainerRef');
@@ -274,34 +306,6 @@ onMounted(async () => {
     });
 });
 
-EventSystem.on('modInfoChanged', (modInfo) => {
-    //debug
-    console.log('get modInfoChanged');
-    mods.value = null;
-    setTimeout(async () => {
-        await loadMods();
-        if (modInfo){
-            iManager.setCurrentCharacter(modInfo.character);
-        }
-        observeMods();
-    }, 1);
-});
-
-
-//! on addMod event, reload mods
-EventSystem.on('addMod', () => {
-    //debug
-    console.log('get addMod');
-    mods.value = null;
-    setTimeout(() => {
-        loadMods();
-        observeMods();
-    }, 1);
-});
-
-EventSystem.on('currentPresetChanged', (preset) => {
-    loadPreset(preset);
-});
 
 defineExpose({
     loadPreset

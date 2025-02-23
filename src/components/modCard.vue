@@ -81,17 +81,6 @@ const getImage = async () => {
     }
 }
 
-// onMounted(() => {
-//     //加载图片
-//     props.modRef.getPreviewBase64(true).then((res) => {
-//         img.value = res;
-//     });
-// })  
-
-// EventSystem.on('addMod',(mod)=>{
-//     console.log(`modItem ${props.mod} received addMod event`,enteredWindow.value,props.lazyLoad,img.value == null);
-// })
-
 //==================== init ====================//
 
 const enterWindow = async () => {
