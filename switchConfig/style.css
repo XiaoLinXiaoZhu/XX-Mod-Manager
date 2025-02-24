@@ -107,7 +107,7 @@
     height: 75px;
     right: 0.5vw;
     top: 1vh;
-    background-image: url("../src/assets/tape/info-box.png");
+    background-image: url("./src/assets/info-box.png");
     background-size: cover;
     display: flex;
     justify-content: center;

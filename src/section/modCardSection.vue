@@ -75,7 +75,6 @@ import IManager from '../../electron/IManager';
 import { g_temp_vue , g_config_vue,g_data_vue } from '../../electron/IManager';
 import fsProxy from '../../electron/fsProxy';
 const iManager = new IManager();
-const fsproxy = new fsProxy();
 import { EventType, EventSystem } from '../../helper/EventSystem';
 
 const displayModRef = g_temp_vue.currentMod;
@@ -84,7 +83,7 @@ const displayModRef = g_temp_vue.currentMod;
 
 function handlePresetManageButtonClicked() {
     console.log('preset manage button clicked');
-    fsproxy.openDir(iManager.config.presetPath);
+    fsProxy.openDir(iManager.config.presetPath);
     iManager.showDialog('dialog-need-refresh');
 }
 

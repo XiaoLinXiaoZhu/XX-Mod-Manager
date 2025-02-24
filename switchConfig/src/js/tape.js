@@ -13,7 +13,7 @@ function createTapeMaterial(frontTexture, sideTexture, backTexture, spineTexture
     const materials = [
         new THREE.MeshLambertMaterial({
             map: frontTexture,
-            normalMap: textureLoader.load(`../src/assets/tape/normal.png`), //法线贴图
+            normalMap: textureLoader.load(`./src/assets/normal.png`), //法线贴图
             //设置深浅程度，默认值(1,1)。
             normalScale: new THREE.Vector2(-1, 1),
         }), //材质对象Material
@@ -22,13 +22,13 @@ function createTapeMaterial(frontTexture, sideTexture, backTexture, spineTexture
         new THREE.MeshLambertMaterial({ map: sideTexture }),   // 右侧
         new THREE.MeshLambertMaterial({
             map: spineTexture,
-            normalMap: textureLoader.load(`../src/assets/tape/normal.png`), //法线贴图
+            normalMap: textureLoader.load(`./src/assets/normal.png`), //法线贴图
             //设置深浅程度，默认值(1,1)。
             normalScale: new THREE.Vector2(3, 3)
         }),    // 顶面
         new THREE.MeshLambertMaterial({
             map: spineTexture,
-            normalMap: textureLoader.load(`../src/assets/tape/normal.png`), //法线贴图
+            normalMap: textureLoader.load(`./src/assets/normal.png`), //法线贴图
             //设置深浅程度，默认值(1,1)。
             normalScale: new THREE.Vector2(1, 1)
         })    // 底面
@@ -60,8 +60,8 @@ function createTapeMaterial(frontTexture, sideTexture, backTexture, spineTexture
 
 class Tape {
     //--------------audio----------------
-    static bookAudio = new Audio('../src/assets/tape/book.ogg');
-    static clickedAudio = new Audio('../src/assets/tape/display.ogg');
+    static bookAudio = new Audio('./src/assets/book.ogg');
+    static clickedAudio = new Audio('./src/assets/display.ogg');
     static defaultVolume = 0.1;
 
     static playAudio(audio, volume = Tape.defaultVolume) {
@@ -93,10 +93,10 @@ class Tape {
     }
 
     //--------------texture----------------
-    static defaultfrontTexture = textureLoader.load(`../src/assets/tape/tape_front.jpg`);
-    static defaultsideTexture = textureLoader.load(`../src/assets/tape/tape_side.jpg`);
-    static defaultbackTexture = textureLoader.load(`../src/assets/tape/tape_back.jpg`);
-    static defaultspineTexture = textureLoader.load(`../src/assets/tape/tape_spine.png`);
+    static defaultfrontTexture = textureLoader.load(`./src/assets/tape_front.jpg`);
+    static defaultsideTexture = textureLoader.load(`./src/assets/tape_side.jpg`);
+    static defaultbackTexture = textureLoader.load(`./src/assets/tape_back.jpg`);
+    static defaultspineTexture = textureLoader.load(`./src/assets/tape_spine.png`);
 
     frontTexture = Tape.defaultfrontTexture;
     sideTexture = Tape.defaultsideTexture;

@@ -28,6 +28,7 @@
     "vue-i18n": "^10.0.5"
   },
   "devDependencies": {
+    "@types/three": "^0.173.0",
     "@vitejs/plugin-vue": "^5.1.4",
     "electron": "^33.2.0",
     "electron-builder": "^25.1.8",

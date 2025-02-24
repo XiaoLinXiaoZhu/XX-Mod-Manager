@@ -11,27 +11,27 @@ class fsProxy {
         fsProxy.instance = this;
     }
 
-    async readFile(path) {
+    static async readFile(path) {
         return await ipcRenderer.invoke('fs-read-file', path);
     }
 
-    async writeFile(path, data) {
+    static async writeFile(path, data) {
         return await ipcRenderer.invoke('fs-write-file', path, data);
     }
 
-    async createFile(path) {
+    static async createFile(path) {
         return await ipcRenderer.invoke('fs-create-file', path);
     }
 
-    async readDir(path) {
+    static async readDir(path) {
         return await ipcRenderer.invoke('fs-read-dir', path);
     }
 
-    async isDir(path) {
+    static async isDir(path) {
         return await ipcRenderer.invoke('fs-is-dir', path);
     }
 
-    async openDir(path) {
+    static async openDir(path) {
         return await ipcRenderer.invoke('fs-open-dir', path);
     }
 }

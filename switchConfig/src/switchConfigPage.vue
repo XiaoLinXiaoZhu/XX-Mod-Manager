@@ -11,10 +11,7 @@
         
         <div id="head-frame">
             <backButton id="close-btn"></backButton>
-            <div id="info-box">
-                <div id="tape-title"></div>
-                <div id="tape-description"></div>
-            </div>
+            <InfoBox :title="title" :description="description" />
         </div>
 
         <div id="tape-selector" class="OO-color-gradient-svg OO-capering" capering-k="20">
@@ -48,7 +45,7 @@
 
 <script setup>
 import { Tween, Group, Easing } from '@tweenjs/tween.js';
-import backButton from '../src/components/backButton.vue';
+import backButton from '../../src/components/backButton.vue';
 import * as THREE from 'three';
 //-========================后期处理========================
 import { UnrealBloomPass } from 'three/examples/jsm/Addons.js';
@@ -65,8 +62,9 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { onMounted } from 'vue';
 
 
-import { Tape, TapeManager } from './tape.js';
-import { createBulbLight } from './bulbLight.js';
+import { Tape, TapeManager } from './js/tape.js';
+import { createBulbLight } from './js/bulbLight.js';
+import InfoBox from './components/infoBox.vue';
 
 const fs = require('fs');
 const path = require('path');
@@ -146,7 +144,7 @@ function initScene(scene) {
     // 创建书架背景
     const shelfGeometry = new THREE.BoxGeometry(81.92 / 2, 25.76 / 2, 30); // 书架的深度、宽度、高度
     const textureLoader = new THREE.TextureLoader();
-    const shelfTexture = textureLoader.load('../src/assets/tape/television.jpg');
+    const shelfTexture = textureLoader.load('./src/assets/television.jpg');
     const shelfMaterial = new THREE.MeshLambertMaterial({ map: shelfTexture });
     shelf = new THREE.Mesh(shelfGeometry, shelfMaterial);
     shelf.position.set(0, 1, -30); // 位置靠近相机后方
@@ -237,7 +235,7 @@ function showLogo() {
     // 将 scene-mask  的 index 设置为 0，使得 logo 在最上层
     document.getElementById('scene-mask').style.zIndex = -1;
 
-    const logoTexture = new THREE.TextureLoader().load('../src/assets/tape/icon.png');
+    const logoTexture = new THREE.TextureLoader().load('./src/assets/icon.png');
     const logoMaterial = new THREE.MeshBasicMaterial({ map: logoTexture });
     const logoGeometry = new THREE.PlaneGeometry(1, 1);
     const logo = new THREE.Mesh(logoGeometry, logoMaterial);

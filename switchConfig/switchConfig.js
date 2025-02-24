@@ -5,7 +5,7 @@ import { Snackbar } from 'sober'
 import '../src/style.css'
 
 import { createApp } from 'vue'
-import switchConfigPage from './switchConfigPage.vue'
+import switchConfigPage from './src/switchConfigPage.vue'
 
 const { ipcRenderer} = require('electron');
 

@@ -61,7 +61,6 @@
 <script setup>
 import { computed, defineProps, ref, watch } from 'vue';
 import fsProxy from '../../electron/fsProxy';
-const fsproxy = new fsProxy();
 import { ModData } from '../../helper/ModHelper';
 import { snack } from '../../helper/SnackHelper';
 import { DialogID , DialogHelper } from '../../helper/DialogHelper';
@@ -113,7 +112,7 @@ const openModFolder = async () => {
         snack(t('no-mod-selected'), 'error');
         return;
     }
-    fsproxy.openDir(await props.mod.getModPath());
+    fsProxy.openDir(await props.mod.getModPath());
 };
 
 </script>
