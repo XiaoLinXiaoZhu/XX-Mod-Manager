@@ -743,6 +743,12 @@ function setCustomConfigFolder(path) {
     ifCustomConfig = true;
     customConfigFolder = path;
 }
+
+ipcMain.handle('set-custom-config-folder', async (event, path) => {
+    setCustomConfigFolder(path);
+});
+
+
 module.exports = {
     setMainWindow,
     setCustomConfigFolder

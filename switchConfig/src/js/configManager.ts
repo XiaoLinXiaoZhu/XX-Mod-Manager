@@ -7,9 +7,14 @@ const { ipcRenderer } = require('electron');
 import { snack, t_snack, SnackType} from '../../../helper/SnackHelper';
 import { TranslatedText } from '../../../helper/Language';
 import fsProxy from '../../../electron/fsProxy';
+import { ref } from 'vue';
+
+let g_allConfig: TapeConfig[] = [];
+const g_allConfig_vue = ref(g_allConfig);
+
 
 class TapeConfig{
-    private _dir: string;
+    public _dir: string;
     private static _userConfigPath: string = '';
     private static _configRootPath: string = '';
     public static async getConfigRootPath(){
@@ -29,12 +34,14 @@ class TapeConfig{
 
     constructor(dir: string) {
         this._dir = dir;
+        // name为文件夹名
+        this.name = path.basename(dir);
         this.tape_front = ['jpg', 'jpeg', 'png', 'gif'].map(ext => path.join(this._dir, `front.${ext}`)).find(fs.existsSync) || '';
         this.tape_side = ['jpg', 'jpeg', 'png', 'gif'].map(ext => path.join(this._dir, `side.${ext}`)).find(fs.existsSync) || '';
         this.tape_back = ['jpg', 'jpeg', 'png', 'gif'].map(ext => path.join(this._dir, `back.${ext}`)).find(fs.existsSync) || '';
         this.tape_spine = ['jpg', 'jpeg', 'png', 'gif'].map(ext => path.join(this._dir, `spine.${ext}`)).find(fs.existsSync) || '';
         const descriptionPath = path.join(this._dir, 'description.txt');
-        this.desc = fs.existsSync(descriptionPath) ? fs.readFileSync(descriptionPath, 'utf-8') : new TranslatedText('No Description','没有描述');
+        this.desc = fs.existsSync(descriptionPath) ? fs.readFileSync(descriptionPath, 'utf-8') : new TranslatedText('No Description','没有描述').get();
 
         // debug
         console.log(this);
@@ -62,8 +69,35 @@ class TapeConfig{
         const configList: TapeConfig[] = configDirs.map((dir: string): TapeConfig => {
             return new TapeConfig(path.join(configRootDir, dir));
         });
-
+        //debug
+        console.log("0000000000000000000000", configList);
+        this.allConfig = configList;
         return configList;
+    }
+    static _allConfig: TapeConfig[] = [];
+    static get allConfig(){
+        return this._allConfig;
+    }
+    static set allConfig(value: TapeConfig[]){
+        this._allConfig = value;
+        // 全局变量 和 这里同步
+        g_allConfig_vue.value = value;
+        g_allConfig = value;
+    }
+
+
+    static async getAllConfig(){
+        if(this._allConfig.length === 0){
+            this._allConfig = await this.loadAllConfig();
+        }
+        return this._allConfig;
+    }
+    static async reloadAllConfig(){
+        this._allConfig = await this.loadAllConfig();
+    }
+    static clearConfig(){
+        this._allConfig = [];
+        console.log('All configurations cleared.');
     }
 }
 
@@ -72,3 +106,4 @@ class TapeConfig{
 TapeConfig.getConfigRootPath();
 
 export default TapeConfig;
+export { g_allConfig_vue };

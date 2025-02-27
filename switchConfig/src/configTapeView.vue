@@ -1,6 +1,4 @@
 <template>
-
-
     <div class="main-container">
         <div id="drag-bar" style="position: fixed;width: 100%;height: 30px;-webkit-app-region: drag;">
         </div>
