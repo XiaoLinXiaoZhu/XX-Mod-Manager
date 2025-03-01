@@ -229,6 +229,22 @@ ipcMain.handle('toggle-fullscreen', async () => {
   }
 });
 
+ipcMain.handle('pin-window', async () => {
+  const win = BrowserWindow.getFocusedWindow();
+  win.setAlwaysOnTop(true);
+  //debug
+  console.log('pin-window', win.isAlwaysOnTop());
+  return true;
+});
+
+ipcMain.handle('unpin-window', async () => {
+  const win = BrowserWindow.getFocusedWindow();
+  win.setAlwaysOnTop(false);
+  //debug
+  console.log('unpin-window', win.isAlwaysOnTop());
+  return false;
+});
+
 
 // 设置窗口大小
 ipcMain.handle('set-bounds', async (event, boundsStr) => {
