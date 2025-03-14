@@ -106,18 +106,6 @@ const g_data_vue = {
 };
 
 
-//-================= 处理 addedCli ==================-//
-let addedCli = '';
-if (process.argv.includes('--addedCli')) {
-  const index = process.argv.indexOf('--addedCli');
-  addedCli = process.argv[index + 1];
-  // 将其前后的标识[cli_start]和[cli_end]去掉
-  const cli = addedCli.replace('[cli_start]', '').replace('[cli_end]', '');
-  console.log('cli', cli);
-  // 执行命令
-  addedCli = cli;
-}
-
 class IManager {
     //-==================== 单例 ====================
     static instance = null;
@@ -426,7 +414,7 @@ class IManager {
 
         // 将其添加到 modList 中
         this.data.modList.push(mod);
-        
+
         // 刷新一下characterList
         this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
         this.data.characterList = Array.from(this.data.characterList).sort();
@@ -446,12 +434,6 @@ class IManager {
     //-==================== 生命周期 ====================
     // 初始化
     async init() {
-        //debug
-        console.log('✅>> init IManager',addedCli);
-        if (addedCli) {
-            console.log('addedCli:', addedCli);
-            HMC.openApp(addedCli);
-        }
         // 加载配置
         await this.loadConfig();
         console.log('✅>> loadConfig done');
@@ -521,7 +503,7 @@ class IManager {
             this.setCurrentMod(this.data.modList[0]);
             console.log('✅>> currentMod init', this.temp.currentMod);
         }
-        
+
         //------ 如果开启了 ifStartWithLastPreset，则启动时使用上次使用的预设 -----
         if (this.config.ifStartWithLastPreset) {
             if (this.config.lastUsedPreset !== null) {
@@ -692,7 +674,10 @@ class IManager {
         const exePath = process.execPath;
         const exeDir = path.dirname(exePath);
         const desktopPath = await ipcRenderer.invoke('get-desktop-path');
-        const command = `start "" "${exeDir}" --customConfig "${configPath}" --addedCli [cli_start]${addedCli}[cli_end]`; // 用于标记 cli 的开始和结束
+        //类似 --addedCli [cli_start][cli_quote]D:\\Applications\\XXMI\\Resources\\Bin\\XXMI[cli_space]Launcher.exe[cli_quote][cli_space]--nogui[cli_space]--xxmi[cli_space]ZZMI[cli_end]",
+        // 进行转义，使其变为一整个参数：" => [cli_quote]，空格 => [cli_space]，" => [cli_quote]
+        addedCli = addedCli.replace(/"/g, '[cli_quote]').replace(/ /g, '[cli_space]');
+        const command = `start "" "${exeDir}" --customConfig "${configPath}" --addedCli [cli_start]${addedCli}[cli_end]`; // 用于创建快捷方式的命令
         console.log(`createAppShortCut from ${exeDir} to ${desktopPath} with command: ${command}`);
 
         // 创建快捷方式
@@ -900,7 +885,7 @@ class IManager {
         let callbackCount = 0;
         let startCallback = false;
         const extractCallback = (entry) => {
-            
+
             const filePath = path.join(destinationPath, entry.path);
 
             // 当解压出来的文件包含中文时，会被替换为 * ，但是文件夹名不能包含 * ，所以需要将其替换为其他字符
@@ -1145,7 +1130,7 @@ class IManager {
 
         this.setCurrentMod(mod);
         this.setCurrentCharacter(mod.character);
-        
+
         this.showDialog('edit-mod-dialog');
 
         // getModInfo 遇到新的 mod 会触发 addMod 事件，所以这里不需要再次触发
@@ -1460,6 +1445,25 @@ ipcRenderer.on('wakeUp', () => {
     EventSystem.trigger('wakeUp');
 });
 
+EventSystem.on('wakeUp', async () => {
+    //debug
+    const addedCli = await ipcRenderer.invoke('get-added-cli');
+    console.log('✅>> init IManager', addedCli);
+    if (addedCli) {
+        console.log('addedCli:', addedCli);
+        // 执行 addedCli
+        const exec = require('child_process').exec;
+        exec(addedCli, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`exec error: ${error}`);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+            console.error(`stderr: ${stderr}`);
+        });
+    }
+});
+
 let sleepTimer = '';
 let isSleeping = false;
 // 失去焦点10s后进入睡眠模式
@@ -1497,4 +1501,4 @@ ipcRenderer.on('windowFocus', () => {
 });
 
 export default IManager;
-export { waitInitIManager,g_temp,g_temp_vue,g_config,g_config_vue,g_data,g_data_vue};
+export { waitInitIManager, g_temp, g_temp_vue, g_config, g_config_vue, g_data, g_data_vue };

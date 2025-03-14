@@ -365,6 +365,21 @@ const addedCli ={
     }
 }
 
+const changeConfigWithCli = {
+    name: 'changeConfigWithCli',
+    data: null,
+    type: 'dir',
+    displayName: 'Use Config From Folder',
+    t_displayName: {
+        zh_cn: '使用来自文件夹的配置',
+        en: 'Use Config From Folder'
+    },
+    onChange: (value) => {
+        console.log('changeConfigWithCli changed:', value);
+        changeConfigWithCli.data = value;
+    }
+}
+
 const createShortOfCurrentConfigWithCli = {
     name: 'createShortOfCurrentConfigWithCli',
     data: null,
@@ -381,8 +396,7 @@ const createShortOfCurrentConfigWithCli = {
     },
     onChange: (value) => {
         console.log('createShortOfCurrentConfigWithCli changed:', addedCli.data);
-
-        iManager.createAppShortCut(addedCli.data).then(() => {
+        iManager.createAppShortCutWithAddedCli(addedCli.data).then(() => {
             console.log('createShortOfCurrentConfigWithCli success');
         }).catch((err) => {
             console.log('createShortOfCurrentConfigWithCli failed:', err);
@@ -401,6 +415,7 @@ const changeConfig = {
     },
     onChange: (value) => {
         console.log('changeConfig changed:', value);
+        changeConfig.data = value;
     }
 }
 
