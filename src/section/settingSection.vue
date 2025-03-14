@@ -50,6 +50,7 @@
                 <settingBar :data="createShortOfCurrentConfig"></settingBar>
                 <Markdown :content="$t('firstLoad.switchConfigInfo3')"></Markdown>
                 <settingBar :data="addedCli"></settingBar>
+                <settingBar :data="changeConfigWithCli"></settingBar>
                 <settingBar :data="createShortOfCurrentConfigWithCli"></settingBar>
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
@@ -396,7 +397,7 @@ const createShortOfCurrentConfigWithCli = {
     },
     onChange: (value) => {
         console.log('createShortOfCurrentConfigWithCli changed:', addedCli.data);
-        iManager.createAppShortCutWithAddedCli(addedCli.data).then(() => {
+        iManager.createAppShortCutWithAddedCli(changeConfigWithCli.data,addedCli.data).then(() => {
             console.log('createShortOfCurrentConfigWithCli success');
         }).catch((err) => {
             console.log('createShortOfCurrentConfigWithCli failed:', err);
