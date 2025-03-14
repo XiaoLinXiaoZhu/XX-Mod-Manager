@@ -27,6 +27,11 @@ const transformedContent = ref('')
 
 const transformMarkdown = (markdown) => {
     let html = ''
+    // 忽略末尾的第一个换行符
+    if (markdown.endsWith('\n')) {
+        markdown = markdown.slice(0, -1)
+    }
+    // 按行分割markdown文本
     const lines = markdown.split('\n')
     let inList = false
     let inParagraph = false
@@ -106,7 +111,7 @@ onMounted(() => {
 
 <style scoped>
 .markdown-container{
-    display: flex;
+    /* display: flex; */
     flex-direction: column;
     flex-wrap: nowrap;
 }

@@ -667,47 +667,6 @@ class IManager {
         }
     }
 
-    async createAppShortCutWithAddedCli(configPath, addedCli) {
-        const { app, shell } = require('electron');
-        const path = require('path');
-
-        const exePath = process.execPath;
-        const exeDir = path.dirname(exePath);
-        const desktopPath = await ipcRenderer.invoke('get-desktop-path');
-        //类似 --addedCli [cli_start][cli_quote]D:\\Applications\\XXMI\\Resources\\Bin\\XXMI[cli_space]Launcher.exe[cli_quote][cli_space]--nogui[cli_space]--xxmi[cli_space]ZZMI[cli_end]",
-        // 进行转义，使其变为一整个参数：" => [cli_quote]，空格 => [cli_space]，" => [cli_quote]
-        addedCli = addedCli.replace(/"/g, '[cli_quote]').replace(/ /g, '[cli_space]');
-        const command = `start "" "${exeDir}" --customConfig "${configPath}" --addedCli [cli_start]${addedCli}[cli_end]`; // 用于创建快捷方式的命令
-        console.log(`createAppShortCut from ${exeDir} to ${desktopPath} with command: ${command}`);
-
-        // 创建快捷方式
-        // 快捷方式名称和路径
-        const configName = path.basename(configPath);
-        const shortcutName = 'XXMM_' + configName + '.lnk';
-        const shortcutPath = path.join(desktopPath, shortcutName);
-
-        // 启动参数
-        const args = `--customConfig "${configPath}" ${addedCli}`;
-
-        // 应用程序的根目录
-        try {
-            // 创建快捷方式
-            await shell.writeShortcutLink(shortcutPath, 'create', {
-                target: exePath,
-                args: args,
-                cwd: exeDir, // 设置工作目录为应用程序的根目录
-                icon: exePath, // 可选：设置图标为应用程序图标
-                iconIndex: 0 // 可选：图标索引，通常为0
-            });
-
-            console.log(`Shortcut created successfully at ${shortcutPath}`);
-        } catch (error) {
-            console.error('Failed to create shortcut:', error);
-        }
-    }
-
-
-
     //------ 文件拖拽 ------
     async handleDrop(event) {
         console.log('handleDrop', event);
@@ -1443,25 +1402,6 @@ ipcRenderer.on('wakeUp', () => {
         en: '🌞Program is waking up~',
     })
     EventSystem.trigger('wakeUp');
-});
-
-EventSystem.on('wakeUp', async () => {
-    //debug
-    const addedCli = await ipcRenderer.invoke('get-added-cli');
-    console.log('✅>> init IManager', addedCli);
-    if (addedCli) {
-        console.log('addedCli:', addedCli);
-        // 执行 addedCli
-        const exec = require('child_process').exec;
-        exec(addedCli, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`exec error: ${error}`);
-                return;
-            }
-            console.log(`stdout: ${stdout}`);
-            console.error(`stderr: ${stderr}`);
-        });
-    }
 });
 
 let sleepTimer = '';

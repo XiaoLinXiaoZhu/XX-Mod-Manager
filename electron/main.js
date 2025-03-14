@@ -36,19 +36,6 @@ if(customConfig){
   setCustomConfigFolder(customConfigFolder);
 }
 
-// electron . --dev --devTools --addedCli [cli_start]\"D:\\Applications\\XXMI\\Resources\\Bin\\XXMI[cli_space]Launcher.exe\"[cli_space]--nogui[cli_space]--xxmi ZZMI[cli_end]"
-let addedCli = '';
-if (process.argv.includes('--addedCli')) {
-  const index = process.argv.indexOf('--addedCli');
-  addedCli = process.argv[index + 1];
-  // 删除[cli_start]和[cli_end],并替换[cli_space]为' ',[cli_quote]为'"'
-  addedCli = addedCli.replace('[cli_start]', '').replace('[cli_end]', '').replace(/\[cli_space\]/g, ' ').replace(/\[cli_quote\]/g, '"');
-}
-
-ipcMain.handle('get-added-cli', async () => {
-  return addedCli;
-});
-
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({

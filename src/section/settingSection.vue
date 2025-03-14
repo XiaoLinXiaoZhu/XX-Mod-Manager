@@ -39,19 +39,16 @@
             <!-- -在这里你可以选择开启在开始的时候选择配置文件的功能，并且设置配置文件保存位置 -->
             <div v-if="currentTab === 'switch-config'">
                 <settingBar :data="openSwitchConfigPage"></settingBar>
-                <Markdown :content="$t('firstLoad.switchConfigInfo1')"></Markdown>
+                <settingBar :data="openConfigFolder"></settingBar>
+                <s-divider></s-divider>
                 <Markdown :content="$t('firstLoad.switchConfigTitle1')"></Markdown>
+                <Markdown :content="$t('firstLoad.switchConfigInfo1')"></Markdown>
                 <settingBar :data="newConfigName"></settingBar>
                 <settingBar :data="addConfig"></settingBar>
+                <s-divider></s-divider>
                 <Markdown :content="$t('firstLoad.switchConfigInfo2')"></Markdown>
-                <settingBar :data="openConfigFolder"></settingBar>
-                <Markdown :content="$t('firstLoad.switchConfig')"></Markdown>
                 <settingBar :data="changeConfig"></settingBar>
                 <settingBar :data="createShortOfCurrentConfig"></settingBar>
-                <Markdown :content="$t('firstLoad.switchConfigInfo3')"></Markdown>
-                <settingBar :data="addedCli"></settingBar>
-                <settingBar :data="changeConfigWithCli"></settingBar>
-                <settingBar :data="createShortOfCurrentConfigWithCli"></settingBar>
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
 
@@ -351,60 +348,6 @@ const openSwitchConfigPage = {
     }
 }
 
-const addedCli ={
-    name: 'addedCli',
-    data: null,
-    type: 'string',
-    displayName: 'Added Cli',
-    t_displayName: {
-        zh_cn: '添加的命令行',
-        en: 'Added Cli'
-    },
-    onChange: (value) => {
-        console.log('addedCli changed:', value);
-        addedCli.data = value;
-    }
-}
-
-const changeConfigWithCli = {
-    name: 'changeConfigWithCli',
-    data: null,
-    type: 'dir',
-    displayName: 'Use Config From Folder',
-    t_displayName: {
-        zh_cn: '使用来自文件夹的配置',
-        en: 'Use Config From Folder'
-    },
-    onChange: (value) => {
-        console.log('changeConfigWithCli changed:', value);
-        changeConfigWithCli.data = value;
-    }
-}
-
-const createShortOfCurrentConfigWithCli = {
-    name: 'createShortOfCurrentConfigWithCli',
-    data: null,
-    type: 'iconbutton',
-    displayName: 'Create Short Of Custom Config With Cli',
-    buttonName: 'Create',
-    t_displayName: {
-        zh_cn: '创建附带额外命令行的快捷方式',
-        en: 'Create Short Of Current Config With Cli'
-    },
-    t_buttonName: {
-        zh_cn: '创建快捷方式',
-        en: 'Create Short Cut'
-    },
-    onChange: (value) => {
-        console.log('createShortOfCurrentConfigWithCli changed:', addedCli.data);
-        iManager.createAppShortCutWithAddedCli(changeConfigWithCli.data,addedCli.data).then(() => {
-            console.log('createShortOfCurrentConfigWithCli success');
-        }).catch((err) => {
-            console.log('createShortOfCurrentConfigWithCli failed:', err);
-        });
-    }
-}
-
 const changeConfig = {
     name: 'changeConfig',
     data: null,
@@ -423,7 +366,7 @@ const changeConfig = {
 const createShortOfCurrentConfig = {
     name: 'createShortOfCurrentConfig',
     data: null,
-    type: 'button',
+    type: 'iconbutton',
     displayName: 'Create Short Of Custom Config',
     description: 'Create Short Of Custom Config',
     buttonName: 'Create',
