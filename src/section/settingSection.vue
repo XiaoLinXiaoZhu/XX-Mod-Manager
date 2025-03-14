@@ -38,9 +38,19 @@
             <!-- -切换配置 -->
             <!-- -在这里你可以选择开启在开始的时候选择配置文件的功能，并且设置配置文件保存位置 -->
             <div v-if="currentTab === 'switch-config'">
+                <settingBar :data="openSwitchConfigPage"></settingBar>
+                <Markdown :content="$t('firstLoad.switchConfigInfo1')"></Markdown>
+                <Markdown :content="$t('firstLoad.switchConfigTitle1')"></Markdown>
+                <settingBar :data="newConfigName"></settingBar>
+                <settingBar :data="addConfig"></settingBar>
+                <Markdown :content="$t('firstLoad.switchConfigInfo2')"></Markdown>
+                <settingBar :data="openConfigFolder"></settingBar>
                 <Markdown :content="$t('firstLoad.switchConfig')"></Markdown>
                 <settingBar :data="changeConfig"></settingBar>
                 <settingBar :data="createShortOfCurrentConfig"></settingBar>
+                <Markdown :content="$t('firstLoad.switchConfigInfo3')"></Markdown>
+                <settingBar :data="addedCli"></settingBar>
+                <settingBar :data="createShortOfCurrentConfigWithCli"></settingBar>
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
 
@@ -166,6 +176,8 @@ import settingBar from '../components/settingBar.vue';
 import { computed, onMounted, ref, watch } from 'vue';
 import IManager from '../../electron/IManager';
 const iManager = new IManager();
+import fsProxy from '../../electron/fsProxy';
+import TapeConfig from '../../switchConfig/src/js/configManager.ts';
 import getData from './settingSectionData.js';
 const {
     languageData,
@@ -253,20 +265,139 @@ const refreshDuleToPlugin = {
     }
 }
 
+const newConfigName = {
+    name: 'newConfigName',
+    data: '',
+    type: 'string',
+    displayName: 'New Config Name',
+    t_displayName: {
+        zh_cn: '新配置名称',
+        en: 'New Config Name'
+    },
+    onChange: (value) => {
+        console.log('newConfigName changed:', value);
+        newConfigName.data = value;
+    }
+}
+
+const addConfig = {
+    name: 'addConfig',
+    data: null,
+    type: 'iconbutton',
+    displayName: 'Add Config',
+    buttonName: 'Add',
+    t_displayName: {
+        zh_cn: '添加配置',
+        en: 'Add Config'
+    },
+    t_buttonName: {
+        zh_cn: '添加',
+        en: 'Add'
+    },
+    onChange: (value) => {
+        console.log('addConfig changed:', value);
+        TapeConfig.createConfig(newConfigName.data).then(() => {
+            console.log('addConfig success');
+            // 打开配置页面
+            iManager.changeUrl('switchConfig');
+        }).catch((err) => {
+            console.log('addConfig failed:', err);
+        });
+    }
+}
+
+const openConfigFolder = {
+    name: 'openConfigFolder',
+    data: null,
+    type: 'iconbutton',
+    displayName: 'Open Config Folder',
+    buttonName: 'Open',
+    t_displayName: {
+        zh_cn: '打开配置文件夹',
+        en: 'Open Config Folder'
+    },
+    t_buttonName: {
+        zh_cn: '打开',
+        en: 'Open'
+    },
+    onChange: (value) => {
+        console.log('openConfigFolder changed:', value);
+        TapeConfig.getConfigRootPath().then((path) => {
+            fsProxy.openDir(path);
+        }).catch((err) => {
+            console.log('openConfigFolder failed:', err);
+        });
+    }
+}
+
+const openSwitchConfigPage = {
+    name: 'openSwitchConfigPage',
+    data: null,
+    type: 'iconbutton',
+    displayName: 'Open Switch Config Page',
+    buttonName: 'Open',
+    t_displayName: {
+        zh_cn: '打开配置切换页面',
+        en: 'Open Switch Config Page'
+    },
+    t_buttonName: {
+        zh_cn: '打开',
+        en: 'Open'
+    },
+    onChange: (value) => {
+        console.log('openSwitchConfigPage,herf:', window.location.href, '/switchConfig');
+        iManager.changeUrl('switchConfig');
+    }
+}
+
+const addedCli ={
+    name: 'addedCli',
+    data: null,
+    type: 'string',
+    displayName: 'Added Cli',
+    t_displayName: {
+        zh_cn: '添加的命令行',
+        en: 'Added Cli'
+    },
+    onChange: (value) => {
+        console.log('addedCli changed:', value);
+        addedCli.data = value;
+    }
+}
+
+const createShortOfCurrentConfigWithCli = {
+    name: 'createShortOfCurrentConfigWithCli',
+    data: null,
+    type: 'iconbutton',
+    displayName: 'Create Short Of Custom Config With Cli',
+    buttonName: 'Create',
+    t_displayName: {
+        zh_cn: '创建附带额外命令行的快捷方式',
+        en: 'Create Short Of Current Config With Cli'
+    },
+    t_buttonName: {
+        zh_cn: '创建快捷方式',
+        en: 'Create Short Cut'
+    },
+    onChange: (value) => {
+        console.log('createShortOfCurrentConfigWithCli changed:', addedCli.data);
+
+        iManager.createAppShortCut(addedCli.data).then(() => {
+            console.log('createShortOfCurrentConfigWithCli success');
+        }).catch((err) => {
+            console.log('createShortOfCurrentConfigWithCli failed:', err);
+        });
+    }
+}
 
 const changeConfig = {
     name: 'changeConfig',
     data: null,
     type: 'dir',
     displayName: 'Change Config',
-    description: 'Change Config',
     t_displayName: {
         zh_cn: '配置另存为',
         en: 'Save Config To'
-    },
-    t_description: {
-        zh_cn: '选择配置文件夹',
-        en: 'Select Config Folder'
     },
     onChange: (value) => {
         console.log('changeConfig changed:', value);

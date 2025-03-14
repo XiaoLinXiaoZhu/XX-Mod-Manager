@@ -120,6 +120,8 @@ function handleApplyButtonClicked() {
 }
 
 function changeUrl(url: string) {
+    //debug
+    console.log('change url from:', window.location.href, 'to:', url);
     window.location.href = url;
 }
 

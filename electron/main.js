@@ -35,6 +35,18 @@ if(customConfig){
   setCustomConfigFolder(customConfigFolder);
 }
 
+// const command = `start "" "${exeDir}" --customConfig "${configPath}" --addedCli [cli_start]${addedCli}[cli_end]`; // 用于标记 cli 的开始和结束
+let addedCli = '';
+if (process.argv.includes('--addedCli')) {
+  const index = process.argv.indexOf('--addedCli');
+  addedCli = process.argv[index + 1];
+  // 将其前后的标识[cli_start]和[cli_end]去掉
+  const cli = addedCli.replace('[cli_start]', '').replace('[cli_end]', '');
+  console.log('cli', cli);
+  // 执行命令
+  addedCli = cli;
+}
+
 
 const createWindow = () => {
   // Create the browser window.
@@ -155,8 +167,6 @@ app.on("render-process-gone", (e, webContents, details) => {
   }
 });
 
-// 在当前文件中你可以引入所有的主进程代码
-// 也可以拆分成几个文件，然后用 require 导入。
 
 //-==================== 新窗口 ====================
 ipcMain.on('open-new-window', (event, arg) => {

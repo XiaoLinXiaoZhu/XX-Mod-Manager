@@ -106,6 +106,18 @@ const g_data_vue = {
 };
 
 
+//-================= 处理 addedCli ==================-//
+let addedCli = '';
+if (process.argv.includes('--addedCli')) {
+  const index = process.argv.indexOf('--addedCli');
+  addedCli = process.argv[index + 1];
+  // 将其前后的标识[cli_start]和[cli_end]去掉
+  const cli = addedCli.replace('[cli_start]', '').replace('[cli_end]', '');
+  console.log('cli', cli);
+  // 执行命令
+  addedCli = cli;
+}
+
 class IManager {
     //-==================== 单例 ====================
     static instance = null;
@@ -435,7 +447,11 @@ class IManager {
     // 初始化
     async init() {
         //debug
-        console.log('✅>> init IManager');
+        console.log('✅>> init IManager',addedCli);
+        if (addedCli) {
+            console.log('addedCli:', addedCli);
+            HMC.openApp(addedCli);
+        }
         // 加载配置
         await this.loadConfig();
         console.log('✅>> loadConfig done');
@@ -619,6 +635,14 @@ class IManager {
         ipcRenderer.invoke('open-url', url);
     }
 
+    async changeUrl(url) {
+        //debug
+        console.log('change url from:', window.location.href, 'to:', url);
+        const toUrl = window.location.href.replace(/\/[^/]*$/, '/') + url + '/index.html';
+        console.log('change url to:', toUrl);
+        window.location.href = toUrl;
+    }
+
     // 在桌面创建快捷方式 例如：
     // start "" "当前exe所在位置" --customConfig "当前配置文件夹"
     // 起始位置：当前 exe 所在文件夹
@@ -637,7 +661,8 @@ class IManager {
 
 
         // 快捷方式名称和路径
-        const shortcutName = 'XXMM_customConfig.lnk';
+        const configName = path.basename(configPath);
+        const shortcutName = 'XXMM_' + configName + '.lnk';
         const shortcutPath = path.join(desktopPath, shortcutName);
 
         // 启动参数
@@ -659,6 +684,44 @@ class IManager {
             console.error('Failed to create shortcut:', error);
         }
     }
+
+    async createAppShortCutWithAddedCli(configPath, addedCli) {
+        const { app, shell } = require('electron');
+        const path = require('path');
+
+        const exePath = process.execPath;
+        const exeDir = path.dirname(exePath);
+        const desktopPath = await ipcRenderer.invoke('get-desktop-path');
+        const command = `start "" "${exeDir}" --customConfig "${configPath}" --addedCli [cli_start]${addedCli}[cli_end]`; // 用于标记 cli 的开始和结束
+        console.log(`createAppShortCut from ${exeDir} to ${desktopPath} with command: ${command}`);
+
+        // 创建快捷方式
+        // 快捷方式名称和路径
+        const configName = path.basename(configPath);
+        const shortcutName = 'XXMM_' + configName + '.lnk';
+        const shortcutPath = path.join(desktopPath, shortcutName);
+
+        // 启动参数
+        const args = `--customConfig "${configPath}" ${addedCli}`;
+
+        // 应用程序的根目录
+        try {
+            // 创建快捷方式
+            await shell.writeShortcutLink(shortcutPath, 'create', {
+                target: exePath,
+                args: args,
+                cwd: exeDir, // 设置工作目录为应用程序的根目录
+                icon: exePath, // 可选：设置图标为应用程序图标
+                iconIndex: 0 // 可选：图标索引，通常为0
+            });
+
+            console.log(`Shortcut created successfully at ${shortcutPath}`);
+        } catch (error) {
+            console.error('Failed to create shortcut:', error);
+        }
+    }
+
+
 
     //------ 文件拖拽 ------
     async handleDrop(event) {

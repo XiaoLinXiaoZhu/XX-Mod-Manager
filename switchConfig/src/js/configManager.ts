@@ -99,6 +99,23 @@ class TapeConfig{
         this._allConfig = [];
         console.log('All configurations cleared.');
     }
+
+    static async createConfig(name: string){
+        if (name === ''){
+            t_snack(new TranslatedText('Name cannot be empty', '名称不能为空'), SnackType.error);
+            return;
+        }
+        const configRootDir = await this.getConfigRootPath();
+        const newConfigDir = path.join(configRootDir, name);
+        console.log(newConfigDir);
+        if(fs.existsSync(newConfigDir)){
+            t_snack(new TranslatedText('Config already exists', '配置已存在'), SnackType.error);
+            return;
+        }
+        fs.mkdirSync(newConfigDir);
+        t_snack(new TranslatedText('Config created', '配置已创建'), SnackType.info);
+        this.reloadAllConfig();
+    }
 }
 
 
