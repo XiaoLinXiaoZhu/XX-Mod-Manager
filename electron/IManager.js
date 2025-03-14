@@ -46,6 +46,7 @@ let g_temp = {
     currentTab: 'mod',
     currentPreset: "default",
     wakeUped: false,
+    ifDontSaveOnClose: false,
 };
 let g_config = {
     firstLoad: true,
@@ -78,6 +79,7 @@ const g_temp_vue = {
     currentTab: ref('mod'),
     currentPreset: ref('default'),
     wakeUped: ref(false),
+    ifDontSaveOnClose: ref(false),
 };
 
 const g_config_vue = {
@@ -195,6 +197,7 @@ class IManager {
         currentTab: 'mod', // 当前tab
         currentPreset: "default", // 当前预设
         wakeUped: false, // 是否 在唤醒状态
+        ifDontSaveOnClose: false, // 是否在关闭时不保存配置
     };
 
     //-==================== 设置数据 ====================

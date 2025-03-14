@@ -125,7 +125,6 @@ ipcRenderer.on('snack', (event, message,type = 'info') => {
 
 window.onbeforeunload = function (e) {
     // console.log('onbeforeunload');
-
     iManager.config.bounds = {
         x: window.screenX,
         y: window.screenY,
@@ -138,6 +137,7 @@ window.onbeforeunload = function (e) {
     console.log('window unload');
 
     if (iManager.config.firstLoad) return;
+    if (iManager.temp.ifDontSaveOnClose) return;
 
     console.log('save config');
     iManager.saveConfigSync();
