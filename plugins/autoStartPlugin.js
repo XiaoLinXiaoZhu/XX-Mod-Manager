@@ -58,6 +58,24 @@ function startModLoader(iManager, modLoaderPath) {
     iManager.startExe(modLoaderPath);
 }
 
+function runCommand(iManager, command) {
+    if (!command) {
+        const snackMessage = iManager.config.language === 'zh_cn' ? '命令未设置' : 'Command not set';
+        iManager.snack(snackMessage, "error");
+        return false;
+    }
+    const exec = require('child_process').exec;
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
+    }
+    );
+}
+
 const pluginName = 'autoStartPlugin';
 module.exports = {
     name: pluginName,
@@ -72,9 +90,8 @@ module.exports = {
             console.log('wakeUp');
             if (iManager.getPluginData(pluginName, 'autoStartModLoader')) startModLoader(iManager, iManager.getPluginData(pluginName, 'modLoaderPath'));
             if (iManager.getPluginData(pluginName, 'autoStartGame')) startGame(iManager, iManager.getPluginData(pluginName, 'gamePath'));
+            if (iManager.getPluginData(pluginName, 'ifRunCommand')) runCommand(iManager, iManager.getPluginData(pluginName, 'command'));
         });
-
-
 
         let pluginData = [];
 
@@ -176,7 +193,7 @@ module.exports = {
 
 
 
-        let divider = {
+        let divider1 = {
             name: 'divider',
             data: '',
             type: 'markdown',
@@ -187,7 +204,7 @@ module.exports = {
                 en: 'Divider'
             }
         }
-        pluginData.push(divider);
+        pluginData.push(divider1);
 
         let markdownGame = {
             name: 'markdownGame',
@@ -279,6 +296,116 @@ module.exports = {
             }
         };
         pluginData.push(startGameButton);
+
+        let divider2 = {
+            name: 'divider',
+            data: '',
+            type: 'markdown',
+            displayName: 'Divider',
+            description: '---',
+            t_displayName: {
+                zh_cn: '分割线',
+                en: 'Divider'
+            }
+        }
+        pluginData.push(divider2);
+
+        let markdownCommand = {
+            name: 'markdownCommand',
+            data: '',
+            type: 'markdown',
+            displayName: 'Command',
+            description: 'Run command when program start',
+            t_displayName: {
+                zh_cn: '命令',
+                en: 'Command'
+            },
+            t_description: {
+                zh_cn: '# 在程序启动时运行自定义命令\n比如你想要在XXMM启动时，也启动当前配置对应的游戏的XXMI，你可以在这里设置运行命令行为：\n "XXMI Launcher.exe" --nogui --xxmi ZZMI \n-\n注意将其中的XXMI替换为你的XXMI所在的位置，ZZMI为其所启动的模组加载器的类型，有ZZMI/WWMI/HSMI等\n请确保命令正确，并且将开关打开。',
+                en: '# Run custom command when program start\nFor example, if you want to start the XXMI corresponding to the current configuration when XXMM starts, you can set the command to run here: \n "XXMI Launcher.exe" --nogui --xxmi ZZMI \n-\nReplace XXMI with the location of your XXMI, and ZZMI with the type of mod loader it starts, such as ZZMI/WWMI/HSMI, etc. \nPlease make sure the command is correct and turn on the switch.'
+            },
+            onChange: (value) => {
+                // markdown 类型的数据不会触发 onChange,它只作为展示
+            }
+        };
+        pluginData.push(markdownCommand);
+
+        //- 是否运行命令
+        let ifRunCommand = {
+            name: 'ifRunCommand',
+            data: false,
+            type: 'boolean',
+            displayName: 'Run Command',
+            t_displayName: {
+                zh_cn: '运行命令',
+                en: 'Run Command'
+            },
+            onChange: (value) => {
+                console.log('runCommand changed:', value);
+                ifRunCommand.data = value;
+            }
+        }
+        pluginData.push(ifRunCommand);
+
+        //- 忽略是否是切换配置界面
+        let ignoreSwitchConfig = {
+            name: 'ignoreSwitchConfig',
+            data: false,
+            type: 'boolean',
+            displayName: 'Ignore Switch Config',
+            t_displayName: {
+                zh_cn: '忽略切换配置界面',
+                en: 'Ignore Switch Config'
+            },
+            onChange: (value) => {
+                console.log('ignoreSwitchConfig changed:', value);
+                ignoreSwitchConfig.data = value;
+            }
+        }
+
+        //- 命令
+        let command = {
+            name: 'command',
+            data: '',
+            type: 'string',
+            displayName: 'Command',
+            t_displayName: {
+                zh_cn: '命令',
+                en: 'Command'
+            },
+            onChange: (value) => {
+                console.log('command changed:', value);
+                command.data = value;
+            }
+        }
+        pluginData.push(command);
+
+        //- 手动运行命令的按钮
+        let runCommandButton = {
+            name: 'runCommand',
+            type: 'iconbutton',
+            displayName: 'Test Run Command',
+            t_displayName: {
+                zh_cn: '测试运行命令',
+                en: 'Test Run Command'
+            },
+            buttonName: 'Run Command',
+            t_buttonName: {
+                zh_cn: '运行命令',
+                en: 'Run Command'
+            },
+            onChange: () => {
+                const command = iManager.getPluginData(pluginName, 'command');
+                if (!command) {
+                    const snackMessage = iManager.config.language === 'zh_cn' ? '命令未设置' : 'Command not set';
+                    iManager.snack(snackMessage, "error");
+                    return false;
+                }
+                runCommand(iManager, command);
+            }
+        };
+        pluginData.push(runCommandButton);
+
 
 
         iManager.registerPluginConfig(pluginName, pluginData);

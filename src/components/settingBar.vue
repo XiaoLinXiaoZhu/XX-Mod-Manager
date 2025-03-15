@@ -4,6 +4,14 @@
         <markdown v-if="data.t_description" :content="data.t_description[local] || data.description"></markdown>
         <markdown v-else :content="data.description"></markdown>
     </div>
+    <!-- -hidden -->
+    <div v-else-if="data.type === 'hidden'" style="display: none;">
+        <h3 v-if="data.t_displayName">{{ data.t_displayName[local] }}</h3>
+        <h3 v-else>{{ data.displayName }}</h3>
+        
+        <!-- rawData -->
+        <p>{{ data.data }}</p>
+    </div>
     <div class="OO-setting-bar" v-else-if="display">
         <h3 v-if="data.t_displayName">{{ data.t_displayName[local] }}</h3>
         <h3 v-else>{{ data.displayName }}</h3>

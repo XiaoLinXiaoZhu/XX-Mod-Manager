@@ -450,7 +450,6 @@ class IManager {
         this.trigger('themeChange', this.config.theme);
         console.log('✅>> themeChange to', this.config.theme);
 
-
         // 加载mod
         await this.loadMods();
         console.log('✅>> loadMods done');
