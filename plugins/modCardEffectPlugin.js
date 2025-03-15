@@ -276,6 +276,41 @@ module.exports = {
         };
         pluginData.push(hoverSwitchCurrentCard);
 
+        //- 隐藏卡片下的快捷键提示
+        let hideModCardSwapKey = {
+            name: 'hideModCardSwapKey',
+            data: false,
+            type: 'boolean',
+            displayName: 'Hide Mod Card Swap Key',
+            description: 'If true, the swap key of the mod card will be hidden',
+            t_displayName: {
+                zh_cn: '隐藏卡片切换快捷键',
+                en: 'Hide Mod Card Swap Key'
+            },
+            t_description: {
+                zh_cn: '隐藏卡片下的快捷键提示',
+                en: 'If true, the swap key of the mod card will be hidden'
+            },
+            onChange: (value) => {
+                console.log('hideModCardSwapKey changed:', value);
+                hideModCardSwapKey.data = value;
+                if (value) {
+                    iManager.addCssWithHash(`
+                    .mod-item .hotkey-container {
+                        display: none !important;
+                    }
+                    `);
+                } else {
+                    iManager.removeCssWithHash(`
+                    .mod-item .hotkey-container {
+                        display: none !important;
+                    }
+                    `);
+                }
+            }
+        };
+        pluginData.push(hideModCardSwapKey);
+
 
         iManager.registerPluginConfig(pluginName, pluginData);
     }
