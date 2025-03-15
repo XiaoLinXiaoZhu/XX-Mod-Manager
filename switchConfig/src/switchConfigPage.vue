@@ -116,13 +116,7 @@ function handleApplyButtonClicked() {
     ipcRenderer.invoke('set-custom-config-folder', currentTape.value._dir);
     // 页面重载为 mainPage
     // ipcRenderer.send('switch-page', 'mainPage');
-    changeUrl('/main');
-}
-
-function changeUrl(url: string) {
-    //debug
-    console.log('change url from:', window.location.href, 'to:', url);
-    window.location.href = url;
+    iManager.changeUrl('main');
 }
 
 
