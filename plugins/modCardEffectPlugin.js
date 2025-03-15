@@ -125,6 +125,15 @@ module.exports = {
             if (hoverSwitchCurrentCard) {
                 addHoverEffect(document, iManager);
             }
+
+            let hideModCardSwapKey = iManager.getPluginData(pluginName, 'hideModCardSwapKey');
+            if (hideModCardSwapKey) {
+                iManager.addCssWithHash(`
+                .mod-item .hotkey-container {
+                    display: none !important;
+                }
+                `);
+            }
         });
 
 
