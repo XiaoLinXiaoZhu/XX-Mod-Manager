@@ -36,6 +36,18 @@ if(customConfig){
   setCustomConfigFolder(customConfigFolder);
 }
 
+// 渲染进程获取参数
+ipcMain.handle('get-args', async () => {
+  return {
+    devMode: devMode,
+    firstpage: firstpage,
+    switchConfig: switchConfig,
+    devTools: devTools,
+    customConfig: customConfig,
+    customConfigFolder: customConfigFolder
+  }
+});
+
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({

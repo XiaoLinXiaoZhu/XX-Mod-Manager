@@ -59,21 +59,14 @@ function startModLoader(iManager, modLoaderPath) {
 }
 
 function runCommand(iManager, command) {
+    //debug
+    console.log('runCommand:', command);
     if (!command) {
         const snackMessage = iManager.config.language === 'zh_cn' ? '命令未设置' : 'Command not set';
         iManager.snack(snackMessage, "error");
         return false;
     }
-    const exec = require('child_process').exec;
-    exec(command, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return;
-        }
-        console.log(`stdout: ${stdout}`);
-        console.error(`stderr: ${stderr}`);
-    }
-    );
+    iManager.runCommand(command);
 }
 
 const pluginName = 'autoStartPlugin';
@@ -85,12 +78,34 @@ module.exports = {
     },
     init(iManager) {
         // iManager.snack('Auto Start Plugin Loaded from '+__dirname);
-
+        const ignoredState = 'ignoreSwitchConfig,waiting for switchConfig';
         iManager.on('wakeUp', () => {
-            console.log('wakeUp');
+            console.log('wakeUp', iManager.getPluginData(pluginName, 'autoStartModLoader'), iManager.getPluginData(pluginName, 'autoStartGame'), iManager.getPluginData(pluginName, 'ifRunCommand'));
             if (iManager.getPluginData(pluginName, 'autoStartModLoader')) startModLoader(iManager, iManager.getPluginData(pluginName, 'modLoaderPath'));
             if (iManager.getPluginData(pluginName, 'autoStartGame')) startGame(iManager, iManager.getPluginData(pluginName, 'gamePath'));
-            if (iManager.getPluginData(pluginName, 'ifRunCommand')) runCommand(iManager, iManager.getPluginData(pluginName, 'command'));
+            if (iManager.getPluginData(pluginName, 'ifRunCommand')) {
+                ipcRenderer.invoke('get-args').then((args) => {
+                    //debug
+                    console.log('get-args:', args, args.switchConfig, iManager.getPluginData(pluginName, 'ignoreSwitchConfig'));
+                    if (!args.switchConfig || iManager.getPluginData(pluginName, 'ignoreSwitchConfig')) {
+                        runCommand(iManager, iManager.getPluginData(pluginName, 'command'));
+                        // 重置 commandStatus
+                        commandStatus.data = '';
+                    } else {
+                        console.log('ignoreSwitchConfig,waiting for switchConfig');
+                        commandStatus.data = ignoredState;
+                        iManager.savePluginConfig();
+                    }
+                });
+            }
+            
+            // 如果发现 commandStatus 为 ignoredState,那么就说明上一次刷新结束时，并没有执行命令，这次刷新时，即使拥有参数 --switchConfig 也要执行命令
+            if (iManager.getPluginData(pluginName, 'commandStatus') === ignoredState && !window.location.href.includes('switchConfig')) {
+                runCommand(iManager, iManager.getPluginData(pluginName, 'command'));
+                // 重置 commandStatus
+                commandStatus.data = '';
+                iManager.savePluginConfig();
+            }
         });
 
         let pluginData = [];
@@ -362,6 +377,7 @@ module.exports = {
                 ignoreSwitchConfig.data = value;
             }
         }
+        pluginData.push(ignoreSwitchConfig);
 
         //- 命令
         let command = {
@@ -379,6 +395,23 @@ module.exports = {
             }
         }
         pluginData.push(command);
+
+        //- 指令执行状态
+        let commandStatus = {
+            name: 'commandStatus',
+            data: '',
+            type: 'hidden',
+            displayName: 'Command Status',
+            t_displayName: {
+                zh_cn: '命令执行状态',
+                en: 'Command Status'
+            },
+            onChange: (value) => {
+                console.log('commandStatus changed:', value);
+                commandStatus.data = value;
+            }
+        }
+        pluginData.push(commandStatus);
 
         //- 手动运行命令的按钮
         let runCommandButton = {

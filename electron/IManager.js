@@ -602,6 +602,19 @@ class IManager {
         this.HMC.openApp(exePath);
     }
 
+    async runCommand(command) {
+        const exec = require('child_process').exec;
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`exec error: ${error}`);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+            console.error(`stderr: ${stderr}`);
+        }
+        );
+    }
+
     async initAllData() {
         await ipcRenderer.invoke('init-all-data');
         // 刷新页面
@@ -1393,14 +1406,15 @@ function waitInitIManager() {
     });
 }
 
-ipcRenderer.on('wakeUp', () => {
-    console.log('🌞wakeUp');
-    // snack('🌞wakeUp');
-    t_snack({
-        zh_cn: '🌞程序正常启动~',
-        en: '🌞Program is waking up~',
-    })
-    EventSystem.trigger('wakeUp');
+ipcRenderer.on('wakeUp', () => {  
+    waitInitIManager().then((iManager) => {
+        console.log('🌞wakeUp');
+        t_snack({
+            zh_cn: '🌞程序正常启动~',
+            en: '🌞Program is waking up~',
+        })
+        EventSystem.trigger('wakeUp');
+    });
 });
 
 let sleepTimer = '';
