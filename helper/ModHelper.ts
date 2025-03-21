@@ -117,17 +117,22 @@ class ModData {
             hotkeys: this.hotkeys
         };
     }
-    public copy(): ModData {    
-        return new ModData(
+    public copy(): ModData {
+        const newModData = new ModData(
             this.name,
             this.character,
             this.description,
             this.url,
             this.preview,
-            this.hotkeys
+            // 这里需要深拷贝,不然传递的是一个引用
+            JSON.parse(JSON.stringify(this.hotkeys))
         ).setModSourcePath(this.modSourcePath);
+
+        return newModData;
     }
     public equals(modData: ModData): boolean {
+        //debug
+        console.log(`comparing......`,this.id,this.toJson(),modData.id,modData.toJson());
         return JSON.stringify(this.toJson()) === JSON.stringify(modData.toJson());
     }
 

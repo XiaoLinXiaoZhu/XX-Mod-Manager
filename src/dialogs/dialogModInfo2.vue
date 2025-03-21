@@ -245,6 +245,8 @@ watch(() => props.mod, async (newVal) => {
 });
 
 const handleHotkeyInput = (hotkey, value) => {
+  //debug
+  console.log(`input hot key`,hotkey,value,`to`,tempModInfo.value.id);
   if (value === '') {
     // 删除快捷键
     const index = tempModInfo.value.hotkeys.indexOf(hotkey);
@@ -255,10 +257,12 @@ const handleHotkeyInput = (hotkey, value) => {
 }
 
 const addNewHotkeyByDescription = (description) => {
+  console.log(`add hot key`,description,`to`,tempModInfo.value.id);
   tempModInfo.value.addHotkey("", description);
 }
 
 const addNewHotkeyByHotkey = (key) => {
+  console.log(`add hot key`,key,`to`,tempModInfo.value.id);
   tempModInfo.value.addHotkey(key, "");
 }
 
