@@ -632,7 +632,16 @@ class IManager {
     async changeUrl(url) {
         //debug
         console.log('change url from:', window.location.href, 'to:', url);
-        const toUrl = window.location.href.replace(/\/[^/]*$/, '/') + url + '/index.html';
+        // const toUrl = window.location.href.replace(/\/[^/]*$/, '') + url + '/index.html';
+        // url 截取掉最后的 /index.html
+        let toUrl = window.location.href.replace(/\/index.html$/, '');
+        // 再截取掉最后的 /switchConfig
+        toUrl = toUrl.replace(/\/switchConfig$/, '');
+        // 防止最后为 / ，导致出现 // 的情况，所以再截取一次
+        toUrl = toUrl.replace(/\/$/, ''); // 去掉最后的 /
+        
+        toUrl = toUrl + url + '/index.html';
+
         console.log('change url to:', toUrl);
         window.location.href = toUrl;
     }

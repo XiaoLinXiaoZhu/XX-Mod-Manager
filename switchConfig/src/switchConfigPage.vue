@@ -116,7 +116,7 @@ function handleApplyButtonClicked() {
     ipcRenderer.invoke('set-custom-config-folder', currentTape.value._dir);
     // 页面重载为 mainPage
     // ipcRenderer.send('switch-page', 'mainPage');
-    iManager.changeUrl('main');
+    iManager.changeUrl('');
 }
 
 

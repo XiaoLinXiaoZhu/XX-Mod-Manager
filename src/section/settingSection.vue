@@ -297,7 +297,7 @@ const addConfig = {
         TapeConfig.createConfig(newConfigName.data).then(() => {
             console.log('addConfig success');
             // 打开配置页面
-            iManager.changeUrl('switchConfig');
+            iManager.changeUrl('/switchConfig');
         }).catch((err) => {
             console.log('addConfig failed:', err);
         });
@@ -344,7 +344,7 @@ const openSwitchConfigPage = {
     },
     onChange: (value) => {
         console.log('openSwitchConfigPage,herf:', window.location.href, '/switchConfig');
-        iManager.changeUrl('switchConfig');
+        iManager.changeUrl('/switchConfig');
     }
 }
 
