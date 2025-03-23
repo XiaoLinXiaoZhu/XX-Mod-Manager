@@ -1243,8 +1243,8 @@ class IManager {
         ipcRenderer.invoke('set-current-config', this._config);
     }
 
-    async getFilePath(fileName, fileType) {
-        const filePath = await ipcRenderer.invoke('get-file-path', fileName, fileType);
+    async getFilePath(fileName, fileType,defaultPath) {
+        const filePath = await ipcRenderer.invoke('get-file-path', fileName, fileType,defaultPath);
         //debug
         console.log('=================================');
         console.log(filePath);

@@ -417,17 +417,19 @@ ipcMain.handle('save-preset', async (event, presetName, mods) => {
     savePreset(presetPath, presetName, mods);
 });
 
-ipcMain.handle('get-file-path', async (event, fileName, fileType) => {
+ipcMain.handle('get-file-path', async (event, fileName, fileType, defaultPath) => {
     //通过文件选择对话框选择文件
     let result;
     if (fileType == 'directory') {
         result = await dialog.showOpenDialog({
+            defaultPath: defaultPath,
             title: 'Select ' + fileName,
             properties: ['openDirectory']
         });
     }
     else if (fileType == 'image') {
         result = await dialog.showOpenDialog({
+            defaultPath: defaultPath,
             title: 'Select ' + fileName,
             properties: ['openFile'],
             filters: [
@@ -437,6 +439,7 @@ ipcMain.handle('get-file-path', async (event, fileName, fileType) => {
     }
     else if (fileType == 'exe') {
         result = await dialog.showOpenDialog({
+            defaultPath: defaultPath,
             title: 'Select ' + fileName,
             properties: ['openFile'],
             filters: [
@@ -446,6 +449,7 @@ ipcMain.handle('get-file-path', async (event, fileName, fileType) => {
     }
     else if (fileType == 'ini') {
         result = await dialog.showOpenDialog({
+            defaultPath: defaultPath,
             title: 'Select ' + fileName,
             properties: ['openFile'],
             filters: [
@@ -455,6 +459,7 @@ ipcMain.handle('get-file-path', async (event, fileName, fileType) => {
     }
     else {
         result = await dialog.showOpenDialog({
+            defaultPath: defaultPath,
             title: 'Select ' + fileName,
             properties: ['openFile'],
             filters: [

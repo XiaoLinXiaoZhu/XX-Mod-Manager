@@ -267,7 +267,7 @@ const addNewHotkeyByHotkey = (key) => {
 }
 
 const handleSelectImage = async () => {
-  const imgPath = await iManager.getFilePath('preview', 'image');
+  const imgPath = await iManager.getFilePath('preview', 'image',tempModInfo.value.preview);
   if (imgPath) {
     const imgBase64 = await iManager.getImageBase64(imgPath);
     img.value = "data:image/png;base64," + imgBase64;
