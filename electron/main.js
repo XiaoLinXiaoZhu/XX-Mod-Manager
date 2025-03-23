@@ -23,12 +23,12 @@ let devTools = false;
 devTools = process.argv.includes('--devTools');
 console.log('devTools', devTools);
 
-let customConfig = false;
-customConfig = process.argv.includes('--customConfig');
-console.log('customConfig', customConfig);
+let ifCustomConfig = false;
+ifCustomConfig = process.argv.includes('--customConfig');
+console.log('customConfig', ifCustomConfig);
 // customConfig 获取一个配置文件路径
 let customConfigFolder = '';
-if(customConfig){
+if(ifCustomConfig){
   const index = process.argv.indexOf('--customConfig');
   customConfigFolder = process.argv[index + 1];
   console.log('customConfigFolder', customConfigFolder);
@@ -43,7 +43,7 @@ ipcMain.handle('get-args', async () => {
     firstpage: firstpage,
     switchConfig: switchConfig,
     devTools: devTools,
-    customConfig: customConfig,
+    ifCustomConfig: ifCustomConfig,
     customConfigFolder: customConfigFolder
   }
 });

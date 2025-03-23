@@ -17,7 +17,10 @@ let Archive = window.Archive;
 //! 下面两个变量是为了解决 vite 打包时，无法正确导入 wasm 文件的问题
 import ArchiveWASM from './lib/libarchive.wasm?url';
 import workerBound from './lib/worker-bundle.js?url';
-
+import { ModInfo, ModMetaData, ModMetaDataItem, ModMetaDataType } from '../core/ModInfo';
+import XXMMCore from '../core/XXMMCore';
+import LogHandler from '../core/LogHandler';
+import ModLoader from '../core/ModLoader';
 
 // 导入 Language
 import { Language, TranslatedText, setCurrentLanguage } from '../helper/Language';
@@ -30,7 +33,7 @@ import { IPluginLoader } from '../helper/PluginLoader';
 // 导入 PathHelper
 import { PathHelper } from '../helper/PathHelper';
 // 导入 ModHelper
-import { ModData } from '../helper/ModHelper';
+import { ModData } from '../core/ModHelper';
 // 导入 DialogHelper
 import { DialogID, DialogHelper } from '../helper/DialogHelper';
 
@@ -284,8 +287,10 @@ class IManager {
     t_snack = t_snack;
 
     async loadConfig() {
-        const currentConfig = await ipcRenderer.invoke('get-current-config');
+        // const currentConfig = await ipcRenderer.invoke('get-current-config');
+        const currentConfig = XXMMCore.getCurrentConfig();
         console.log(currentConfig);
+
         //如果为空，则使用默认配置
         if (currentConfig == {} || currentConfig == null) {
             snack('配置文件不存在');
@@ -305,7 +310,6 @@ class IManager {
                 snack(`Loading config error: ${error}`);
             }
         }
-
         this.saveConfig();
     }
 
@@ -1322,41 +1326,28 @@ class IManager {
         this.saveConfig();
     }
 
-    async saveModInfo(modInfo) {
-        // 该方法已弃用，当调用的时候，抛出异常
-        console.warn('saveModInfo is deprecated，data.modList 是同步的，保存到本地请使用 ModInfo.saveModInfo()');
-        return;
-        //这里的 modInfo 是一个对象，不能直接传递给主进程
-        //所以需要将 modInfo 转化为 json
-        this.printModInfo(modInfo);
-        console.log(modInfo);
-
-        // iManager 保存    
-        // 根据 modInfo 的 name 找到对应的 mod，然后替换
-        const index = this.data.modList.findIndex((mod) => mod.name === modInfo.name);
-        if (index === -1) {
-            snack(`Mod ${modInfo.name} not found`);
-            return;
-        }
-        this.data.modList[index] = modInfo;
-
-        // 刷新 角色列表
-        this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
-        this.data.characterList = Array.from(this.data.characterList).sort();
-
-        // 本地保存
-        const jsonModInfo = JSON.stringify(modInfo);
-        await ipcRenderer.invoke('save-mod-info', this.config.modSourcePath, jsonModInfo);
-        this.trigger('modInfoChanged', modInfo);
-    }
-
     printModInfo(modInfo) {
         console.log(ModData.fromJson(modInfo).print());
         return;
     }
 
     async moveAllFiles(sourcePath, targetPath) {
-        await ipcRenderer.invoke('move-all-files', sourcePath, targetPath);
+        const moveAllFiles = (srcDir, destDir) => {
+            // 将 srcDir 下的所有文件移动到 destDir
+            if (!fs.existsSync(destDir)) {
+                fs.mkdirSync(destDir, { recursive: true });
+            }
+        
+            const files = fs.readdirSync(srcDir);
+            files.forEach(file => {
+                const srcFile = path.join(srcDir, file);
+                const destFile = path.join(destDir, file);
+                fs.copyFileSync(srcFile, destFile);
+                fs.unlinkSync(srcFile);
+            });
+        }
+
+        moveAllFiles(sourcePath, targetPath);
     }
 
     //-==================== 事件管理 ====================

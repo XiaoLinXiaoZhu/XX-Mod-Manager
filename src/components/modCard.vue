@@ -46,7 +46,7 @@ const iManager = new IManager();
 import horizontalScrollBar from './horizontalScrollBar.vue';
 
 import { EventSystem, EventType } from '../../helper/EventSystem';
-import { ModData } from '../../helper/ModHelper';   
+import { ModData } from '../../core/ModHelper';   
 import { DialogHelper,DialogID } from '../../helper/DialogHelper';
 
 const props = defineProps({

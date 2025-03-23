@@ -61,7 +61,7 @@
 <script setup>
 import { computed, defineProps, ref, watch } from 'vue';
 import fsProxy from '../../electron/fsProxy';
-import { ModData } from '../../helper/ModHelper';
+import { ModData } from '../../core/ModHelper';
 import { snack } from '../../helper/SnackHelper';
 import { DialogID , DialogHelper } from '../../helper/DialogHelper';
 // 导入 i18n 的 t 函数

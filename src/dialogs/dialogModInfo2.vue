@@ -205,7 +205,7 @@ import { defineProps, defineEmits, onMounted, computed, watch, useTemplateRef } 
 import IManager from '../../electron/IManager';
 import DialogTemplate from './dialogTemplate.vue';
 import horizontalScrollBar from '../components/horizontalScrollBar.vue';
-import { ModData } from '../../helper/ModHelper';
+import { ModData } from '../../core/ModHelper';
 const iManager = new IManager();
 
 // 参数为 字符串类型的 mod，之后通过 iManager.getModInfo(mod) 获取 mod 信息
