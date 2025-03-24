@@ -1,7 +1,9 @@
 //-==================== 事件管理 ====================
 // 所有的事件：
 //----------生命周期----------
-// wakeUp,initDone
+// wakeUp,initDone,startDone
+//------- 插件加载相关 -------
+// pluginLoaded
 //----------状态变更----------
 // themeChange,languageChange,
 // lastClickedModChanged,
@@ -20,6 +22,8 @@ enum EventType {
     wakeUp = 'wakeUp',
     initDone = 'initDone',
     startDone = 'startDone',
+    //------- 插件加载相关 -------
+    pluginLoaded = 'pluginLoaded',
     //----------状态变更----------
     themeChange = 'themeChange',
     languageChange = 'languageChange',

@@ -111,7 +111,7 @@ module.exports = {
     },
     init(iManager) {
 
-        iManager.on("initDone", () => {
+        iManager.on("pluginLoaded", () => {
             let useModCardFadeInOut = iManager.getPluginData(pluginName, 'useModCardFadeInOut');
             if (useModCardFadeInOut) {
                 const fadeInSpeed = iManager.getPluginData(pluginName, 'fadeInSpeed');

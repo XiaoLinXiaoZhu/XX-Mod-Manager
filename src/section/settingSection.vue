@@ -397,11 +397,11 @@ const createShortOfCurrentConfig = {
 
 
 onMounted(async () => {
-    // 挂载插件的额外设置
-    EventSystem.on(EventType.startDone, () => {
-        //初始化tab
-        currentTab.value = tabs.value[0];
+    //初始化tab
+    currentTab.value = tabs.value[0];
 
+    // 挂载插件的额外设置
+    EventSystem.on(EventType.pluginLoaded, () => {
         plugins.value = IPluginLoader.plugins;
         pluginConfig.value = IPluginLoader.pluginConfig;
 

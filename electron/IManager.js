@@ -514,6 +514,7 @@ class IManager {
         // 加载插件
         await IPluginLoader.Init(this);
         console.log('✅>> loadPlugins done');
+        EventSystem.trigger(EventType.pluginLoaded, this);
 
         //-------- 再次切换一次 语言和主题，因为有些页面可能在 init 之后才加载，所以需要再次切换一次
         this.trigger('languageChange', this.config.language);
