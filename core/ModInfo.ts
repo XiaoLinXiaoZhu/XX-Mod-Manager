@@ -220,6 +220,7 @@ modDataTemplate.add('character', 'unknow', ModMetaDataType.String);
 modDataTemplate.add('url', 'unknow', ModMetaDataType.String);
 modDataTemplate.add('tags', [], ModMetaDataType.Array);
 modDataTemplate.add('category', 'unknow', ModMetaDataType.String);
+modDataTemplate.add('description', 'no description', ModMetaDataType.String);
 modDataTemplate.add('hotkeys', [], ModMetaDataType.Array);
 modDataTemplate.add('preview', 'unknow', ModMetaDataType.String);
 ModInfo.setModDataTemplate(modDataTemplate);
