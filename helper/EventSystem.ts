@@ -19,6 +19,7 @@ enum EventType {
     //----------生命周期----------
     wakeUp = 'wakeUp',
     initDone = 'initDone',
+    startDone = 'startDone',
     //----------状态变更----------
     themeChange = 'themeChange',
     languageChange = 'languageChange',

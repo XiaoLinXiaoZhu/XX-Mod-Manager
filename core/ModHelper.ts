@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { ipcRenderer } = require('electron');
+import { ModInfo } from "./ModInfo";
 
 import { EventType,EventSystem } from "../helper/EventSystem";
 import { SnackType,snack,t_snack } from "../helper/SnackHelper";
@@ -114,6 +115,48 @@ class ModData {
             preview: this.preview,
             hotkeys: this.hotkeys
         };
+    }
+    public static fromModInfo(modInfo: ModInfo): ModData {
+        const modData = new ModData(
+            modInfo.metaData.get('name') || modInfo.modName,
+            modInfo.metaData.get('character') || "unknow",
+            modInfo.metaData.get('description') || "no description",
+            modInfo.metaData.get('url') || "no url",
+            "", // preview will be handled below
+            modInfo.metaData.get('hotkeys') || []
+        );
+
+        const handlePreview = () => {
+            const previewName = modInfo.metaData.get('preview') || "";
+            if (previewName) {
+                // If there is a preview name, construct the path
+                modData.preview = path.join(modInfo.location, previewName);
+            }
+            if (!modData.preview || !fs.existsSync(modData.preview) || !previewName) {
+                // If no preview exists, search for a preview image in the mod folder
+                const previewFiles = fs.readdirSync(modInfo.location);
+                const previewFile = previewFiles.find(file => file.startsWith('preview'));
+                if (previewFile) {
+                    modData.preview = path.join(modInfo.location, previewFile);
+                } else {
+                    // If no preview image is found, look for the first image file
+                    const imageFiles = previewFiles.filter(file =>
+                        file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg') ||
+                        file.endsWith('.gif') || file.endsWith('.bmp') || file.endsWith('.webp')
+                    );
+                    if (imageFiles.length > 0) {
+                        modData.preview = path.join(modInfo.location, imageFiles[0]);
+                    }
+                }
+            }
+            // If no preview is found after all attempts, set a default image
+            if (!modData.preview || !fs.existsSync(modData.preview)) {
+                modData.preview = path.resolve('./src/assets/default.png');
+            }
+        };
+
+        handlePreview();
+        return modData;
     }
     public copy(): ModData {
         const newModData = new ModData(
@@ -252,6 +295,7 @@ class ModData {
             // setTimeout(() => {
             //     ImageHelper.clearImageCache();
             // }, 1000);
+            //debug
             return ImageHelper.getImageUrlFromLocalPath(this.preview);
         }
 

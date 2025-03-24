@@ -313,8 +313,11 @@ function getMods(modSourcePath) {
 
 
 ipcMain.handle('get-mods', async (event, modSourcePath) => {
+    const startTime = new Date().getTime();
     const mods = getMods(modSourcePath);
-    snack('get-mods');
+    const endTime = new Date().getTime();
+    console.log(`get ${mods.length} mods in ${endTime - startTime}ms`);
+    snack(`get ${mods.length} mods in ${endTime - startTime}ms`);
     return mods;
 });
 

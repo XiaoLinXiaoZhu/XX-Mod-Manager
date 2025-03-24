@@ -130,7 +130,7 @@
                     </s-switch>
                 </div>
 
-                
+
             </div>
             <!-- -这里后面提供 各个插件的设置 -->
             <div v-for="(pluginData, pluginName) in pluginConfig" :key="pluginName">
@@ -193,6 +193,7 @@ import Markdown from '../components/markdown.vue';
 const { t, locale } = useI18n()
 
 import { IPluginLoader } from '../../helper/PluginLoader.ts';
+import { EventSystem, EventType } from '../../helper/EventSystem.ts';
 
 const tabs = ref(['normal', 'advanced', 'switch-config', 'about', 'plugin']);
 const translatedTabs = computed(() => {
@@ -396,16 +397,17 @@ const createShortOfCurrentConfig = {
 
 
 onMounted(async () => {
-    await iManager.waitInit();
-
-    //初始化tab
-    currentTab.value = tabs.value[0];
-
     // 挂载插件的额外设置
-    // plugins.value = iManager.plugins;
-    // pluginConfig.value = iManager.pluginConfig;
-    plugins.value = IPluginLoader.plugins;
-    pluginConfig.value = IPluginLoader.pluginConfig;
+    EventSystem.on(EventType.startDone, () => {
+        //初始化tab
+        currentTab.value = tabs.value[0];
+
+        plugins.value = IPluginLoader.plugins;
+        pluginConfig.value = IPluginLoader.pluginConfig;
+
+        tabs.value.push(...Object.keys(pluginConfig.value));
+    });
+
     // console.log('pluginConfig', pluginConfig);
 
 
@@ -434,7 +436,7 @@ onMounted(async () => {
     // 通过这个数据，我们可以动态生成插件的设置界面
 
     // 为 plugin 添加 tab
-    tabs.value.push(...Object.keys(pluginConfig.value));
+    // tabs.value.push(...Object.keys(pluginConfig.value));
 });
 </script>
 

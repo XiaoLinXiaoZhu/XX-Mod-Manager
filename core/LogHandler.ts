@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-// 代理 console.log，将日志输出到控制台和文件
 
 class LogHandler {
     private static originalConsole = {
@@ -10,6 +9,9 @@ class LogHandler {
         info: console.info,
         debug: console.debug,
     };
+
+    private static logBuffer: string[] = [];
+    private static flushInterval: NodeJS.Timeout;
 
     constructor() {
         console.error('LogHandler cannot be instantiated');
@@ -24,41 +26,62 @@ class LogHandler {
         console.warn = LogHandler.warn;
         console.info = LogHandler.info;
         console.debug = LogHandler.debug;
+
+        // Start periodic flushing
+        LogHandler.flushInterval = setInterval(() => {
+            LogHandler.flushBuffer();
+        }, 10000);
+
+        // Flush logs on exit
+        process.on('exit', () => LogHandler.flushBuffer());
+        process.on('SIGINT', () => {
+            LogHandler.flushBuffer();
+            process.exit();
+        });
     }
 
     static log(...args) {
-        LogHandler.writeToFile('LOG', ...args);
+        LogHandler.writeToBuffer('LOG', ...args);
         LogHandler.originalConsole.log(...args);
     }
 
     static error(...args) {
-        LogHandler.writeToFile('ERROR', ...args);
+        LogHandler.writeToBuffer('ERROR', ...args);
         LogHandler.originalConsole.error(...args);
     }
 
     static warn(...args) {
-        LogHandler.writeToFile('WARN', ...args);
+        LogHandler.writeToBuffer('WARN', ...args);
         LogHandler.originalConsole.warn(...args);
     }
 
     static info(...args) {
-        LogHandler.writeToFile('INFO', ...args);
+        LogHandler.writeToBuffer('INFO', ...args);
         LogHandler.originalConsole.info(...args);
     }
 
     static debug(...args) {
-        LogHandler.writeToFile('DEBUG', ...args);
+        LogHandler.writeToBuffer('DEBUG', ...args);
         LogHandler.originalConsole.debug(...args);
     }
 
-    static writeToFile(level: string, ...args: any[]) {
+    static writeToBuffer(level: string, ...args: any[]) {
         const timestamp = new Date().toISOString();
         const message = `[${level}][${timestamp}]: ${args.join(' ')}\n`;
-        if (!fs.existsSync(LogHandler.logFile)) {
-            fs.mkdirSync(path.dirname(LogHandler.logFile), { recursive: true });
-            fs.writeFileSync(LogHandler.logFile, '', 'utf8');
+        LogHandler.logBuffer.push(message);
+    }
+
+    static flushBuffer() {
+        if (LogHandler.logBuffer.length === 0) return;
+
+        const logDir = path.dirname(LogHandler.logFile);
+        if (!fs.existsSync(logDir)) {
+            fs.mkdirSync(logDir, { recursive: true });
         }
-        fs.appendFileSync(LogHandler.logFile, message, 'utf8');
+
+        const logData = LogHandler.logBuffer.join('');
+        fs.appendFileSync(LogHandler.logFile, logData, 'utf8');
+        LogHandler.logBuffer = [];
     }
 
     static instance: LogHandler;
@@ -66,17 +89,22 @@ class LogHandler {
 }
 
 LogHandler.logFile = path.join('Logs', `XXMMLog${new Date().toISOString().replace(/:/g, '-').slice(0, 16)}.log`);
-// 如果已经存在日志文件，则删除
+
+// If the log file already exists, delete it
 if (fs.existsSync(LogHandler.logFile)) {
     fs.unlinkSync(LogHandler.logFile);
 }
-// 如果日志文件夹内的文件数量超过 10 个，则删除最旧的文件
+
+// If the number of files in the log directory exceeds 10, delete the oldest files
 const logDir = path.dirname(LogHandler.logFile);
-while (fs.readdirSync(logDir).map(file => path.join(logDir, file)).length > 10) {
-    const logFiles = fs.readdirSync(logDir).map(file => path.join(logDir, file));
-    logFiles.sort((a, b) => fs.statSync(a).mtimeMs - fs.statSync(b).mtimeMs);
-    fs.unlinkSync(logFiles[0]);
+if (fs.existsSync(logDir)) {
+    while (fs.readdirSync(logDir).map(file => path.join(logDir, file)).length > 10) {
+        const logFiles = fs.readdirSync(logDir).map(file => path.join(logDir, file));
+        logFiles.sort((a, b) => fs.statSync(a).mtimeMs - fs.statSync(b).mtimeMs);
+        fs.unlinkSync(logFiles[0]);
+    }
 }
+
 LogHandler.init();
 LogHandler.log('LogHandler init');
 

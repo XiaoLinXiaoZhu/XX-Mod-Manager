@@ -93,22 +93,63 @@ class ModInfo {
         this.modName = path.basename(location);
         this.metaData = ModInfo.modDataTemplate.copy();
 
+        this.init(location);
+    }
+
+    private init(location: string) {
+        let needSave = false;
         // 读取模块元数据
         const metaDataPath = path.join(location, 'mod.json');
         if (fs.existsSync(metaDataPath)) {
-            const metaData = JSON.parse(fs.readFileSync(metaDataPath, 'utf8'));
+            const rawData = fs.readFileSync(metaDataPath, 'utf8');
+            let metaData = {};
+            try {
+                metaData = JSON.parse(rawData);
+            } catch (e) {
+                console.error(`解析模块元数据失败：${metaDataPath}`, rawData);
+            }
 
             // id 为必须的字段，如果没有则生成一个
             this.id = metaData['id'] || '';
             if (!this.id) {
                 this.generateID();
+                needSave = true;
             }
 
             // 读取模板中定义的数据
             for (const item of ModInfo.modDataTemplate.items) {
                 const value = metaData[item.key];
                 if (value !== undefined) {
-                    this.metaData.set(item.key, value, item.type);
+                    // this.metaData.set(item.key, value, item.type);
+
+                    // 除了 array 和 object 类型，其他类型都直接赋值
+                    if (item.type === ModMetaDataType.Array) {
+                        // 如果是数组，则需要判断是否是数组
+                        if (Array.isArray(value)) {
+                            this.metaData.set(item.key, value, item.type);
+                        }
+                        else {
+                            console.error(`模块元数据错误：${item.key} 不是数组`);
+                            needSave = true;
+                        }
+                    }
+                    else if (item.type === ModMetaDataType.Object) {
+                        // 如果是对象，则需要判断是否是对象
+                        if (typeof value === 'object' && value !== null) {
+                            this.metaData.set(item.key, value, item.type);
+                        }
+                        else {
+                            console.error(`模块元数据错误：${item.key} 不是对象`);
+                            needSave = true;
+                        }
+                    }
+                    else {
+                        this.metaData.set(item.key, value, item.type);
+                    }
+                }
+                else {
+                    // 如果没有这个字段，则需要保存
+                    needSave = true;
                 }
             }
         }
@@ -121,8 +162,9 @@ class ModInfo {
         }
 
         // 将模块元数据写入文件
-        this.saveMetaData();
-        
+        if (needSave) {
+            this.saveMetaData();
+        }
     }
 
     generateID() {
@@ -142,10 +184,27 @@ class ModInfo {
         // 保存模块元数据到文件
         const metaDataPath = path.join(this.location, 'mod.json');
         const metaData = this.metaData.items.reduce((obj, item) => {
-            obj[item.key] = item.value;
+            switch (item.type) {
+                case ModMetaDataType.String:
+                    obj[item.key] = String(item.value);
+                    break;
+                case ModMetaDataType.Number:
+                    obj[item.key] = Number(item.value);
+                    break;
+                case ModMetaDataType.Boolean:
+                    obj[item.key] = Boolean(item.value);
+                    break;
+                case ModMetaDataType.Array:
+                    obj[item.key] = Array.isArray(item.value) ? item.value : [];
+                    break;
+                case ModMetaDataType.Object:
+                    obj[item.key] = typeof item.value === 'object' && item.value !== null ? item.value : {};
+                    break;
+                default:
+                    obj[item.key] = item.value;
+            }
             return obj;
-        }
-        , {});
+        }, {});
         // 添加上 id 和 location 以及 modName
         metaData['id'] = this.id;
         metaData['location'] = this.location;
@@ -156,17 +215,22 @@ class ModInfo {
 
 //测试代码
 const modDataTemplate = new ModMetaData();
-modDataTemplate.add('version', '1.0.0', ModMetaDataType.String);
-modDataTemplate.add('enabled', true, ModMetaDataType.Boolean);
-modDataTemplate.add('dependencies', ['mod1', 'mod2'], ModMetaDataType.Array);
-modDataTemplate.add('config', { key: 'value' }, ModMetaDataType.Object);
+modDataTemplate.add('author', 'unknow', ModMetaDataType.String);
+modDataTemplate.add('character', 'unknow', ModMetaDataType.String);
+modDataTemplate.add('url', 'unknow', ModMetaDataType.String);
+modDataTemplate.add('tags', [], ModMetaDataType.Array);
+modDataTemplate.add('category', 'unknow', ModMetaDataType.String);
+modDataTemplate.add('hotkeys', [], ModMetaDataType.Array);
+modDataTemplate.add('preview', 'unknow', ModMetaDataType.String);
 ModInfo.setModDataTemplate(modDataTemplate);
 
 const modInfo = new ModInfo("E:\\1myProgramFile\\electron Files\\TestMod");
-console.log(modInfo.metaData.get<string>('version'));
-console.log(modInfo.metaData.get<boolean>('enabled'));
-console.log(modInfo.metaData.get<string>('dependencies'));
-console.log(modInfo.metaData.get<string>('config'));
 console.log(modInfo.id);
+console.log(modInfo.metaData.get<string>('author'));
+console.log(modInfo.metaData.get<string>('character'));
+console.log(modInfo.metaData.get<string>('category'));
+console.log(modInfo.metaData.get<string>('tags'));
+console.log(modInfo.metaData.get<string>('hotkeys'));
+console.log(modInfo.metaData.get<string>('preview'));
 
 export { ModInfo, ModMetaData, ModMetaDataItem, ModMetaDataType };

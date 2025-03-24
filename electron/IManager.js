@@ -346,6 +346,25 @@ class IManager {
         console.log(`成功加载 ${loadMods.length} 个 mod，总共 ${this.data.characterList.length} 个 角色`);
         return loadMods;
     }
+    async newLoadMods() {
+        ModLoader.addModSourceFolder(this.config.modSourcePath);
+        const loadModData = await ModLoader.loadMods(this.config.modSourcePath);
+        const loadRawMods = ModLoader.modsRaw;
+        // 如果 loadRawMods 中的mod 的 newMod 为 true，则将其设置为 false，并触发addMod事件
+        this.newMods = loadRawMods.filter((mod) => mod.newMod);
+        //debug
+        console.log(`newMods:`, this.newMods);
+
+        // loadModData 是一个 ModData 的数组，直接赋值给 data.modList
+        this.data.modList = loadModData;
+
+        // 刷新 characterList
+        await this.refreshCharacterList();
+
+        //debug
+        console.log(`成功加载 ${loadModData.length} 个 mod，总共 ${this.data.characterList.length} 个 角色`);
+        return loadRawMods;
+    }
 
     async refreshCharacterList() {
         // 加载 character
@@ -439,8 +458,10 @@ class IManager {
     // 初始化
     async init() {
         // 加载配置
+        let startTime = new Date().getTime();
         await this.loadConfig();
-        console.log('✅>> loadConfig done');
+        let endTime = new Date().getTime();
+        console.log('✅>> loadConfig done, cost', endTime - startTime, 'ms');
 
         //-=============== 优先进行页面初始化 ===============-//
         //------ 设置窗口大小 -----
@@ -455,16 +476,16 @@ class IManager {
         console.log('✅>> themeChange to', this.config.theme);
 
         // 加载mod
-        await this.loadMods();
-        console.log('✅>> loadMods done');
+        startTime = new Date().getTime();
+        await this.newLoadMods();
+        endTime = new Date().getTime();
+        console.log('✅>> loadMods done, cost', endTime - startTime, 'ms');
 
         // 加载预设
         await this.loadPresets();
         console.log('✅>> loadPresets done');
 
-        // 加载插件
-        await IPluginLoader.Init(this);
-        console.log('✅>> loadPlugins done');
+
 
         //debug
         console.log('✅>> init IManager done');
@@ -490,6 +511,10 @@ class IManager {
 
     // start 在 init 之后调用，在各个其他页面 绑定好事件之后调用
     async start() {
+        // 加载插件
+        await IPluginLoader.Init(this);
+        console.log('✅>> loadPlugins done');
+
         //-------- 再次切换一次 语言和主题，因为有些页面可能在 init 之后才加载，所以需要再次切换一次
         this.trigger('languageChange', this.config.language);
         setCurrentLanguage(this.config.language);
@@ -526,6 +551,7 @@ class IManager {
             this.setCurrentPreset('default');
         }
 
+        EventSystem.trigger(EventType.startDone, this);
     }
     //-==================== 对外接口 - 状态变更 ====================
     async setLastClickedMod(mod) {
