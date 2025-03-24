@@ -27,7 +27,7 @@ import { IPluginLoader } from './PluginLoader';
 // 导入 PathHelper
 import { PathHelper } from './PathHelper';
 // 导入 ModHelper
-import { ModData } from './ModHelper';
+import { ModData } from '../core/ModHelper';
 
 
 

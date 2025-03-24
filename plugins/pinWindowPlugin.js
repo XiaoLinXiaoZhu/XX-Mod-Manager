@@ -75,11 +75,10 @@ module.exports = {
         en: 'Pin Window'
     },
     init(iManager) {
-        iManager.waitInit().then(() => {
+        iManager.on("pluginLoaded", (iManager) => {
             const ifAble = iManager.getPluginData(pluginName, 'ifAblePlugin')
             if (ifAble) {
                 addPinWindowButton(iManager)
-
                 // 如果继承上次的状态，则设置当前状态为上次的状态
                 const ifInherit = iManager.getPluginData(pluginName, 'ifInherit')
                 if (ifInherit) {
@@ -90,7 +89,7 @@ module.exports = {
                     setPinState(iManager, false)
                 }
             }
-        })
+        });
 
         let pluginData = [];
 

@@ -156,7 +156,7 @@ module.exports = {
     },
     init(iManager){
 
-        iManager.waitInit().then(() => {
+        iManager.on("pluginLoaded", (iManager) => {
             // debug
             const ifAble = iManager.getPluginData(pluginName, 'ifAblePlugin')
             // iManager.snack('deleteModPlugin Loaded from '+__dirname + ' ifAble:'+ifAble);

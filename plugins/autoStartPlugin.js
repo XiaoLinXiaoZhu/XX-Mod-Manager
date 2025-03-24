@@ -69,6 +69,34 @@ function runCommand(iManager, command) {
     iManager.runCommand(command);
 }
 
+function autoStart(iManager) {
+    if (iManager.getPluginData(pluginName, 'autoStartModLoader')) startModLoader(iManager, iManager.getPluginData(pluginName, 'modLoaderPath'));
+    if (iManager.getPluginData(pluginName, 'autoStartGame')) startGame(iManager, iManager.getPluginData(pluginName, 'gamePath'));
+    if (iManager.getPluginData(pluginName, 'ifRunCommand')) {
+        ipcRenderer.invoke('get-args').then((args) => {
+            //debug
+            console.log('get-args:', args, args.switchConfig, iManager.getPluginData(pluginName, 'ignoreSwitchConfig'));
+            if (!args.switchConfig || iManager.getPluginData(pluginName, 'ignoreSwitchConfig')) {
+                runCommand(iManager, iManager.getPluginData(pluginName, 'command'));
+                // 重置 commandStatus
+                commandStatus.data = '';
+            } else {
+                console.log('ignoreSwitchConfig,waiting for switchConfig');
+                commandStatus.data = ignoredState;
+                iManager.savePluginConfig();
+            }
+        });
+    }
+
+    // 如果发现 commandStatus 为 ignoredState,那么就说明上一次刷新结束时，并没有执行命令，这次刷新时，即使拥有参数 --switchConfig 也要执行命令
+    if (iManager.getPluginData(pluginName, 'commandStatus') === ignoredState && !window.location.href.includes('switchConfig')) {
+        runCommand(iManager, iManager.getPluginData(pluginName, 'command'));
+        // 重置 commandStatus
+        commandStatus.data = '';
+        iManager.savePluginConfig();
+    }
+}
+
 const pluginName = 'autoStartPlugin';
 module.exports = {
     name: pluginName,
@@ -79,32 +107,17 @@ module.exports = {
     init(iManager) {
         // iManager.snack('Auto Start Plugin Loaded from '+__dirname);
         const ignoredState = 'ignoreSwitchConfig,waiting for switchConfig';
+        let conditionCount = 0;
         iManager.on('wakeUp', () => {
-            console.log('wakeUp', iManager.getPluginData(pluginName, 'autoStartModLoader'), iManager.getPluginData(pluginName, 'autoStartGame'), iManager.getPluginData(pluginName, 'ifRunCommand'));
-            if (iManager.getPluginData(pluginName, 'autoStartModLoader')) startModLoader(iManager, iManager.getPluginData(pluginName, 'modLoaderPath'));
-            if (iManager.getPluginData(pluginName, 'autoStartGame')) startGame(iManager, iManager.getPluginData(pluginName, 'gamePath'));
-            if (iManager.getPluginData(pluginName, 'ifRunCommand')) {
-                ipcRenderer.invoke('get-args').then((args) => {
-                    //debug
-                    console.log('get-args:', args, args.switchConfig, iManager.getPluginData(pluginName, 'ignoreSwitchConfig'));
-                    if (!args.switchConfig || iManager.getPluginData(pluginName, 'ignoreSwitchConfig')) {
-                        runCommand(iManager, iManager.getPluginData(pluginName, 'command'));
-                        // 重置 commandStatus
-                        commandStatus.data = '';
-                    } else {
-                        console.log('ignoreSwitchConfig,waiting for switchConfig');
-                        commandStatus.data = ignoredState;
-                        iManager.savePluginConfig();
-                    }
-                });
+            conditionCount++;
+            if (conditionCount === 2) {
+                autoStart(iManager);
             }
-            
-            // 如果发现 commandStatus 为 ignoredState,那么就说明上一次刷新结束时，并没有执行命令，这次刷新时，即使拥有参数 --switchConfig 也要执行命令
-            if (iManager.getPluginData(pluginName, 'commandStatus') === ignoredState && !window.location.href.includes('switchConfig')) {
-                runCommand(iManager, iManager.getPluginData(pluginName, 'command'));
-                // 重置 commandStatus
-                commandStatus.data = '';
-                iManager.savePluginConfig();
+        });
+        iManager.on('pluginLoaded', () => {
+            conditionCount++;
+            if (conditionCount === 2) {
+                autoStart(iManager);
             }
         });
 
