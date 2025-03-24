@@ -16,6 +16,9 @@ class XXMMCore{
     static ifCustomConfig: boolean = false;
     static customConfigFolder: string = "config";
 
+    static setDataPath = (path: string) => {
+        dataPath = path;
+    }
     // 获取配置文件路径
     static readonly getConfigFilePath: () => string = () => {
         return (XXMMCore.ifCustomConfig) ? path.join(XXMMCore.customConfigFolder, 'config.json') : path.join(dataPath, 'config.json');
@@ -28,7 +31,7 @@ class XXMMCore{
     }
     static readonly getCurrentConfig = () => {
         //debug
-        // console.log(`getConfigFilePath: ${XXMMCore.getConfigFilePath()}，content: ${fs.readFileSync(XXMMCore.getConfigFilePath(), 'utf8')}`);
+        console.log(`getConfigFilePath: ${XXMMCore.getConfigFilePath()}，content: ${fs.readFileSync(XXMMCore.getConfigFilePath(), 'utf8')}`);
         // return JSON.parse(fs.readFileSync(XXMMCore.getConfigFilePath(), 'utf8'));
         return ErrorHandler.create(() => {
             if (!fs.existsSync(XXMMCore.getConfigFilePath())) {
@@ -47,6 +50,9 @@ class XXMMCore{
 
     // 初始化
     static async init(){
+        // 获取数据路径
+        dataPath = await ipcRenderer.invoke('get-user-data-path');
+
         const args = await ipcRenderer.invoke('get-args');
         if (args.ifCustomConfig){
             XXMMCore.ifCustomConfig = true;
@@ -65,5 +71,4 @@ class XXMMCore{
 }
 
 XXMMCore.init();
-dataPath = await ipcRenderer.invoke('get-user-data-path');
 export default XXMMCore;

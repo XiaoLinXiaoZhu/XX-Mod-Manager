@@ -9,6 +9,10 @@ class ModLoader {
     public static modSourceFolders: string[] = [];
     static addModSourceFolder(folder: string) {
         // check一下是否存在
+        if (folder === undefined || folder === null || folder === '') {
+            console.warn('ModLoader.addModSourceFolder: folder is empty');
+            return;
+        }
         if (!fs.existsSync(folder)) {
             throw new Error(`ModLoader.addModSourceFolder: folder does not exist: ${folder}`);
         }

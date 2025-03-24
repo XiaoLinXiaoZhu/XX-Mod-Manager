@@ -288,6 +288,8 @@ class IManager {
 
     async loadConfig() {
         // const currentConfig = await ipcRenderer.invoke('get-current-config');
+        const dataPath = await ipcRenderer.invoke('get-user-data-path');
+        XXMMCore.setDataPath(dataPath);
         const currentConfig = XXMMCore.getCurrentConfig();
         console.log(currentConfig);
 
@@ -347,6 +349,22 @@ class IManager {
         return loadMods;
     }
     async newLoadMods() {
+        //debug
+        console.log(`newLoadMods from ${this.config.modSourcePath}`);
+        if (this.config.modSourcePath === null) {
+            t_snack({
+                zh_cn: `mod路径未定义, 请在设置>高级设置中设置mod路径`,
+                en: `Mod path not defined, please set mod path in Settings>Advanced Settings`,
+            }, SnackType.error);
+            return;
+        }
+        if (!fs.existsSync(this.config.modSourcePath)) {
+            t_snack({
+                zh_cn: `mod路径不存在,请检查路径是否正确`,
+                en: `Mod path not exists, please check if the path is correct`,
+            }, SnackType.error);
+            return;
+        }
         ModLoader.addModSourceFolder(this.config.modSourcePath);
         const loadModData = await ModLoader.loadMods(this.config.modSourcePath);
         const loadRawMods = ModLoader.modsRaw;
@@ -1219,6 +1237,21 @@ class IManager {
     async applyMods(modList) {
         const modTargetPath = this.config.modTargetPath;
         const modSourcePath = this.config.modSourcePath;
+        if (modTargetPath === null || modTargetPath === '') {
+            t_snack({
+                zh_cn: '未设置目标路径',
+                en: 'Target path not set',
+            }, 'error');
+            return;
+        }
+        if (modSourcePath === null || modSourcePath === '') {
+            t_snack({
+                zh_cn: '未设置源路径',
+                en: 'Source path not set',
+            }, 'error');
+            return;
+        }
+        //debug
         await ipcRenderer.invoke('apply-mods', modList, modSourcePath, modTargetPath);
         this.trigger('modsApplied', modList);
         ipcRenderer.send('snack', '应用成功');
