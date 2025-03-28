@@ -21,6 +21,7 @@ import { ModInfo, ModMetaData, ModMetaDataItem, ModMetaDataType } from '../core/
 import XXMMCore from '../core/XXMMCore';
 import LogHandler from '../core/LogHandler';
 import ModLoader from '../core/ModLoader';
+import PresetHelper from '../core/PresetHelper';
 
 // 导入 Language
 import { Language, TranslatedText, setCurrentLanguage } from '../helper/Language';
@@ -351,7 +352,7 @@ class IManager {
         console.log(`成功加载 ${loadMods.length} 个 mod，总共 ${this.data.characterList.length} 个 角色`);
         return loadMods;
     }
-    
+
     async newLoadMods() {
         //debug
         console.log(`newLoadMods from ${this.config.modSourcePath}`);
@@ -402,7 +403,8 @@ class IManager {
     }
 
     async loadPresets() {
-        const data = await ipcRenderer.invoke('get-preset-list');
+        PresetHelper.loadPresets([this.config.presetPath]);
+        const data = PresetHelper.getPresetList();
         this.data.presetList = data;
     }
 
@@ -410,13 +412,14 @@ class IManager {
         if (presetName === 'default') {
             return [];
         }
-        const presetPath = this.config.presetPath;
-        const presetFilePath = path.join(presetPath, `${presetName}.json`);
-        if (fs.existsSync(presetFilePath)) {
-            return JSON.parse(fs.readFileSync(presetFilePath, 'utf-8'));
+
+        const preset = PresetHelper.getPresetByName(presetName);
+        if (preset === null) {
+            snack(`Preset ${presetName} not found`);
+            return null;
         }
-        snack(`Preset ${presetName} not found`);
-        return null;
+        console.log(`load preset ${presetName}`, preset);
+        return preset.getModNames();
     }
 
     async getModInfo(modName) {

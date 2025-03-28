@@ -69,20 +69,14 @@ class XXMMCore{
         }).exec();
     }
 
-    private static isSavingConfig = false;
-    public static async saveCurrentConfig(config: any) {
-        if (XXMMCore.isSavingConfig) return;
-        XXMMCore.isSavingConfig = true;
-        //debug
-        return ErrorHandler.create(async () => {
-            //debug
+    public static saveCurrentConfig(config: any) {
+        try {
+            // debug
             console.log(`saveCurrentConfig: ${JSON.stringify(config, null, 4)}`);
-            fs.promises.writeFile(XXMMCore.getConfigFilePath(), JSON.stringify(config, null, 4), 'utf8').then(() => {
-                XXMMCore.isSavingConfig = false;
-            });
-        }).onErr((e) => {
+            fs.writeFileSync(XXMMCore.getConfigFilePath(), JSON.stringify(config, null, 4), 'utf8');
+        } catch (e) {
             console.error(`saveCurrentConfig error: ${e}`);
-        }).exec();
+        }
     }
 
     static readonly getPluginConfig = () => {
