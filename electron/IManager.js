@@ -287,20 +287,16 @@ class IManager {
     t_snack = t_snack;
 
     async loadConfig() {
-        // const currentConfig = await ipcRenderer.invoke('get-current-config');
-        const dataPath = await ipcRenderer.invoke('get-user-data-path');
-        XXMMCore.setDataPath(dataPath);
         const currentConfig = XXMMCore.getCurrentConfig();
-        console.log(currentConfig);
 
-        //如果为空，则使用默认配置
+        //如果为空，则使用默认配置，并覆盖本地配置
         if (currentConfig == {} || currentConfig == null) {
             snack('配置文件不存在');
             this.saveConfig();
             return;
         }
 
-        console.log('loadConfig:', currentConfig);
+        
         // this.config = currentConfig;
         // 这样会导致 较新的配置项 丢失，所以需要逐个赋值
         for (const key in currentConfig) {
@@ -312,6 +308,9 @@ class IManager {
                 snack(`Loading config error: ${error}`);
             }
         }
+
+        //debug
+        console.log('loadConfig adjust to:', this._config);
         this.saveConfig();
     }
 
@@ -477,6 +476,7 @@ class IManager {
     async init() {
         // 加载配置
         let startTime = new Date().getTime();
+        console.log('⏳>> loadConfig');
         await this.loadConfig();
         let endTime = new Date().getTime();
         console.log('✅>> loadConfig done, cost', endTime - startTime, 'ms');
@@ -1296,7 +1296,6 @@ class IManager {
     async saveConfig() {
         //debug
         console.log('saveConfig:', this._config);
-
         await ipcRenderer.invoke('set-current-config', this._config);
     }
 

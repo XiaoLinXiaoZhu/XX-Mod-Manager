@@ -225,13 +225,13 @@ modDataTemplate.add('hotkeys', [], ModMetaDataType.Array);
 modDataTemplate.add('preview', 'unknow', ModMetaDataType.String);
 ModInfo.setModDataTemplate(modDataTemplate);
 
-const modInfo = new ModInfo("E:\\1myProgramFile\\electron Files\\TestMod");
-console.log(modInfo.id);
-console.log(modInfo.metaData.get<string>('author'));
-console.log(modInfo.metaData.get<string>('character'));
-console.log(modInfo.metaData.get<string>('category'));
-console.log(modInfo.metaData.get<string>('tags'));
-console.log(modInfo.metaData.get<string>('hotkeys'));
-console.log(modInfo.metaData.get<string>('preview'));
+// const modInfo = new ModInfo("E:\\1myProgramFile\\electron Files\\TestMod");
+// console.log(modInfo.id);
+// console.log(modInfo.metaData.get<string>('author'));
+// console.log(modInfo.metaData.get<string>('character'));
+// console.log(modInfo.metaData.get<string>('category'));
+// console.log(modInfo.metaData.get<string>('tags'));
+// console.log(modInfo.metaData.get<string>('hotkeys'));
+// console.log(modInfo.metaData.get<string>('preview'));
 
 export { ModInfo, ModMetaData, ModMetaDataItem, ModMetaDataType };

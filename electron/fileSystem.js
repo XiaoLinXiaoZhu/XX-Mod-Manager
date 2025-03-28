@@ -108,6 +108,10 @@ ipcMain.handle('get-user-data-path', async (event) => {
     return app.getPath('userData');
 });
 
+ipcMain.on('get-user-data-path-sync', (event,data) => {
+    event.returnValue = app.getPath('userData');
+});
+
 ipcMain.handle('get-app-path', async (event) => {
     return app.getAppPath();
 });

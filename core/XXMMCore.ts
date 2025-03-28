@@ -20,16 +20,39 @@ class XXMMCore{
         dataPath = path;
     }
     // 获取配置文件路径
+    public static async getDataPath(){
+        if (dataPath === ""){
+            dataPath = await ipcRenderer.invoke('get-user-data-path');
+        }
+        return dataPath;
+    }
+    public static getDataPathSync(){
+        if (dataPath === ""){
+            dataPath = ipcRenderer.sendSync('get-user-data-path-sync');
+        }
+        return dataPath;
+    }
+
+    static checkDataPath(){
+        if (dataPath === ""){
+            dataPath = XXMMCore.getDataPathSync();
+        }
+    }
     static readonly getConfigFilePath: () => string = () => {
+        this.checkDataPath();
         return (XXMMCore.ifCustomConfig) ? path.join(XXMMCore.customConfigFolder, 'config.json') : path.join(dataPath, 'config.json');
     }
     static readonly getPluginConfigPath = () => {
+        this.checkDataPath();
+
         return (XXMMCore.ifCustomConfig) ? path.join(XXMMCore.customConfigFolder, 'pluginConfig.json') : path.join(dataPath, 'pluginConfig.json');
     }
     static readonly getDisabledPluginsPath = () => {
+        this.checkDataPath();
         return (XXMMCore.ifCustomConfig) ? path.join(XXMMCore.customConfigFolder, 'disabledPlugins.json') : path.join(dataPath, 'disabledPlugins.json');
     }
-    static readonly getCurrentConfig = () => {
+
+    public static getCurrentConfig(){
         //debug
         console.log(`getConfigFilePath: ${XXMMCore.getConfigFilePath()}，content: ${fs.readFileSync(XXMMCore.getConfigFilePath(), 'utf8')}`);
         // return JSON.parse(fs.readFileSync(XXMMCore.getConfigFilePath(), 'utf8'));
@@ -44,6 +67,8 @@ class XXMMCore{
             return {};
         }).exec();
     }
+
+
     static readonly getPluginConfig = () => {
         return JSON.parse(fs.readFileSync(XXMMCore.getPluginConfigPath(), 'utf8'));
     }

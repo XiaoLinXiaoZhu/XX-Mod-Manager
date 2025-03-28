@@ -10,6 +10,9 @@ class LogHandler {
         debug: console.debug,
     };
 
+    // 可选项
+    public static ifGetCaller = false;
+
     private static logBuffer: string[] = [];
     private static flushInterval: NodeJS.Timeout;
 
@@ -42,7 +45,14 @@ class LogHandler {
 
     static log(...args) {
         LogHandler.writeToBuffer('LOG', ...args);
-        LogHandler.originalConsole.log(...args);
+        if (LogHandler.ifGetCaller) {
+            const stackInfo = new Error().stack?.split('\n')[2]?.trim() || '';
+            const caller = stackInfo.replace(/^at\s*/, '');
+            LogHandler.originalConsole.log(...args, `[${caller}]`);
+        }
+        else {
+            LogHandler.originalConsole.log(...args);
+        }
     }
 
     static error(...args) {
@@ -105,7 +115,7 @@ if (fs.existsSync(logDir)) {
     }
 }
 
-LogHandler.init();
-LogHandler.log('LogHandler init');
+// LogHandler.init();
+
 
 export default LogHandler;
