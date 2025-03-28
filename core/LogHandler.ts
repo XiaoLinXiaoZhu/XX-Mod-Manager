@@ -115,7 +115,7 @@ if (fs.existsSync(logDir)) {
     }
 }
 
-LogHandler.init();
+// LogHandler.init();
 
 
 export default LogHandler;

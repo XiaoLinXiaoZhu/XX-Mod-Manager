@@ -422,8 +422,9 @@ class IManager {
             snack(`Preset ${presetName} not found`);
             return null;
         }
-        console.log(`load preset ${presetName}`, preset);
-        return preset.getModNames();
+        const modNames = preset.getModNames();
+        console.log(`load preset ${presetName}`, preset, modNames);
+        return modNames;
     }
 
     async getModInfo(modName) {

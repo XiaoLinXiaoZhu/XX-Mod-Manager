@@ -117,17 +117,64 @@ class Preset {
     }
 
     getModIds() {
-        return this.modIds;
+        // 如果开始了实验性功能且有继承的preset，则需要将继承的preset的modIds也加入到当前preset中
+        if (!this.useExperimentalFeature) {
+            return this.modIds;
+        }
+
+        // debug
+        console.log(`${this.name} is using experimental feature, get mod ids from inherited presets`);
+
+        let inheritedPresets = [] as Preset[];
+        let inheritedModIds = [] as string[];
+
+        // 首先找到所有继承的preset，如果继承的preset也开始且有继承的preset，则需要递归查找，并加入到当前preset中，如果当前preset已经有了或者是自己，则不加入
+        const getInhertedPresets = (preset: Preset) => {
+            if(preset.useExperimentalFeature && preset.experimentalFeatureConfig.inheritPresets !== undefined){
+                preset.experimentalFeatureConfig.inheritPresets.forEach((id: string) => {
+                    let inheritedPreset = PresetHelper.getPresetById(id);
+                    if (inheritedPreset !== undefined && inheritedPreset.id !== preset.id && !inheritedPresets.includes(inheritedPreset) && this.id !== inheritedPreset.id) {
+                        inheritedPresets.push(inheritedPreset);
+                        getInhertedPresets(inheritedPreset);
+                    }
+                });
+            }
+        }
+
+        // 递归查找所有继承的preset
+        getInhertedPresets(this);
+
+        // debug
+        console.log(`getInhertedPresets: ${inheritedPresets.map(p => p.name)}`);
+
+        // 去重
+        inheritedPresets = [...new Set(inheritedPresets)];
+        // debug
+
+        // 获取所有继承的preset的modIds
+        // 深拷贝
+        inheritedModIds = JSON.parse(JSON.stringify(this.modIds));
+        inheritedPresets.forEach(preset => {
+            // debug
+            console.log(`add modIds from preset: ${preset.name}`, preset.modIds);
+            inheritedModIds = inheritedModIds.concat(preset.modIds);
+        });
+        // 去重
+        inheritedModIds = [...new Set(inheritedModIds)];
+
+        // 返回当前preset的modIds和继承的preset的modIds
+        return inheritedModIds;
     }
 
     public getModNames() {
-        const modNames = this.modIds.map(modId => {
+        const adjustedModIds = this.getModIds();
+        const modNames = adjustedModIds.map(modId => {
             const mod = ModLoader.mods.find(mod => mod.id === modId);
             return mod?.name || modId;
         }
         );
         // debug
-        console.log(`getModNames: ${modNames}`);
+        console.log(`getModNames: ${modNames}`, this.modIds, adjustedModIds);
         return modNames;
     }
 
@@ -156,7 +203,7 @@ class Preset {
     }
 }
 class PresetHelper {
-    static presets: Preset[] = [];
+    public static presets: Preset[] = [];
     static loadPresets(folders: string[]) {
         // clear all presets
         PresetHelper.presets = [];
