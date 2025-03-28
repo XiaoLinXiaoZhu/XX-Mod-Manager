@@ -93,6 +93,9 @@ class ModData {
         this.modSourcePath = modSourcePath;
         return this;
     }
+    getModSourcePath() {
+        return this.modSourcePath;
+    }
 
     public static fromJson(json: any): ModData {
         // mod 一定要有 name
@@ -120,12 +123,12 @@ class ModData {
     }
     public static fromModInfo(modInfo: ModInfo): ModData {
         const modData = new ModData(
-            modInfo.metaData.get('name') || modInfo.modName,
-            modInfo.metaData.get('character') || "unknow",
-            modInfo.metaData.get('description') || "no description",
-            modInfo.metaData.get('url') || "no url",
+            JSON.parse(JSON.stringify(modInfo.metaData.get('name') || modInfo.modName)),
+            JSON.parse(JSON.stringify(modInfo.metaData.get('character') || "unknow")),
+            JSON.parse(JSON.stringify(modInfo.metaData.get('description') || "no description")),
+            JSON.parse(JSON.stringify(modInfo.metaData.get('url') || "no url")),
             "", // preview will be handled below
-            modInfo.metaData.get('hotkeys') || []
+            JSON.parse(JSON.stringify(modInfo.metaData.get('hotkeys') || []))
         );
 
         modData.id = modInfo.id;

@@ -38,7 +38,12 @@ const pluginName = 'recognizeModInfoPlugin';
 const getModKeySwap = async (iManager, mod) => {
     const fs = require('fs');
     const path = require('path');
-    const modPath = path.join(iManager.config.modSourcePath, mod.name);
+    // const modPath = path.join(iManager.config.modSourcePath, mod.name);
+    const modPath = await mod.getModPath();
+
+    //debug
+    console.log('modPath:', modPath);
+
     // 1. 寻找文件夹下的所有 ini 文件，忽略 desktop.ini 和以 DISABLED 开头的 ini 文件
     let iniFilePaths = [];
     const findIniInFolder = (folderPath) => {
@@ -142,6 +147,9 @@ const getModKeySwap = async (iManager, mod) => {
             });
         }
     });
+
+    //debug
+    console.log('adjusted mod data:', mod);
     return mod;
 };
 
@@ -252,12 +260,12 @@ const getSwapkeyFromIni = (iniFilePath) => {
         }
 
         //debug
-        console.log(`keyswap: ${keyswap}`);
+        console.log(`add key: ${add}, description: ${keyType}`);
 
     });
 
     //debug
-    console.log(`for ini file ${iniFilePath}, keyswap: ${keyswap}`);
+    console.log(`for ini file ${iniFilePath}, keyswap:`,keyswap);
     return keyswap;
 }
 

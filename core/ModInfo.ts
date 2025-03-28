@@ -159,6 +159,7 @@ class ModInfo {
             this.generateID();
 
             console.warn(`未找到模块元数据文件：${metaDataPath}`);
+            needSave = true;
         }
 
         // 将模块元数据写入文件

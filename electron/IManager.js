@@ -374,7 +374,11 @@ class IManager {
         const loadModData = await ModLoader.loadMods(this.config.modSourcePath);
         const loadRawMods = ModLoader.modsRaw;
         // 如果 loadRawMods 中的mod 的 newMod 为 true，则将其设置为 false，并触发addMod事件
-        this.newMods = loadRawMods.filter((mod) => mod.newMod);
+        // newMods 是 ModData 而不是 ModInfo 的数组
+        this.newMods = loadModData.filter((modData) => {
+            const rawMod = loadRawMods.find((raw) => raw.id === modData.id);
+            return rawMod && rawMod.newMod;
+        });
         //debug
         console.log(`newMods:`, this.newMods);
 
@@ -385,7 +389,7 @@ class IManager {
         await this.refreshCharacterList();
 
         //debug
-        console.log(`成功加载 ${loadModData.length} 个 mod，总共 ${this.data.characterList.length} 个 角色`);
+        console.log(`成功加载 ${loadModData.length} 个 mod，总共 ${this.data.characterList.length} 个 角色,有 ${this.newMods.length} 个新mod`);
         return loadRawMods;
     }
 
@@ -482,7 +486,7 @@ class IManager {
     //-==================== 生命周期 ====================
     // 初始化
     async init() {
-        // 加载配置
+        // // 加载配置
         let startTime = new Date().getTime();
         console.log('⏳>> loadConfig');
         await this.loadConfig();
