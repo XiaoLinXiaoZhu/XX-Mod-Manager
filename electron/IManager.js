@@ -1488,6 +1488,9 @@ ipcRenderer.on('wakeUp', () => {
     });
 });
 
+// send a ready event to main process
+ipcRenderer.send('main-window-ready');
+
 let sleepTimer = '';
 let isSleeping = false;
 // 失去焦点10s后进入睡眠模式

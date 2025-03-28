@@ -28,7 +28,7 @@ ifCustomConfig = process.argv.includes('--customConfig');
 console.log('customConfig', ifCustomConfig);
 // customConfig 获取一个配置文件路径
 let customConfigFolder = '';
-if(ifCustomConfig){
+if (ifCustomConfig) {
   const index = process.argv.indexOf('--customConfig');
   customConfigFolder = process.argv[index + 1];
   console.log('customConfigFolder', customConfigFolder);
@@ -69,23 +69,23 @@ const createWindow = () => {
   setMainWindow(mainWindow);
 
   //-==================== 监听窗口显隐 ====================
-// currentMainWindow.on("minimize",()=>{
-//   console.debug("window minimize");
-// });
+  // currentMainWindow.on("minimize",()=>{
+  //   console.debug("window minimize");
+  // });
 
-// currentMainWindow.on("restore",()=>{
-//   console.debug("window restore");
-// });
+  // currentMainWindow.on("restore",()=>{
+  //   console.debug("window restore");
+  // });
 
-currentMainWindow.on("blur",()=>{
-  console.debug("window blur");
-  currentMainWindow.webContents.send('windowBlur')
-});
+  currentMainWindow.on("blur", () => {
+    console.debug("window blur");
+    currentMainWindow.webContents.send('windowBlur')
+  });
 
-currentMainWindow.on("focus",()=>{
-  console.debug("window focus");
-  currentMainWindow.webContents.send('windowFocus')
-});
+  currentMainWindow.on("focus", () => {
+    console.debug("window focus");
+    currentMainWindow.webContents.send('windowFocus')
+  });
 
 
   //debug
@@ -95,19 +95,19 @@ currentMainWindow.on("focus",()=>{
   // 加载 index.html(这里不管是什么路径，都是相对于你的项目根目录的路径)
   //mainWindow.loadFile('./electron/index.html')
   // 因为现在是 使用 vite + vue3 开发的，所以这里加载的是 vite 启动的地址
-  if(devMode){
+  if (devMode) {
     mainWindow.loadURL('http://localhost:3000/')
-    if(firstpage){
+    if (firstpage) {
       mainWindow.loadURL('http://localhost:3000/firstLoad/index.html')
     }
-    if(switchConfig){
+    if (switchConfig) {
       mainWindow.loadURL('http://localhost:3000/switchConfig/index.html')
     }
-    if(devTools){
+    if (devTools) {
       mainWindow.webContents.openDevTools()
     }
   }
-  else{
+  else {
     mainWindow.loadFile('dist/index.html')
   }
 
@@ -138,10 +138,42 @@ app.whenReady().then(() => {
 
   //! 这里因为 vite 的热更新问题，它的服务器 需要 先加载完毕，才能加载 electron 的窗口
   //! 按理来说应该寻找一个更好的解决方案，而不是这样延迟加载
-  setTimeout(() => {
-    console.log('===== createWindow end =====');
+  // setTimeout(() => {
+  //   console.log('===== createWindow end =====');
+  //   wakeUpCondition ++;
+  //   if (wakeUpCondition > 1) {
+  //     sendWakeUp()
+  //   }
+  // }, 1000);
+
+  console.log('===== createWindow end =====');
+  wakeUpCondition++;
+  console.log('wakeUp condition count', wakeUpCondition);
+  if (wakeUpCondition == wakeUpNeeds) {
+    sendWakeUp()
+  }
+})
+
+let wakeUpCondition = 0;
+const wakeUpNeeds = 2; // 需要唤醒的次数
+
+function sendWakeUp() {
+  if (currentMainWindow) {
+    //debug
+    console.log('send wakeUp', currentMainWindow == null);
+    // 向主窗口发送消息，告诉它可以开始工作了
     currentMainWindow.webContents.send('wakeUp')
-  }, 1000);
+  }
+}
+
+// 监听主窗口是否准备好
+ipcMain.on('main-window-ready', (event) => {
+  console.log('main-window-ready', currentMainWindow == null);
+  wakeUpCondition++;
+  console.log('wakeUp condition count', wakeUpCondition);
+  if (wakeUpCondition == wakeUpNeeds) {
+    sendWakeUp()
+  }
 })
 
 // 除了 macOS 外，当所有窗口都被关闭的时候退出程序。 因此, 通常
@@ -187,7 +219,7 @@ ipcMain.on('open-new-window', (event, arg) => {
   if (devMode) {
     newWindow.loadURL('http://localhost:3000/' + arg + '/index.html')
   }
-  else{
+  else {
     const path = require('path');
     const filePath = path.join(__dirname, `../dist/${arg}/index.html`);
     console.log('filePath', filePath);
@@ -278,26 +310,26 @@ ipcMain.handle('set-bounds', async (event, boundsStr) => {
         win.setBounds({ x: x, y: y, width: width, height: height });
       }
       else
-       if (
-        (bounds.x + bounds.width) > (screenArea.x + screenArea.width) ||
-        bounds.x > (screenArea.x + screenArea.width) ||
-        bounds.x < screenArea.x ||
-        (bounds.y + bounds.height) > (screenArea.y + screenArea.height) ||
-        bounds.y > (screenArea.y + screenArea.height) ||
-        bounds.y < screenArea.y
-      ) {
-        // Fit and center window into the existing screenarea
-        const width = Math.min(bounds.width, screenArea.width);
-        const height = Math.min(bounds.height, screenArea.height);
-        const x = Math.floor((screenArea.width - width) / 2);
-        const y = Math.floor((screenArea.height - height) / 2);
-        //debug
-        console.log('set-bounds', { x: x, y: y, width: width, height: height });
-        win.setBounds({ x: x, y: y, width: width, height: height });
-      }
-      else {
-        win.setBounds(bounds);
-      }
+        if (
+          (bounds.x + bounds.width) > (screenArea.x + screenArea.width) ||
+          bounds.x > (screenArea.x + screenArea.width) ||
+          bounds.x < screenArea.x ||
+          (bounds.y + bounds.height) > (screenArea.y + screenArea.height) ||
+          bounds.y > (screenArea.y + screenArea.height) ||
+          bounds.y < screenArea.y
+        ) {
+          // Fit and center window into the existing screenarea
+          const width = Math.min(bounds.width, screenArea.width);
+          const height = Math.min(bounds.height, screenArea.height);
+          const x = Math.floor((screenArea.width - width) / 2);
+          const y = Math.floor((screenArea.height - height) / 2);
+          //debug
+          console.log('set-bounds', { x: x, y: y, width: width, height: height });
+          win.setBounds({ x: x, y: y, width: width, height: height });
+        }
+        else {
+          win.setBounds(bounds);
+        }
     }
   } catch (e) {
     console.error('set-bounds', e);
