@@ -1239,7 +1239,8 @@ class IManager {
     }
 
     async savePreset(presetName, data) {
-        ipcRenderer.invoke('save-preset', presetName, data);
+        // ipcRenderer.invoke('save-preset', presetName, data);
+        PresetHelper.savePresetByName(presetName, data);
     }
 
     async applyMods(modList) {

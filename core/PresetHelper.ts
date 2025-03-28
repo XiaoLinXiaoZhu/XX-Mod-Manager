@@ -22,7 +22,7 @@ const path = require('path');
     }
 }
 */
-class Preset{
+class Preset {
     id: string;
     name: string;
     location: string;
@@ -30,7 +30,7 @@ class Preset{
     modIds: string[];
     useExperimentalFeature: boolean;
     experimentalFeatureConfig: any;
-    constructor(id: string, name: string, location: string, description: string, modIds: string[], useExperimentalFeature: boolean, experimentalFeatureConfig: any){
+    constructor(id: string, name: string, location: string, description: string, modIds: string[], useExperimentalFeature: boolean, experimentalFeatureConfig: any) {
         // id 为 preset 的唯一标识，如果没有则生成一个
         this.id = id;
         this.name = name;
@@ -54,15 +54,15 @@ class Preset{
         return this.id;
     }
 
-    setLocation(location: string){
+    setLocation(location: string) {
         this.location = location;
     }
 
-    static fromJson(json: any){
+    static fromJson(json: any) {
         return new Preset(json.id, json.name, json.location, json.description, json.modIds, json.useExperimentalFeature, json.experimentalFeatureConfig);
     }
 
-    static fromPath(location: string){
+    static fromPath(location: string) {
         try {
             const content = fs.readFileSync(location, 'utf-8');
             const json = JSON.parse(content);
@@ -75,24 +75,9 @@ class Preset{
         }
     }
 
-    getModIds(){
-        return this.modIds;
-    }
-
-    public getModNames(){
-        const modNames = this.modIds.map(modId => {
-            const mod = ModLoader.mods.find(mod => mod.id === modId);
-            return mod?.name || modId;
-        }
-        );
-        // debug
-        console.log(`getModNames: ${modNames}`);
-        return modNames;
-    }
-
-    build(allPresets: Preset[]){
+    build(allPresets: Preset[]) {
         // 如果没有id，则生成一个
-        if (this.id === undefined){
+        if (this.id === undefined) {
             // 哈希碰撞的可能性很小，所以我们不检查重复
             this.generateID();
         }
@@ -102,12 +87,12 @@ class Preset{
         this.name = fileName;
         // 检查是否有重复的name
         let sameNamePresets = allPresets.filter(p => p.name === this.name);
-        if (sameNamePresets.length > 1){
+        if (sameNamePresets.length > 1) {
             // 有重复的name，需要加上数字
             let index = 1;
-            while (true){
+            while (true) {
                 let newName = `${this.name}(${index})`;
-                if (allPresets.find(p => p.name === newName) === undefined){
+                if (allPresets.find(p => p.name === newName) === undefined) {
                     this.name = newName;
                     break;
                 }
@@ -130,34 +115,73 @@ class Preset{
         // 去重
         this.modIds = [...new Set(this.modIds)];
     }
+
+    getModIds() {
+        return this.modIds;
+    }
+
+    public getModNames() {
+        const modNames = this.modIds.map(modId => {
+            const mod = ModLoader.mods.find(mod => mod.id === modId);
+            return mod?.name || modId;
+        }
+        );
+        // debug
+        console.log(`getModNames: ${modNames}`);
+        return modNames;
+    }
+
+    setModsByNames(modNames: string[]) {
+        // 这里的modNames是一个数组，包含了所有的mod的名称
+        // 需要转换为mod的id
+        const modIds = modNames.map(modName => {
+            const mod = ModLoader.mods.find(mod => mod.name === modName);
+            return mod?.id || modName;
+        });
+        // 保存到preset中
+        this.modIds = modIds;
+
+        return this;
+    }
+
+    setModsByIds(modIds: string[]) {
+        this.modIds = modIds;
+        return this;
+    }
+
+    savePreset() {
+        // 保存到文件中
+        const content = JSON.stringify(this, null, 4);
+        fs.writeFileSync(this.location, content, 'utf-8');
+    }
 }
-class PresetHelper{
+class PresetHelper {
     static presets: Preset[] = [];
-    static loadPresets(folders: string[]){
+    static loadPresets(folders: string[]) {
         // clear all presets
         PresetHelper.presets = [];
 
         // debug
         console.log(`load preset from folders: ${folders}`);
-        if (folders === undefined || folders === null || folders.length === 0){
+        if (folders === undefined || folders === null || folders.length === 0) {
             console.warn('PresetHelper.loadPreset: no preset folder');
             return;
         }
 
         folders.forEach(folder => {
             if (fs.existsSync(folder)) {
-            const files = fs.readdirSync(folder);
-            files.forEach(file => {
-                const filePath = path.join(folder, file);
-                if (fs.statSync(filePath).isFile() && path.extname(file) === '.json') {
-                    const preset = Preset.fromPath(filePath);
-                    if (preset !== null){
-                        PresetHelper.presets.push(preset);
+                const files = fs.readdirSync(folder);
+                files.forEach(file => {
+                    const filePath = path.join(folder, file);
+                    if (fs.statSync(filePath).isFile() && path.extname(file) === '.json') {
+                        const preset = Preset.fromPath(filePath);
+                        if (preset !== null) {
+                            PresetHelper.presets.push(preset);
+                        }
                     }
-                }
-            });
+                });
             } else {
-            console.warn(`Folder does not exist: ${folder}`);
+                console.warn(`Folder does not exist: ${folder}`);
             }
         });
 
@@ -165,26 +189,36 @@ class PresetHelper{
         PresetHelper.presets.forEach(preset => preset.build(PresetHelper.presets));
     }
 
-    static getPresetList(){
+    static getPresetList() {
         // 返回所有preset的名称
         return PresetHelper.presets.map(preset => preset.name);
     }
 
-    static readonly defaultPresetName = "default";
-    static getPresetByName(name: string){
-        if (name === PresetHelper.defaultPresetName){
+    public static readonly defaultPresetName = "default";
+    public static getPresetByName(name: string) {
+        if (name === PresetHelper.defaultPresetName) {
             // 警告一下，返回一个空
             console.warn(`PresetHelper.getPresetByName: ${name} is default preset, return empty preset`);
             return new Preset("", "", "", "", [], false, {});
         }
-        
+
         return PresetHelper.presets.find(preset => preset.name === name);
     }
 
-    static getPresetById(id: string){
+    static getPresetById(id: string) {
         return PresetHelper.presets.find(preset => preset.id === id);
     }
 
+    //- 保存预设
+    public static savePresetByName(name: string, modNames: string[]) {
+        const preset = PresetHelper.getPresetByName(name);
+        if (preset === undefined) {
+            console.warn(`PresetHelper.savePresetByName: ${name} not found`);
+            return;
+        }
+        preset.setModsByNames(modNames).savePreset();
+        console.log(`PresetHelper.savePresetByName: ${name} saved`);
+    }
 }
 
 
