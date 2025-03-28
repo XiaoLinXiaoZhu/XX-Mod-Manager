@@ -282,11 +282,13 @@ const handleCancel = async () => {
 
 const handleSave = () => {
   //debug
-  console.log('saved', saved,`equals`,props.mod.equals(tempModInfo.value));
+  const ifEqual = props.mod.equals(tempModInfo.value);
+  console.log('saved', saved,`equals`,ifEqual);
   // 保存修改的 mod 信息
 
-  if (props.mod.equals(tempModInfo.value) && !changdPreviewByPaste) {
-    editModInfoDialog.value.$el.dismiss();
+  if (ifEqual) {
+    // editModInfoDialog.value.$el.dismiss();
+    // 点击按钮自动会关闭dialog，这里如果手动关闭会导致再次触发dismiss事件，导致不必要的性能消耗
     return;
   }
 

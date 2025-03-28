@@ -19,7 +19,7 @@ class XXMMCore{
     static setDataPath = (path: string) => {
         dataPath = path;
     }
-    // 获取配置文件路径
+    //- dataPath
     public static async getDataPath(){
         if (dataPath === ""){
             dataPath = await ipcRenderer.invoke('get-user-data-path');
@@ -32,12 +32,13 @@ class XXMMCore{
         }
         return dataPath;
     }
-
     static checkDataPath(){
         if (dataPath === ""){
             dataPath = XXMMCore.getDataPathSync();
         }
     }
+
+    //- 获取配置文件路径
     static readonly getConfigFilePath: () => string = () => {
         this.checkDataPath();
         return (XXMMCore.ifCustomConfig) ? path.join(XXMMCore.customConfigFolder, 'config.json') : path.join(dataPath, 'config.json');
@@ -68,6 +69,21 @@ class XXMMCore{
         }).exec();
     }
 
+    private static isSavingConfig = false;
+    public static async saveCurrentConfig(config: any) {
+        if (XXMMCore.isSavingConfig) return;
+        XXMMCore.isSavingConfig = true;
+        //debug
+        return ErrorHandler.create(async () => {
+            //debug
+            console.log(`saveCurrentConfig: ${JSON.stringify(config, null, 4)}`);
+            fs.promises.writeFile(XXMMCore.getConfigFilePath(), JSON.stringify(config, null, 4), 'utf8').then(() => {
+                XXMMCore.isSavingConfig = false;
+            });
+        }).onErr((e) => {
+            console.error(`saveCurrentConfig error: ${e}`);
+        }).exec();
+    }
 
     static readonly getPluginConfig = () => {
         return JSON.parse(fs.readFileSync(XXMMCore.getPluginConfigPath(), 'utf8'));

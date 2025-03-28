@@ -291,11 +291,15 @@ class IManager {
 
         //如果为空，则使用默认配置，并覆盖本地配置
         if (currentConfig == {} || currentConfig == null) {
-            snack('配置文件不存在');
+            // snack('配置文件不存在');
+            t_snack({
+                zh_cn: `配置文件不存在`,
+                en: `Config file not found`,
+            }, SnackType.error);
+
             this.saveConfig();
             return;
         }
-
         
         // this.config = currentConfig;
         // 这样会导致 较新的配置项 丢失，所以需要逐个赋值
@@ -347,6 +351,7 @@ class IManager {
         console.log(`成功加载 ${loadMods.length} 个 mod，总共 ${this.data.characterList.length} 个 角色`);
         return loadMods;
     }
+    
     async newLoadMods() {
         //debug
         console.log(`newLoadMods from ${this.config.modSourcePath}`);
@@ -1294,9 +1299,8 @@ class IManager {
     }
 
     async saveConfig() {
-        //debug
-        console.log('saveConfig:', this._config);
-        await ipcRenderer.invoke('set-current-config', this._config);
+        // await ipcRenderer.invoke('set-current-config', this._config);
+        XXMMCore.saveCurrentConfig(this._config);
     }
 
     // 同步的保存配置

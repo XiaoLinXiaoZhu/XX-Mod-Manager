@@ -41,8 +41,10 @@ class ModData {
     public preview: string;
     public hotkeys: {key: string;description: string;}[];
 
-    private id = 0; // mod的id
-    private static idCount = 0; // mod的id计数器
+    private index = 0; // mod的id
+    private static indexCount = 0; // mod的id计数器
+
+    public id:string = ""; // mod的id
 
     private modSourcePath: string = ""; // mod的源路径
     private oldPreview = ""; // 旧的预览图的路径
@@ -62,8 +64,8 @@ class ModData {
         this.modPreviewBase64WithHeader = new ImageBase64("");
 
         // 为每个mod生成一个id
-        this.id = ModData.idCount;
-        ModData.idCount ++;
+        this.index = ModData.indexCount;
+        ModData.indexCount ++;
         //debug
         // const stackTrace = new Error();
         // console.log(`ℹ️ℹ️ℹ️ModData ${this.name} is being created`,this.id,stackTrace)
@@ -126,6 +128,8 @@ class ModData {
             modInfo.metaData.get('hotkeys') || []
         );
 
+        modData.id = modInfo.id;
+
         const handlePreview = () => {
             const previewName = modInfo.metaData.get('preview') || "";
             if (previewName) {
@@ -173,7 +177,7 @@ class ModData {
     }
     public equals(modData: ModData): boolean {
         //debug
-        console.log(`comparing......`,this.id,this.toJson(),modData.id,modData.toJson());
+        console.log(`comparing......`,new Error(),this.index,this.toJson(),modData.index,modData.toJson());
         return JSON.stringify(this.toJson()) === JSON.stringify(modData.toJson());
     }
 
