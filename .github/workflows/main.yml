@@ -3,7 +3,7 @@ name: Build and Publish Electron App
 on:
   push:
     tags:
-      - 'v*'  # 触发标签推送，例如：v0.0.6
+      - 'v**'  # 触发标签推送，例如：v0.0.6
 
 jobs:
   build:
