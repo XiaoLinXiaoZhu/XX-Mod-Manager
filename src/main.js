@@ -48,6 +48,13 @@ watch(language, (newVal) => {
     console.log('languageChange:', newVal);
 });
 
+// manager初始化完成之后再切换一次
+iManager.on("initDone", () => {
+    // 手动触发一次语言切换事件
+    vue_app.config.globalProperties.$i18n.locale = iManager.config.language;
+    console.log('languageChange:', iManager.config.language);
+}
+);
 
 // ------------------ first load ------------------ //
 // 首次打开时打开 初始化窗口
