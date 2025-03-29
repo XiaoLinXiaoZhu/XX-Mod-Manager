@@ -48,6 +48,37 @@ ipcMain.handle('get-args', async () => {
   }
 });
 
+// 获取参数的同步版本
+ipcMain.on('get-args-sync', (event) => {
+  //debug
+  console.log('get-args-sync', {
+    devMode: devMode,
+    firstpage: firstpage,
+    switchConfig: switchConfig,
+    devTools: devTools,
+    ifCustomConfig: ifCustomConfig,
+    customConfigFolder: customConfigFolder
+  });
+  event.returnValue = {
+    devMode: devMode,
+    firstpage: firstpage,
+    switchConfig: switchConfig,
+    devTools: devTools,
+    ifCustomConfig: ifCustomConfig,
+    customConfigFolder: customConfigFolder
+  }
+});
+
+ipcMain.on("set-custom-config-folder", (event, folder) => {
+  console.log("set-custom-config-folder", folder);
+  // 设置配置文件夹路径
+  ifCustomConfig = true;
+  customConfigFolder = folder;
+  // 设置配置文件夹路径
+  setCustomConfigFolder(folder);
+});
+
+
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({

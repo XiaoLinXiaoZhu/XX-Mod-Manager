@@ -1,5 +1,7 @@
 import ErrorHandler from "./ErrorHandler";
+import { SnackType, t_snack } from "../helper/SnackHelper";
 import { ModInfo, ModMetaData, ModMetaDataItem, ModMetaDataType } from "./ModInfo";
+import { TranslatedText } from "../helper/Language";
 const fs = require('fs');
 const path = require('path');
 
@@ -15,8 +17,24 @@ class XXMMCore{
     // 是否使用默认配置文件
     static ifCustomConfig: boolean = false;
     static customConfigFolder: string = "config";
+    // dataPath 就是默认的 configFolder
+    public static setCustomConfigFolder = (path: string) => {
+        // 检查路径是否存在
+        if (!fs.existsSync(path)){
+            t_snack(new TranslatedText("Custom config folder not exist", "自定义配置文件夹不存在"), SnackType.error);
+            console.error(`Custom config folder not exist: ${path}`);
+            return;
+        }
+        // 设置自定义配置文件夹
+        XXMMCore.customConfigFolder = path;
+        XXMMCore.ifCustomConfig = true;
 
-    static setDataPath = (path: string) => {
+        // when reload，these two lines will be clear
+        // so we need send it back to main process
+        ipcRenderer.send('set-custom-config-folder', path);
+    }
+
+    static setDataPath(path: string){
         dataPath = path;
     }
     //- dataPath
@@ -28,13 +46,35 @@ class XXMMCore{
     }
     public static getDataPathSync(){
         if (dataPath === ""){
+            // 获取一下参数，检查是否有传入自定义路径
+            // debug
+            console.log(`data path is empty, get args`);
+            const args = ipcRenderer.sendSync('get-args-sync');
+            //debug
+            console.log(`args: `, args);
+            if (args.ifCustomConfig){
+                XXMMCore.ifCustomConfig = true;
+                // XXMMCore.customConfigFolder = args.customConfigFolder;
+                // 检查路径是否存在
+                if (fs.existsSync(args.customConfigFolder)){
+                    XXMMCore.customConfigFolder = args.customConfigFolder;
+                }else{
+                    t_snack(new TranslatedText("Custom config folder not exist", "自定义配置文件夹不存在"), SnackType.error);
+                    console.error(`Custom config folder not exist: ${args.customConfigFolder}`);
+                }
+            }
             dataPath = ipcRenderer.sendSync('get-user-data-path-sync');
         }
         return dataPath;
     }
+
     static checkDataPath(){
         if (dataPath === ""){
             dataPath = XXMMCore.getDataPathSync();
+        }
+        if (this.ifCustomConfig){
+            //debug
+            console.log(`Using custom config folder: ${this.customConfigFolder} instead of ${dataPath}`);
         }
     }
 

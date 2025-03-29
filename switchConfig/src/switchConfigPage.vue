@@ -80,6 +80,8 @@ const currentTapeIndex = ref(0);
 
 const plainConfigRefs = useTemplateRef("plainConfigRefs");
 
+import XXMMCore from '../../core/XXMMCore';
+
 function selectTape(e, tape) {
     console.log('selectTape', tape)
     currentTape.value = tape;
@@ -113,9 +115,11 @@ function handleApplyButtonClicked() {
     console.log('handleApplyButtonClicked');
     // TapeConfig.applyConfig(currentTape.value);
     iManager.temp.ifDontSaveOnClose = true;
-    ipcRenderer.invoke('set-custom-config-folder', currentTape.value._dir);
+    // ipcRenderer.invoke('set-custom-config-folder', currentTape.value._dir);
+    XXMMCore.setCustomConfigFolder(currentTape.value._dir);
     // 页面重载为 mainPage
     // ipcRenderer.send('switch-page', 'mainPage');
+    // 5s后重载
     iManager.changeUrl('');
 }
 
