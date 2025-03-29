@@ -73,6 +73,9 @@ function autoStart(iManager) {
     //debug
     console.log('autoStart:', iManager.getPluginData(pluginName, 'autoStartModLoader'), iManager.getPluginData(pluginName, 'autoStartGame'));
     iManager.snack('Trying to auto start mod loader and game...');
+    const commandStatus = {
+        data: iManager.getPluginData(pluginName, 'commandStatus')
+    }
     if (iManager.getPluginData(pluginName, 'autoStartModLoader')) startModLoader(iManager, iManager.getPluginData(pluginName, 'modLoaderPath'));
     if (iManager.getPluginData(pluginName, 'autoStartGame')) startGame(iManager, iManager.getPluginData(pluginName, 'gamePath'));
     if (iManager.getPluginData(pluginName, 'ifRunCommand')) {
@@ -101,6 +104,7 @@ function autoStart(iManager) {
 }
 
 const pluginName = 'autoStartPlugin';
+const ignoredState = 'ignoreSwitchConfig,waiting for switchConfig';
 module.exports = {
     name: pluginName,
     t_displayName: {

@@ -157,6 +157,7 @@ class IManager {
     HMC = null;
     ModData = ModData;
     TranslatedText = TranslatedText;
+    LogHandler = LogHandler;
 
 
     //-==================== 核心数据 ====================
@@ -1502,8 +1503,6 @@ EventSystem.on(EventType.startDone, () => {
         IManager.triggerWakeUp();
     }
 });
-
-
 
 // send a ready event to main process
 ipcRenderer.send('main-window-ready');

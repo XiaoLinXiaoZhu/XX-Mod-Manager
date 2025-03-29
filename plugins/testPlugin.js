@@ -84,7 +84,43 @@ module.exports = {
             en: 'Test Plugin is used to show the function of the plugin, provide reference for plugin writing, for ordinary users, you can close the plugin in settings>plugin to cancel the display of the plugin.'      
         });
 
+        iManager.on('pluginLoaded', () => {
+            // 如果开启了打印日志到文件，则激活LogHandler
+            const ifLog2File = iManager.getPluginData(pluginName, 'ifLog2File');
+            if (ifLog2File) {
+                iManager.t_snack({
+                    zh_cn: '日志将会被打印到文件中',
+                    en: 'Log will be printed to file'
+                });
+                iManager.LogHandler.init();
+            }
+        });
+
         let pluginData = [];
+
+        //- 是否打印日志
+        let ifLog2File = {
+            name: 'ifLog2File',
+            data: false,
+            type: 'boolean',
+            displayName: 'If Log To File',
+            description: 'If true, the plugin will log to file',
+            t_displayName: {
+                zh_cn: '是否打印日志到文件',
+                en: 'Log To File'
+            },
+            t_description: {
+                zh_cn: '如果为真，插件将打印日志到文件',
+                en: 'If true, the plugin will log to file'
+            },
+            onChange: (value) => {
+                console.log('ifLog2File changed:', value);
+                ifLog2File.data = value;
+                iManager.snack('ifLog2File changed:' + value);
+                iManager.showDialog('dialog-need-refresh');
+            }
+        };
+        pluginData.push(ifLog2File);
 
         //- 测试 markdown 类型
         let testMarkdown = {
