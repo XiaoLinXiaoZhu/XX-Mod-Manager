@@ -70,6 +70,9 @@ function runCommand(iManager, command) {
 }
 
 function autoStart(iManager) {
+    //debug
+    console.log('autoStart:', iManager.getPluginData(pluginName, 'autoStartModLoader'), iManager.getPluginData(pluginName, 'autoStartGame'));
+    iManager.snack('Trying to auto start mod loader and game...');
     if (iManager.getPluginData(pluginName, 'autoStartModLoader')) startModLoader(iManager, iManager.getPluginData(pluginName, 'modLoaderPath'));
     if (iManager.getPluginData(pluginName, 'autoStartGame')) startGame(iManager, iManager.getPluginData(pluginName, 'gamePath'));
     if (iManager.getPluginData(pluginName, 'ifRunCommand')) {
@@ -110,12 +113,16 @@ module.exports = {
         let conditionCount = 0;
         iManager.on('wakeUp', () => {
             conditionCount++;
+            //debug
+            console.log('auto start plugin get wakeUp event:', conditionCount);
             if (conditionCount === 2) {
                 autoStart(iManager);
             }
         });
         iManager.on('pluginLoaded', () => {
             conditionCount++;
+            //debug
+            console.log('auto start plugin get pluginLoaded event:', conditionCount);
             if (conditionCount === 2) {
                 autoStart(iManager);
             }

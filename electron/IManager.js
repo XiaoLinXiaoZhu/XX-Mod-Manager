@@ -1426,6 +1426,14 @@ class IManager {
     on = EventSystem.on;
     trigger = EventSystem.trigger;
 
+    static triggerWakeUp(){
+        console.log('🌞wakeUp');
+        t_snack({
+            zh_cn: '🌞程序正常启动~',
+            en: '🌞Program is waking up~',
+        })
+        EventSystem.trigger('wakeUp',this.instance);
+    }
 
     //-===================== 插件 =====================
     //----------插件接口----------
@@ -1478,16 +1486,24 @@ function waitInitIManager() {
     });
 }
 
+const wakeUpConditionCount = 2
+let wakeUpCondition = 0
+// 只有同时满足 主进程那边确认这次是 初次加载 以及 这里 插件加载完成（也就是startdone）之后，才会触发 wakeUp 事件
 ipcRenderer.on('wakeUp', () => {  
-    waitInitIManager().then((iManager) => {
-        console.log('🌞wakeUp');
-        t_snack({
-            zh_cn: '🌞程序正常启动~',
-            en: '🌞Program is waking up~',
-        })
-        EventSystem.trigger('wakeUp');
-    });
+    wakeUpCondition++;
+    if (wakeUpCondition == wakeUpConditionCount) {
+        IManager.triggerWakeUp();
+    }
+    // 这里不应该是在initdone完成之后触发，应该是在 startdone 之后触发
 });
+EventSystem.on(EventType.startDone, () => {
+    wakeUpCondition++;
+    if (wakeUpCondition == wakeUpConditionCount) {
+        IManager.triggerWakeUp();
+    }
+});
+
+
 
 // send a ready event to main process
 ipcRenderer.send('main-window-ready');
