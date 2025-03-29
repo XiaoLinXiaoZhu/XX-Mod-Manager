@@ -46,19 +46,24 @@ vue_app.use(i18n);
 
 vue_app.mount('#app-container');
 
-watch(() => g_config_vue.language, (language) => {
+const language = g_config_vue.language;
+watch(language, (language) => {
     // 将语言设置为 imanager 中的语言
     vue_app.config.globalProperties.$i18n.locale = language;
-    console.log('set language:', language);
+    console.log('set language to:', language);
 })
 
-iManager.waitInit().then((iManager) => {
+iManager.on("initDone", () => {
+    // 手动触发一次语言切换事件
+    vue_app.config.globalProperties.$i18n.locale = iManager.config.language;
+    console.log('languageChange:', iManager.config.language);
+}
+);
 
-    // ------------------ first load ------------------ //
-    // 首次打开时打开 初始化窗口
-    // 已经初始化了
-    iManager.config.firstLoad = false;
-})
+// 每1s打印一次语言
+setInterval(() => {
+    console.log('language:', g_config_vue.language.value);
+}, 1000);
 
 
 //-=====================事件监听====================-//

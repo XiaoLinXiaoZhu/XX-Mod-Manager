@@ -359,12 +359,6 @@ onMounted(async () => {
     modTargetPath.value = iManager.config.modTargetPath;
     modSourcePath.value = iManager.config.modSourcePath;
     presetPath.value = iManager.config.presetPath;
-    autoStartGame.value = iManager.config.autoStartGame;
-    modLoaderDir.value = iManager.config.modLoaderDir;
-    gameDir.value = iManager.config.gameDir;
-    ifAutoApply.value = iManager.config.ifAutoApply;
-    ifAutoRefreshInZZZ.value = iManager.config.ifAutoRefreshInZZZ;
-    ifUseAdmin.value = iManager.config.ifUseAdmin;
 
     // 不论用户是否看完了 都 取消首次加载
     iManager.config.firstLoad = false;

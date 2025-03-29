@@ -95,6 +95,12 @@ class XXMMCore{
 
     public static getCurrentConfig(){
         //debug
+        const configFilePath = XXMMCore.getConfigFilePath();
+        if (!fs.existsSync(configFilePath)){
+            fs.writeFileSync(configFilePath, JSON.stringify({}, null, 4), 'utf8');
+            console.log(`Config file not exist, create a new one: ${configFilePath}`);
+        }
+        //debug
         console.log(`getConfigFilePath: ${XXMMCore.getConfigFilePath()}，content: ${fs.readFileSync(XXMMCore.getConfigFilePath(), 'utf8')}`);
         // return JSON.parse(fs.readFileSync(XXMMCore.getConfigFilePath(), 'utf8'));
         return ErrorHandler.create(() => {

@@ -26,6 +26,9 @@ const addPinWindowButton = (iManager) => {
 
     // 添加到原有的按钮组中
     const buttons = document.querySelector('.bottom-left')
+    if (!buttons) {
+        return
+    }
     buttons.appendChild(pinTooltip)
 
     // 添加点击事件

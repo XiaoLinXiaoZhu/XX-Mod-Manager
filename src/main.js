@@ -45,7 +45,7 @@ vue_app.config.globalProperties.$i18n.locale = `zh_cn`;
 const language = g_config_vue.language;
 watch(language, (newVal) => {
     vue_app.config.globalProperties.$i18n.locale = newVal;
-    console.log('languageChange:', newVal);
+    console.log('languageChange to:', newVal);
 });
 
 // manager初始化完成之后再切换一次
