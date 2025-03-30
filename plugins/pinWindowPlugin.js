@@ -27,6 +27,8 @@ const addPinWindowButton = (iManager) => {
     // 添加到原有的按钮组中
     const buttons = document.querySelector('.bottom-left')
     if (!buttons) {
+        //debug
+        console.warn('bottom-left not found')
         return
     }
     buttons.appendChild(pinTooltip)

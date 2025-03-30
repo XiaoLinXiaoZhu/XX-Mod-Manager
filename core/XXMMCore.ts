@@ -144,6 +144,22 @@ class XXMMCore{
         return JSON.parse(fs.readFileSync(XXMMCore.getPluginConfigPath(), 'utf8'));
     }
 
+    public static getPluginConfig(pluginName){
+        const pluginConfigPath = XXMMCore.getPluginConfigPath();
+        if (!fs.existsSync(pluginConfigPath)){
+            fs.writeFileSync(pluginConfigPath, JSON.stringify({}, null, 4), 'utf8');
+            console.log(`Plugin config file not exist, create a new one: ${pluginConfigPath}`);
+        }
+        // 读取文件，找到对应的插件配置，返回
+        const pluginConfig = JSON.parse(fs.readFileSync(pluginConfigPath, 'utf8'));
+        // 如果没有这个插件的配置，则返回空对象
+        if (pluginConfig[pluginName] === undefined){
+            return {};
+        }
+        // 返回插件配置
+        return pluginConfig[pluginName];
+    }
+
     public static savePluginConfig(pluginName,pluginDataToSave){
         const pluginConfigPath = XXMMCore.getPluginConfigPath();
         if (!fs.existsSync(pluginConfigPath)){

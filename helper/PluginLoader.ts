@@ -163,18 +163,17 @@ class IPluginLoader {
         }
 
         // 检测是否有本地配置
-        ipcRenderer.invoke('get-plugin-config', plugin.name).then((localPluginData) => {
-            if (localPluginData) {
-                IPluginLoader.pluginConfig[plugin.name].forEach((data) => {
-                    if (localPluginData[data.name] !== undefined) {
-                        data.data = localPluginData[data.name];
-                    }
-                });
-                // debug
-                const tt = new TranslatedText(`🔧plugin ${plugin.name} loaded with local data`, `🔧插件 ${plugin.name} 使用本地数据启动`);
-                console.log(tt.get(), IPluginLoader.pluginConfig[plugin.name]);
-            }
-        });
+        const localPluginData = XXMMCore.getPluginConfig(plugin.name);
+        if (localPluginData) {
+            IPluginLoader.pluginConfig[plugin.name].forEach((data) => {
+                if (localPluginData[data.name] !== undefined) {
+                    data.data = localPluginData[data.name];
+                }
+            });
+            // debug
+            const tt = new TranslatedText(`🔧plugin ${plugin.name} loaded with local data`, `🔧插件 ${plugin.name} 使用本地数据启动`);
+            console.log(tt.get(), IPluginLoader.pluginConfig[plugin.name]);
+        }
         return true;
     }
 
