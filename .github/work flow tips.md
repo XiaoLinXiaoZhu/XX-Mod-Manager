@@ -31,3 +31,13 @@ for major changes
 npm version major
 git push --follow-tags
 ```
+
+
+creata a fix version
+```
+npm version 1.3.9-fix3 --allow-same-version --no-git-tag-version
+git add package.json
+git commit -m "修复版本 1.3.9-fix3"
+git tag v1.3.9-fix3
+git push origin v1.3.9-fix3 --force
+```

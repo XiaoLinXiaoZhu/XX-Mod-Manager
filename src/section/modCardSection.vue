@@ -158,7 +158,6 @@ function handleApplyButtonClicked() {
     const mods = Array.from(document.querySelectorAll('.mod-item'));
     iManager.applyMods(selectedMods()).then(() => {
         console.log('apply success');
-
     });
 }
 

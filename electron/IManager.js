@@ -1269,7 +1269,11 @@ class IManager {
         //debug
         await ipcRenderer.invoke('apply-mods', modList, modSourcePath, modTargetPath);
         this.trigger('modsApplied', modList);
-        ipcRenderer.send('snack', '应用成功');
+        // ipcRenderer.send('snack', '应用成功');
+        t_snack({
+            zh_cn: '应用成功',
+            en: 'Applied successfully',
+        });
     }
 
     async addPreset(presetName) {
