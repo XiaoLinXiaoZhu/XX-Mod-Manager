@@ -79,10 +79,7 @@ class XXMMCore{
     }
 
     //- 获取配置文件路径
-    static readonly getConfigFilePath: () => string = () => {
-        this.checkDataPath();
-        return (XXMMCore.ifCustomConfig) ? path.join(XXMMCore.customConfigFolder, 'config.json') : path.join(dataPath, 'config.json');
-    }
+
     static readonly getPluginConfigPath = () => {
         this.checkDataPath();
 
@@ -93,6 +90,12 @@ class XXMMCore{
         return (XXMMCore.ifCustomConfig) ? path.join(XXMMCore.customConfigFolder, 'disabledPlugins.json') : path.join(dataPath, 'disabledPlugins.json');
     }
 
+    //---------------- current config ------------------
+    // 获取当前配置文件路径
+    static readonly getConfigFilePath: () => string = () => {
+        this.checkDataPath();
+        return (XXMMCore.ifCustomConfig) ? path.join(XXMMCore.customConfigFolder, 'config.json') : path.join(dataPath, 'config.json');
+    }
     public static getCurrentConfig(){
         //debug
         const configFilePath = XXMMCore.getConfigFilePath();
@@ -124,9 +127,52 @@ class XXMMCore{
             console.error(`saveCurrentConfig error: ${e}`);
         }
     }
+    
+    public static saveCurrentConfigSync(config: any) {
+        // 同步的保存配置文件
+        try {
+            // debug
+            console.log(`saveCurrentConfigSync: ${JSON.stringify(config, null, 4)}`);
+            fs.writeFileSync(XXMMCore.getConfigFilePath(), JSON.stringify(config, null, 4), 'utf8');
+        } catch (e) {
+            console.error(`saveCurrentConfigSync error: ${e}`);
+        }
+    }
 
-    static readonly getPluginConfig = () => {
+    //----------------- plugin config ------------------
+    public static getAllPluginConfig(){
         return JSON.parse(fs.readFileSync(XXMMCore.getPluginConfigPath(), 'utf8'));
+    }
+
+    public static savePluginConfig(pluginName,pluginDataToSave){
+        const pluginConfigPath = XXMMCore.getPluginConfigPath();
+        if (!fs.existsSync(pluginConfigPath)){
+            fs.writeFileSync(pluginConfigPath, JSON.stringify({}, null, 4), 'utf8');
+            console.log(`Plugin config file not exist, create a new one: ${pluginConfigPath}`);
+        }
+        // 读取文件，插入新的数据，保存文件
+        const pluginConfig = JSON.parse(fs.readFileSync(pluginConfigPath, 'utf8'));
+        // 插入新的数据
+        pluginConfig[pluginName] = pluginDataToSave;
+        // 保存文件
+        fs.writeFileSync(pluginConfigPath, JSON.stringify(pluginConfig, null, 4), 'utf8');
+        // debug
+        console.log(`Plugin config file saved: ${pluginConfigPath}`);
+    }
+
+    //----------------- disabled plugins ------------------
+    public static getDisabledPlugins(){
+        const disabledPluginsPath = XXMMCore.getDisabledPluginsPath();
+        if (!fs.existsSync(disabledPluginsPath)){
+            fs.writeFileSync(disabledPluginsPath, JSON.stringify([], null, 4), 'utf8');
+            console.log(`Disabled plugins file not exist, create a new one: ${disabledPluginsPath}`);
+            return [];
+        }
+        return JSON.parse(fs.readFileSync(disabledPluginsPath, 'utf8'));
+    }
+
+    public static saveDisabledPlugins(disabledPlugins: string[]){
+        fs.writeFileSync(XXMMCore.getDisabledPluginsPath(), JSON.stringify(disabledPlugins, null, 4), 'utf8');
     }
 
     // 初始化

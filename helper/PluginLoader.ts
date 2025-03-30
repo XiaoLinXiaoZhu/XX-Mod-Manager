@@ -1,5 +1,6 @@
 //-===================== 插件 =====================
 const { ipcRenderer } = require('electron');
+import XXMMCore from "../core/XXMMCore";
 import { EventType, EventSystem } from "./EventSystem";
 import { TranslatedText } from "./Language";
 import { PathHelper } from "./PathHelper";
@@ -67,6 +68,14 @@ class IPluginLoader {
     public static pluginConfig: { [key: string]: IPluginData[] } = {};
     public static enviroment: any;
 
+    public static pluginLoadFolders: (() => string)[] = [
+        () => path.resolve('./plugins'), // 内置插件
+        () => {
+            const userDataPath = ipcRenderer.sendSync('get-user-data-path-sync');
+            return path.join(userDataPath, 'plugins'); // 用户插件
+        }   // 全局插件
+    ];
+
     //-============= 自身初始化 =============-//
     public static clearAllPlugins() {
         IPluginLoader.plugins = {};
@@ -87,7 +96,8 @@ class IPluginLoader {
     }
 
     static async LoadDisabledPlugins() {
-        IPluginLoader.disabledPluginNames = await ipcRenderer.invoke('get-disabled-plugins');
+        // IPluginLoader.disabledPluginNames = await ipcRenderer.invoke('get-disabled-plugins');
+        IPluginLoader.disabledPluginNames = XXMMCore.getDisabledPlugins();
         // this.trigger('disabledPluginsLoaded', disabledPluginNames);
         // debug
         console.log('disabledPluginNames:', IPluginLoader.disabledPluginNames);
@@ -119,7 +129,8 @@ class IPluginLoader {
     }
 
     static async saveDisabledPlugins() {
-        ipcRenderer.invoke('save-disabled-plugins', IPluginLoader.disabledPluginNames);
+        // ipcRenderer.invoke('save-disabled-plugins', IPluginLoader.disabledPluginNames);
+        XXMMCore.saveDisabledPlugins(IPluginLoader.disabledPluginNames);
     }
 
     //-============= 插件注册 =============-//
@@ -138,7 +149,7 @@ class IPluginLoader {
             // debug
             const tt = new TranslatedText(`⛔plugin ${plugin.name} disabled`, `⛔插件 ${plugin.name} 已禁用`);
             console.log(tt.get());
-            t_snack(tt, SnackType.info);
+            // t_snack(tt, SnackType.info);
             return false;
         }
 
@@ -201,6 +212,34 @@ class IPluginLoader {
     }
 
     /** @function
+     * @desc 从指定的文件夹加载插件
+     * @param {any} enviroment - 应当是XManager的实例，或者IManager的实例
+     * @param {string} folder - 插件文件夹
+     * @returns {Promise<void>}
+     */
+    static async LoadPluginsFromFolder(enviroment: any, folder: string) {
+        if (!PathHelper.CheckDir(folder, false, true, new TranslatedText('plugin folder', '插件文件夹'))) {
+            return;
+        }
+        const files = fs.readdirSync(folder);
+        files.forEach(async (file) => {
+            if (file.endsWith('.js')) {
+                try {
+                    const plugin: IPlugin = require(path.join(folder, file)) as unknown as IPlugin;
+                    await IPluginLoader.RegisterPlugin(plugin, enviroment);
+                }
+                catch (e) {
+                    // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
+                    fs.writeFileSync(`./plugins/lookAtMe`, 'lookAtMe');
+                    const tt = new TranslatedText(`❌plugin ${file} load failed`, `❌插件 ${file} 加载失败`);
+                    console.error(tt.get());
+                    t_snack(tt, SnackType.error);
+                }
+            }
+        });
+    }
+
+    /** @function
      * @desc 加载所有插件
      * @param {any} enviroment - 应当是XManager的实例，或者IManager的实例
      * 这里使用 enviroment 是为了 避免循环引用
@@ -208,58 +247,31 @@ class IPluginLoader {
     static async LoadPlugins(enviroment: any) {
         // 插件为 一个 js 文件，通过 require 引入
         // 然后调用 init 方法，将 iManager 传递给插件
-
-        // 先加载内置的插件
-        const builtInPluginPath = path.resolve('./plugins');
-        if (!PathHelper.CheckDir(builtInPluginPath, false, true, new TranslatedText('plugin folder', '插件文件夹'))) {
-            return;
-        }
-        const builtInPlugins = fs.readdirSync(builtInPluginPath);
-        builtInPlugins.forEach(async (pluginName) => {
-            if (pluginName.endsWith('.js')) {
-                try {
-                    const plugin: IPlugin = require(path.join(builtInPluginPath, pluginName)) as unknown as IPlugin;
-                    IPluginLoader.RegisterPlugin(plugin, enviroment);
-                }
-                catch (e) {
-                    // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
-                    fs.writeFileSync(`./plugins/lookAtMe`, 'lookAtMe');
-                    const tt = new TranslatedText(`❌built-in plugin ${pluginName} load failed`, `❌内置插件 ${pluginName} 加载失败`);
-                    console.error(tt.get());
-                    t_snack(tt, SnackType.error);
-                }
+        const startTime = new Date().getTime();
+        await Promise.all(
+            IPluginLoader.pluginLoadFolders.map(async (folder) => {
+                // debug
+                console.log(`Load plugins from ${folder()}`);
+                await IPluginLoader.LoadPluginsFromFolder(enviroment, folder());
             }
-        });
+            ));
 
-        // 从 plugins 文件夹中加载插件，其位于 ,userData/plugins 文件夹中
-        // 这里应该被视为全局插件 作用于所有的 游戏配置
-        const userDataPath = await ipcRenderer.invoke('get-user-data-path');
-        const pluginPath = path.join(userDataPath, 'plugins');
-        if (!PathHelper.CheckDir(pluginPath, true, true, new TranslatedText('global plugin folder', '全局插件文件夹'))) {
-            return
-        }
-        const files = fs.readdirSync(pluginPath);
-        files.forEach(async (file) => {
-            if (file.endsWith('.js')) {
-                try {
-                    const plugin: IPlugin = require(path.join(pluginPath, file)) as unknown as IPlugin;
-                    IPluginLoader.RegisterPlugin(plugin, enviroment);
-                }
-                catch (e) {
-                    const tt = new TranslatedText(`❌plugin ${file} load failed`, `❌插件 ${file} 加载失败`);
-                    console.error(tt.get());
-                    t_snack(tt, SnackType.error);
-                    // 在 本应该 应该有 插件的位置 创建一个 lookAtMe 文件，以便我定位问题
-                    fs.writeFileSync(`./plugins/lookAtMe`, 'lookAtMe');
-                }
-            }
-        });
-
-        //debug 打印所有插件
-        console.log(Object.keys(IPluginLoader.plugins));
+        const endTime = new Date().getTime();
+        const tt = new TranslatedText(`🚀plugin loaded in ${endTime - startTime}ms`, `🚀插件加载完成，耗时 ${endTime - startTime}ms`);
+        console.log(tt.get(), `${IPluginLoader.plugins.length} plugins loaded, ${IPluginLoader.disabledPluginNames.length} disabled`);
+        t_snack(tt, SnackType.info);
     }
 
     //-===================== 插件配置 =====================
+    static transformPluginConfigToSave(pluginConfig: IPluginData[]) {
+        // 只保留 data
+        const pluginDataToSave = {};
+        pluginConfig.forEach((data) => {
+            pluginDataToSave[data.name] = data.data;
+        });
+        return pluginDataToSave;
+    }
+
     /** @function
      * @desc 保存单个插件的配置
      * 保存的配置是 pluginData 里面的 data
@@ -275,16 +287,15 @@ class IPluginLoader {
         // 但是我们不需要保存 pluginData里面的所有数据，比如说显示名称，描述，onChange等，只需要保存 data
         // data 是一个对象，包含了 插件的配置数据
 
-        const pluginDataToSave = {};
-        pluginData.forEach((data) => {
-            pluginDataToSave[data.name] = data.data;
-        });
+        const pluginDataToSave = IPluginLoader.transformPluginConfigToSave(pluginData);
 
         // debug
         const tt = new TranslatedText(`🔧plugin ${pluginName} config saved`, `🔧插件 ${pluginName} 配置已保存`
         );
         console.log(tt.get(), pluginName, pluginDataToSave);
-        ipcRenderer.invoke('save-plugin-config', pluginName, pluginDataToSave);
+        // ipcRenderer.invoke('save-plugin-config', pluginName, pluginDataToSave);
+        // 保存插件配置到文件
+        XXMMCore.savePluginConfig(pluginName, pluginDataToSave);
     }
 
     /** @function   

@@ -1317,7 +1317,8 @@ class IManager {
     saveConfigSync() {
         //debug
         console.log('saveConfig:', this._config);
-        ipcRenderer.invoke('set-current-config', this._config);
+        // ipcRenderer.invoke('set-current-config', this._config);
+        XXMMCore.saveCurrentConfigSync(this._config);
     }
 
     async getFilePath(fileName, fileType,defaultPath) {
