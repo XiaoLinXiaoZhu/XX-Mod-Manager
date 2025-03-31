@@ -248,7 +248,7 @@ watch(() => props.mod, async (newVal) => {
 
 const handleModNameChange = (event) => {
   //debug
-  console.log(`input mod name`,event.target.value,`of`,tempModInfo.value.id);
+  console.log(`input mod name`, event.target.value, `of`, tempModInfo.value.id);
   tempModInfo.value.name = event.target.value;
 
   // 检查 mod 名称是否为空，如果为空则设置为默认值
@@ -272,7 +272,7 @@ const handleModNameChange = (event) => {
 
 const handleHotkeyInput = (hotkey, value) => {
   //debug
-  console.log(`input hot key`,hotkey,value,`to`,tempModInfo.value.id);
+  console.log(`input hot key`, hotkey, value, `to`, tempModInfo.value.id);
   if (value === '') {
     // 删除快捷键
     const index = tempModInfo.value.hotkeys.indexOf(hotkey);
@@ -283,17 +283,17 @@ const handleHotkeyInput = (hotkey, value) => {
 }
 
 const addNewHotkeyByDescription = (description) => {
-  console.log(`add hot key`,description,`to`,tempModInfo.value.id);
+  console.log(`add hot key`, description, `to`, tempModInfo.value.id);
   tempModInfo.value.addHotkey("", description);
 }
 
 const addNewHotkeyByHotkey = (key) => {
-  console.log(`add hot key`,key,`to`,tempModInfo.value.id);
+  console.log(`add hot key`, key, `to`, tempModInfo.value.id);
   tempModInfo.value.addHotkey(key, "");
 }
 
 const handleSelectImage = async () => {
-  const imgPath = await iManager.getFilePath('preview', 'image',tempModInfo.value.preview);
+  const imgPath = await iManager.getFilePath('preview', 'image', tempModInfo.value.preview);
   if (imgPath) {
     const imgBase64 = await iManager.getImageBase64(imgPath);
     img.value = "data:image/png;base64," + imgBase64;
@@ -309,10 +309,10 @@ const handleCancel = async () => {
 const handleSave = () => {
   //debug
   const ifEqual = props.mod.equals(tempModInfo.value);
-  console.log('saved', saved,`equals`,ifEqual);
+  console.log('saved', saved, `equals`, ifEqual);
   // 保存修改的 mod 信息
-  
-  if (ifEqual) {
+
+  if (ifEqual && !changdPreviewByPaste) {
     // editModInfoDialog.value.$el.dismiss();
     // 点击按钮自动会关闭dialog，这里如果手动关闭会导致再次触发dismiss事件，导致不必要的性能消耗
     return;
@@ -330,7 +330,7 @@ const handleSave = () => {
   if (needChangePreview) {
     props.mod.setPreviewByPath(tempModInfo.value.preview);
   }
-  
+
   // 如果是通过粘贴操作更改的预览图片，则保存到本地
   if (changdPreviewByPaste) {
     props.mod.setPreviewByBase64(img.value);
@@ -349,7 +349,7 @@ let changdPreviewByPaste = false;
 onMounted(() => {
   // 监听 dialog 的 dismiss 事件，如果未保存则弹出保存更改的 dialog
   editModInfoDialog.value.$el.addEventListener('dismiss', () => {
-    console.log('dismiss','props.mod',props.mod,'tempModInfo',tempModInfo.value,saved);
+    console.log('dismiss', 'props.mod', props.mod, 'tempModInfo', tempModInfo.value, saved);
     if (!saved && !props.mod.equals(tempModInfo.value)) {
       iManager.showDialog('save-change-dialog');
     }
@@ -357,7 +357,7 @@ onMounted(() => {
   });
 
   // 监听 dialog 的 show 事件，再同步一次 tempModInfo
-  editModInfoDialog.value.$el.addEventListener('show',async () => {
+  editModInfoDialog.value.$el.addEventListener('show', async () => {
     tempModInfo.value = props.mod.copy();
     img.value = await props.mod.getPreviewBase64(true);
   });
@@ -365,7 +365,7 @@ onMounted(() => {
   // 监听粘贴操作，如果粘贴的是图片则将其设置为 mod 的预览图片
   window.addEventListener('paste', async (event) => {
     //debug
-    console.log('paste',event.clipboardData);
+    console.log('paste', event.clipboardData);
     const items = (event.clipboardData || event.originalEvent.clipboardData).items;
     for (const item of items) {
       if (item.kind === 'file') {

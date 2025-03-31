@@ -283,7 +283,7 @@ class ModData {
     }
 
     //-========== 保存mod信息 ===========
-    public async saveModInfo2() {
+    public async saveModInfoOld() {
         await this.checkModSourcePath();
         const modSourcePath = this.modSourcePath;
 

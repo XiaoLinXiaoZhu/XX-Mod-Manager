@@ -204,6 +204,9 @@ class ModInfo {
             console.error(`解析模块元数据失败：${this.location}`, json);
         }
 
+        //debug
+        console.log(`设置模块元数据：${this.location}`, metaData);
+
         // id 为必须的字段，如果没有则生成一个
         this.id = metaData['id'] || '';
         if (!this.id) {
@@ -211,8 +214,30 @@ class ModInfo {
         }
 
         // 保存modName 和 location
-        this.modName = metaData['name'] || this.modName;
-        this.location = metaData['location'] || this.location;
+        // 如果开启了保持mod名称和文件夹名称，那么当更改 modName 时，文件夹名称需要随着更改
+        if (ModInfo.ifKeepModNameAsModFolderName && metaData['name'] !== this.modName) {
+            // 更改文件夹名称
+            // 确认有无重复的文件夹名称
+            const newModFolderName = metaData['name'];
+            // debug
+            console.log(`更改模块名称：${this.modName} -> ${newModFolderName} in folder ${this.location}`);
+            const newModFolderPath = path.join(path.dirname(this.location), newModFolderName);
+            if (fs.existsSync(newModFolderPath)) {
+                console.error(`模块名称重复：${newModFolderName} 已存在`);
+                return;
+            }
+            // 重命名文件夹
+            fs.renameSync(this.location, newModFolderPath);
+            // 更新文件夹名称
+            this.modName = newModFolderName;
+            // 更新文件路径
+            this.location = newModFolderPath;
+            // id保持不变
+        } 
+        if (!ModInfo.ifKeepModNameAsModFolderName) {
+            this.modName = metaData['modName'] || this.modName;
+            this.location = metaData['location'] || this.location;
+        }
 
         // 读取模板中定义的数据
         for (const item of ModInfo.modDataTemplate.items) {
@@ -221,6 +246,7 @@ class ModInfo {
                 this.metaData.set(item.key, value, item.type);
             }
         }
+
 
         // debug
         console.log(`模块元数据：${this.location} from`, json, this);
