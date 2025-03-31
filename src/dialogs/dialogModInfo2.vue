@@ -51,16 +51,17 @@
             <div class="OO-setting-bar">
               <s-tooltip>
                 <h3 slot="trigger"> {{ $t('editDialog.mod-info-name') }} </h3>
-                <horizontalScrollBar class="OO-box OO-shade-box hotkey-container">
+                <horizontalScrollBar class="hotkey-container">
                   <p
                     style="line-height: 1.2; word-wrap: break-word; max-width: 120px; overflow-wrap: break-word; white-space: normal;">
                     {{ $t('editDialog.mod-info-name-tip') }} </p>
                 </horizontalScrollBar>
               </s-tooltip>
 
-              <s-button>
+              <!-- <s-button>
                 <p id="edit-mod-name"> {{ tempModInfo ? tempModInfo.name : "no name" }} </p>
-              </s-button>
+              </s-button> -->
+              <s-text-field :value="tempModInfo.name" @change="handleModNameChange" id="edit-mod-name" />
             </div>
 
             <!-- -mod角色 -->
@@ -99,7 +100,7 @@
                   {{ $t('editDialog.mod-info-hotkeys-tip') }} </p>
               </s-tooltip>
               <div style="display: flex;flex-direction: row;align-items: center;justify-content: space-between;">
-                <horizontalScrollBar class="OO-box OO-shade-box hotkey-container" scollSpeed=0.005 dragSpeed=1>
+                <horizontalScrollBar class="OO-box OO-shade-box hotkey-container" scrollSpeed=0.5 dragSpeed=1>
                   <div style="display: flex;flex-direction: row;flex-wrap: nowrap;padding: 0 10px;">
                     <div v-for="(hotkey, index) in tempModInfo.hotkeys" :key="index">
                       <s-tooltip>
@@ -206,6 +207,7 @@ import IManager from '../../electron/IManager';
 import DialogTemplate from './dialogTemplate.vue';
 import horizontalScrollBar from '../components/horizontalScrollBar.vue';
 import { ModData } from '../../core/ModHelper';
+import { TranslatedText } from '../../helper/Language';
 const iManager = new IManager();
 
 // 参数为 字符串类型的 mod，之后通过 iManager.getModInfo(mod) 获取 mod 信息
@@ -232,7 +234,7 @@ const img = ref(null);
 watch(() => props.mod, async (newVal) => {
   console.log('[dialogModInfo2] watch props.mod changed', newVal.name);
   // 检查newVal 的类型，应当为 ModData 类型，如果不是则尝试转化为 ModData 类型
-  if (!newVal instanceof ModData) {
+  if (!(newVal instanceof ModData)) {
     console.error('mod is not a ModData instance');
     return;
   }
@@ -243,6 +245,30 @@ watch(() => props.mod, async (newVal) => {
     img.value = await newVal.getPreviewBase64(true);
   }
 });
+
+const handleModNameChange = (event) => {
+  //debug
+  console.log(`input mod name`,event.target.value,`of`,tempModInfo.value.id);
+  tempModInfo.value.name = event.target.value;
+
+  // 检查 mod 名称是否为空，如果为空则设置为默认值
+  if (tempModInfo.value.name === '') {
+    tempModInfo.value.name = props.mod.name;
+    const tt = new TranslatedText(`Cannot set mod name to empty`, `无法将 mod 名称设置为空`);
+    iManager.t_snack(tt, `error`);
+  }
+
+  // 检查 mod 名称是否重复，如果重复则设置为默认值
+  if (tempModInfo.value.name !== props.mod.name) {
+    const modList = iManager.data.modList;
+    const modNameList = modList.map(mod => mod.name);
+    if (modNameList.includes(tempModInfo.value.name)) {
+      tempModInfo.value.name = props.mod.name;
+      const tt = new TranslatedText(`Mod name already exists`, `mod 名称已存在`);
+      iManager.t_snack(tt, `error`);
+    }
+  }
+}
 
 const handleHotkeyInput = (hotkey, value) => {
   //debug

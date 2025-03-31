@@ -75,6 +75,8 @@ class ModMetaData {
 //- 2. 将确认图片到底是哪个文件
 //- 3. 将图片转化为 缓存url 或者 base64
 class ModInfo {
+    public static ifKeepModNameAsModFolderName: boolean = false; // 是否保持 mod 名称和文件夹名称一致
+
     public static modDataTemplate: ModMetaData = new ModMetaData();
     public static setModDataTemplate(template: ModMetaData) {
         ModInfo.modDataTemplate = template;
@@ -114,6 +116,16 @@ class ModInfo {
             if (!this.id) {
                 this.generateID();
                 needSave = true;
+            }
+
+            // 对于modName，如果开启了保持一致，则需要保持一致，否则如果为空，则使用文件夹名称
+            const modFolderName = path.basename(location);
+            if (ModInfo.ifKeepModNameAsModFolderName && this.modName !== modFolderName) {
+                this.modName = modFolderName;
+                needSave = true;
+            }
+            if (!ModInfo.ifKeepModNameAsModFolderName) {
+                this.modName = metaData['modName'] || this.modName;
             }
 
             // 读取模板中定义的数据
@@ -179,6 +191,39 @@ class ModInfo {
         hash.update(this.location);
         this.id = hash.digest('hex');
         return this.id;
+    }
+
+    public setMetaDataFromJson(json: JSON) {
+        // 将 json 字符串转化为对象
+        let metaData = {};
+        // 处理一下，防止 json 解析失败
+        // 这里使用了深拷贝，防止引用问题
+        try {
+            metaData = JSON.parse(JSON.stringify(json));
+        } catch (e) {
+            console.error(`解析模块元数据失败：${this.location}`, json);
+        }
+
+        // id 为必须的字段，如果没有则生成一个
+        this.id = metaData['id'] || '';
+        if (!this.id) {
+            metaData["id"] = this.generateID();
+        }
+
+        // 保存modName 和 location
+        this.modName = metaData['name'] || this.modName;
+        this.location = metaData['location'] || this.location;
+
+        // 读取模板中定义的数据
+        for (const item of ModInfo.modDataTemplate.items) {
+            const value = metaData[item.key];
+            if (value !== undefined) {
+                this.metaData.set(item.key, value, item.type);
+            }
+        }
+
+        // debug
+        console.log(`模块元数据：${this.location} from`, json, this);
     }
 
     public saveMetaData() {

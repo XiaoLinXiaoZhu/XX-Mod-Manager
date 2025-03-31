@@ -7,6 +7,8 @@ import { EventType,EventSystem } from "../helper/EventSystem";
 import { SnackType,snack,t_snack } from "../helper/SnackHelper";
 
 import { ImageHelper } from "../helper/ImageHelper";
+import ModLoader from "./ModLoader";
+import { ModMetaDataType } from "./ModInfo";
 
 let count = 0;
 class ImageBase64 {
@@ -175,6 +177,8 @@ class ModData {
             // 这里需要深拷贝,不然传递的是一个引用
             JSON.parse(JSON.stringify(this.hotkeys))
         ).setModSourcePath(this.modSourcePath);
+        newModData.id = this.id;
+        newModData.index = this.index;
 
         return newModData;
     }
@@ -195,10 +199,10 @@ class ModData {
     //-========== 编辑预览图 ===========
     private async checkModSourcePath() {
         if (!this.modSourcePath) {
-            throw new Error("ModData.setPreviewBase64: modSourcePath is required, please call setModSourcePath() first");
+            throw new Error("ModData.checkModSourcePath: modSourcePath is required, please call setModSourcePath() first");
         }
         else if (!fs.existsSync(this.modSourcePath)) {
-            throw new Error("ModData.setPreviewBase64: modSourcePath does not exist");  
+            throw new Error("ModData.checkModSourcePath: modSourcePath does not exist");  
         }
     }
 
@@ -277,14 +281,46 @@ class ModData {
     }
 
     //-========== 保存mod信息 ===========
-    public async saveModInfo() {
+    public async saveModInfo2() {
         await this.checkModSourcePath();
         const modSourcePath = this.modSourcePath;
 
         //这里的 modInfo 是一个对象，不能直接传递给主进程
         //所以需要将 modInfo 转化为 json
         const jsonModInfo = JSON.stringify(this.toJson(), null, 4);
+        //debug
+        console.log(`ModData.saveModInfo: ${this.name}`,this, jsonModInfo);
         await ipcRenderer.invoke('save-mod-info', modSourcePath, jsonModInfo);
+    }
+
+    public async saveModInfo() {
+        // 改用 modInfo 的 saveMetaData 方法来保存 mod 信息
+        await this.checkModSourcePath();
+
+        if (!this.id) {
+            throw new Error("ModData.saveModInfo: id is required, please check if the mod is loaded");
+        }
+        const modInfo = ModLoader.getModByID(this.id);
+
+        if (!modInfo) {
+            throw new Error("ModData.saveModInfo: modInfo is not found, please check if the mod is loaded");
+        }
+
+        //debug
+        console.log(`ModData.saveModInfo: ${this.name}`,this, this.toJson());
+
+        // 保存 mod 信息，将this上所有的属性保存到 modInfo 上
+        // 这里需要深拷贝，不然会传递引用
+        const modInfoJson = JSON.parse(JSON.stringify(this.toJson()));
+        // preview 不保存具体的路径，只保存文件名
+        const previewName = path.basename(this.preview);
+        modInfoJson.preview = previewName;
+
+        //debug
+        console.log(`ModData.saveModInfo: ${this.name}`,this, modInfoJson);
+        // 保存 mod 信息
+        modInfo.setMetaDataFromJson(modInfoJson);
+        modInfo.saveMetaData();
     }
 
     //-========== 获取mod信息 ===========

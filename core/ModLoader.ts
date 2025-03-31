@@ -61,6 +61,10 @@ class ModLoader {
 
         return this.mods;
     }
+
+    public static getModByID(id: string): ModInfo | undefined {
+        return this.modsRaw.find(mod => mod.id === id);
+    }
 }
 
 // 测试一下
