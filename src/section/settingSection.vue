@@ -12,6 +12,8 @@
                 <s-divider></s-divider>
                 <settingBar :data="ifStartWithLastPresetData"></settingBar>
                 <s-divider></s-divider>
+                <settingBar :data="ifKeepModNameAsModFolderName"></settingBar>
+                <s-divider></s-divider>
                 <settingBar :data="openFirstLoadButton"></settingBar>
                 <div class="placeholder" style="flex: 1;min-height: 150px;"></div>
             </div>
@@ -392,6 +394,23 @@ const createShortOfCurrentConfig = {
         }).catch((err) => {
             console.log('createShortOfCurrentConfig failed:', err);
         });
+    }
+}
+
+const ifKeepModNameAsModFolderName = {
+    name: 'ifKeepModNameAsModFolderName',
+    data: iManager.config.ifKeepModNameAsModFolderName,
+    type: 'boolean',
+    displayName: 'Keep Mod Name As Mod Folder Name',
+    t_displayName: {
+        zh_cn: '保持mod名称与mod文件夹名称一致',
+        en: 'Keep Mod Name As Mod Folder Name'
+    },
+    onChange: (value) => {
+        console.log('ifKeepModNameAsModFolderName changed:', value);
+        ifKeepModNameAsModFolderName.data = value;
+
+        iManager.config.ifKeepModNameAsModFolderName = value;
     }
 }
 

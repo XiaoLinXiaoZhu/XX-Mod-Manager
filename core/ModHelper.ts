@@ -212,7 +212,8 @@ class ModData {
 
         // 将 previewPath 的 文件 复制到 modSourcePath 的 preview 文件夹下，并且将 mod 的 preview 属性设置为 previewPath，然后保存
         const previeFileName = path.basename(previewPath);
-        const previewDest = path.join(modSourcePath, this.name, previeFileName);
+        // const previewDest = path.join(modSourcePath, this.name, previeFileName);
+        const previewDest = path.join(this.getModPathSync(), previeFileName);
         fs.copyFileSync(previewPath, previewDest);
         this.preview = previewDest;
 
@@ -229,7 +230,8 @@ class ModData {
         const modSourcePath = this.modSourcePath;
         this.modPreviewBase64WithHeader.set(previewBase64);
 
-        const imageDest = path.join(modSourcePath, this.name, `preview.${this.modPreviewBase64WithHeader.getExt()}`);
+        // const imageDest = path.join(modSourcePath, this.name, `preview.${this.modPreviewBase64WithHeader.getExt()}`);
+        const imageDest = path.join(this.getModPathSync(), `preview.${this.modPreviewBase64WithHeader.getExt()}`);
 
         fs.writeFileSync(imageDest, this.modPreviewBase64WithHeader.withoutHeader(), 'base64');
 
@@ -346,9 +348,23 @@ class ModData {
         return ifWithHeader ? this.modPreviewBase64WithHeader.get() : this.modPreviewBase64WithHeader.withoutHeader();
     }
     
+    public getModPathSync() {
+        if (!this.modSourcePath) {
+            throw new Error("ModData.getModPathSync: modSourcePath is required, please call setModSourcePath() first");
+        }
+        else if (!fs.existsSync(this.modSourcePath)) {
+            throw new Error("ModData.getModPathSync: modSourcePath does not exist");  
+        }
+
+        // return path.join(this.modSourcePath, this.name);
+        // 因为 name 不一定 是文件夹，所以这里需要使用ModInfo的location
+        return ModLoader.getModByID(this.id)?.location || path.join(this.modSourcePath, this.name);
+    }
     public async getModPath() {
         await this.checkModSourcePath();
-        return path.join(this.modSourcePath, this.name);
+        // return path.join(this.modSourcePath, this.name);
+        // 因为 name 不一定 是文件夹，所以这里需要使用ModInfo的location
+        return ModLoader.getModByID(this.id)?.location || path.join(this.modSourcePath, this.name);
     }
 
 

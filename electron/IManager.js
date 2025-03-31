@@ -66,7 +66,8 @@ let g_config = {
         height: 600,
         x: -1,
         y: -1,
-    }
+    },
+    ifKeepModNameAsModFolderName: false
 };
 let g_data = {
     modList: [],
@@ -75,7 +76,7 @@ let g_data = {
 };
 
 //-==================== vue 版本的全局变量 ====================//
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 const g_temp_vue = {
     lastClickedMod: ref(null),
     currentMod: ref(null),
@@ -101,6 +102,7 @@ const g_config_vue = {
         x: -1,
         y: -1,
     }),
+    ifKeepModNameAsModFolderName: ref(false),
 };
 
 const g_data_vue = {
@@ -183,7 +185,8 @@ class IManager {
             height: 600,
             x: -1,
             y: -1,
-        }
+        },
+        ifKeepModNameAsModFolderName: false, // 是否保持 mod 名称和文件夹名称一致
     };
 
     // 程序运行时的数据
@@ -317,6 +320,14 @@ class IManager {
 
         //debug
         console.log('loadConfig adjust to:', this._config);
+
+        ModInfo.ifKeepModNameAsModFolderName = this.config.ifKeepModNameAsModFolderName;
+        watch(g_config_vue.ifKeepModNameAsModFolderName, (newValue) => {
+            ModInfo.ifKeepModNameAsModFolderName = newValue;
+            // debug
+            console.log('ifKeepModNameAsModFolderName changed to:', newValue);
+        });
+
         this.saveConfig();
     }
 

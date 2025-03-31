@@ -311,7 +311,7 @@ const handleSave = () => {
   const ifEqual = props.mod.equals(tempModInfo.value);
   console.log('saved', saved,`equals`,ifEqual);
   // 保存修改的 mod 信息
-
+  
   if (ifEqual) {
     // editModInfoDialog.value.$el.dismiss();
     // 点击按钮自动会关闭dialog，这里如果手动关闭会导致再次触发dismiss事件，导致不必要的性能消耗
@@ -330,6 +330,7 @@ const handleSave = () => {
   if (needChangePreview) {
     props.mod.setPreviewByPath(tempModInfo.value.preview);
   }
+  
   // 如果是通过粘贴操作更改的预览图片，则保存到本地
   if (changdPreviewByPaste) {
     props.mod.setPreviewByBase64(img.value);

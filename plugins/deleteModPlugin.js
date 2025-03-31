@@ -119,13 +119,13 @@ function addDeleteButton(iManager){
 
     // 单击时弹出提示
     deleteButton.onclick = () => {
-        const modName = document.getElementById('edit-mod-name').innerHTML;
+        const modName = document.getElementById('editDialog-mod-info-name').innerHTML;
         iManager.snack('双击以删除mod: '+modName, 'info');
     }
 
     // 双击时删除mod
     deleteButton.ondblclick = () => {
-        const modName = document.getElementById('edit-mod-name').innerHTML;
+        const modName = document.getElementById('editDialog-mod-info-name').innerHTML;
         deleteMod(iManager, modName);
     }
 
@@ -134,10 +134,10 @@ function addDeleteButton(iManager){
         const firstDiv = editModInfoContent.querySelector('div');
         console.log('firstDiv:', firstDiv);
         if (firstDiv) {
-            const sButton = firstDiv.querySelector('s-button');
-            console.log('sButton:', sButton);
-            if (sButton) {
-                firstDiv.insertBefore(deleteButton, sButton);
+            const targetElement = firstDiv.querySelector('#edit-mod-name');
+            console.log('edit-mod-name:', targetElement);
+            if (targetElement) {
+                firstDiv.insertBefore(deleteButton, targetElement);
                 iManager.snack('add delete button');
                 return;
             }
