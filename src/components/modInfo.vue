@@ -1,7 +1,7 @@
 <template>
     <div class="mod-info-card OO-box" ref="modInfoRef">
         <div class="mod-title">{{ props.mod ? props.mod.name : $t('modInfo.emptyTitle') }}</div>
-        <div class="mod-character OO-color-gradient">
+        <div class="mod-character OO-color-gradient" style="font-weight: 600;">
             <p> {{ props.mod ? props.mod.character : $t('modInfo.emptyCharacter') }}</p>
         </div>
         <div class="mod-image">
@@ -21,8 +21,7 @@
             <h4> {{ $t('modInfo.description') }}</h4>
 
             <div class="OO-box OO-shade-box a-little-left" id="mod-info-description">
-
-                <p id="mod-description" style="white-space: normal;">
+                <p id="mod-description" style="white-space: pre-warp;">
                     {{ props.mod ? props.mod.description : $t('modInfo.emptyDescription') }}
                 </p>
             </div>

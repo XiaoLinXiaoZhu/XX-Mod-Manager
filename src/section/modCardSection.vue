@@ -1,5 +1,6 @@
 <template>
     <div class="main-container">
+
         <leftMenu :tabs="presets" :translatedTabs="translatedPresets" @tabChange="handlePresetChange" ref="presetSelectorRef">
             <template #up-button>
                 <s-icon type="arrow_drop_up"></s-icon>
@@ -156,8 +157,9 @@ const presetSelectorRef = useTemplateRef('presetSelectorRef');
 function handleApplyButtonClicked() {
     // debug
     const mods = Array.from(document.querySelectorAll('.mod-item'));
+
     iManager.applyMods(selectedMods()).then(() => {
-        console.log('apply success');
+        console.log('apply success', selectedMods());
     });
 }
 
