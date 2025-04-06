@@ -41,3 +41,70 @@ git commit -m "修复版本 1.3.9-fix3"
 git tag v1.3.9-fix3
 git push origin v1.3.9-fix3 --force
 ```
+
+---
+
+以下是实现你描述的版本发布流程的 **完整操作指南**，包含命令、原理说明和最佳实践建议：
+
+---
+
+### **版本发布流程与对应命令**
+按照你的需求，版本顺序应为：  
+`1.3.10-alpha.0` → `1.3.10-alpha.1` → ... → `1.3.10` → `1.3.11-alpha.0` → ...
+
+#### **1. 从 `1.3.9` 开始首次预发布**
+```bash
+# 1. 确保当前版本是 1.3.9
+npm version patch --no-git-tag-version  # 1.3.9 → 1.3.10 (推进到下一修订版)
+npm version prerelease --preid=alpha    # 1.3.10 → 1.3.10-alpha.0
+
+# 2. 提交并打标签
+git add package.json
+git commit -m "Release 1.3.10-alpha.0"
+git tag v1.3.10-alpha.0
+git push --follow-tags
+```
+
+#### **2. 迭代预发布版本（alpha.1, alpha.2...）**
+```bash
+# 每次迭代只需运行（自动递增预发布序号）：
+npm version prerelease --preid=alpha    # 1.3.10-alpha.0 → 1.3.10-alpha.1
+git push --follow-tags
+```
+
+#### **3. 发布正式版本 `1.3.10`**
+```bash
+# 移除预发布标识符，生成正式版本
+npm version patch --no-git-tag-version  # 1.3.10-alpha.X → 1.3.10
+git add package.json
+git commit -m "Release 1.3.10"
+git tag v1.3.10
+git push --follow-tags
+```
+
+#### **4. 开启下一轮预发布（1.3.11-alpha.0）**
+```bash
+# 1. 先推进到下一修订版
+npm version patch --no-git-tag-version  # 1.3.10 → 1.3.11
+
+# 2. 添加预发布标识
+npm version prerelease --preid=alpha    # 1.3.11 → 1.3.11-alpha.0
+git push --follow-tags
+```
+
+### **操作流程图**
+```mermaid
+graph TB
+  A[当前版本: 1.3.9] --> B[npm version patch]
+  B --> C[1.3.10]
+  C --> D[npm version prerelease --preid=alpha]
+  D --> E[1.3.10-alpha.0]
+  E --> F[git push --follow-tags]
+  F --> G[Alpha测试迭代]
+  G --> H{npm version prerelease}
+  H --> I[1.3.10-alpha.1, alpha.2...]
+  I --> J[准备正式发布]
+  J --> K[npm version patch]
+  K --> L[1.3.10]
+  L --> M[开启下一轮: 1.3.11-alpha.0]
+```
