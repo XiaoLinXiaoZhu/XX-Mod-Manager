@@ -61,6 +61,27 @@ class ModLoader {
 
         return this.mods;
     }
+    static async loadMod(modPath: string) {
+        if (modPath === undefined || modPath === null || modPath === '') {
+            throw new Error('ModLoader.loadMod: modPath is empty');
+        }
+        if (!fs.existsSync(modPath)) {
+            throw new Error(`ModLoader.loadMod: modPath does not exist: ${modPath}`);
+        }
+        // check一下是否是文件夹
+        if (!fs.statSync(modPath).isDirectory()) {
+            throw new Error(`ModLoader.loadMod: modPath is not a directory: ${modPath}`);
+        }
+        let modInfo = new ModInfo(modPath);
+        this.modsRaw.push(modInfo);
+        const folder = path.dirname(modPath);
+        let modData = ModData.fromModInfo(modInfo).setModSourcePath(folder);
+        this.mods.push(modData);
+        return {
+            modInfo: modInfo,
+            modData: modData
+        };
+    }
 
     public static getModByID(id: string): ModInfo | undefined {
         return this.modsRaw.find(mod => mod.id === id);

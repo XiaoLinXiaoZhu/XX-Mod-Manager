@@ -106,7 +106,7 @@ class ModData {
         }
         return new ModData(
             json.name,
-            json.character || "unknown",
+            json.character || "Unknown",
             json.description || "no description",
             json.url || "",
             json.preview || "",
@@ -126,7 +126,7 @@ class ModData {
     public static fromModInfo(modInfo: ModInfo): ModData {
         const modData = new ModData(
             JSON.parse(JSON.stringify(modInfo.metaData.get('name') || modInfo.modName)),
-            JSON.parse(JSON.stringify(modInfo.metaData.get('character') || "unknow")),
+            JSON.parse(JSON.stringify(modInfo.metaData.get('character') || "Unknown")),
             JSON.parse(JSON.stringify(modInfo.metaData.get('description') || "no description")),
             JSON.parse(JSON.stringify(modInfo.metaData.get('url') || "no url")),
             "", // preview will be handled below

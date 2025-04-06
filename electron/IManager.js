@@ -451,9 +451,45 @@ class IManager {
 
         return data;
     }
-
     async loadModInfo(modName) {
+        const {modInfo, modData} = await ModLoader.loadMod(path.join(this.config.modSourcePath, modName));
+
+        if (modInfo == null) {
+            const tt = new TranslatedText({
+                zh_cn: `加载mod信息失败`,
+                en: `Failed to load mod info`,
+            });
+            t_snack(tt, SnackType.error);
+            console.error(tt.get(), modName);
+            return null;
+        }
+
+        // 如果是新的 mod，则触发 addMod 事件
+        if (modInfo.newMod) {
+            modInfo.newMod = false;
+            await EventSystem.trigger('addMod', modData);
+        }
+
+        // 将其添加到 modList 中，如果已经存在，则不添加
+        if (!this.data.modList.find((mod) => mod.name === modName)) {
+            //debug
+            console.log(`add mod ${modName} to modList`, this.data.modList.length);
+            this.data.modList.push(modData);
+        }else{
+            //debug
+            console.log(`mod ${modName} already exists`, this.data.modList.length);
+        }
+
+        // 刷新一下characterList
+        this.data.characterList = new Set(this.data.modList.map((mod) => mod.character));
+        this.data.characterList = Array.from(this.data.characterList).sort();
+
+        return modData;
+    }
+
+    async loadModInfoOld(modName) {
         const data = await ipcRenderer.invoke('get-mod-info', this.config.modSourcePath, modName);
+        
 
         if (data == null) {
             const tt = new TranslatedText({
@@ -888,7 +924,7 @@ class IManager {
         // extractFiles 只是将其解压到内存中，并不会写入到磁盘
         // 通过 extractCallback 可以获取到解压的文件，然后将其写入到磁盘
 
-        console.debug(archiveReader, archiveReader.workerUrl);
+        console.debug("archive config",archiveReader, archiveReader.workerUrl);
 
         const ifEncrypted = await archiveReader.hasEncryptedData();
 
@@ -1027,9 +1063,22 @@ class IManager {
         }
 
         // 等待所有文件解压完成
+        // 最大超时 10 秒
+        const maxWaitTime = 3000;
+        const startTime = new Date().getTime();
         while (callbackCount > 0 || !startCallback) {
             //debug
             console.log(`callbackCount: ${callbackCount}`);
+            if (new Date().getTime() - startTime > maxWaitTime && !startCallback) {
+                console.error(`Error: Extract can't start.The archive may be damaged or is empty`);
+                t_snack({
+                    zh_cn: `无法开始解压，压缩包可能损坏或为空`,
+                    en: `Unable to start extraction, the archive may be damaged or empty`,
+                }, 'error');
+                // snack(`解压失败,请手动解压`);
+                ifSuccess = false;
+                break;
+            }
             await new Promise((resolve) => setTimeout(resolve, 10));
         }
 

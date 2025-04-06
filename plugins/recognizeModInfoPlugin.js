@@ -124,7 +124,7 @@ const getModKeySwap = async (iManager, mod) => {
             if (hotkey.key === key.key) {
                 flag = true;
             }
-            if (hotkey.description == "未知" || hotkey.description == "unknown") {
+            if (hotkey.description == "未知" || hotkey.description == "Unknown") {
                 flag = false;
                 // 将未知项删除
                 removeHotkey.push(hotkey);

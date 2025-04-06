@@ -219,7 +219,7 @@ let saved = false;
 
 // modInfo 为 mod 信息，用于储存临时修改的 mod 信息，最后保存时再将其赋值给 props.mod
 const tempModInfo = ref(ModData.fromJson({
-  name: 'unknown',
+  name: 'Unknown',
   character: '',
   url: '',
   hotkeys: [],

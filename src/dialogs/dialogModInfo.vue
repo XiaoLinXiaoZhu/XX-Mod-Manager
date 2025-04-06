@@ -207,11 +207,11 @@ let saved = false;
 
 // modInfo 为 mod 信息，用于储存临时修改的 mod 信息，最后保存时再将其赋值给 props.mod
 const modInfo = ref({
-  name: 'unknow',
-  character: 'unknow',
+  name: 'Unknown',
+  character: '',
   preview: '',
   url: '',
-  description: 'unknow',
+  description: '',
 });
 const editModInfoDialog = useTemplateRef('edit-mod-dialog');
 const img = ref(null);
