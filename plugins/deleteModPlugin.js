@@ -37,6 +37,11 @@ function removeModFromList(iManager, modName) {
         return mod.name !== modName;
     });
 
+    // 如果currentMod是modName，则清空currentMod
+    if (iManager.temp.currentMod.name === modName) {
+        iManager.setCurrentMod(iManager.data.modList[0]);
+    }
+
     // 刷新角色列表
     iManager.refreshCharacterList();
 
@@ -100,7 +105,6 @@ function deleteMod(iManager, modName) {
     } else {
         iManager.snack('mod文件夹不存在: '+modPath, 'error');
     }
-
 }
 
 function addDeleteButton(iManager){

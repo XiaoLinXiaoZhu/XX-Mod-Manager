@@ -451,6 +451,7 @@ class IManager {
 
         return data;
     }
+
     async loadModInfo(modName) {
         const {modInfo, modData} = await ModLoader.loadMod(path.join(this.config.modSourcePath, modName));
 
@@ -1166,6 +1167,7 @@ class IManager {
             if (this.temp.currentCharacter !== null && this.temp.currentCharacter !== 'all' && this.temp.currentCharacter !== 'selected' && mod.character === 'Unknown') {
                 mod.character = this.temp.currentCharacter;
                 await mod.saveModInfo();
+                mod.triggerChanged();
             }
 
             this.setCurrentCharacter(mod.character);
@@ -1229,6 +1231,7 @@ class IManager {
         if (this.temp.currentCharacter !== null && this.temp.currentCharacter !== 'all' && this.temp.currentCharacter !== 'selected' && mod.character === 'Unknown') {
             mod.character = this.temp.currentCharacter;
             await mod.saveModInfo();
+            mod.triggerChanged();
         }
 
         this.setCurrentMod(mod);
