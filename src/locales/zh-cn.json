@@ -99,7 +99,9 @@
     "nextPage": "上一页",
     "forePage": "下一页",
     "confirm": "确认",
-    "refresh": "刷新"
+    "refresh": "刷新",
+    "all": "全部",
+    "selected": "已选择"
   },
   "firstLoad": {
     "huan-ying-shi-yong-xxmodmanagerxxmm": "欢迎使用 XX-mod-manager(XXMM)",

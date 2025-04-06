@@ -99,7 +99,9 @@
     "forePage": "Next page",
     "nextPage": "Previous page",
     "confirm": "confirm",
-    "refresh": "refresh"
+    "refresh": "refresh",
+    "all": "All",
+    "selected": "Selected"
   },
   "author": "author",
   "caimogu": "Caimogu",

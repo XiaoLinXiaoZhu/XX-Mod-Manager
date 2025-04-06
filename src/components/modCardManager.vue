@@ -1,7 +1,9 @@
 <template>
     <div id="mod-card-manager" class="OO-box" ref="modCardManagerRef">
-        <chipRadioBar class="characterFilter" :items="characters" @itemChange="handleFilterChange"
-            :translatedItems="translateCharacters" ref="characterFilterRef" />
+        <!-- <chipRadioBar class="characterFilter" :items="characters" @itemChange="handleFilterChange"
+            :translatedItems="translateCharacters" ref="characterFilterRef" /> -->
+        <ModCharacterFilter class="characterFilter" @itemChange="handleFilterChange" ref="characterFilterRef" @filterChangeToAll="handleFilterChangeToAll"
+            @filterChangeToSelected="handleFilterChangeToSelected" @filterChangeToSearch="handleFilterChangeToSearch" />
         <s-scroll-view style="overflow-x:hidden;overflow-y: auto;border-radius: 0 0 10px 10px;">
             <div class="refresh-placeholder" ref="refreshPlaceholderRef"></div>
             <div id="mod-container" :compact="compactMode" ref="modContainerRef">
@@ -22,6 +24,7 @@ import { Tween, Group } from "@tweenjs/tween.js";
 import IManager, { g_data_vue } from '../../electron/IManager';
 import { g_config_vue, g_temp_vue } from '../../electron/IManager';
 import { EventType, EventSystem } from '../../helper/EventSystem';
+import ModCharacterFilter from './modCharacterFilter.vue';
 
 const iManager = new IManager();
 
@@ -98,10 +101,63 @@ const setModCardRef = (name) => (el) => {
     modCardRefs.value[name] = el;
 };
 
+let wasSearching = false;
 // 定义 handleFilterChange 方法
 const handleFilterChange = (character) => {
     iManager.setCurrentCharacter(character);
 };
+
+const handleFilterChangeToAll = () => {
+    iManager.setCurrentCharacter('all');
+    if (wasSearching) {
+        wasSearching = false;
+        changeFilterToSearch('');
+    } else {
+        changeFilter('all');
+    }
+};
+
+const handleFilterChangeToSelected = () => {
+    iManager.setCurrentCharacter('selected');
+    if (wasSearching) {
+        wasSearching = false;
+        changeFilterToSearch('');
+    } else {
+        changeFilter('selected');
+    }
+};
+
+const handleFilterChangeToSearch = (search) => {
+    console.log('handleFilterChangeToSearch', search);
+    // currentCharacter变成all
+    // iManager.setCurrentCharacter('all');
+    // 但是筛选并不按照currentCharacter来筛选，而是按照搜索的内容来筛选
+    changeFilterToSearch(search);
+    wasSearching = true;
+};
+
+async function changeFilterToSearch(search){
+    // 筛选出所有 mod-item 元素
+    const modItems = document.querySelectorAll('.mod-item');
+    // 如果搜索内容为空，则显示所有 mod-item 元素
+    if (search === '') {
+        modItems.forEach(item => {
+            item.classList.remove('hidden');
+        });
+        return;
+    }
+    // 遍历 mod-item 元素，判断是否包含搜索内容
+    modItems.forEach(item => {
+        // 获取 mod-item 的名称
+        const name = item.getAttribute('id');
+        // 如果名称包含搜索内容，则显示，否则隐藏
+        if (name && name.includes(search)) {
+            item.classList.remove('hidden');
+        } else {
+            item.classList.add('hidden');
+        }
+    });
+}
 
 async function changeFilter(character) {
     // 通过设置 card 的 class 属性来实现筛选

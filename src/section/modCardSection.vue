@@ -68,7 +68,8 @@
 </template>
 
 <script setup>
-import modCardManager from '../components/modCardManager.vue'
+import modCardManager from '../components/modCardManager.vue';
+import modCardManager2 from '../components/modCardManager2.vue';
 import leftMenu from '../components/leftMenu.vue';
 import modInfo from '../components/modInfo.vue';
 import { ref, onMounted, useTemplateRef,watch, computed } from 'vue';
