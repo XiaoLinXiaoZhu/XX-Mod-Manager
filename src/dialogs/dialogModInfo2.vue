@@ -129,7 +129,7 @@
                       {{ $t('editDialog.edit-mod-hotkeys') }} </p>
                   </s-tooltip>
 
-                  <div class="OO-box OO-shade-box" style="width: 70vb;height: fit-content;overflow: hidden;">
+                  <div class="OO-box OO-shade-box" style="width: 70vb;height: fit-content;max-height: calc(100vh - 200px);overflow-y: auto;">
                     <div v-for="(hotkey, index) in tempModInfo.hotkeys" :key="index" class="hotkey-item OO-setting-bar">
                       <s-text-field :value="hotkey.description" @input="hotkey.description = $event.target.value"
                         style="left: 5px;" />
