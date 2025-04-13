@@ -1,6 +1,6 @@
 ---
-title: 开始写作
-description: 使用「Doku」创建和编写文档
+title: 概述
+description: 使用「XX Mod Manager」管理你的mod
 type: docs
 lang: zh-CN
 ---
