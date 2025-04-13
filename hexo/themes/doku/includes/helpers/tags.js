@@ -20,6 +20,8 @@ module.exports = function (hexo) {
         let html = '<ul class="doku-pagination">';
 
         const sidebar = hexo.theme.config.sidebar[page.lang][page.type];
+        // ensure sidebar is not empty
+        console.log(JSON.stringify(sidebar));
         const sidebarLinkArr = [];
         const sidebarNameArr = [];
         if (sidebar.level === 1) {
@@ -28,13 +30,18 @@ module.exports = function (hexo) {
                 sidebarLinkArr.push(url_for(item.split(' | ')[1]));
             }
         } else if (sidebar.level === 2) {
-            for (const obj of sidebar.items) {
-                for (const children of Object.values(obj)) {
-                    for (const item of children) {
-                        sidebarNameArr.push(item.split(' | ')[0]);
-                        sidebarLinkArr.push(url_for(item.split(' | ')[1]));
+            if (Array.isArray(sidebar.items)) {
+                for (const obj of sidebar.items) {
+                    for (const children of Object.values(obj)) {
+                        for (const item of children) {
+                            sidebarNameArr.push(item.split(' | ')[0]);
+                            sidebarLinkArr.push(url_for(item.split(' | ')[1]));
+                        }
                     }
                 }
+            }
+            else {
+                console.error('sidebar.items is not an array',typeof sidebar.items);
             }
         }
 
