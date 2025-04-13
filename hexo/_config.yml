@@ -3,12 +3,12 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle: ''
+title: XX-Mod-Manager
+subtitle: 'a mod manager for XX(zenless zone zero/honkai impact/star rail/genshin impact/wuthering waves)'
 description: ''
 keywords:
-author: John Doe
-language: en
+author: xiaolinxiaozhu
+language: zh-CN
 timezone: ''
 
 # URL
@@ -50,7 +50,7 @@ highlight:
   auto_detect: false
   tab_replace: ''
   wrap: true
-  hljs: false
+  hljs: true
 prismjs:
   enable: false
   preprocess: true
