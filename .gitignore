@@ -25,4 +25,4 @@ build
 *.sw?
 
 # doc
-docs/**
+docs/
