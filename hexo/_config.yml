@@ -13,7 +13,8 @@ timezone: ''
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
+url: https://xiaolinxiaozhu.github.io/XX-Mod-Manager  # 注意末尾无斜杠
+root: /XX-Mod-Manager/  # 必须以斜杠开头和结尾
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
