@@ -1,0 +1,33 @@
+name: Deploy Docs
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'hexo/**'
+      - '.github/workflows/deploy-docs.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Hexo
+        run: |
+          cd hexo
+          npm install
+      - name: Generate Docs
+        run: |
+          cd hexo
+          npx hexo clean && npx hexo generate
+          rm -rf ../docs/*
+          cp -r public/* ../docs/
+      - name: Commit Docs
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add ../docs/
+          git commit -m "Auto-generated docs [skip ci]" || echo "No changes to commit"
+          git push
