@@ -1,5 +1,3 @@
-<% const navbar = theme.navbar.links[page.lang]; %>
-
 <nav id="doku-navbar" class="navbar is-spaced has-shadow">
     <div class="container">
         <div class="navbar-brand">
@@ -19,17 +17,19 @@
         </div>
         <div class="navbar-menu">
             <div class="navbar-start">
-                <% for (const link of navbar) { %>
-                    <a class="navbar-item" href="<%= url_for(link.url) %>">
-                        <% if (link.logo) { %>
-                            <span class="icon">
-                                <i class="<%= link.logo %>"></i>
-                            </span>
-                        <% } %>
-                        <% if (link.text) { %>
-                            <span><%= link.text %></span>
-                        <% } %>
-                    </a>
+                <% if (check_navbar_config(theme.navbar)) { %>
+                    <% for (const link of theme.navbar.links[page.lang]) { %>
+                        <a class="navbar-item" href="<%= url_for(link.url) %>">
+                            <% if (link.logo) { %>
+                                <span class="icon">
+                                    <i class="<%= link.logo %>"></i>
+                                </span>
+                            <% } %>
+                            <% if (link.text) { %>
+                                <span><%= link.text %></span>
+                            <% } %>
+                        </a>
+                    <% } %>
                 <% } %>
                 <!-- navbar link -->
                 <!--<a class="navbar-item">
