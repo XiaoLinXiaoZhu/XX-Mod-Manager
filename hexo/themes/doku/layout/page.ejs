@@ -10,8 +10,9 @@
             <% if (page.description) { %>
                 <p class="subtitle"><%= page.description %></p>
             <% } %>
-            <% if (hexo.theme.github.repo && hexo.theme.github.edit_on_github) { %>
-                <a href="<%= 'https://github.com/' + hexo.theme.github.repo + '/tree/' + hexo.theme.github.branch + hexo.theme.github.source_dir + 'source/' + page.source %>" target="_blank" rel="external nofollow noreferrer noopener" class="button is-small is-rounded is-black"><span class="icon is-small"><i class="fab fa-github"></i></span><span>在 GitHub 上编辑</span></a>
+            <% check_github_config(theme.github) %>
+            <% if (theme.github.repo && theme.github.edit_on_github) { %>
+                <a href="<%= 'https://github.com/' + theme.github.repo + '/tree/' + theme.github.branch + theme.github.source_dir + 'source/' + page.source %>" target="_blank" rel="external nofollow noreferrer noopener" class="button is-small is-rounded is-black"><span class="icon is-small"><i class="fab fa-github"></i></span><span>在 GitHub 上编辑</span></a>
             <% } %>
         </div>
     </header>

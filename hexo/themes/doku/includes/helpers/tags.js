@@ -48,6 +48,13 @@ module.exports = function (hexo) {
         return true;
     }
     hexo.extend.helper.register('check_sidebar_config', check_sidebar_config);
+
+    /// check the config of github
+    function check_github_config(github) {
+        console.log(hexo.theme.config.github)
+        console.log(github);
+    }
+    hexo.extend.helper.register('check_github_config', check_github_config);
     
     hexo.extend.helper.register('page_nav', function (page = null) {
         page = (page === null) ? this.page : page;
