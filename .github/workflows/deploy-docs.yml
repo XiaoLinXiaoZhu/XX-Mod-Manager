@@ -22,11 +22,14 @@ jobs:
       - name: Install Hexo
         run: |
           cd hexo
+          ls -la
           npm install
 
       - name: Generate Docs
         run: |
           cd hexo
+          ls -la themes/doku/  # 检查主题文件
+          cat themes/doku/_config.yml  # 检查主题配置
           npx hexo clean && npx hexo generate
           # 由于 public_dir 指向 ../docs，文件已直接生成到 /docs，无需复制
 
