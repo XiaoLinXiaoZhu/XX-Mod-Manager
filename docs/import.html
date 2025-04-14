@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-<title>开始写作 | XX-Mod-Manager</title>
+<title>导入与启用Mod | XX-Mod-Manager</title>
 <meta name="generator" content="Hexo 6.3.0">
 <meta http-equiv="x-dns-prefetch-control" content="on">
 <meta name="description" content="">
@@ -170,20 +170,95 @@
 <article class="doku-document-container clearfix">
     <header class="hero is-light" id="doku-document-hero">
         <div class="hero-body">
-            <h1 class="title">开始写作</h1>
+            <h1 class="title">导入与启用Mod</h1>
             
-                <p class="subtitle">使用「Doku」创建和编写文档</p>
+                <p class="subtitle">使用xxmm导入你的第一个mod</p>
             
             
             
-                <a href="https://github.com/xiaolinxiaozhu/XX-Mod-Manager/tree/main/hexo/source/install - 副本 (3).md" target="_blank" rel="external nofollow noreferrer noopener" class="button is-small is-rounded is-black"><span class="icon is-small"><i class="fab fa-github"></i></span><span>在 GitHub 上编辑</span></a>
+                <a href="https://github.com/xiaolinxiaozhu/XX-Mod-Manager/tree/main/hexo/source/import.md" target="_blank" rel="external nofollow noreferrer noopener" class="button is-small is-rounded is-black"><span class="icon is-small"><i class="fab fa-github"></i></span><span>在 GitHub 上编辑</span></a>
             
         </div>
     </header>
     <div class="columns">
         <div class="column is-9-tablet doku-document-wrapper">
             <div class="content">
-                <h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2>
+                <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在使用 XX-Mod-Manager（以下简称 <code>XXMM</code>）时，您需要首先导入一个 Mod 并尝试启用它。本教程将逐步指导您完成这一过程。</p>
+<hr>
+<h2 id="1-准备工作"><a href="#1-准备工作" class="headerlink" title="1. 准备工作"></a>1. 准备工作</h2><p>在导入 Mod 前，请确保以下几点：</p>
+<ol>
+<li><strong>安装前置工具</strong>：请确保已安装并正确配置 Mod 加载器（如 3dmigoto、ZZMI）。</li>
+<li><strong>设置文件夹路径</strong>：<ul>
+<li><strong>Mod 源文件夹</strong>：存放所有 Mod 的目录。</li>
+<li><strong>Mod 目标文件夹</strong>：由 Mod 加载器读取并加载 Mod 的目录。</li>
+<li><strong>预设文件夹</strong>：存储 Mod 配置预设的目录。<blockquote>
+<p>注意：这三个文件夹路径不能相同，否则会导致程序无法正常运行。</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="2-导入-Mod"><a href="#2-导入-Mod" class="headerlink" title="2. 导入 Mod"></a>2. 导入 Mod</h2><p>XXMM 支持三种方式导入 Mod：</p>
+<ol>
+<li><p><strong>直接添加到 Mod 源文件夹</strong>：</p>
+<ul>
+<li>将解压后的 Mod 文件夹直接放入您配置的 Mod 源文件夹路径中。</li>
+<li>打开程序后，点击刷新按钮，新增的 Mod 会以卡片形式显示在 Mod 列表中。</li>
+</ul>
+</li>
+<li><p><strong>拖拽解压后的 Mod 文件夹</strong>：</p>
+<ul>
+<li>将解压后的 Mod 文件夹直接拖拽到 XXMM 界面中。</li>
+<li>程序会自动将 Mod 添加到 Mod 源文件夹，并刷新显示。</li>
+</ul>
+</li>
+<li><p><strong>拖拽压缩包文件</strong>：</p>
+<ul>
+<li>将包含 Mod 的压缩包文件直接拖拽到 XXMM 界面中。</li>
+<li>程序会自动解压并将其添加到 Mod 源文件夹中。</li>
+<li>如果压缩包有密码，程序会提示您输入密码。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="3-启用-Mod"><a href="#3-启用-Mod" class="headerlink" title="3. 启用 Mod"></a>3. 启用 Mod</h2><p>完成导入后，您可以按照以下步骤启用 Mod：</p>
+<ol>
+<li>在 <strong>Mod 列表</strong> 中找到您导入的 Mod 卡片。</li>
+<li>左键点击 Mod 卡片，将其设置为选中状态（高亮显示）。</li>
+<li>点击页面下方的 <strong>应用</strong> 按钮，程序会将选中的 Mod 创建虚拟链接到 Mod 目标文件夹中。</li>
+<li>打开 Mod 目标文件夹，确认已生成虚拟链接。</li>
+</ol>
+<hr>
+<h2 id="4-测试与验证"><a href="#4-测试与验证" class="headerlink" title="4. 测试与验证"></a>4. 测试与验证</h2><ol>
+<li>启动您的 Mod 加载器（如 3dmigoto）。</li>
+<li>确认加载器已正确读取 Mod 目标文件夹中的内容。</li>
+<li>启动游戏，检查 Mod 是否成功加载。</li>
+</ol>
+<hr>
+<h2 id="5-故障排除"><a href="#5-故障排除" class="headerlink" title="5. 故障排除"></a>5. 故障排除</h2><p>如果在导入或启用过程中遇到问题，请参考以下解决方法：</p>
+<ol>
+<li><strong>Mod 列表中未显示导入的 Mod</strong>：<ul>
+<li>检查 Mod 源文件夹路径是否正确。</li>
+<li>确认文件夹中是否存在有效的 Mod 文件夹。</li>
+<li>重启程序后再次尝试。</li>
+</ul>
+</li>
+<li><strong>压缩包拖拽失败</strong>：<ul>
+<li>确认压缩包是否完整，程序不支持分片压缩包。</li>
+<li>检查并输入正确的解压密码。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="6-下一步操作"><a href="#6-下一步操作" class="headerlink" title="6. 下一步操作"></a>6. 下一步操作</h2><p>完成第一个 Mod 的导入与启用后，您可以：</p>
+<ul>
+<li>了解如何管理多个 Mod 的启用状态，参考 <a href="preset.md">预设功能文档</a>。</li>
+<li>配置自动化功能，实现 Mod 加载器与游戏的自动启动，参考 <a href="automation.md">自动化功能文档</a>。</li>
+</ul>
+<hr>
+<p>如有其他问题，您可以访问帮助页面或联系项目维护者获取支持。</p>
+
             </div>
 
             <ul class="doku-pagination">
@@ -199,7 +274,7 @@
             <aside class="doku-document-toc" id="doku-document-toc">
                 <div class="doku-document-toc-content">
                     <p class="doku-document-toc-title">目录</p>
-                    <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="post-toc-text">测试</span></a></li></ol>
+                    <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="post-toc-text">概述</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="post-toc-text">1. 准备工作</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-%E5%AF%BC%E5%85%A5-Mod"><span class="post-toc-text">2. 导入 Mod</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-%E5%90%AF%E7%94%A8-Mod"><span class="post-toc-text">3. 启用 Mod</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-%E6%B5%8B%E8%AF%95%E4%B8%8E%E9%AA%8C%E8%AF%81"><span class="post-toc-text">4. 测试与验证</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#5-%E6%95%85%E9%9A%9C%E6%8E%92%E9%99%A4"><span class="post-toc-text">5. 故障排除</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#6-%E4%B8%8B%E4%B8%80%E6%AD%A5%E6%93%8D%E4%BD%9C"><span class="post-toc-text">6. 下一步操作</span></a></li></ol>
                 </div>
             </aside>
         </div>
