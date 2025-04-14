@@ -22,7 +22,6 @@ jobs:
       - name: Install Hexo
         run: |
           cd hexo
-          ls -la
           npm install
 
       - name: Generate Docs
