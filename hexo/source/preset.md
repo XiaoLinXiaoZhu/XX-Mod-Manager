@@ -1,7 +1,7 @@
 ---
 title: 使用 预设 功能
 description: 如题
-type: doc
+type: docs
 lang: zh-CN
 ---
 
