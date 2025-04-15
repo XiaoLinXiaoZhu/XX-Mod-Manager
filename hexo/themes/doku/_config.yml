@@ -36,14 +36,19 @@ sidebar:
         #
         # 2 level example:
         - 开始使用:
-          - 安装 | install.html
+          - 下载和安装 | install.html
           - 配置 | config.html
           - 导入你的第一个Mod | import.html
-          - 自动化 | automation.html
+          - 启动游戏 | start.html
           - 预设 | preset.html
+
         - 后续步骤:
+          - 管理模组 | manage.html
+          - 对象分类 | classification.html
+          - 自动化 | automation.html
           - 和XXMI协作 | workWithXXMI.html
           - 多游戏支持 | multiGame.html
+          - 插件 | plugin.html
 
 
 github:
