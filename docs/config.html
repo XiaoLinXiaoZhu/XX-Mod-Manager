@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-<title>开始写作 | XX-Mod-Manager</title>
+<title>环境配置 | XX-Mod-Manager</title>
 <meta name="generator" content="Hexo 6.3.0">
 <meta http-equiv="x-dns-prefetch-control" content="on">
 <meta name="description" content="">
@@ -186,9 +186,9 @@
 <article class="doku-document-container clearfix">
     <header class="hero is-light" id="doku-document-hero">
         <div class="hero-body">
-            <h1 class="title">开始写作</h1>
+            <h1 class="title">环境配置</h1>
             
-                <p class="subtitle">使用「Doku」创建和编写文档</p>
+                <p class="subtitle">配置「XXMM」所需的必要目录以及Mod加载器</p>
             
             
             
@@ -199,7 +199,27 @@
     <div class="columns">
         <div class="column is-9-tablet doku-document-wrapper">
             <div class="content">
-                <h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2>
+                <h2 id="作为一个-Mod-管理器"><a href="#作为一个-Mod-管理器" class="headerlink" title="作为一个 Mod 管理器"></a>作为一个 Mod 管理器</h2><p><strong>注意：</strong> XXMM只是一个 Mod 管理器，并不提供直接加载 Mod 的功能，因此需要依赖 Mod 加载器来完成 Mod 的载入。  </p>
+<p>在使用 <code>XX-Mod-Manager</code> 之前，请确保您已经安装了一个支持的 Mod 加载器（例如 3dmigoto、ZZMI、XXMI 等）。  </p>
+<p>如果您尚未安装 Mod 加载器，请先安装一个适合您游戏的加载器。如果你已经有一个Mod管理器那么就可以跳过这一步，直接看下面的<code>配置环境</code></p>
+<h2 id="配置环境"><a href="#配置环境" class="headerlink" title="配置环境"></a>配置环境</h2><p>在开始使用 <code>XX-Mod-Manager</code> 之前，您需要配置以下几个重要的文件夹路径：</p>
+<h3 id="Mod-源文件夹"><a href="#Mod-源文件夹" class="headerlink" title="Mod 源文件夹"></a><strong>Mod 源文件夹</strong></h3><p>这是您存储所有 Mod 文件的目录。  </p>
+<ul>
+<li><strong>功能</strong>：管理器会从这个文件夹中读取 Mod 文件，并根据需要将它们链接到目标文件夹。</li>
+<li><strong>建议</strong>：设置为一个专用的空文件夹，避免与其他文件混淆。</li>
+</ul>
+<h3 id="Mod-目标文件夹"><a href="#Mod-目标文件夹" class="headerlink" title="Mod 目标文件夹"></a><strong>Mod 目标文件夹</strong></h3><p>这是 Mod 加载器实际加载 Mod 的目录。  </p>
+<ul>
+<li><strong>功能</strong>：管理器会在该文件夹中创建虚拟链接，供 Mod 加载器使用。</li>
+<li><strong>警告</strong>：请勿手动在此文件夹中添加文件，以免影响程序的正常运行。</li>
+</ul>
+<h3 id="预设文件夹"><a href="#预设文件夹" class="headerlink" title="预设文件夹"></a><strong>预设文件夹</strong></h3><p>这是保存 Mod 配置预设的目录。  </p>
+<ul>
+<li><strong>功能</strong>：管理器会在这里存储一组 Mod 的启用&#x2F;禁用状态配置，帮助您快速切换不同的 Mod 组合。</li>
+<li><strong>建议</strong>：设置为一个空文件夹，便于管理。</li>
+</ul>
+<p><strong>注意：</strong> 以上三个文件夹的路径不能相同，否则会导致程序无法正常运行。</p>
+
             </div>
 
             <ul class="doku-pagination">
@@ -221,7 +241,7 @@
             <aside class="doku-document-toc" id="doku-document-toc">
                 <div class="doku-document-toc-content">
                     <p class="doku-document-toc-title">目录</p>
-                    <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="post-toc-text">测试</span></a></li></ol>
+                    <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BD%9C%E4%B8%BA%E4%B8%80%E4%B8%AA-Mod-%E7%AE%A1%E7%90%86%E5%99%A8"><span class="post-toc-text">作为一个 Mod 管理器</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83"><span class="post-toc-text">配置环境</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Mod-%E6%BA%90%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="post-toc-text">Mod 源文件夹</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Mod-%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="post-toc-text">Mod 目标文件夹</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%A2%84%E8%AE%BE%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="post-toc-text">预设文件夹</span></a></li></ol></li></ol>
                 </div>
             </aside>
         </div>
