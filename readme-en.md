@@ -43,9 +43,9 @@ XX-Mod-Manager is just a mod manager and does not include a mod loader. You can 
 tips: Please do not download the **XX-Mod-Manager-Setup-X.X.X.exe** file, as it is an installer that I have not tested and may have various issues.
 
 ### For Linux Users
-1. Download the latest version of the **xx-mods-manager-X.X.X.tar.xz** file.
-2. Extract the **xx-mods-manager-X.X.X.tar.xz** file.
-3. Run the **xx-mods-manager** program.
+1. Download the latest version of the **xx-mod-manager-X.X.X.tar.xz** file.
+2. Extract the **xx-mod-manager-X.X.X.tar.xz** file.
+3. Run the **xx-mod-manager** program.
 
 tips: I have not tested the program on Linux. The **automatically open game and mod loader** and **refresh mods in-game** features use Windows APIs and some Windows-specific features, so they may not work properly on Linux. However, the other features should work fine.
 

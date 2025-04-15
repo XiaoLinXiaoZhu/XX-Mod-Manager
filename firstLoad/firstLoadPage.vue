@@ -227,7 +227,7 @@
                         <h3> {{ $t('github') }} </h3>
                         <s-icon-button type="filled" slot="start" class="OO-icon-button"
                             style="border: 5px solid  var(--s-color-surface-container-high);transform: scale(1);left: 15px;"
-                            @click="iManager.openUrl('https://github.com/XiaoLinXiaoZhu/Mods-Manager-for-3Dmigoto')">
+                            @click="iManager.openUrl('https://github.com/XiaoLinXiaoZhu/XX-Mod-Manager')">
                             <s-icon><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
                                     <path d="m256-240-56-56 384-384H240v-80h480v480h-80v-344L256-240Z"></path>
                                 </svg></s-icon>

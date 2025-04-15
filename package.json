@@ -1,7 +1,7 @@
 {
-  "name": "xx-mods-manager",
+  "name": "xx-mod-manager",
   "private": true,
-  "description": "xx-mods-manager",
+  "description": "xx-mod-manager",
   "main": "./electron/main.js",
   "author": "XLXZ",
   "license": "GPL-3.0-only",

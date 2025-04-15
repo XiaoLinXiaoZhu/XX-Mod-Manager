@@ -47,9 +47,9 @@
 
 ### Linux 用户
 ```bash
-wget https://example.com/xx-mods-manager-X.X.X.tar.xz
-tar -xvf xx-mods-manager-X.X.X.tar.xz
-./xx-mods-manager
+wget https://example.com/xx-mod-manager-X.X.X.tar.xz
+tar -xvf xx-mod-manager-X.X.X.tar.xz
+./xx-mod-manager
 ```
 
 ## 快速入门
