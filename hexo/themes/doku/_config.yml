@@ -38,8 +38,12 @@ sidebar:
         - 开始使用:
           - 安装 | install.html
           - 配置 | config.html
-        - 基本操作:
-          - 编写 | writing.html
+          - 导入你的第一个Mod | import.html
+          - 自动化 | automation.html
+          - 预设 | preset.html
+        - 后续步骤:
+          - 和XXMI协作 | workWithXXMI.html
+          - 多游戏支持 | multiGame.html
 
 
 github:

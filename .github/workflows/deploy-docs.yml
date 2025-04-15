@@ -29,7 +29,8 @@ jobs:
           cd hexo
           ls -la themes/doku/  # 检查主题文件
           cat themes/doku/_config.yml  # 检查主题配置
-          npx hexo clean && npx hexo generate
+          # npx hexo clean && npx hexo generate 这里因为github会监听docs/目录的变化，所以如果清除可能会导致重复的提交，github page会构筑两次浪费时间
+          npx hexo generate
           # 由于 public_dir 指向 ../docs，文件已直接生成到 /docs，无需复制
 
       - name: Commit Docs
