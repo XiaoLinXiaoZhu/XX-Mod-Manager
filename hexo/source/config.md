@@ -1,11 +1,22 @@
 ---
-title: 开始写作
-description: 使用「Doku」创建和编写文档
+title: 环境配置
+description: 配置「XXMM」所需的必要目录以及Mod加载器
 type: docs
 lang: zh-CN
 ---
 
-## 3. 配置环境
+## 作为一个 Mod 管理器
+
+**注意：** XXMM只是一个 Mod 管理器，并不提供直接加载 Mod 的功能，因此需要依赖 Mod 加载器来完成 Mod 的载入。  
+
+在使用 `XX-Mod-Manager` 之前，请确保您已经安装了一个支持的 Mod 加载器（例如 3dmigoto、ZZMI、XXMI 等）。  
+
+如果您尚未安装 Mod 加载器，请先安装一个适合您游戏的加载器。如果你已经有一个Mod管理器那么就可以跳过这一步，直接看下面的`配置环境`
+
+
+
+
+## 配置环境
 
 在开始使用 `XX-Mod-Manager` 之前，您需要配置以下几个重要的文件夹路径：
 
