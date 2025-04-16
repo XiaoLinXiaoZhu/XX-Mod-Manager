@@ -149,7 +149,7 @@ async function changeFilterToSearch(search){
     // 遍历 mod-item 元素，判断是否包含搜索内容
     modItems.forEach(item => {
         // 获取 mod-item 的名称
-        const name = item.getAttribute('id');
+        const name = item.getAttribute('name');
         // 如果名称包含搜索内容，则显示，否则隐藏
         if (name && name.includes(search)) {
             item.classList.remove('hidden');

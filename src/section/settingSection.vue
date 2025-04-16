@@ -441,7 +441,7 @@ const ifUseTraditionalApply = {
                 iManager.config.ifKeepModNameAsModFolderName = false;
                 console.log('ifUseTraditionalApply changed:', value, 'modTarget and modSource need to be the same folder');
                 t_snack({
-                    zh_cn: 'mod目标和源文件夹需要是同一个文件夹',
+                    zh_cn: '在传统模式下，mod目标和源文件夹需要是同一个文件夹',
                     en: 'modTarget and modSource need to be the same folder'
                 }, SnackType.error)
                 return false;
