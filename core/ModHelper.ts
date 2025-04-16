@@ -3,8 +3,8 @@ const path = require("path");
 const { ipcRenderer } = require('electron');
 import { ModInfo } from "./ModInfo";
 
-import { EventType,EventSystem } from "../helper/EventSystem";
-import { SnackType,snack,t_snack } from "../helper/SnackHelper";
+import { EventType, EventSystem } from "../helper/EventSystem";
+import { SnackType, snack, t_snack } from "../helper/SnackHelper";
 
 import { ImageHelper } from "../helper/ImageHelper";
 import ModLoader from "./ModLoader";
@@ -14,9 +14,9 @@ let count = 0;
 class ImageBase64 {
     private base64WithHeader: string = "";
     public get = () => this.base64WithHeader;
-    public set = (base64WithHeader: string) =>{
+    public set = (base64WithHeader: string) => {
         this.base64WithHeader = base64WithHeader;
-        count ++ ;
+        count++;
     }
 
     public withoutHeader = () => this.base64WithHeader.split(',')[1];
@@ -38,21 +38,21 @@ class ImageBase64 {
 class ModData {
     public name: string;
     public character: string;
-    public description: string; 
+    public description: string;
     public url: string;
     public preview: string;
-    public hotkeys: {key: string;description: string;}[];
+    public hotkeys: { key: string; description: string; }[];
 
     private index = 0; // mod的id
     private static indexCount = 0; // mod的id计数器
 
-    public id:string = ""; // mod的id
+    public id: string = ""; // mod的id
 
     private modSourcePath: string = ""; // mod的源路径
     private oldPreview = ""; // 旧的预览图的路径
     // public modPreviewBase64: string = ""; // mod的预览图的base64，不包含头部
     public modPreviewBase64WithHeader: ImageBase64 = new ImageBase64(""); // mod的预览图的base64，包含头部
-    constructor(name: string, character: string, description: string, url: string, preview: string, hotkeys: {key: string;description: string;}[]) {
+    constructor(name: string, character: string, description: string, url: string, preview: string, hotkeys: { key: string; description: string; }[]) {
         this.name = name;
         this.character = character;
         this.description = description;
@@ -67,17 +67,17 @@ class ModData {
 
         // 为每个mod生成一个id
         this.index = ModData.indexCount;
-        ModData.indexCount ++;
+        ModData.indexCount++;
         //debug
         // const stackTrace = new Error();
         // console.log(`ℹ️ℹ️ℹ️ModData ${this.name} is being created`,this.id,stackTrace)
 
         // 当进入休眠状态时，清空缓存
-        EventSystem.on(EventType.windowSleep, async() => {
+        EventSystem.on(EventType.windowSleep, async () => {
             this.oldPreview = "";
             // this.modPreviewBase64 = "";
             this.modPreviewBase64WithHeader.clear();
-            
+
         });
     }
     // 析构函数
@@ -135,38 +135,54 @@ class ModData {
 
         modData.id = modInfo.id;
 
-        const handlePreview = () => {
-            const previewName = modInfo.metaData.get('preview') || "";
-            if (previewName) {
-                // If there is a preview name, construct the path
-                modData.preview = path.join(modInfo.location, previewName);
-            }
-            if (!modData.preview || !fs.existsSync(modData.preview) || !previewName) {
-                // If no preview exists, search for a preview image in the mod folder
-                const previewFiles = fs.readdirSync(modInfo.location);
-                const previewFile = previewFiles.find(file => file.startsWith('preview'));
-                if (previewFile) {
-                    modData.preview = path.join(modInfo.location, previewFile);
-                } else {
-                    // If no preview image is found, look for the first image file
-                    const imageFiles = previewFiles.filter(file =>
-                        file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg') ||
-                        file.endsWith('.gif') || file.endsWith('.bmp') || file.endsWith('.webp')
-                    );
-                    if (imageFiles.length > 0) {
-                        modData.preview = path.join(modInfo.location, imageFiles[0]);
-                    }
-                }
-            }
-            // If no preview is found after all attempts, set a default image
-            if (!modData.preview || !fs.existsSync(modData.preview)) {
-                modData.preview = path.resolve('./src/assets/default.png');
-            }
-        };
-
-        handlePreview();
+        ModData.handlePreview(modData, modInfo);
         return modData;
     }
+
+    static calcPreviewPath(modPath, previewName) {
+        let previewPath = "";
+        if (previewName) {
+            // If there is a preview name, construct the path
+            previewPath = path.join(modPath, previewName);
+        }
+        if (!previewPath || !fs.existsSync(previewPath) || !previewName) {
+            // If no preview exists, search for a preview image in the mod folder
+            const previewFiles = fs.readdirSync(modPath);
+            const previewFile = previewFiles.find(file => file.startsWith('preview'));
+            if (previewFile) {
+                previewPath = path.join(modPath, previewFile);
+            } else {
+                // If no preview image is found, look for the first image file
+                const imageFiles = previewFiles.filter(file =>
+                    file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg') ||
+                    file.endsWith('.gif') || file.endsWith('.bmp') || file.endsWith('.webp')
+                );
+                if (imageFiles.length > 0) {
+                    previewPath = path.join(modPath, imageFiles[0]);
+                }
+            }
+        }
+        // If no preview is found after all attempts, set a default image
+        if (!previewPath || !fs.existsSync(previewPath)) {
+            previewPath = path.resolve('./src/assets/default.png');
+        }
+
+        return previewPath;
+    }
+
+    static handlePreview(modData:ModData, modInfo:ModInfo) {
+        const previewName = modInfo.metaData.get('preview') || "";
+        const modPath = ModLoader.getModByID(modData.id)?.location || modData.getModPathSync() || "";
+        if (!modPath) {
+            throw new Error("ModData.handlePreview: modPath is required, please call setModSourcePath() first");
+        }
+        const previewPath = ModData.calcPreviewPath(modPath, previewName);
+
+        if (!modData.preview || !fs.existsSync(modData.preview)) {
+            modData.preview = previewPath;
+        }
+    };
+
     public copy(): ModData {
         const newModData = new ModData(
             this.name,
@@ -184,7 +200,7 @@ class ModData {
     }
     public equals(modData: ModData): boolean {
         //debug
-        console.log(`comparing......`,new Error(),this.index,this.toJson(),modData.index,modData.toJson());
+        console.log(`comparing......`, new Error(), this.index, this.toJson(), modData.index, modData.toJson());
         return JSON.stringify(this.toJson()) === JSON.stringify(modData.toJson());
     }
 
@@ -202,7 +218,7 @@ class ModData {
             throw new Error("ModData.checkModSourcePath: modSourcePath is required, please call setModSourcePath() first");
         }
         else if (!fs.existsSync(this.modSourcePath)) {
-            throw new Error("ModData.checkModSourcePath: modSourcePath does not exist");  
+            throw new Error("ModData.checkModSourcePath: modSourcePath does not exist");
         }
     }
 
@@ -269,7 +285,7 @@ class ModData {
             console.log("ModData.addHotkey: key and description are required");
             return;
         }
-        this.hotkeys.push({key, description});
+        this.hotkeys.push({ key, description });
     }
     public async removeHotkey(key: string) {
         if (key === undefined) {
@@ -291,7 +307,7 @@ class ModData {
         //所以需要将 modInfo 转化为 json
         const jsonModInfo = JSON.stringify(this.toJson(), null, 4);
         //debug
-        console.log(`ModData.saveModInfo: ${this.name}`,this, jsonModInfo);
+        console.log(`ModData.saveModInfo: ${this.name}`, this, jsonModInfo);
         await ipcRenderer.invoke('save-mod-info', modSourcePath, jsonModInfo);
     }
 
@@ -309,7 +325,7 @@ class ModData {
         }
 
         //debug
-        console.log(`ModData.saveModInfo: ${this.name}`,this, this.toJson());
+        console.log(`ModData.saveModInfo: ${this.name}`, this, this.toJson());
 
         // 保存 mod 信息，将this上所有的属性保存到 modInfo 上
         // 这里需要深拷贝，不然会传递引用
@@ -319,7 +335,7 @@ class ModData {
         modInfoJson.preview = previewName;
 
         //debug
-        console.log(`ModData.saveModInfo: ${this.name}`,this, modInfoJson);
+        console.log(`ModData.saveModInfo: ${this.name}`, this, modInfoJson);
         // 保存 mod 信息
         modInfo.setMetaDataFromJson(modInfoJson);
         modInfo.saveMetaData();
@@ -328,32 +344,32 @@ class ModData {
     //-========== 获取mod信息 ===========
     public async getPreviewBase64(ifWithHeader: boolean = false) {
         // 优化,改为使用ImageBase64类
-        if(!this.preview){
+        if (!this.preview) {
             return "";
         }
-        if(this.preview === this.oldPreview && !this.modPreviewBase64WithHeader.isEmpty()){
+        if (this.preview === this.oldPreview && !this.modPreviewBase64WithHeader.isEmpty()) {
             return ifWithHeader ? this.modPreviewBase64WithHeader.get() : this.modPreviewBase64WithHeader.withoutHeader();
         }
         this.oldPreview = this.preview;
-        if (ifWithHeader){
+        if (ifWithHeader) {
             // 1s 后 清理缓存
             // setTimeout(() => {
             //     ImageHelper.clearImageCache();
             // }, 1000);
             //debug
-            return ImageHelper.getImageUrlFromLocalPath(this.preview);
+            return ImageHelper.getImageUrlFromLocalPath(this.getModPreviewPath(), true);
         }
 
         this.modPreviewBase64WithHeader.set("data:image/png;base64," + await ipcRenderer.invoke('get-image', this.preview));
         return ifWithHeader ? this.modPreviewBase64WithHeader.get() : this.modPreviewBase64WithHeader.withoutHeader();
     }
-    
+
     public getModPathSync() {
         if (!this.modSourcePath) {
             throw new Error("ModData.getModPathSync: modSourcePath is required, please call setModSourcePath() first");
         }
         else if (!fs.existsSync(this.modSourcePath)) {
-            throw new Error("ModData.getModPathSync: modSourcePath does not exist");  
+            throw new Error("ModData.getModPathSync: modSourcePath does not exist");
         }
 
         // return path.join(this.modSourcePath, this.name);
@@ -367,18 +383,29 @@ class ModData {
         return ModLoader.getModByID(this.id)?.location || path.join(this.modSourcePath, this.name);
     }
 
+    public getModPreviewPath() {
+        // 检查 this.preview 是否存在
+        if (!this.preview || !fs.existsSync(this.preview)) {
+            // 重新计算 preview
+            this.preview = ModData.calcPreviewPath(this.getModPathSync(), this.preview);
+            //debug
+            console.log(`Recalculating preview path: ${this.preview}`);
+        }
+        return this.preview;
+    }
+
 
 
 
 
 
     //-========== 触发事件 ===========
-    public async triggerChanged(){
+    public async triggerChanged() {
         EventSystem.trigger(EventType.modInfoChanged, this);
     }
-    public async triggerCurrentModChanged(){    
+    public async triggerCurrentModChanged() {
         EventSystem.trigger(EventType.currentModChanged, this);
     }
 }
 
-export {ModData};
+export { ModData };

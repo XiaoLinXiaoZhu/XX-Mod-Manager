@@ -1,5 +1,5 @@
 <template>
-    <s-card ref="modItemRef" class="mod-item" :clicked=clicked clickable="true" :id="props.modRef.name" inWindow="none"
+    <s-card ref="modItemRef" class="mod-item" :clicked=clicked clickable="true" :id="props.modRef.id" inWindow="none" :name="props.modRef.name"
         :character="props.modRef.character" @click="click" :compact="props.compactMode"
         @contextmenu.prevent.stop="openEditModDialog">
 
@@ -147,7 +147,7 @@ function playClickAnim(modItem, event = null, rect = null) {
     }
     if (!modItem.inWindow) {
         //如果modItem不在视窗内，则不进行动画
-        console.log(`${modItem.id} is not in window: prop inWindow is ${modItem.inWindow}`);
+        console.log(`${modItem.name} | ${modItem.id} is not in window: prop inWindow is ${modItem.inWindow}`);
         return;
     }
 
@@ -158,7 +158,7 @@ function playClickAnim(modItem, event = null, rect = null) {
 
     if (modItem.inWindow == false) {
         //如果modItem不在视窗内，则不进行动画
-        console.log(`${modItem.id} is not in window: prop inWindow is ${modItem.inWindow}`);
+        console.log(`${modItem.name} | ${modItem.id} is not in window: prop inWindow is ${modItem.inWindow}`);
         return;
     }
 
@@ -288,7 +288,7 @@ watch(() => props.compactMode, (newVal, oldVal) => {
     }
     if (modItem.getAttribute('inWindow') != 'true') {
         //如果modItem不在视窗内，则不进行动画
-        console.log(`${modItem.id} is not in window: prop inWindow is ${modItem.getAttribute('inWindow')}`);
+        console.log(`${modItem.name} | ${modItem.id} is not in window: prop inWindow is ${modItem.getAttribute('inWindow')}`);
         return;
     }
     if (newVal) {

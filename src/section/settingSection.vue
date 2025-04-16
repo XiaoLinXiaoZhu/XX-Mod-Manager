@@ -28,6 +28,7 @@
 
                 <s-divider></s-divider>
                 <settingBar :data="presetPathData"></settingBar>
+                <settingBar :data="ifUseTraditionalApply"></settingBar>
 
                 <s-divider></s-divider>
                 <s-button class="OO-color-gradient" @click="console.log(iManager.config)">
@@ -196,6 +197,7 @@ const { t, locale } = useI18n()
 
 import { IPluginLoader } from '../../helper/PluginLoader.ts';
 import { EventSystem, EventType } from '../../helper/EventSystem.ts';
+import { SnackType, t_snack } from '../../helper/SnackHelper.ts';
 
 const tabs = ref(['normal', 'advanced', 'switch-config', 'about', 'plugin']);
 const translatedTabs = computed(() => {
@@ -411,6 +413,66 @@ const ifKeepModNameAsModFolderName = {
         ifKeepModNameAsModFolderName.data = value;
 
         iManager.config.ifKeepModNameAsModFolderName = value;
+    }
+}
+
+const ifUseTraditionalApply = {
+    name: 'ifUseTraditionalApply',
+    data: iManager.config.ifUseTraditionalApply,
+    type: 'boolean',
+    displayName: 'Use Traditional Apply',
+    t_displayName: {
+        zh_cn: '使用传统应用方式',
+        en: 'Use Traditional Apply'
+    },
+    description: 'If true, the mod will be applied in a traditional way',
+    t_description: {
+        zh_cn: '开启后，mod将以传统方式应用，使用传统模式时，将会通过更改文件夹名称来变更mod应用状态',
+        en: 'If true, the mod will be applied in a traditional way, using the traditional mode, the mod application status will be changed by changing the folder name'
+    },
+    onChange: (value) => {
+        // 检查：
+        // 1. modTarget和 modSource 需要是同一个文件夹
+        // 2. ifKeepModNameAsModFolderName 需要是 false
+
+        if (value) {
+            if (iManager.config.modTargetPath !== iManager.config.modSourcePath) {
+                iManager.config.ifUseTraditionalApply = false;
+                iManager.config.ifKeepModNameAsModFolderName = false;
+                console.log('ifUseTraditionalApply changed:', value, 'modTarget and modSource need to be the same folder');
+                t_snack({
+                    zh_cn: 'mod目标和源文件夹需要是同一个文件夹',
+                    en: 'modTarget and modSource need to be the same folder'
+                }, SnackType.error)
+                return false;
+            }
+            if (iManager.config.ifKeepModNameAsModFolderName) {
+                iManager.config.ifUseTraditionalApply = false;
+                console.log('ifUseTraditionalApply changed:', value, 'ifKeepModNameAsModFolderName need to be false');
+                t_snack({
+                    zh_cn: '使用该功能需要 关闭 保持mod名称与mod文件夹名称一致，请在 设置/常规设置 中关闭',
+                    en: 'ifKeepModNameAsModFolderName need to be false, please turn it off in the setting/normal setting'
+                }, SnackType.error)
+                return false;
+            }
+            // debug
+            console.log('ifUseTraditionalApply changed:', value);
+            ifUseTraditionalApply.data = true;
+            iManager.config.ifUseTraditionalApply = true;
+            // return true;
+        }
+        else {
+            // debug
+            console.log('ifUseTraditionalApply changed:', value);
+            ifUseTraditionalApply.data = false;
+            iManager.config.ifUseTraditionalApply = false;
+            // return false;
+        }
+
+        
+        
+
+        
     }
 }
 

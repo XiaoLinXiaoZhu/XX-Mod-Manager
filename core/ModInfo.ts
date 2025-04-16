@@ -283,6 +283,39 @@ class ModInfo {
         metaData['modName'] = this.modName;
         fs.writeFileSync(metaDataPath, JSON.stringify(metaData, null, 4), 'utf8');
     }
+
+    public rename(newName: string, callback: (err: any) => void) {
+        // 重命名mod
+        // 确认location是否存在
+        if (!fs.existsSync(this.location)) {
+            console.error(`模块不存在：${this.location}`);
+            callback(new Error(`模块不存在：${this.location}`));
+            return false;
+        }
+        // 确认有无重复的文件夹名称
+        const newModFolderName = newName;
+        const newModFolderPath = path.join(path.dirname(this.location), newModFolderName);
+        if (fs.existsSync(newModFolderPath)) {
+            console.error(`模块名称重复：${newModFolderName} 已存在`);
+            callback(new Error(`模块名称重复：${newModFolderName} 已存在`));
+            return false;
+        }
+        // 重命名文件夹
+        try{
+            fs.renameSync(this.location, newModFolderPath);
+        } catch (err) {
+            console.error(`重命名模块失败：${this.location} -> ${newModFolderPath}`, err);
+            callback(err);
+            return false;
+        }
+        // 更新文件夹名称
+        if (ModInfo.ifKeepModNameAsModFolderName) {
+            this.modName = newModFolderName;
+        }
+        // 更新文件路径
+        this.location = newModFolderPath;
+        return true;
+    }
 }
 
 //测试代码

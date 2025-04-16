@@ -560,7 +560,7 @@ ipcMain.handle('apply-mods', async (event, mods, modSourcePath, modTargetPath) =
         }
     });
 
-    // 复制选中的mod
+    // 为选中的mod创建链接
     mods.forEach(mod => {
         const src = path.join(modSourcePath, mod);
         const dest = path.join(modTargetPath, mod);

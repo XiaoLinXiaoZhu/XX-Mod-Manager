@@ -31,7 +31,28 @@ class ModLoader {
     // 加载 Mod
     static modsRaw: ModInfo[] = [];
     static mods: ModData[] = [];
+    private static afterLoadCallbacks: ((mods: ModData[]) => void)[] = [];
+
+    static onAfterLoad(callback: (mods: ModData[]) => void) {
+        if (typeof callback !== 'function') {
+            throw new Error('ModLoader.onAfterLoad: callback must be a function');
+        }
+        this.afterLoadCallbacks.push(callback);
+    }
+
+    private static triggerAfterLoadCallbacks() {
+        this.afterLoadCallbacks.forEach(callback => {
+            try {
+                callback(this.mods);
+            } catch (error) {
+                console.error('ModLoader.triggerAfterLoadCallbacks: error in callback', error);
+            }
+        });
+    }
+
     static async loadMods() {
+        // 检查一下调用堆栈
+        console.trace('ModLoader.loadMods: called from', new Error());
         let startTime = Date.now();
 
         this.modsRaw = [];
@@ -59,8 +80,13 @@ class ModLoader {
             console.log(`ModLoader.loadMods: loaded ${this.modsRaw.length} mods in ${Date.now() - startTime}ms`);
         });
 
+        // 触发回调函数
+        this.triggerAfterLoadCallbacks();
+        // 返回 mod 列表
+
         return this.mods;
     }
+
     static async loadMod(modPath: string) {
         if (modPath === undefined || modPath === null || modPath === '') {
             throw new Error('ModLoader.loadMod: modPath is empty');

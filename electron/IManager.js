@@ -67,7 +67,8 @@ let g_config = {
         x: -1,
         y: -1,
     },
-    ifKeepModNameAsModFolderName: false
+    ifKeepModNameAsModFolderName: false,
+    ifUseTraditionalApply: false,
 };
 let g_data = {
     modList: [],
@@ -77,6 +78,7 @@ let g_data = {
 
 //-==================== vue 版本的全局变量 ====================//
 import { ref, watch } from 'vue';
+import { applyMods, applyModsTranditional } from '../core/ApplyMods';
 const g_temp_vue = {
     lastClickedMod: ref(null),
     currentMod: ref(null),
@@ -103,6 +105,7 @@ const g_config_vue = {
         y: -1,
     }),
     ifKeepModNameAsModFolderName: ref(false),
+    ifUseTraditionalApply: ref(false),
 };
 
 const g_data_vue = {
@@ -187,6 +190,7 @@ class IManager {
             y: -1,
         },
         ifKeepModNameAsModFolderName: false, // 是否保持 mod 名称和文件夹名称一致
+        ifUseTraditionalApply: false, // 是否使用传统的应用方式
     };
 
     // 程序运行时的数据
@@ -305,7 +309,7 @@ class IManager {
             this.saveConfig();
             return;
         }
-        
+
         // this.config = currentConfig;
         // 这样会导致 较新的配置项 丢失，所以需要逐个赋值
         for (const key in currentConfig) {
@@ -383,7 +387,11 @@ class IManager {
             return;
         }
         ModLoader.addModSourceFolder(this.config.modSourcePath);
-        const loadModData = await ModLoader.loadMods(this.config.modSourcePath);
+        const loadModData = await ModLoader.loadMods();
+    }
+
+    async afterModsLoad(){
+        const loadModData = ModLoader.mods;
         const loadRawMods = ModLoader.modsRaw;
         // 如果 loadRawMods 中的mod 的 newMod 为 true，则将其设置为 false，并触发addMod事件
         // newMods 是 ModData 而不是 ModInfo 的数组
@@ -391,8 +399,6 @@ class IManager {
             const rawMod = loadRawMods.find((raw) => raw.id === modData.id);
             return rawMod && rawMod.newMod;
         });
-        //debug
-        console.log(`newMods:`, this.newMods);
 
         // loadModData 是一个 ModData 的数组，直接赋值给 data.modList
         this.data.modList = loadModData;
@@ -452,8 +458,29 @@ class IManager {
         return data;
     }
 
+    async getModInfoById(modId) {
+        let data = this.data.modList.find((mod) => mod.id === modId);
+
+        if (data == null) {
+            // 如果只知道id无法找到mod，那么也没办法将其载入
+            // 只能通过刷新所有的mod的方式才能够导入
+            await this.newLoadMods();
+            data = this.data.modList.find((mod) => mod.id === modId);
+            if (data == null) {
+                const tt = new TranslatedText({
+                    zh_cn: `无法找到id为${modId}的mod`,
+                    en: `Cannot find mod with id ${modId}`,
+                });
+                t_snack(tt, SnackType.error);
+                console.error(tt.get());
+                return null;
+            }
+        }
+        return data;
+    }
+
     async loadModInfo(modName) {
-        const {modInfo, modData} = await ModLoader.loadMod(path.join(this.config.modSourcePath, modName));
+        const { modInfo, modData } = await ModLoader.loadMod(path.join(this.config.modSourcePath, modName));
 
         if (modInfo == null) {
             const tt = new TranslatedText({
@@ -476,7 +503,7 @@ class IManager {
             //debug
             console.log(`add mod ${modName} to modList`, this.data.modList.length);
             this.data.modList.push(modData);
-        }else{
+        } else {
             //debug
             console.log(`mod ${modName} already exists`, this.data.modList.length);
         }
@@ -490,7 +517,7 @@ class IManager {
 
     async loadModInfoOld(modName) {
         const data = await ipcRenderer.invoke('get-mod-info', this.config.modSourcePath, modName);
-        
+
 
         if (data == null) {
             const tt = new TranslatedText({
@@ -557,6 +584,8 @@ class IManager {
 
         // 加载mod
         startTime = new Date().getTime();
+        // 挂载回调
+        ModLoader.onAfterLoad(this.afterModsLoad.bind(this));
         await this.newLoadMods();
         endTime = new Date().getTime();
         console.log('✅>> loadMods done, cost', endTime - startTime, 'ms');
@@ -687,6 +716,18 @@ class IManager {
         this.trigger('currentModChanged', this.temp.currentMod);
     }
 
+    async setCurrentModById(modId) {
+        this.temp.currentMod = await this.getModInfoById(modId);
+        if (this.temp.currentMod === null) {
+            //debug
+            console.error('mod not found', modId);
+            return;
+        }
+        //debug
+        console.log(`setCurrentModById: ${modId}`, this.temp.currentMod, this.hashCode(this.temp.currentMod));
+        this.trigger('currentModChanged', this.temp.currentMod);
+    }
+
     async toggledModByName(modName) {
         const mod = await this.getModInfo(modName);
         this.trigger('toggledMod', mod);
@@ -750,7 +791,7 @@ class IManager {
         toUrl = toUrl.replace(/\/switchConfig$/, '');
         // 防止最后为 / ，导致出现 // 的情况，所以再截取一次
         toUrl = toUrl.replace(/\/$/, ''); // 去掉最后的 /
-        
+
         toUrl = toUrl + url + '/index.html';
 
         console.log('change url to:', toUrl);
@@ -925,7 +966,7 @@ class IManager {
         // extractFiles 只是将其解压到内存中，并不会写入到磁盘
         // 通过 extractCallback 可以获取到解压的文件，然后将其写入到磁盘
 
-        console.debug("archive config",archiveReader, archiveReader.workerUrl);
+        console.debug("archive config", archiveReader, archiveReader.workerUrl);
 
         const ifEncrypted = await archiveReader.hasEncryptedData();
 
@@ -1330,7 +1371,15 @@ class IManager {
             return;
         }
         //debug
-        await ipcRenderer.invoke('apply-mods', modList, modSourcePath, modTargetPath);
+        // await ipcRenderer.invoke('apply-mods', modList, modSourcePath, modTargetPath);
+        // await applyMods(modList, modSourcePath, modTargetPath);
+        if (this.config.ifUseTraditionalApply){
+            await applyModsTranditional(modList);
+        }
+        else {
+            await applyMods(modList, modSourcePath, modTargetPath);
+        }
+        
         this.trigger('modsApplied', modList);
         // ipcRenderer.send('snack', '应用成功');
         t_snack({
@@ -1388,8 +1437,8 @@ class IManager {
         XXMMCore.saveCurrentConfigSync(this._config);
     }
 
-    async getFilePath(fileName, fileType,defaultPath) {
-        const filePath = await ipcRenderer.invoke('get-file-path', fileName, fileType,defaultPath);
+    async getFilePath(fileName, fileType, defaultPath) {
+        const filePath = await ipcRenderer.invoke('get-file-path', fileName, fileType, defaultPath);
         //debug
         console.log('=================================');
         console.log(filePath);
@@ -1478,7 +1527,7 @@ class IManager {
             if (!fs.existsSync(destDir)) {
                 fs.mkdirSync(destDir, { recursive: true });
             }
-        
+
             const files = fs.readdirSync(srcDir);
             files.forEach(file => {
                 const srcFile = path.join(srcDir, file);
@@ -1495,13 +1544,13 @@ class IManager {
     on = EventSystem.on;
     trigger = EventSystem.trigger;
 
-    static triggerWakeUp(){
+    static triggerWakeUp() {
         console.log('🌞wakeUp');
         t_snack({
             zh_cn: '🌞程序正常启动~',
             en: '🌞Program is waking up~',
         })
-        EventSystem.trigger('wakeUp',this.instance);
+        EventSystem.trigger('wakeUp', this.instance);
     }
 
     //-===================== 插件 =====================
@@ -1558,7 +1607,7 @@ function waitInitIManager() {
 const wakeUpConditionCount = 2
 let wakeUpCondition = 0
 // 只有同时满足 主进程那边确认这次是 初次加载 以及 这里 插件加载完成（也就是startdone）之后，才会触发 wakeUp 事件
-ipcRenderer.on('wakeUp', () => {  
+ipcRenderer.on('wakeUp', () => {
     wakeUpCondition++;
     if (wakeUpCondition == wakeUpConditionCount) {
         IManager.triggerWakeUp();

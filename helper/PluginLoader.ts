@@ -4,7 +4,7 @@ import XXMMCore from "../core/XXMMCore";
 import { EventType, EventSystem } from "./EventSystem";
 import { TranslatedText } from "./Language";
 import { PathHelper } from "./PathHelper";
-import { SnackType, t_snack } from "./SnackHelper";
+import { snack, SnackType, t_snack } from "./SnackHelper";
 const pathOsName = 'path'
 const path = require(pathOsName);
 const fs = require('fs');
@@ -218,6 +218,9 @@ class IPluginLoader {
      */
     static async LoadPluginsFromFolder(enviroment: any, folder: string) {
         if (!PathHelper.CheckDir(folder, false, true, new TranslatedText('plugin folder', '插件文件夹'))) {
+            // 不存在就创建
+            fs.mkdirSync(folder, { recursive: true });
+            t_snack(new TranslatedText('create plugin folder', '创建插件文件夹'), SnackType.info);
             return;
         }
         const files = fs.readdirSync(folder);

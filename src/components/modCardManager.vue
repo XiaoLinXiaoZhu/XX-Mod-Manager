@@ -8,7 +8,7 @@
             <div class="refresh-placeholder" ref="refreshPlaceholderRef"></div>
             <div id="mod-container" :compact="compactMode" ref="modContainerRef">
                 <modCard v-for="mod in mods" :modRef="mod" :lazyLoad=true :compactMode="compactMode"
-                    :ref="setModCardRef(mod.name)" />
+                    :ref="setModCardRef(mod.id)" />
             </div>
             <div class="placeholder"></div>
         </s-scroll-view>
@@ -97,8 +97,8 @@ const loadMods = async () => {
 // 绑定 mod卡片的引用
 const modCardRefs = ref({});
 // 定义 setModCardRef 方法
-const setModCardRef = (name) => (el) => {
-    modCardRefs.value[name] = el;
+const setModCardRef = (id) => (el) => {
+    modCardRefs.value[id] = el;
 };
 
 let wasSearching = false;
@@ -356,10 +356,10 @@ onMounted(async () => {
         event.stopPropagation();
 
         const modItem = event.target.closest('.mod-item');
-        if (modItem && modItem.id != iManager.temp.currentMod.name) {
+        if (modItem && modItem.id != iManager.temp.currentMod.id) {
             event.dataTransfer.dropEffect = 'copy';
             // iManager.setLastClickedMod_ByName(modItem.id);
-            iManager.setCurrentModByName(modItem.id);
+            iManager.setCurrentModById(modItem.id);
         }
     });
 
