@@ -773,6 +773,8 @@ class IManager {
     }
 
     async openUrl(url) {
+        //debug
+        console.log('open url:', url);
         if (url === '') {
             snack('链接为空');
             return;
