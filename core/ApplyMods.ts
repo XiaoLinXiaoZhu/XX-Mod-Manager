@@ -1,6 +1,6 @@
 import { ModInfo } from "./ModInfo";
 import ModLoader from "./ModLoader";
-import { ModData } from "./ModHelper";
+
 import { SnackType, t_snack } from "../helper/SnackHelper";
 import { TranslatedText } from "../helper/Language";
 

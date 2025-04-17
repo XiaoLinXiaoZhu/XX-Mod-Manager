@@ -1,7 +1,8 @@
 <template>
     <div class="main-container">
 
-        <leftMenu :tabs="presets" :translatedTabs="translatedPresets" @tabChange="handlePresetChange" ref="presetSelectorRef">
+        <leftMenu :tabs="presets" :translatedTabs="translatedPresets" @tabChange="handlePresetChange"
+            ref="presetSelectorRef">
             <template #up-button>
                 <s-icon type="arrow_drop_up"></s-icon>
             </template>
@@ -50,6 +51,32 @@
         </div>
         <div class="bottom-right">
             <!-- <s-button @click="handleApplyButtonClicked" /> -->
+            <s-popup align="top">
+                <s-tooltip slot="trigger" style="position: relative;left: 15px;">
+                    <s-icon-button icon="image" class="OO-button"
+                        style="border: 5px solid var(--s-color-surface-container-high);transform: scale(1);"
+                        slot="trigger">
+                        <s-icon type="chevron_down"></s-icon>
+                    </s-icon-button>
+
+                    <p style="line-height: 1.2;">
+                        {{ $t('editDialog.batch-operation') }} </p>
+                </s-tooltip>
+                <div style="width: 600px;height: max-content;">
+                    <div class="OO-setting-bar" style="width: 600px;">
+                    <h3>{{ $t('editDialog.batch-set-character') }}</h3>
+                    <div class="OO-s-text-field-container" >
+                        <s-text-field v-model="targetCharacter">
+                        </s-text-field>
+                        <s-icon-button type="filled" slot="start" class="OO-icon-button"
+                            @click="handleBatchSetCharacterButtonClicked">
+                            <s-icon type="add"></s-icon>
+                        </s-icon-button>
+                    </div>
+                </div>
+            </div>
+                
+            </s-popup>
             <s-button @click="handleApplyButtonClicked" id="apply-button"
                 class="OO-color-gradient font-hongmeng OO-button" style="color: var(--s-color-surface);">
                 {{ $t('buttons.apply') }}
@@ -72,12 +99,14 @@ import modCardManager from '../components/modCardManager.vue';
 import modCardManager2 from '../components/modCardManager2.vue';
 import leftMenu from '../components/leftMenu.vue';
 import modInfo from '../components/modInfo.vue';
-import { ref, onMounted, useTemplateRef,watch, computed } from 'vue';
+import { ref, onMounted, useTemplateRef, watch, computed } from 'vue';
 import IManager from '../../electron/IManager';
-import { g_temp_vue , g_config_vue,g_data_vue } from '../../electron/IManager';
+import { g_temp_vue, g_config_vue, g_data_vue } from '../../electron/IManager';
 import fsProxy from '../../electron/fsProxy';
 const iManager = new IManager();
+import settingBar from '../components/settingBar.vue';
 import { EventType, EventSystem } from '../../helper/EventSystem';
+import { SnackType, t_snack } from '../../helper/SnackHelper';
 
 const displayModRef = g_temp_vue.currentMod;
 
@@ -99,6 +128,40 @@ function handlePresetAddButtonClicked() {
 function handleRefreshButtonClicked() {
     const { ipcRenderer } = require('electron');
     ipcRenderer.send('refresh-main-window');
+}
+
+const targetCharacter = ref('');
+function handleBatchSetCharacterButtonClicked(){
+    console.log('batch set character button clicked', targetCharacter.value);
+    const ModIds = selectedModIds();
+
+    if (!targetCharacter.value) {
+        t_snack({
+            zh_cn: '请输入角色名',
+            en: 'Please enter the character name',
+        },SnackType.error);
+        console.error('targetCharacter is empty');
+        return;
+    }
+    if (ModIds.length == 0) {
+        t_snack({
+            zh_cn: '请至少选择一个mod',
+            en: 'Please select at least one mod',
+        },SnackType.error);
+        console.error('selectedModIds is empty');
+        return;
+    }
+    ModIds.forEach(async modId => {
+        const ModData = await iManager.getModInfoById(modId);
+        //debug
+        console.log('ModData', ModData, targetCharacter.value);
+        console.log('TargetCharacter', targetCharacter.value);
+        if (ModData && targetCharacter.value) {
+            ModData.character = targetCharacter.value;
+            ModData.saveModInfo();
+            ModData.triggerChanged();
+        }
+    });
 }
 
 //-============================== Compact Mode ==============================
@@ -141,13 +204,15 @@ function handlePresetChange(tab) {
     iManager.setCurrentPreset(tab);
 }
 
-const selectedMods = () => Array.from(document.querySelectorAll('.mod-item')).filter(item => item.getAttribute('clicked') == 'true').map(item => item.id);
+const selectedModIds = () => Array.from(document.querySelectorAll('.mod-item')).filter(item => item.getAttribute('clicked') == 'true').map(item => item.id);
+const selectedModNames = () => Array.from(document.querySelectorAll('.mod-item')).filter(item => item.getAttribute('clicked') == 'true').map(item => item.name);
+
 
 function savePreset() {
     if (currentPreset.value == 'default') return;
     //debug
-    console.log('save preset', currentPreset.value, selectedMods());
-    iManager.savePreset(currentPreset.value, selectedMods());
+    console.log('save preset', currentPreset.value, selectedModIds());
+    iManager.savePresetByModIds(currentPreset.value, selectedModIds());
 }
 
 const presetSelectorRef = useTemplateRef('presetSelectorRef');
@@ -159,8 +224,8 @@ function handleApplyButtonClicked() {
     // debug
     const mods = Array.from(document.querySelectorAll('.mod-item'));
 
-    iManager.applyMods(selectedMods()).then(() => {
-        console.log('apply success', selectedMods());
+    iManager.applyMods(selectedModIds()).then(() => {
+        console.log('apply success', selectedModIds());
     });
 }
 
@@ -203,6 +268,12 @@ EventSystem.on('toggledMod', (mod) => {
     /* background-color: var(--s-color-primary); */
     display: flex;
     justify-content: space-between;
+    align-items: center;
+}
+
+.bottom-right {
+    display: flex;
+    justify-content: flex-end;
     align-items: center;
 }
 

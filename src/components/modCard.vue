@@ -1,6 +1,6 @@
 <template>
-    <s-card ref="modItemRef" class="mod-item" :clicked=clicked clickable="true" :id="props.modRef.id" inWindow="none" :name="props.modRef.name"
-        :character="props.modRef.character" @click="click" :compact="props.compactMode"
+    <s-card ref="modItemRef" class="mod-item" :clicked=clicked clickable="true" :id="props.modRef.id" inWindow="none"
+        :name="props.modRef.name" :character="props.modRef.character" @click="click" :compact="props.compactMode"
         @contextmenu.prevent.stop="openEditModDialog">
 
         <div slot="image" style="height: 200px;" v-if="ifDisplayImage">
@@ -15,9 +15,14 @@
             <s-scroll-view>
                 <!-- <p id="mod-hotkeys">Hotkeys: {{ displayHotKeys }}</p> -->
                 <p id="mod-item-description">{{ props.modRef.description }}</p>
+                <p v-if="props.displayHotKeysMode == displayHotKeysModes.inline">
+                    <!-- 将按键拼合为文本 -->
+                    {{props.modRef.hotkeys.map(hotkey => hotkey.description + "->" +hotkey.key).join('  ')}}
+                </p>
                 <div class="placeholder"></div>
             </s-scroll-view>
-            <horizontalScrollBar class="OO-box OO-shade-box hotkey-container" scrollSpeed=0.1 dragSpeed=1>
+            <horizontalScrollBar v-if="props.displayHotKeysMode == displayHotKeysModes.scrollbar"
+                class="OO-box OO-shade-box hotkey-container" scrollSpeed=0.1 dragSpeed=1>
                 <div style="display: flex;flex-direction: row;flex-wrap: nowrap;">
                     <div v-for="(hotkey, index) in props.modRef.hotkeys" :key="index">
                         <s-tooltip>
@@ -46,8 +51,14 @@ const iManager = new IManager();
 import horizontalScrollBar from './horizontalScrollBar.vue';
 
 import { EventSystem, EventType } from '../../helper/EventSystem';
-import { ModData } from '../../core/ModHelper';   
-import { DialogHelper,DialogID } from '../../helper/DialogHelper';
+import { ModData } from '../../core/ModHelper';
+import { DialogHelper, DialogID } from '../../helper/DialogHelper';
+
+const displayHotKeysModes = {
+    none: 0,
+    inline: 1,
+    scrollbar: 2,
+}
 
 const props = defineProps({
     modRef: {
@@ -56,6 +67,10 @@ const props = defineProps({
     },
     lazyLoad: Boolean,
     compactMode: Boolean,
+    displayHotKeysMode: {
+        type: Number,
+        default: 1
+    },
 })
 const enteredWindow = ref(false);
 
@@ -74,7 +89,7 @@ const getImage = async () => {
             return '';
         }
         ifDisplayImage.value = true;
-        return await props.modRef.getPreviewBase64(true);   
+        return await props.modRef.getPreviewBase64(true);
     }
     else {
         return await props.modRef.getPreviewBase64(true);
@@ -389,6 +404,7 @@ defineExpose({
     height: 80px;
     border: 0;
 }
+
 .mod-item[compact="true"] {
     width: 250px;
     height: 150px;
@@ -415,6 +431,23 @@ defineExpose({
 <style scoped>
 .hotkey-container {
     overflow-y: hidden;
+    overflow-x: auto;
+    height: 25px;
+    align-items: center;
+    max-width: 450px;
+    padding: 0px 0px;
+    border-radius: 0 20px 0 20px;
+
+    position: absolute;
+    bottom: 5px;
+    left: 10px;
+    right: 5px;
+}
+
+.hotkey-container-inline {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
     overflow-x: auto;
     height: 25px;
     align-items: center;

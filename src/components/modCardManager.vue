@@ -218,7 +218,8 @@ async function changeFilter(character) {
 
 
 async function loadPreset(presetName) {
-    const mods = await iManager.loadPreset(presetName);
+    const preset = await iManager.loadPreset(presetName);
+    const mods = preset?.getModIds() || [];
     //遍历modCardRefs，如果 满足 mods.includes(mod.name) ^ mod.clicked 则调用click
     for (const [key, value] of Object.entries(modCardRefs.value)) {
         if (!value) continue;

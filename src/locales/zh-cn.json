@@ -84,7 +84,9 @@
     "cancel": "取消",
     "ignore": "忽略",
     "changeNotSave": "检测到未保存的更改",
-    "ifSaveChange": "是否保存更改？"
+    "ifSaveChange": "是否保存更改？",
+    "batch-operation": "批量操作",
+    "batch-set-character": "批量设置角色"
   },
   "buttons": {
     "save": "保存",

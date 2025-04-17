@@ -432,7 +432,7 @@ class IManager {
 
     async loadPreset(presetName) {
         if (presetName === 'default') {
-            return [];
+            return null;
         }
 
         const preset = PresetHelper.getPresetByName(presetName);
@@ -440,9 +440,8 @@ class IManager {
             snack(`Preset ${presetName} not found`);
             return null;
         }
-        const modNames = preset.getModNames();
-        console.log(`load preset ${presetName}`, preset, modNames);
-        return modNames;
+        console.log(`load preset ${presetName}`, preset, preset.modIds.length);
+        return preset;
     }
 
     async getModInfo(modName) {
@@ -1348,9 +1347,14 @@ class IManager {
         await ipcRenderer.send('open-new-window', windowPath);
     }
 
-    async savePreset(presetName, data) {
+    async savePresetByModNames(presetName, modNames) {
         // ipcRenderer.invoke('save-preset', presetName, data);
-        PresetHelper.savePresetByName(presetName, data);
+        PresetHelper.savePresetByName(presetName, modNames);
+    }
+
+    async savePresetByModIds(presetName,modIds){
+        // ipcRenderer.invoke('save-preset', presetName, data);
+        PresetHelper.savePresetById(presetName,modIds);
     }
 
     async applyMods(modList) {

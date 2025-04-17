@@ -264,7 +264,16 @@ class PresetHelper {
             return;
         }
         preset.setModsByNames(modNames).savePreset();
-        console.log(`PresetHelper.savePresetByName: ${name} saved`);
+        console.log(`PresetHelper.savePresetByName: ${name} saved`, preset.modIds);
+    }
+    public static savePresetById(name: string, modIds: string[]) {
+        const preset = PresetHelper.getPresetByName(name);
+        if (preset === undefined) {
+            console.warn(`PresetHelper.savePresetById: ${name} not found`);
+            return;
+        }
+        preset.setModsByIds(modIds).savePreset();
+        console.log(`PresetHelper.savePresetById: ${name} saved`, preset.modIds);
     }
 }
 
