@@ -81,7 +81,7 @@ const modContainerCss = `
 function addHoverEffect (document, iManager) {
     document.querySelectorAll('.mod-item').forEach((item) => {
         item.addEventListener('mouseover', () => {
-            const modName = item.getAttribute('id');
+            const modName = item.getAttribute('name');
             //debug
             console.log('hoverSwitchCurrentCard:', modName);
             // iManager.setLastClickedMod_ByName(modName);
@@ -92,7 +92,7 @@ function addHoverEffect (document, iManager) {
 function removeHoverEffect(document, iManager) {
     document.querySelectorAll('.mod-item').forEach((item) => {
         item.removeEventListener('mouseover', () => {
-            const modName = item.getAttribute('id');
+            const modName = item.getAttribute('name');
             //debug
             console.log('hoverSwitchCurrentCard:', modName);
             // iManager.setLastClickedMod_ByName(modName);

@@ -116,7 +116,7 @@ async function applyMods(
     );
 
     // 如果有错误，抛出错误
-    if (isError || 1) {
+    if (isError) {
         t_snack(new TranslatedText(
             `Failed to create link in ${modTargetPath}, please check permissions or confirm if your disk type supports creating links. Or you can use the traditional way to apply mod.`,
             `无法在 ${modTargetPath} 中创建链接，请检查权限或是确认您的磁盘类型是否支持创建链接。或者您可以换用使用传统方式应用mod。`

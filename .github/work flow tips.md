@@ -67,8 +67,8 @@ git push --follow-tags
 
 #### **2. 迭代预发布版本（alpha.1, alpha.2...）**
 ```bash
-# 每次迭代只需运行（自动递增预发布序号）：
-npm version prerelease --preid=alpha    # 1.3.10-alpha.0 → 1.3.10-alpha.1
+# 每次迭代只需运行（自动递增预发布序号）：# 1.3.10-alpha.0 → 1.3.10-alpha.1
+npm version prerelease --preid=alpha    
 git push --follow-tags
 ```
 
