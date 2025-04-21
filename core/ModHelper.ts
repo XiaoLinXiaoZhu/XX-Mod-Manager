@@ -380,7 +380,20 @@ class ModData {
         await this.checkModSourcePath();
         // return path.join(this.modSourcePath, this.name);
         // 因为 name 不一定 是文件夹，所以这里需要使用ModInfo的location
-        return ModLoader.getModByID(this.id)?.location || path.join(this.modSourcePath, this.name);
+        const modData = ModLoader.getModByID(this.id);
+        if (modData) {
+            if (modData.location){
+                return modData.location
+            }
+            else {
+                console.warn(`Didn't find location of modData ${this.id}`);
+                return path.join(this.modSourcePath, this.name);
+            }
+        }
+        else {
+            console.warn(`Can't get modData of ${this.id}`)
+            return path.join(this.modSourcePath, this.name);
+        }
     }
 
     public getModPreviewPath() {
