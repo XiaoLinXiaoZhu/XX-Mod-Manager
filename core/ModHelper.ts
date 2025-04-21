@@ -376,6 +376,8 @@ class ModData {
         // 因为 name 不一定 是文件夹，所以这里需要使用ModInfo的location
         return ModLoader.getModByID(this.id)?.location || path.join(this.modSourcePath, this.name);
     }
+
+    
     public async getModPath() {
         await this.checkModSourcePath();
         // return path.join(this.modSourcePath, this.name);
