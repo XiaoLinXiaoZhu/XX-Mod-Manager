@@ -235,7 +235,8 @@ class ModInfo {
             // id保持不变
         } 
         if (!ModInfo.ifKeepModNameAsModFolderName) {
-            this.modName = metaData['modName'] || this.modName;
+            // 两个格式不一样，一个是 name，而metadata 是 modName
+            this.modName = metaData['name'] || this.modName;
             this.location = metaData['location'] || this.location;
         }
 
