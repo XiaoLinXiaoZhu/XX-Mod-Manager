@@ -242,6 +242,8 @@ class IManager {
                 // console.log(`data set: ${key}`, value);
                 // 不保存 modList，因为 modList 是一个对象数组，如果 传来传去，会导致内存占用过大
                 if (key === 'modList') {
+                    // 打印 err
+                    console.log(`data set: ${key}`, new Error());
                     // 如果 modList 变化，则 触发 modListChanged 事件
                     EventSystem.trigger(EventType.modListChanged, value);
                     return true;
@@ -493,15 +495,19 @@ class IManager {
 
         // 如果是新的 mod，则触发 addMod 事件
         if (modInfo.newMod) {
+            //debug
+            console.log(`new mod ${modName}`, modInfo);
             modInfo.newMod = false;
-            await EventSystem.trigger('addMod', modData);
+            EventSystem.trigger('addMod', modData);
         }
 
         // 将其添加到 modList 中，如果已经存在，则不添加
-        if (!this.data.modList.find((mod) => mod.name === modName)) {
+        if (!this.data.modList.find((mod) => mod.id === modData.id)) {
             //debug
-            console.log(`add mod ${modName} to modList`, this.data.modList.length);
+            // 将之前的 modList 复制一遍（复制引用）
             this.data.modList.push(modData);
+            //! 这里有点问题，我需要手动刷新一下
+            console.log(`add mod ${modName} to modList`, this.data.modList.length);
         } else {
             //debug
             console.log(`mod ${modName} already exists`, this.data.modList.length);

@@ -257,6 +257,16 @@ EventSystem.on(EventType.modListChanged, () => {
     }, 1);
 });
 
+EventSystem.on(EventType.addMod, (mod) => {
+    //debug
+    console.log('get addMod, reload display mods', mods.value);
+    mods.value = null;
+    setTimeout(() => {
+        loadMods();
+        observeMods();
+    }, 1);
+});
+
 EventSystem.on('currentPresetChanged', (preset) => {
     loadPreset(preset);
 });
