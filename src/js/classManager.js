@@ -12,7 +12,7 @@
 
 //-============ 优化：如果窗口睡眠就停止刷新 ==========
 let isSleep = false;
-import { EventSystem } from "../../helper/EventSystem";
+import { EventSystem, EventType } from "../../helper/EventSystem";
 
 EventSystem.on('windowFocus',()=>{ isSleep = false;});
 EventSystem.on('windowSleep',()=>{ isSleep = true;});
@@ -74,6 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const instance = ClassManagerService.instance;
     //debug
     console.log(instance);
+    // instance.onPageInit();
+    // instance.update();
+});
+
+EventSystem.on(EventType.pluginLoaded, () => {
+    const instance = ClassManagerService.instance;
     instance.onPageInit();
     instance.update();
 });

@@ -145,7 +145,7 @@ colorManager.onUpdate = function () {
 }
 
 colorManager.needRefresh = true;
-colorManager.onPageInit = function () {}
+colorManager.onPageInit = function () {colorManager.refresh(); }
 colorManager.init = function (element) { }
 colorManager.destroy = function (element) {
     element.style.backgroundColor = '';
@@ -164,27 +164,31 @@ colorManager2.onUpdate = function () {
     });
 }
 
-colorManager2.needRefresh = true;
-colorManager2.onPageInit = function () {}
+// colorManager2.needRefresh = true;
+colorManager2.onPageInit = function () {colorManager2.refresh(); }
 colorManager2.init = function (element) { }
 colorManager2.destroy = function (element) {
     element.style.color = '';
 }
 
-//-========================= OO-color-gradient-svg ========================
-// const colorManagerSvg = new ClassManager('OO-color-gradient-svg');
-// colorManagerSvg.onUpdate = function () {
-//     const currentColor = getColor();
-//     this.items.forEach(item => {
-//         const svg = item.querySelector('svg');
-//         const group = svg.querySelector('g');
-//         group.setAttribute('fill', `#${currentColor}`);
-//     });
-// }
-// colorManagerSvg.needRefresh = true;
-// colorManagerSvg.onPageInit = function () {}
-// colorManagerSvg.init = function (element) { }
-// colorManagerSvg.destroy = function (element) { }
+//-========================= OO-color-gradient-border ========================
+// 定义 classManager
+const colorManager3 = new ClassManager('OO-color-gradient-border');
+colorManager3.onUpdate = function () {
+    //debug
+    group.update();
+    const currentColor = getColor();
+    this.items.forEach(item => {
+        item.style.borderColor = `#${currentColor}`;
+    });
+}
+
+// colorManager3.needRefresh = true;
+colorManager3.onPageInit = function () {colorManager3.refresh(); }
+colorManager3.init = function (element) { }
+colorManager3.destroy = function (element) {
+    element.style.borderColor = '';
+}
 
 
 //-========================= OO-OO-capering ========================
