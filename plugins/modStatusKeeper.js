@@ -333,8 +333,8 @@ If you use XXMM as your mod manager, the program will try to automatically get t
             data: "", // Default to empty string
             displayName: 'D3DX User INI Path',
             t_displayName: {
-                zh_cn: 'D3DX 用户 INI 路径',
-                en: 'D3DX User INI Path'
+                zh_cn: 'd3dx_user.ini 路径',
+                en: 'd3dx_user.ini Path'
             },
             onChange: (value) => {
                 // check if the provided path is valid
@@ -379,7 +379,17 @@ If you use XXMM as your mod manager, the program will try to automatically get t
                             en: "Cannot enable auto-sync: No backup files (.msk) found. Please create backups first or enable 'I DON'T CARE ABOUT BACKUPS'.",
                             zh_cn: "无法启用自动同步：未找到备份文件(.msk)。请先创建备份或启用'我不在乎备份'。"
                         }, 'warning');
-                        return;
+                        return false; // Prevent enabling auto-sync
+                    }
+
+                    // Check if d3dx_user.ini path is set
+                    const d3dxUserPath = getD3dxUserPath(); 
+                    if (!d3dxUserPath) {
+                        iManager.t_snack({
+                            en: "d3dx_user.ini path is not set",
+                            zh_cn: "d3dx_user.ini路径未设置"
+                        }, 'error');
+                        return false; // Prevent enabling auto-sync
                     }
 
                     autoUpdater.data = value;
@@ -1274,14 +1284,9 @@ The plugin is able to create log files to assist with debugging and recording op
         const getD3dxUserPath = () => {
             const defaultPath = d3dxUserIniPath.data;
             if (!defaultPath) {
-                log('d3dx_user.ini path is not set', 'ERROR');
-                iManager.t_snack({
-                    en: "d3dx_user.ini path is not set",
-                    zh_cn: "d3dx_user.ini路径未设置"
-                }, 'error');
-                return null;
+                log('d3dx_user.ini path is not set, attempting to find it automatically...','WARNING');
             }
-            if (fs.existsSync(defaultPath)) {
+            if (defaultPath && fs.existsSync(defaultPath)) {
                 return defaultPath;
             }
             // 如果不存在，则尝试利用 iManager.config.modSourcePath 或者 iManager.config.modTargetPath 构建路径
@@ -1290,14 +1295,21 @@ The plugin is able to create log files to assist with debugging and recording op
                 path.join(path.resolve(iManager.config.modSourcePath), '..', 'XXMI', 'ZZMI', 'd3dx_user.ini'),
             ];
             for (const p of tryPaths) {
+                //debug
+                log(`Checking for d3dx_user.ini at: ${p}`);
                 if (fs.existsSync(p)) {
+                    // Once we find a valid path, we can return it immediately
+                    log(`Found d3dx_user.ini at: ${p}`);
+                    // Set it to d3dxUserPath
+                    // d3dxUserIniPath.data = p; // Update the path in the plugin data
+                    iManager.setPluginData(pluginName, d3dxUserIniPath.name, p);
                     return p;
                 }
             }
             log(`d3dx_user.ini not found at any expected location: ${tryPaths.join(', ')}`, 'ERROR');
             iManager.t_snack({
-                en: "d3dx_user.ini not found at any expected location",
-                zh_cn: "在任何预期位置未找到d3dx_user.ini"
+                en: "d3dx_user.ini not found at any expected location, please set the path manually",
+                zh_cn: "在任何预期位置未找到d3dx_user.ini，请手动设置路径"
             }, 'error');
             return null;
         }
@@ -1902,7 +1914,8 @@ The plugin is able to create log files to assist with debugging and recording op
 
         // Register cleanup handler for when plugin is disabled or reloaded
         // Ensures file watcher and periodic sync are properly stopped to prevent memory leaks
-        iManager.on('pluginUnload', () => {
+        iManager.on('pluginDisabled', (disabledPluginName) => {
+            if (disabledPluginName !== pluginName) return;
             stopWatcher();
             stopPeriodicSync();
         });
@@ -1921,9 +1934,26 @@ The plugin is able to create log files to assist with debugging and recording op
          * Initialize auto-watcher if toggle is already enabled
          * This handles the case where the plugin loads with auto-updater already on
          */
-        setTimeout(() => {
+        iManager.on('pluginLoaded', () => {
             log('Checking if auto-updater should start on plugin load...');
             if (autoUpdater.data === true) {
+                log('Auto-updater toggle is enabled, checking d3dx_user.ini path...');
+                // Ensure d3dx_user.ini path is set
+                if (!d3dxUserIniPath.data) {
+                    log('d3dx_user.ini path is not set, attempting to resolve...');
+                    const resolvedPath = getD3dxUserPath();
+                    if (!resolvedPath) {
+                        log('Failed to resolve d3dx_user.ini path, cannot start auto-updater', 'ERROR');
+                        iManager.t_snack({
+                            en: "Auto-updater failed to start: d3dx_user.ini path could not be resolved.",
+                            zh_cn: "自动更新器启动失败：无法解析 d3dx_user.ini 路径。"
+                        }, 'error');
+
+                        // 关闭开启状态
+                        iManager.setPluginData(pluginName, 'autoUpdater', false);
+                        return; // Exit if path cannot be resolved
+                    }
+                }
                 log('Auto-updater toggle is enabled, starting file watcher...');
 
                 // Check backup requirements
@@ -1955,7 +1985,7 @@ The plugin is able to create log files to assist with debugging and recording op
             } else {
                 log('Auto-updater toggle is disabled, no file watcher needed');
             }
-        }, 1000); // Small delay to ensure plugin is fully loaded
+        });
         // ==================== INITIALIZATION LOGIC END ====================
 
     } // [REQUIRED] - End of init function
