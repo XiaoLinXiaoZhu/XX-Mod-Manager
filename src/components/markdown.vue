@@ -25,6 +25,26 @@ const props = defineProps({
 
 const transformedContent = ref('')
 
+// 处理行内格式：链接、强调、斜体
+const processInlineFormatting = (text) => {
+    // 处理链接 [text](url)
+    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    
+    // 处理强调 **text**
+    text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    
+    // 处理斜体 *text*
+    text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    
+    // 处理行内代码 `code`
+    text = text.replace(/`([^`]+)`/g, '<code>$1</code>')
+
+    // 处理红色强调 !text!
+    text = text.replace(/!([^!]+)!/g, '<span class="OO-red-text">$1</span>')
+
+    return text
+}
+
 const transformMarkdown = (markdown) => {
     let html = ''
     // 忽略末尾的第一个换行符
@@ -42,7 +62,22 @@ const transformMarkdown = (markdown) => {
                 html += '</div>'
                 inParagraph = false
             }
-            html += `<div class="OO-setting-bar" style="font-size:19px;font-weight:1000">${line.slice(1).trim()}</div>`
+            const processedText = processInlineFormatting(line.slice(1).trim())
+            html += `<div class="OO-setting-bar" style="font-size:19px;font-weight:1000">${processedText}</div>`
+        } else if (line.startsWith('## ')) {
+            if (inParagraph) {
+                html += '</div>'
+                inParagraph = false
+            }
+            const processedText = processInlineFormatting(line.slice(2).trim())
+            html += `<div class="OO-setting-bar" style="font-size:16px;font-weight:800">${processedText}</div>`
+        } else if (line.startsWith('### ')) {
+            if (inParagraph) {
+                html += '</div>'
+                inParagraph = false
+            }
+            const processedText = processInlineFormatting(line.slice(3).trim())
+            html += `<div class="OO-setting-bar" style="font-size:14px;font-weight:700">${processedText}</div>`
         } else if (line.startsWith('- ')) {
             if (inParagraph) {
                 html += '</div>'
@@ -52,13 +87,15 @@ const transformMarkdown = (markdown) => {
                 html += '<ul>'
                 inList = true
             }
-            html += `<li>${line.slice(1).trim()}</li>`
+            const processedText = processInlineFormatting(line.slice(1).trim())
+            html += `<li>${processedText}</li>`
         } else if (line.startsWith('> ')) {
             if (inParagraph) {
                 html += '</div>'
                 inParagraph = false
             }
-            html += `<div class="OO-quote">${line.slice(1).trim()}</div>`
+            const processedText = processInlineFormatting(line.slice(1).trim())
+            html += `<div class="OO-quote OO-color-gradient-border">${processedText}</div>`
         } else if (line.trim() === '---') {
             if (inList) {
                 html += '</ul>'
@@ -88,7 +125,8 @@ const transformMarkdown = (markdown) => {
                 html += '<div class="OO-box OO-shade-box" style="line-height: 1.5;">'
                 inParagraph = true
             }
-            html += `${line.trim()}<br>`
+            const processedText = processInlineFormatting(line.trim())
+            html += `${processedText}<br>`
         }
     })
 
@@ -109,10 +147,68 @@ onMounted(() => {
 
 </script>
 
-<style scoped>
+<style scoped >
 .markdown-container{
     /* display: flex; */
     flex-direction: column;
     flex-wrap: nowrap;
+}
+
+/* 链接样式 */
+.markdown-container :deep(a) {
+    color: var(--s-color-primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.markdown-container :deep(a:hover) {
+    color: var(--s-color-secondary);
+    text-decoration: underline;
+}
+
+/* 强调文本样式 */
+.markdown-container :deep(strong) {
+    font-weight: bold;
+    color: inherit;
+}
+
+/* 斜体样式 */
+.markdown-container :deep(em) {
+    font-style: italic;
+    color: inherit;
+}
+
+/* 行内代码样式 */
+.markdown-container :deep(code) {
+    background-color: rgba(27, 31, 35, 0.05);
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+    padding: 0.2em 0.4em;
+}
+
+/* 红色强调文本样式 */
+.markdown-container :deep(.OO-red-text) {
+    color: var(--s-color-error);
+    font-weight: bold;
+}
+
+/* 引用样式 */
+.markdown-container :deep(.OO-quote) {
+    border-left: 4px solid var(--s-color-primary);
+    padding-left: 12px;
+    margin: 8px 12px;
+    color: var(--s-color-text-secondary);
+}
+
+/* 列表样式优化 */
+.markdown-container :deep(ul) {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.markdown-container :deep(li) {
+    margin: 4px 0;
+    list-style-type: disc;
 }
 </style>
