@@ -314,10 +314,44 @@ This plugin modifies the mod's INI files, so please ensure you !back up your mod
             type: 'markdown',
             description: 'Info',
             t_description: {
-                zh_cn: `# 将状态同步到模组 INI 文件`,
-                en: `# Sync Mod Status to Mod INI Files`
+                zh_cn: `# 将状态同步到模组 INI 文件
+你需要选择 d3dx_user.ini 的位置，之后程序能够将持久变量从 d3dx_user.ini 文件同步到所有模组 INI 文件。
+如果你使用 XXMM 作为模组管理器，程序会尝试自动获取 d3dx_user.ini 的位置。`,
+                en: `# Sync Mod Status to Mod INI Files
+You need to select the location of d3dx_user.ini, after which the program can sync persistent variables from the d3dx_user.ini file to all mod INI files.
+If you use XXMM as your mod manager, the program will try to automatically get the location of d3dx_user.ini.`
             }
         });
+
+        /**
+         * [CUSTOM FEATURE] - D3DX User INI File Path
+         * gets the path to the d3dx_user.ini file
+         */
+        const d3dxUserIniPath = {
+            name: 'd3dxUserIniPath',
+            type: 'ini',
+            data: "", // Default to empty string
+            displayName: 'D3DX User INI Path',
+            t_displayName: {
+                zh_cn: 'D3DX 用户 INI 路径',
+                en: 'D3DX User INI Path'
+            },
+            onChange: (value) => {
+                // check if the provided path is valid
+                const isValidPath = fs.existsSync(value);
+                if (!isValidPath) {
+                    iManager.t_snack({
+                        en: "Invalid D3DX User INI Path.",
+                        zh_cn: "无效的 D3DX 用户 INI 路径。"
+                    }, 'error');
+                }
+                d3dxUserIniPath.data = value; // Update the path
+            }
+        }
+        pluginData.push(d3dxUserIniPath);
+
+
+
         /**
          * [CUSTOM FEATURE] - Auto-Updater Toggle
          * Monitors d3dx_user.ini and syncs mod status to mod INI files
@@ -384,9 +418,9 @@ This plugin modifies the mod's INI files, so please ensure you !back up your mod
             description: '**Auto-Update Mod Settings** - Monitors **d3dx_user.ini** for changes and automatically syncs to ALL mod INI files. **⚠️ LIMITATION:** Only works while XX Mod Manager is running. Stops when closed/minimized/sleeping.',
             t_description: {
                 en: `Monitors **d3dx_user.ini** for changes and automatically syncs to ALL mod INI files.
-> !**⚠️ LIMITATION:** Only works while XX Mod Manager is running. Stops when closed/minimized/sleeping.! `,
+!**⚠️ LIMITATION:** Only works while XX Mod Manager is running. Stops when closed/minimized/sleeping.! `,
                 zh_cn: `监控 **d3dx_user.ini** 文件变化并自动同步到所有模组INI文件。
-> !**⚠️ 限制：** 仅在XX模组管理器运行时生效，关闭/最小化/休眠时停止监控。! `
+!**⚠️ 限制：** 仅在XX模组管理器运行时生效，关闭/最小化/休眠时停止监控。! `
             },
             displayName: ''
         });
@@ -468,8 +502,10 @@ This plugin modifies the mod's INI files, so please ensure you !back up your mod
             data: '**Sync Now** - Manually trigger sync of ALL persistent variables from **d3dx_user.ini** to mod INI files. Requires backup files unless override enabled.',
             description: '**Sync Now** - Manually trigger sync of ALL persistent variables from **d3dx_user.ini** to mod INI files. Requires backup files unless override enabled.',
             t_description: {
-                en: '**Sync Now** - Manually trigger sync of ALL persistent variables from **d3dx_user.ini** to mod INI files. Requires backup files unless override enabled.',
-                zh_cn: '**立即同步** - 手动触发从 **d3dx_user.ini** 到模组INI文件的所有持久变量同步。需要备份文件，除非启用覆盖选项。'
+                en: `Manually trigger sync of ALL persistent variables from **d3dx_user.ini** to mod INI files. 
+Requires backup files unless enabled 'I DON'T CARE ABOUT BACKUPS'.`,
+                zh_cn: `手动触发从 **d3dx_user.ini** 到模组INI文件的所有持久变量同步。
+需要备份文件，除非启用 '我不在乎备份'。`
             },
             displayName: ''
         });
@@ -1088,15 +1124,13 @@ This plugin modifies the mod's INI files, so please ensure you !back up your mod
             data: '',
             type: 'markdown',
             displayName: 'Separator',
-            description: '---'
-        });
-
-        pluginData.push({
-            name: 'separator6',
-            data: '',
-            type: 'markdown',
-            displayName: 'Separator',
-            description: '---'
+            description: `# 插件日志`,
+            t_description: {
+                zh_cn: `# 插件日志
+插件能够创建日志文件以帮助调试和记录操作。日志文件存储在模组源目录的上一级目录中，名为 **modStatusKeeper.log**。`,
+                en: `# Plugin Log
+The plugin is able to create log files to assist with debugging and recording operations. Log files are stored in the parent directory of the mod source directory, named **modStatusKeeper.log**.`
+            }
         });
 
         /**
@@ -1161,34 +1195,8 @@ This plugin modifies the mod's INI files, so please ensure you !back up your mod
             }
         });
 
-        // Open log file description
-        pluginData.push({
-            name: 'desc_openLogButton',
-            type: 'markdown',
-            data: '**Open Log File** - Opens plugin log file in your default text editor. Shows operation logs, sync results, and error details.',
-            description: '**Open Log File** - Opens plugin log file in your default text editor. Shows operation logs, sync results, and error details.',
-            t_description: {
-                en: '**Open Log File** - Opens plugin log file in your default text editor. Shows operation logs, sync results, and error details.',
-                zh_cn: '**打开日志文件** - 在默认文本编辑器中打开插件日志文件。显示操作日志、同步结果和错误详情。'
-            },
-            displayName: ''
-        });
-
         // Add logging controls to plugin data
         pluginData.push(loggingEnabled);
-
-        // Logging toggle description
-        pluginData.push({
-            name: 'desc_loggingEnabled',
-            type: 'markdown',
-            data: '**Enable Log File Creation** - Controls whether the plugin creates log files for troubleshooting. Turn ON when you need to debug problems.',
-            description: '**Enable Log File Creation** - Controls whether the plugin creates log files for troubleshooting. Turn ON when you need to debug problems.',
-            t_description: {
-                en: '**Enable Log File Creation** - Controls whether the plugin creates log files for troubleshooting. Turn ON when you need to debug problems.',
-                zh_cn: '**启用日志文件创建** - 控制插件是否创建用于故障排除的日志文件。当您需要调试问题时请开启。'
-            },
-            displayName: ''
-        });
 
         /**
          * [CUSTOM FEATURE] - Clear Log Button
@@ -1249,19 +1257,6 @@ This plugin modifies the mod's INI files, so please ensure you !back up your mod
             }
         });
 
-        // Clear log file description
-        pluginData.push({
-            name: 'desc_clearLogButton',
-            type: 'markdown',
-            data: '**Clear Log File** - Deletes current log file to free space and start fresh. Safe to use, new log created automatically when needed.',
-            description: '**Clear Log File** - Deletes current log file to free space and start fresh. Safe to use, new log created automatically when needed.',
-            t_description: {
-                en: '**Clear Log File** - Deletes current log file to free space and start fresh. Safe to use, new log created automatically when needed.',
-                zh_cn: '**清除日志文件** - 删除当前日志文件以释放空间并重新开始。使用安全，需要时会自动创建新日志。'
-            },
-            displayName: ''
-        });
-
         // ==================== LOGGING MANAGEMENT MODULE END ====================
 
         /**
@@ -1276,7 +1271,36 @@ This plugin modifies the mod's INI files, so please ensure you !back up your mod
          */
         let periodicSyncTimer = null;
 
-
+        const getD3dxUserPath = () => {
+            const defaultPath = d3dxUserIniPath.data;
+            if (!defaultPath) {
+                log('d3dx_user.ini path is not set', 'ERROR');
+                iManager.t_snack({
+                    en: "d3dx_user.ini path is not set",
+                    zh_cn: "d3dx_user.ini路径未设置"
+                }, 'error');
+                return null;
+            }
+            if (fs.existsSync(defaultPath)) {
+                return defaultPath;
+            }
+            // 如果不存在，则尝试利用 iManager.config.modSourcePath 或者 iManager.config.modTargetPath 构建路径
+            const tryPaths = [
+                path.join(path.resolve(iManager.config.modTargetPath), '..', 'd3dx_user.ini'),
+                path.join(path.resolve(iManager.config.modSourcePath), '..', 'XXMI', 'ZZMI', 'd3dx_user.ini'),
+            ];
+            for (const p of tryPaths) {
+                if (fs.existsSync(p)) {
+                    return p;
+                }
+            }
+            log(`d3dx_user.ini not found at any expected location: ${tryPaths.join(', ')}`, 'ERROR');
+            iManager.t_snack({
+                en: "d3dx_user.ini not found at any expected location",
+                zh_cn: "在任何预期位置未找到d3dx_user.ini"
+            }, 'error');
+            return null;
+        }
 
         /**
          * Start monitoring d3dx_user.ini for changes
@@ -1287,7 +1311,7 @@ This plugin modifies the mod's INI files, so please ensure you !back up your mod
             if (fileWatcher) return; // Already watching
 
             // Use consistent path construction with parsePersistentVariables
-            const d3dxUserPath = path.join(path.resolve(iManager.config.modSourcePath), '..', 'XXMI', 'ZZMI', 'd3dx_user.ini');
+            const d3dxUserPath = getD3dxUserPath();
             log(`Starting file watcher for: ${d3dxUserPath}`);
 
             if (!fs.existsSync(d3dxUserPath)) {
@@ -1338,7 +1362,7 @@ This plugin modifies the mod's INI files, so please ensure you !back up your mod
         const stopWatcher = () => {
             if (fileWatcher) {
                 // Use consistent path construction
-                const d3dxUserPath = path.join(path.resolve(iManager.config.modSourcePath), '..', 'XXMI', 'ZZMI', 'd3dx_user.ini');
+                const d3dxUserPath = getD3dxUserPath();
                 fs.unwatchFile(d3dxUserPath);
                 fileWatcher = null;
                 log('✅ File watcher stopped for: ' + d3dxUserPath);
@@ -1358,7 +1382,7 @@ This plugin modifies the mod's INI files, so please ensure you !back up your mod
             periodicSyncTimer = setInterval(async () => {
                 try {
                     // Quick check if d3dx_user.ini exists before attempting sync
-                    const d3dxUserPath = path.join(path.resolve(iManager.config.modSourcePath), '..', 'XXMI', 'ZZMI', 'd3dx_user.ini');
+                    const d3dxUserPath = getD3dxUserPath();
                     if (!fs.existsSync(d3dxUserPath)) {
                         return; // Skip this cycle if file doesn't exist
                     }
@@ -1410,7 +1434,7 @@ This plugin modifies the mod's INI files, so please ensure you !back up your mod
          * @throws {Error} When d3dx_user.ini file is not found
          */
         const parsePersistentVariables = () => {
-            const d3dxUserPath = path.join(path.resolve(iManager.config.modSourcePath), '..', 'XXMI', 'ZZMI', 'd3dx_user.ini');
+            const d3dxUserPath = getD3dxUserPath();
 
             log(`Looking for d3dx_user.ini at: ${d3dxUserPath}`);
 
