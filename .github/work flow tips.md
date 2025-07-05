@@ -22,8 +22,7 @@ git push --follow-tags
 
 for minor changes
 ```
-npm version minor
-git push --follow-tags
+npm version minor && git push --follow-tags
 ```
 
 for major changes
