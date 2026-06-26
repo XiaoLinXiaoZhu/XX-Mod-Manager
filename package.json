@@ -2,11 +2,14 @@
   "name": "xx-mod-manager",
   "private": true,
   "description": "xx-mod-manager",
-  "main": "./electron/main.js",
+  "main": "./apps/electron/main.js",
   "author": "XLXZ",
   "license": "GPL-3.0-only",
   "version": "1.4.0",
   "type": "commonjs",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build && electron-builder --win --linux",
