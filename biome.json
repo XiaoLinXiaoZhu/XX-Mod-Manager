@@ -37,7 +37,7 @@
     {
       "includes": ["*.py"],
       "formatter": {
-        "indentWidth": 4
+        "indentWidth": 2
       }
     },
     {

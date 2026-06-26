@@ -16,7 +16,7 @@ trim_trailing_whitespace = false   # 某些Markdown语法需要尾部空格
 
 # 特定语言规则
 [*.py]
-indent_size = 4
+indent_size = 2
 
 [Makefile]
 indent_style = tab
