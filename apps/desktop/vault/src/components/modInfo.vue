@@ -58,14 +58,14 @@
 </template>
 
 <script setup>
-import { defineProps, ref, watch } from "vue";
-// 导入 i18n 的 t 函数
-import { useI18n } from "vue-i18n";
 import { ModData } from "@xxmm/core/ModHelper";
-import fsProxy from "../../../electron/src/fsProxy";
 import { DialogHelper, DialogID } from "@xxmm/helper/DialogHelper";
 import { EventSystem, EventType } from "@xxmm/helper/EventSystem";
 import { snack } from "@xxmm/helper/SnackHelper";
+import { defineProps, ref, watch } from "vue";
+// 导入 i18n 的 t 函数
+import { useI18n } from "vue-i18n";
+import fsProxy from "../../../electron/src/fsProxy";
 
 const { t } = useI18n();
 

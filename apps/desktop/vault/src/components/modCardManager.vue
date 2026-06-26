@@ -18,13 +18,13 @@
 <script setup>
 import "sober";
 import { Group, Tween } from "@tweenjs/tween.js";
+import { EventSystem, EventType } from "@xxmm/helper/EventSystem";
 import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import IManager, {
   g_config_vue,
   g_data_vue,
   g_temp_vue,
 } from "../../../electron/src/IManager";
-import { EventSystem, EventType } from "@xxmm/helper/EventSystem";
 
 const iManager = new IManager();
 

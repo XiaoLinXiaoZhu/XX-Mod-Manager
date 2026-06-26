@@ -22,8 +22,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, ref, useTemplateRef, watch } from "vue";
 import { ImageHelper } from "@xxmm/helper/ImageHelper";
+import { defineProps, onMounted, ref, useTemplateRef, watch } from "vue";
 import type clickableCard from "../../../src/components/clickableCard.vue";
 import TapeConfig from "../js/configManager";
 

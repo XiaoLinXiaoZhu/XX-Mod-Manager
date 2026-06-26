@@ -5,6 +5,12 @@ export { EventSystem, EventType } from "./EventSystem";
 export { ImageHelper } from "./ImageHelper";
 export { Language, setCurrentLanguage, TranslatedText } from "./Language";
 export { PathHelper } from "./PathHelper";
-export { IPluginLoader, IPlugin, IPluginData, IPluginDataTypes, IPluginOption } from "./PluginLoader";
+export {
+  IPlugin,
+  IPluginData,
+  IPluginDataTypes,
+  IPluginLoader,
+  IPluginOption,
+} from "./PluginLoader";
 export { SnackType, snack, t_snack } from "./SnackHelper";
 export { XManager } from "./XManager";

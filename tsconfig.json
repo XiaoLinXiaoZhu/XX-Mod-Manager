@@ -22,9 +22,7 @@
     "noImplicitOverride": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "paths": {
       "@xxmm/core": ["./packages/core/src/index.ts"],
       "@xxmm/core/*": ["./packages/core/src/*"],
@@ -38,8 +36,5 @@
     "apps/**/*.d.ts",
     "scripts/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "exclude": ["node_modules", "dist"]
 }

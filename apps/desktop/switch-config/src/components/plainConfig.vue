@@ -21,8 +21,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, ref, useTemplateRef } from "vue";
 import { ImageHelper } from "@xxmm/helper/ImageHelper";
+import { defineProps, onMounted, ref, useTemplateRef } from "vue";
 import TapeConfig from "../js/configManager";
 
 const props = defineProps({
