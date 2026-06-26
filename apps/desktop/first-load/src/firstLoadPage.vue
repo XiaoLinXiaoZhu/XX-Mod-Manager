@@ -270,7 +270,7 @@
 
 <script setup>
 import { onMounted, ref, useTemplateRef, watch } from "vue";
-import IManager from "../../electron/src/IManager";
+import IManager from "@xxmm-apps/electron/IManager";
 import getData from "../src/section/settingSectionData.js";
 
 let {

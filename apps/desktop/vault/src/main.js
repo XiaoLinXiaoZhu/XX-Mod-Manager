@@ -6,9 +6,9 @@ import 'sober'
 import 'sober/style/scroll-view.css'
 import { Snackbar } from 'sober'
 const { ipcRenderer } = require("electron");
-import IManager from '../../electron/src/IManager'
+import IManager from '@xxmm-apps/electron/IManager'
 const iManager = new IManager();
-import { g_config_vue } from '../../electron/src/IManager'
+import { g_config_vue } from '@xxmm-apps/electron/IManager'
 
 import { EventSystem } from '@xxmm/helper/EventSystem'
 

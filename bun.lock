@@ -23,6 +23,22 @@
         "electron-builder": "^26.15.3",
       },
     },
+    "apps/desktop/first-load": {
+      "name": "@xxmm-apps/first-load",
+      "version": "1.0.0",
+    },
+    "apps/desktop/switch-config": {
+      "name": "@xxmm-apps/switch-config",
+      "version": "1.0.0",
+    },
+    "apps/desktop/vault": {
+      "name": "@xxmm-apps/vault",
+      "version": "1.0.0",
+    },
+    "apps/electron": {
+      "name": "@xxmm-apps/electron",
+      "version": "1.0.0",
+    },
     "packages/core": {
       "name": "@xxmm/core",
       "version": "1.0.0",
@@ -234,6 +250,14 @@
     "@vue/shared": ["@vue/shared@3.5.39", "", {}, "sha512-l1rrBtBfTnmxvtsvdQDXltUUy8S1Y+ZaqdfUzmAnJkTd8Z8rv5v/ytW+TKiqEOWyHPoqtPlNFSs0lhRmYVSHVA=="],
 
     "@xmldom/xmldom": ["@xmldom/xmldom@0.8.10", "", {}, "sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw=="],
+
+    "@xxmm-apps/electron": ["@xxmm-apps/electron@workspace:apps/electron"],
+
+    "@xxmm-apps/first-load": ["@xxmm-apps/first-load@workspace:apps/desktop/first-load"],
+
+    "@xxmm-apps/switch-config": ["@xxmm-apps/switch-config@workspace:apps/desktop/switch-config"],
+
+    "@xxmm-apps/vault": ["@xxmm-apps/vault@workspace:apps/desktop/vault"],
 
     "@xxmm/core": ["@xxmm/core@workspace:packages/core"],
 

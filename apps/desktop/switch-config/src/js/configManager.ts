@@ -7,7 +7,7 @@ const { ipcRenderer } = require("electron");
 import { TranslatedText } from "@xxmm/helper/Language";
 import { SnackType, t_snack } from "@xxmm/helper/SnackHelper";
 import { ref } from "vue";
-import fsProxy from "../../../../electron/src/fsProxy";
+import fsProxy from "@xxmm-apps/electron/fsProxy";
 
 let g_allConfig: TapeConfig[] = [];
 const g_allConfig_vue = ref(g_allConfig);

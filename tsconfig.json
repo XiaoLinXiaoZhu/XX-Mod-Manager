@@ -27,7 +27,15 @@
       "@xxmm/core": ["./packages/core/src/index.ts"],
       "@xxmm/core/*": ["./packages/core/src/*"],
       "@xxmm/helper": ["./packages/helper/src/index.ts"],
-      "@xxmm/helper/*": ["./packages/helper/src/*"]
+      "@xxmm/helper/*": ["./packages/helper/src/*"],
+      "@xxmm-apps/electron": ["./apps/electron/src"],
+      "@xxmm-apps/electron/*": ["./apps/electron/src/*"],
+      "@xxmm-apps/vault": ["./apps/desktop/vault/src"],
+      "@xxmm-apps/vault/*": ["./apps/desktop/vault/src/*"],
+      "@xxmm-apps/first-load": ["./apps/desktop/first-load/src"],
+      "@xxmm-apps/first-load/*": ["./apps/desktop/first-load/src/*"],
+      "@xxmm-apps/switch-config": ["./apps/desktop/switch-config/src"],
+      "@xxmm-apps/switch-config/*": ["./apps/desktop/switch-config/src/*"]
     }
   },
   "include": [

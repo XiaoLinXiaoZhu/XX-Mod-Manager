@@ -60,7 +60,7 @@ function _handleSectionChange(newSection) {
   console.log("Section changed to:", newSection);
 }
 
-import IManager from "../../../electron/src/IManager";
+import IManager from "@xxmm-apps/electron/IManager";
 import TapeConfig, { g_allConfig_vue } from "./js/configManager";
 
 const iManager = new IManager();

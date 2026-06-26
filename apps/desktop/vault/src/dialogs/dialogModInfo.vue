@@ -192,7 +192,7 @@
 
 <script setup>
 import { defineProps, onMounted, ref, useTemplateRef, watch } from "vue";
-import IManager from "../../../electron/src/IManager";
+import IManager from "@xxmm-apps/electron/IManager";
 
 const iManager = new IManager();
 

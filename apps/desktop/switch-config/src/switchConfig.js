@@ -5,11 +5,11 @@ import { Snackbar } from 'sober'
 import '../src/style.css'
 
 import { createApp } from 'vue'
-import switchConfigPage from './src/switchConfigPage.vue'
+import switchConfigPage from './switchConfigPage.vue'
 
 const { ipcRenderer } = require("electron");
 
-import IManager from '../../electron/src/IManager'
+import IManager from '@xxmm-apps/electron/IManager'
 const iManager = new IManager();
 
 //-=================== 旧的导入 ===================-//

@@ -8,7 +8,11 @@
   "version": "1.4.0",
   "type": "commonjs",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/electron",
+    "apps/desktop/vault",
+    "apps/desktop/first-load",
+    "apps/desktop/switch-config"
   ],
   "scripts": {
     "dev": "vite",

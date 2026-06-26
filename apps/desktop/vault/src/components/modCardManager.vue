@@ -24,7 +24,7 @@ import IManager, {
   g_config_vue,
   g_data_vue,
   g_temp_vue,
-} from "../../../electron/src/IManager";
+} from "@xxmm-apps/electron/IManager";
 
 const iManager = new IManager();
 

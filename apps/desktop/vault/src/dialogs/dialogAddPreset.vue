@@ -27,7 +27,7 @@
 
 <script setup>
 import { ref } from "vue";
-import IManager from "../../../electron/src/IManager";
+import IManager from "@xxmm-apps/electron/IManager";
 
 const iManager = new IManager();
 
