@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import ModCharacterFilter from './modCharacterFilter.vue';
-
 </script>
 
 <!-- 新版的卡片展示页面，还是会复用之前的卡片，但是显示逻辑应该进行修改 -->

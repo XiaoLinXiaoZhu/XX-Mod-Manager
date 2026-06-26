@@ -28,7 +28,7 @@ export default defineConfig({
       },
       output: {
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name && assetInfo.name.endsWith('.wasm')) {
+          if (assetInfo.name?.endsWith('.wasm')) {
             return 'assets/[name].[ext]'; // 保持文件名不变
           }
           return 'assets/[name]-[hash].[ext]';

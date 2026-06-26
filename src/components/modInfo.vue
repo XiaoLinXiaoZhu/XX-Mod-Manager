@@ -58,62 +58,65 @@
 </template>
 
 <script setup>
-import { computed, defineProps, ref, watch } from 'vue';
-import fsProxy from '../../electron/fsProxy';
-import { ModData } from '../../core/ModHelper';
-import { snack } from '../../helper/SnackHelper';
-import { DialogID , DialogHelper } from '../../helper/DialogHelper';
+import { defineProps, ref, watch } from "vue";
 // 导入 i18n 的 t 函数
-import { useI18n } from 'vue-i18n';
-import { EventSystem, EventType } from '../../helper/EventSystem';
+import { useI18n } from "vue-i18n";
+import { ModData } from "../../core/ModHelper";
+import fsProxy from "../../electron/fsProxy";
+import { DialogHelper, DialogID } from "../../helper/DialogHelper";
+import { EventSystem, EventType } from "../../helper/EventSystem";
+import { snack } from "../../helper/SnackHelper";
+
 const { t } = useI18n();
 
 const props = defineProps({
-    mod: {
-        type: ModData,
-        default: null
-    }
+  mod: {
+    type: ModData,
+    default: null,
+  },
 });
-const img = ref('data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D');
-watch(() => props.mod, (newMod) => {
+const img = ref("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D");
+watch(
+  () => props.mod,
+  (newMod) => {
     if (newMod == null) {
-        img.value = null;
-        return;
+      img.value = null;
+      return;
     }
     newMod.getPreviewBase64(true).then((base64) => {
-        img.value = base64;
+      img.value = base64;
     });
-});
+  },
+);
 
-EventSystem.on(EventType.modInfoChanged,(mod) => {
-    if (mod.name == props.mod.name) {
-        setTimeout(() => {
-            props.mod.getPreviewBase64(true).then((base64) => {
-                img.value = base64;
-            });
-        }, 1);
-    }
+EventSystem.on(EventType.modInfoChanged, (mod) => {
+  if (mod.name === props.mod.name) {
+    setTimeout(() => {
+      props.mod.getPreviewBase64(true).then((base64) => {
+        img.value = base64;
+      });
+    }, 1);
+  }
 });
 
 // const emit = defineEmits(['clickEditButton']);
 
-const editMod = () => {
-    if (props.mod == null) {
-        snack(t('no-mod-selected'), 'error');
-        return;
-    }
-    DialogHelper.showDialog(DialogID.editModDialog);
+const _editMod = () => {
+  if (props.mod == null) {
+    snack(t("no-mod-selected"), "error");
+    return;
+  }
+  DialogHelper.showDialog(DialogID.editModDialog);
 };
 
-const openModFolder = async () => {
-    //ipcRenderer.send('open-url', props.mod?.url);
-    if (props.mod == null) {
-        snack(t('no-mod-selected'), 'error');
-        return;
-    }
-    fsProxy.openDir(await props.mod.getModPath());
+const _openModFolder = async () => {
+  //ipcRenderer.send('open-url', props.mod?.url);
+  if (props.mod == null) {
+    snack(t("no-mod-selected"), "error");
+    return;
+  }
+  fsProxy.openDir(await props.mod.getModPath());
 };
-
 </script>
 
 <style scoped>

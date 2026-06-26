@@ -6,10 +6,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, defineProps } from 'vue'
-const props = defineProps({
-    title: String,
-    description: String
-})
+import { defineProps } from "vue";
 
+const _props = defineProps({
+  title: String,
+  description: String,
+});
 </script>

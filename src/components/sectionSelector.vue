@@ -18,58 +18,61 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
-    sections: {
-        type: Array,
-        required: true
-    }
+  sections: {
+    type: Array,
+    required: true,
+  },
 });
 
-const emit = defineEmits(['update:currentSection']);
+const emit = defineEmits(["update:currentSection"]);
 const currentSection = ref(props.sections[0]);
 
-const selectSection = (sec) => {
-    //debug
-    console.log('selectSection', sec);
-    currentSection.value = sec;
-    emit('update:currentSection', sec);
+const _selectSection = (sec) => {
+  //debug
+  console.log("selectSection", sec);
+  currentSection.value = sec;
+  emit("update:currentSection", sec);
 };
 
-const sliderStyle = computed(() => {
-    const index = props.sections.indexOf(currentSection.value);
-    return {
-        width: `${100 / props.sections.length}%`,
-        transform: `translateX(calc(${index * 85 - 15}%)) skew(-20deg)`
-    };
+const _sliderStyle = computed(() => {
+  const index = props.sections.indexOf(currentSection.value);
+  return {
+    width: `${100 / props.sections.length}%`,
+    transform: `translateX(calc(${index * 85 - 15}%)) skew(-20deg)`,
+  };
 });
 
 const nextSection = () => {
-    const index = props.sections.indexOf(currentSection.value);
-    if (index < props.sections.length - 1) {
-        currentSection.value = props.sections[index + 1];
-        emit('update:currentSection', currentSection.value);
-    }
+  const index = props.sections.indexOf(currentSection.value);
+  if (index < props.sections.length - 1) {
+    currentSection.value = props.sections[index + 1];
+    emit("update:currentSection", currentSection.value);
+  }
 };
 
 const prevSection = () => {
-    const index = props.sections.indexOf(currentSection.value);
-    if (index > 0) {
-        currentSection.value = props.sections[index - 1];
-        emit('update:currentSection', currentSection.value);
-    }
+  const index = props.sections.indexOf(currentSection.value);
+  if (index > 0) {
+    currentSection.value = props.sections[index - 1];
+    emit("update:currentSection", currentSection.value);
+  }
 };
 
-watch(() => props.sections, (newSection) => {
+watch(
+  () => props.sections,
+  (newSection) => {
     if (!newSection.includes(currentSection.value)) {
-        currentSection.value = newSection[0];
+      currentSection.value = newSection[0];
     }
-});
+  },
+);
 
 defineExpose({
-    nextSection,
-    prevSection
+  nextSection,
+  prevSection,
 });
 </script>
 

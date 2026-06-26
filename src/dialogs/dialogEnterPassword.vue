@@ -25,46 +25,42 @@
 </template>
 
 <script setup>
-import dialogTemplate from './dialogTemplate.vue';
-import { ref, onMounted } from 'vue';
+import { onMounted, ref } from "vue";
+import IManager from "../../electron/IManager";
 
-
-import IManager from '../../electron/IManager';
 const iManager = new IManager();
 
-const getPassword = ref('');
+const getPassword = ref("");
 
 // 导入 i18n 的 t 函数
-import { useI18n } from 'vue-i18n';
+import { useI18n } from "vue-i18n";
+
 const { t } = useI18n();
 
+function _handleCancel() {
+  iManager.dismissDialog("dialog-enter-password");
+  iManager.dismissDialog("loading-dialog");
+  iManager.snack(t("dialogEnterPassword.cancel"), "error");
 
-function handleCancel() {
-    iManager.dismissDialog('dialog-enter-password');
-    iManager.dismissDialog('loading-dialog');
-    iManager.snack(t('dialogEnterPassword.cancel'), 'error');
-
-    getPassword.value = '';
+  getPassword.value = "";
 }
 
-function handleConfirm() {
-    console.log('confirm password:', getPassword.value);
-    iManager.dismissDialog('dialog-enter-password');
-    iManager.snack(t('dialogEnterPassword.confirm') + getPassword.value, 'info');
-    iManager.archivePassword = getPassword.value;
-    
-    getPassword.value = '';
-}
+function _handleConfirm() {
+  console.log("confirm password:", getPassword.value);
+  iManager.dismissDialog("dialog-enter-password");
+  iManager.snack(t("dialogEnterPassword.confirm") + getPassword.value, "info");
+  iManager.archivePassword = getPassword.value;
 
+  getPassword.value = "";
+}
 
 //测试用
 onMounted(() => {
-    console.log('dialog-enter-password mounted');
-    // iManager.waitInit().then(() => {
-    //     iManager.showDialog('dialog-enter-password');
-    // });
-})
-
+  console.log("dialog-enter-password mounted");
+  // iManager.waitInit().then(() => {
+  //     iManager.showDialog('dialog-enter-password');
+  // });
+});
 </script>
 
 <style scoped>

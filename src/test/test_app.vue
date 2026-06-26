@@ -35,21 +35,7 @@
 </template>
 
 <script setup>
-import { ref} from 'vue';
-
-import modCardSection from '../section/modCardSection.vue';
-import backbutton from '../components/backButton.vue';
-import sectionSelector from '../components/sectionSelector.vue';
-import dialogAddPreset from '../dialogs/dialogAddPreset.vue';
-import settingSection from '../section/settingSection.vue'; 
-import CssProxy from '../components/cssProxy.vue';
-import dialogModInfo2 from '../dialogs/dialogModInfo2.vue';
-import helpSection from '../section/helpSection.vue';
-import dialogLoading from '../dialogs/dialogLoading.vue';
-import dialogEnterPassword from '../dialogs/dialogEnterPassword.vue';
-
-import DialogNeedRefresh from '../dialogs/dialogNeedRefresh.vue';
-import { EventSystem } from '../../helper/EventSystem';
+import { ref } from "vue";
 
 const loaded = ref(false);
 
@@ -57,31 +43,30 @@ const loaded = ref(false);
 // const iManager = new IManager();
 // 这里不需要 iManager 实例，直接通过waitInit 获取
 
-import { waitInitIManager } from '../../electron/IManager';
+import { g_temp_vue, waitInitIManager } from "../../electron/IManager";
 
-import { g_temp_vue } from '../../electron/IManager';
-const currentMod = g_temp_vue.currentMod;
+const _currentMod = g_temp_vue.currentMod;
 
-const sections = ref(['mod', 'help', 'settings']);
-const currentSection = ref('mod');
+const _sections = ref(["mod", "help", "settings"]);
+const currentSection = ref("mod");
 
-const handleSectionChange = (section) => {
-    currentSection.value = section;
-    //debug
-    console.log('handleSectionChange', section);
+const _handleSectionChange = (section) => {
+  currentSection.value = section;
+  //debug
+  console.log("handleSectionChange", section);
 };
 
 const closeApp = () => {
-    //关闭当前窗口
-    window.close();
+  //关闭当前窗口
+  window.close();
 };
 
-const handleBackButtomClick = () => {
-    closeApp();
+const _handleBackButtomClick = () => {
+  closeApp();
 };
 
-waitInitIManager().then((iManager) => {
-    loaded.value = true;
+waitInitIManager().then((_iManager) => {
+  loaded.value = true;
 });
 </script>
 

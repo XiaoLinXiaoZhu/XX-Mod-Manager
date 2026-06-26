@@ -13,12 +13,11 @@
 </template>
 
 <script setup>
-import dialogTemplate from './dialogTemplate.vue';
-const { ipcRenderer } = require('electron');
+const { ipcRenderer } = require("electron");
 
-const refresh = () => {
-    //debug
-    console.log('refresh');
-    ipcRenderer.send('refresh-main-window');
+const _refresh = () => {
+  //debug
+  console.log("refresh");
+  ipcRenderer.send("refresh-main-window");
 };
 </script>

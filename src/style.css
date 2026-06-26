@@ -3,22 +3,26 @@
 @font-face {
   font-family: "Impact";
   src: url(./fonts/zzz-eng.TTF) format("truetype");
-  font-weight: normal
+  font-weight: normal;
 }
 
 @font-face {
   font-family: "hongmengti";
   src: url(./fonts/zzz-chs.ttf) format("truetype");
-  font-weight: bold
+  font-weight: bold;
 }
 
 .font-num {
-  font-family: Impact, "Microsoft YaHei", 微软雅黑, "MicrosoftJhengHei", 华文细黑, STHeiti, MingLiu, sans-serif;
+  font-family:
+    Impact, "Microsoft YaHei", 微软雅黑, "MicrosoftJhengHei", 华文细黑, STHeiti,
+    MingLiu, sans-serif;
   font-weight: 100;
 }
 
 .font-hongmeng {
-  font-family: "hongmengti", "Microsoft YaHei", 微软雅黑, "MicrosoftJhengHei", 华文细黑, STHeiti, MingLiu, sans-serif;
+  font-family:
+    "hongmengti", "Microsoft YaHei", 微软雅黑, "MicrosoftJhengHei", 华文细黑,
+    STHeiti, MingLiu, sans-serif;
   font-weight: 1000;
   font-size: 0.93em;
 }
@@ -46,7 +50,6 @@ p {
   background: var(--s-color-outline-variant, #c1c7ce);
   border-radius: 3px;
   transform: translateX(-10px);
-
 }
 
 html,
@@ -78,16 +81,14 @@ body {
   background-repeat: no-repeat;
 }
 
-
 /* -================ 属性 ================== */
-
 
 .OO-parallelogram {
   transform: skew(-20deg);
   border-radius: 10px;
 }
 
-.OO-parallelogram>* {
+.OO-parallelogram > * {
   /* display: block; */
   transform: skew(20deg);
 }
@@ -142,7 +143,7 @@ s-chip p {
   transition: all 0.3s ease-in-out 0s;
 }
 
-s-chip[type=filled-tonal] {
+s-chip[type="filled-tonal"] {
   border: 1px solid var(--s-color-outline);
   color: var(--s-color-on-primary);
 }
@@ -163,7 +164,7 @@ s-card {
   border-radius: 0px 30px 0px 30px;
 }
 
-s-tooltip>p {
+s-tooltip > p {
   line-height: 1.2;
   word-wrap: break-word;
   max-width: 120px;
@@ -193,7 +194,6 @@ p {
   background: var(--s-color-outline-variant, #c1c7ce);
   border-radius: 3px;
   transform: translateX(-10px);
-
 }
 
 /* -====================== 组件 ================== */
@@ -227,7 +227,7 @@ p {
   border-radius: 0px 19px 19px 0px;
 }
 
-.left-adhesive-button[type='elevated'] {
+.left-adhesive-button[type="elevated"] {
   background-color: var(--s-color-background);
   box-shadow: 0px 0px 0px 2px var(--s-color-primary);
   transform: translateX(-20px);
@@ -237,7 +237,6 @@ p {
   transform: translateX(0px);
   transition: all 0.1s ease-in-out 0s;
 } */
-
 
 /* -=================右侧粘性按钮================ */
 
@@ -268,16 +267,15 @@ p {
   border-radius: 19px 0px 0px 19px;
 }
 
-.right-adhesive-button[type='elevated'] {
+.right-adhesive-button[type="elevated"] {
   background-color: var(--s-color-background);
   box-shadow: 0px 0px 0px 2.5px var(--s-color-primary);
   transform: translateX(20px);
 }
 
-.right-adhesive-button[type='elevated'] p {
+.right-adhesive-button[type="elevated"] p {
   transform: translateX(0px);
 }
-
 
 /* -=================并列按钮条组件================ */
 
@@ -315,7 +313,6 @@ p {
   clip-path: polygon(12px 0, 100% 0, 100% 100%, 26px 100%);
 }
 
-
 .button-bar .button-bar-item:not(:first-child):not(:last-child) {
   /* 这是一个圆角平行四边形 */
   transform: skew(-20deg);
@@ -331,7 +328,7 @@ p {
   border-radius: 10px 0px 0px 10px;
   transform: skew(-20deg);
   /* 将最右边裁剪掉 */
-  clip-path: polygon(0 0, calc(100% - 26px) 0, calc(100% - 13px) 100%, 0 100%)
+  clip-path: polygon(0 0, calc(100% - 26px) 0, calc(100% - 13px) 100%, 0 100%);
 }
 
 /* 使用 after 来绘制左侧的圆 */
@@ -345,11 +342,20 @@ p {
   border-radius: 20px 20px 20px 20px;
   border: 1px solid var(--s-color-outline);
   /* 裁剪掉中间部分，只显示两端 */
-  clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 0, calc(100% - 20px) 0, calc(100% - 20px) 100%, 20px 100%, 20px 0);
+  clip-path: polygon(
+    0 0,
+    0 100%,
+    100% 100%,
+    100% 0,
+    calc(100% - 20px) 0,
+    calc(100% - 20px) 100%,
+    20px 100%,
+    20px 0
+  );
   /* background-color: var(--s-color-surface-container-high); */
 }
 
-.button-bar-item>* {
+.button-bar-item > * {
   transform: skew(20deg);
 }
 
@@ -361,7 +367,6 @@ p {
 
   padding: 10px;
 }
-
 
 /* -=================设置条组件================ */
 .OO-setting-bar {
@@ -437,7 +442,7 @@ p {
   flex-direction: column;
 }
 
-.OO-setting-bar .OO-s-text-field-container>s-text-field {
+.OO-setting-bar .OO-s-text-field-container > s-text-field {
   position: absolute;
   --text-field-border-radius: 29px;
   --text-field-padding: 15px;
@@ -458,11 +463,11 @@ p {
   flex-direction: column;
 }
 
-.OO-setting-bar input[type='radio'] {
+.OO-setting-bar input[type="radio"] {
   display: none;
 }
 
-.OO-setting-bar input[type='radio']:checked+label>s-chip {
+.OO-setting-bar input[type="radio"]:checked + label > s-chip {
   background-color: var(--s-color-primary);
   color: var(--s-color-on-primary);
 }
@@ -508,7 +513,7 @@ p {
   max-width: 305px;
 }
 
-.OO-setting-bar s-button:not([type='text']) {
+.OO-setting-bar s-button:not([type="text"]) {
   box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2);
   border-color: var(--s-color-outline-variant);
   border-width: 2px;
@@ -533,7 +538,6 @@ p {
   --border-radius: 20px;
 }
 
-
 .OO-button-box {
   align-items: center;
   align-content: center;
@@ -556,17 +560,19 @@ p {
   border: 5px solid var(--s-color-outline-variant);
   border-radius: 20px;
   /* box-shadow: 0 0 0px 3px var(--s-color-surface-container-high), inset 1px 1px 1px rgba(255, 255, 255, 0.2); */
-  box-shadow: -0.5px -0.5px 1px 1px rgba(255, 255, 255, 0.3), 0 0 0px 2px var(--s-color-surface-container-high), inset 1px 1px 0px 1px var(--s-color-surface-container);
+  box-shadow:
+    -0.5px -0.5px 1px 1px rgba(255, 255, 255, 0.3),
+    0 0 0px 2px var(--s-color-surface-container-high),
+    inset 1px 1px 0px 1px var(--s-color-surface-container);
   box-sizing: border-box;
   overflow: hidden;
   height: 40px;
   color: var(--s-color-on-surface-variant);
   font-weight: 1000;
 
-  p{
+  p {
     z-index: 0;
   }
-  
 }
 
 .OO-button::before {
@@ -578,13 +584,16 @@ p {
   bottom: 0;
   opacity: 0.1;
 
-  background-color: #00000000 !important;
+  background-color: #00000000;
 
   background-color: #001;
-  background-image: radial-gradient(black 15%, transparent 16%),
+  background-image:
+    radial-gradient(black 15%, transparent 16%),
     radial-gradient(black 15%, transparent 16%);
   background-size: 10px 10px;
-  background-position: 0 0, 5px 5px;
+  background-position:
+    0 0,
+    5px 5px;
 }
 
 .OO-center-bg {
@@ -598,7 +607,6 @@ p {
   background-size: cover;
 }
 
-
 .OO-icon-button {
   align-items: center;
   align-content: center;
@@ -611,7 +619,7 @@ p {
   transform: scale(0.83);
 }
 
-.OO-scorll-box>div {
+.OO-scorll-box > div {
   margin-right: -10px;
   padding-right: 10px;
 }
@@ -627,18 +635,27 @@ p {
   bottom: 0;
   opacity: 0.1;
 
-  background-color: #00000000 !important;
+  background-color: #00000000;
 
   background-color: #001;
-  background-image: radial-gradient(black 15%, transparent 16%),
+  background-image:
+    radial-gradient(black 15%, transparent 16%),
     radial-gradient(black 15%, transparent 16%);
   background-size: 10px 10px;
-  background-position: 0 0, 5px 5px;
+  background-position:
+    0 0,
+    5px 5px;
 }
 
 .OO-background-stripes {
   background-color: gray;
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 7px, rgba(255, 255, 255, .5) 7px, rgba(255, 255, 255, .5) 14px);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 7px,
+    rgba(255, 255, 255, 0.5) 7px,
+    rgba(255, 255, 255, 0.5) 14px
+  );
 }
 
 /* 动画样式 */
