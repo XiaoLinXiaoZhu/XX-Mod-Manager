@@ -11,9 +11,9 @@
 </p>
 
 <div align="center" style="display: flex; flex-wrap: wrap; justify-content: center;">
-  <img src="readme/1.png" alt="界面预览" width="49%">
-  <img src="readme/2.png" alt="模组管理" width="49%">
-  <img src="readme/3.png" alt="预设系统" width="49%">
+  <img src="data/imgs/1.png" alt="界面预览" width="49%">
+  <img src="data/imgs/2.png" alt="模组管理" width="49%">
+  <img src="data/imgs/3.png" alt="预设系统" width="49%">
 </div>
 
 ## 免责声明

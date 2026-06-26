@@ -1,24 +1,26 @@
 {
     "appId": "com.xlxz.xx-mod-manager",
     "productName": "XX Mod Manager",
-    "icon": "./src/assets/icon.ico",
+    "icon": "./apps/desktop/vault/assets/icon.ico",
     // "compression": "maximum",
     "directories": {
         "output": "build"
     },
     "extraResources": [
         {
-            "from": "./plugins",
+            "from": "./data/plugins",
             "to": "../plugins"
         },
         {
-            "from": "./src/assets/default.png",
+            "from": "./apps/desktop/vault/assets/default.png",
             "to": "../src/assets/default.png"
         }
     ],
     "files": [
         "dist",
-        "electron"
+        "apps/electron",
+        "packages",
+        "package.json"
     ],
     "publish": [
         {
@@ -33,12 +35,12 @@
             "nsis",
             "zip"
         ],
-        "icon": "./src/assets/icon.ico"
+        "icon": "./apps/desktop/vault/assets/icon.ico"
     },
     "linux": {
         "target": [
             "tar.xz"
         ],
-        "icon": "./src/assets/icon.ico"
+        "icon": "./apps/desktop/vault/assets/icon.ico"
     }
 }

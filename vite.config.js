@@ -23,8 +23,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: 'index.html',
-        firstLoad: 'firstLoad/index.html',
-        switchConfig: 'switchConfig/index.html',
+        firstLoad: 'apps/desktop/first-load/index.html',
+        switchConfig: 'apps/desktop/switch-config/index.html',
       },
       output: {
         assetFileNames: (assetInfo) => {

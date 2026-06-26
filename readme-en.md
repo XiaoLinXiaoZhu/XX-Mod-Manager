@@ -13,9 +13,9 @@ readme: [简体中文](readme.md) | English
 </p>
 
 <div align="center" style="display: flex; flex-wrap: wrap; justify-content: center;">
-  <img src="readme/1.png" alt="XX Mod Manager" width="50%">
-  <img src="readme/2.png" alt="XX Mod Manager" width="50%">
-  <img src="readme/3.png" alt="XX Mod Manager" width="50%">
+  <img src="data/imgs/1.png" alt="XX Mod Manager" width="50%">
+  <img src="data/imgs/2.png" alt="XX Mod Manager" width="50%">
+  <img src="data/imgs/3.png" alt="XX Mod Manager" width="50%">
 </div>
 
 ## Disclaimer

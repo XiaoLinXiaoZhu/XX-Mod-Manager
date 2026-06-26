@@ -127,10 +127,10 @@ const createWindow = () => {
   if (devMode) {
     mainWindow.loadURL("http://localhost:3000/");
     if (firstpage) {
-      mainWindow.loadURL("http://localhost:3000/firstLoad/index.html");
+      mainWindow.loadURL("http://localhost:3000/apps/desktop/first-load/index.html");
     }
     if (switchConfig) {
-      mainWindow.loadURL("http://localhost:3000/switchConfig/index.html");
+      mainWindow.loadURL("http://localhost:3000/apps/desktop/switch-config/index.html");
     }
     if (devTools) {
       mainWindow.webContents.openDevTools();
@@ -230,6 +230,11 @@ app.on("render-process-gone", (_e, webContents, details) => {
 ipcMain.on("open-new-window", (_event, arg) => {
   console.log("open-new-window", arg);
 
+  // Map legacy arg values to new monorepo paths
+  const pagePath = arg === "firstLoad" ? "apps/desktop/first-load"
+    : arg === "switchConfig" ? "apps/desktop/switch-config"
+    : arg;
+
   const newWindow = new BrowserWindow({
     frame: false,
     width: 800,
@@ -241,12 +246,11 @@ ipcMain.on("open-new-window", (_event, arg) => {
     },
   });
 
-  // newWindow.loadURL('http://localhost:3000/' + arg)
   if (devMode) {
-    newWindow.loadURL(`http://localhost:3000/${arg}/index.html`);
+    newWindow.loadURL(`http://localhost:3000/${pagePath}/index.html`);
   } else {
     const path = require("node:path");
-    const filePath = path.join(__dirname, `../dist/${arg}/index.html`);
+    const filePath = path.join(__dirname, `../../dist/${pagePath}/index.html`);
     console.log("filePath", filePath);
 
     newWindow.loadFile(filePath);
