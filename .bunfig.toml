@@ -1,0 +1,11 @@
+[loader]
+".md" = "text"
+
+[test]
+coverage = false # switch to enable if needed
+coverageThreshold = { line = 0.7, function = 0.8, statement = 0.9 }
+onlyFailures = true
+
+[run]
+# 等同于对所有 `bun run` 命令使用 `bun --bun`
+bun = true

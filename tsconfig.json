@@ -24,6 +24,10 @@
     "noUnusedParameters": false,
     "types": ["node"],
     "paths": {
+      "@xxmm/types": ["./packages/types/src/index.ts"],
+      "@xxmm/types/*": ["./packages/types/src/*"],
+      "@xxmm/ipc": ["./packages/ipc/src/index.ts"],
+      "@xxmm/ipc/*": ["./packages/ipc/src/*"],
       "@xxmm/core": ["./packages/core/src/index.ts"],
       "@xxmm/core/*": ["./packages/core/src/*"],
       "@xxmm/helper": ["./packages/helper/src/index.ts"],
