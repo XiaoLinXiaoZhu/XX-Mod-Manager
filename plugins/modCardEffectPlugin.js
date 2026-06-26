@@ -74,257 +74,257 @@ const modContainerCss = `
 `;
 
 function addHoverEffect(document, iManager) {
-	document.querySelectorAll(".mod-item").forEach((item) => {
-		item.addEventListener("mouseover", () => {
-			const modName = item.getAttribute("name");
-			//debug
-			console.log("hoverSwitchCurrentCard:", modName);
-			// iManager.setLastClickedMod_ByName(modName);
-			iManager.setCurrentModByName(modName);
-		});
-	});
+  document.querySelectorAll(".mod-item").forEach((item) => {
+    item.addEventListener("mouseover", () => {
+      const modName = item.getAttribute("name");
+      //debug
+      console.log("hoverSwitchCurrentCard:", modName);
+      // iManager.setLastClickedMod_ByName(modName);
+      iManager.setCurrentModByName(modName);
+    });
+  });
 }
 function removeHoverEffect(document, iManager) {
-	document.querySelectorAll(".mod-item").forEach((item) => {
-		item.removeEventListener("mouseover", () => {
-			const modName = item.getAttribute("name");
-			//debug
-			console.log("hoverSwitchCurrentCard:", modName);
-			// iManager.setLastClickedMod_ByName(modName);
-			iManager.setCurrentModByName(modName);
-		});
-	});
+  document.querySelectorAll(".mod-item").forEach((item) => {
+    item.removeEventListener("mouseover", () => {
+      const modName = item.getAttribute("name");
+      //debug
+      console.log("hoverSwitchCurrentCard:", modName);
+      // iManager.setLastClickedMod_ByName(modName);
+      iManager.setCurrentModByName(modName);
+    });
+  });
 }
 
 module.exports = {
-	name: pluginName,
-	t_displayName: {
-		zh_cn: "卡片效果",
-		en: "Mod Card Effect",
-	},
-	init(iManager) {
-		iManager.on("pluginLoaded", () => {
-			const useModCardFadeInOut = iManager.getPluginData(
-				pluginName,
-				"useModCardFadeInOut",
-			);
-			if (useModCardFadeInOut) {
-				const fadeInSpeed = iManager.getPluginData(pluginName, "fadeInSpeed");
-				const fadeOutSpeed = iManager.getPluginData(pluginName, "fadeOutSpeed");
-				iManager.addCssWithHash(fadeOutCss(fadeOutSpeed));
-				iManager.addCssWithHash(modCardCss(fadeInSpeed));
-				iManager.addCssWithHash(modContainerCss);
-			}
+  name: pluginName,
+  t_displayName: {
+    zh_cn: "卡片效果",
+    en: "Mod Card Effect",
+  },
+  init(iManager) {
+    iManager.on("pluginLoaded", () => {
+      const useModCardFadeInOut = iManager.getPluginData(
+        pluginName,
+        "useModCardFadeInOut",
+      );
+      if (useModCardFadeInOut) {
+        const fadeInSpeed = iManager.getPluginData(pluginName, "fadeInSpeed");
+        const fadeOutSpeed = iManager.getPluginData(pluginName, "fadeOutSpeed");
+        iManager.addCssWithHash(fadeOutCss(fadeOutSpeed));
+        iManager.addCssWithHash(modCardCss(fadeInSpeed));
+        iManager.addCssWithHash(modContainerCss);
+      }
 
-			const hoverSwitchCurrentCard = iManager.getPluginData(
-				pluginName,
-				"hoverSwitchCurrentCard",
-			);
-			if (hoverSwitchCurrentCard) {
-				addHoverEffect(document, iManager);
-			}
+      const hoverSwitchCurrentCard = iManager.getPluginData(
+        pluginName,
+        "hoverSwitchCurrentCard",
+      );
+      if (hoverSwitchCurrentCard) {
+        addHoverEffect(document, iManager);
+      }
 
-			const hideModCardSwapKey = iManager.getPluginData(
-				pluginName,
-				"hideModCardSwapKey",
-			);
-			if (hideModCardSwapKey) {
-				iManager.addCssWithHash(`
+      const hideModCardSwapKey = iManager.getPluginData(
+        pluginName,
+        "hideModCardSwapKey",
+      );
+      if (hideModCardSwapKey) {
+        iManager.addCssWithHash(`
                 .mod-item .hotkey-container {
                     display: none !important;
                 }
                 `);
-			}
-		});
+      }
+    });
 
-		const pluginData = [];
-		//-是否启用
-		const useModCardFadeInOut = {
-			name: "useModCardFadeInOut",
-			data: false,
-			type: "boolean",
-			displayName: "Use Mod Card Fade In Out",
-			description: "If true, the mod card will fade in and out",
-			t_displayName: {
-				zh_cn: "使用卡片淡入淡出",
-				en: "Use Mod Card Fade In Out",
-			},
-			t_description: {
-				zh_cn:
-					"开启后,mod卡片在显示和隐藏时会有淡入淡出效果，但是会有一定的性能消耗",
-				en: "If true, the mod card will fade in and out, but it will consume some performance",
-			},
-			onChange: (value) => {
-				useModCardFadeInOut.data = value;
-				const fadeInSpeed = iManager.getPluginData(pluginName, "fadeInSpeed");
-				const fadeOutSpeed = iManager.getPluginData(pluginName, "fadeOutSpeed");
+    const pluginData = [];
+    //-是否启用
+    const useModCardFadeInOut = {
+      name: "useModCardFadeInOut",
+      data: false,
+      type: "boolean",
+      displayName: "Use Mod Card Fade In Out",
+      description: "If true, the mod card will fade in and out",
+      t_displayName: {
+        zh_cn: "使用卡片淡入淡出",
+        en: "Use Mod Card Fade In Out",
+      },
+      t_description: {
+        zh_cn:
+          "开启后,mod卡片在显示和隐藏时会有淡入淡出效果，但是会有一定的性能消耗",
+        en: "If true, the mod card will fade in and out, but it will consume some performance",
+      },
+      onChange: (value) => {
+        useModCardFadeInOut.data = value;
+        const fadeInSpeed = iManager.getPluginData(pluginName, "fadeInSpeed");
+        const fadeOutSpeed = iManager.getPluginData(pluginName, "fadeOutSpeed");
 
-				console.log(
-					`useModCardFadeInOut changed: ${value}`,
-					fadeInSpeed,
-					fadeOutSpeed,
-				);
-				if (value) {
-					iManager.addCssWithHash(fadeOutCss(fadeOutSpeed));
-					iManager.addCssWithHash(modCardCss(fadeInSpeed));
-					iManager.addCssWithHash(modContainerCss);
-				} else {
-					iManager.removeCssWithHash(fadeOutCss(fadeOutSpeed));
-					iManager.removeCssWithHash(modCardCss(fadeInSpeed));
-					iManager.removeCssWithHash(modContainerCss);
-				}
-			},
-		};
-		pluginData.push(useModCardFadeInOut);
+        console.log(
+          `useModCardFadeInOut changed: ${value}`,
+          fadeInSpeed,
+          fadeOutSpeed,
+        );
+        if (value) {
+          iManager.addCssWithHash(fadeOutCss(fadeOutSpeed));
+          iManager.addCssWithHash(modCardCss(fadeInSpeed));
+          iManager.addCssWithHash(modContainerCss);
+        } else {
+          iManager.removeCssWithHash(fadeOutCss(fadeOutSpeed));
+          iManager.removeCssWithHash(modCardCss(fadeInSpeed));
+          iManager.removeCssWithHash(modContainerCss);
+        }
+      },
+    };
+    pluginData.push(useModCardFadeInOut);
 
-		//- 动画速度,分为fade in 和 fade out 两个部分
-		const fadeInSpeed = {
-			name: "fadeInSpeed",
-			data: 0.5,
-			type: "number",
-			displayName: "Fade In Speed",
-			description: "The speed of the fade in animation",
-			t_displayName: {
-				zh_cn: "淡入速度",
-				en: "Fade In Speed",
-			},
-			t_description: {
-				zh_cn: "淡入动画的速度,单位为秒",
-				en: "The speed of the fade in animation, in seconds",
-			},
-			onChange: (value) => {
-				console.log("fadeInSpeed changed:", value);
-				const fadeOutSpeed = iManager.getPluginData(pluginName, "fadeOutSpeed");
-				const ifUse = iManager.getPluginData(pluginName, "useModCardFadeInOut");
+    //- 动画速度,分为fade in 和 fade out 两个部分
+    const fadeInSpeed = {
+      name: "fadeInSpeed",
+      data: 0.5,
+      type: "number",
+      displayName: "Fade In Speed",
+      description: "The speed of the fade in animation",
+      t_displayName: {
+        zh_cn: "淡入速度",
+        en: "Fade In Speed",
+      },
+      t_description: {
+        zh_cn: "淡入动画的速度,单位为秒",
+        en: "The speed of the fade in animation, in seconds",
+      },
+      onChange: (value) => {
+        console.log("fadeInSpeed changed:", value);
+        const fadeOutSpeed = iManager.getPluginData(pluginName, "fadeOutSpeed");
+        const ifUse = iManager.getPluginData(pluginName, "useModCardFadeInOut");
 
-				if (ifUse) {
-					iManager.removeCssWithHash(fadeOutCss(fadeOutSpeed));
-					iManager.removeCssWithHash(modCardCss(fadeInSpeed.data));
-					iManager.addCssWithHash(fadeOutCss(fadeOutSpeed));
-					iManager.addCssWithHash(modCardCss(value));
-				}
+        if (ifUse) {
+          iManager.removeCssWithHash(fadeOutCss(fadeOutSpeed));
+          iManager.removeCssWithHash(modCardCss(fadeInSpeed.data));
+          iManager.addCssWithHash(fadeOutCss(fadeOutSpeed));
+          iManager.addCssWithHash(modCardCss(value));
+        }
 
-				fadeInSpeed.data = value;
-			},
-		};
-		pluginData.push(fadeInSpeed);
+        fadeInSpeed.data = value;
+      },
+    };
+    pluginData.push(fadeInSpeed);
 
-		const fadeOutSpeed = {
-			name: "fadeOutSpeed",
-			data: 0.2,
-			type: "number",
-			displayName: "Fade Out Speed",
-			description: "The speed of the fade out animation",
-			t_displayName: {
-				zh_cn: "淡出速度",
-				en: "Fade Out Speed",
-			},
-			t_description: {
-				zh_cn: "淡出动画的速度,单位为秒",
-				en: "The speed of the fade out animation, in seconds",
-			},
-			onChange: (value) => {
-				console.log("fadeOutSpeed changed:", value);
-				fadeOutSpeed.data = value;
-				const fadeInSpeed = iManager.getPluginData(pluginName, "fadeInSpeed");
-				const ifUse = iManager.getPluginData(pluginName, "useModCardFadeInOut");
+    const fadeOutSpeed = {
+      name: "fadeOutSpeed",
+      data: 0.2,
+      type: "number",
+      displayName: "Fade Out Speed",
+      description: "The speed of the fade out animation",
+      t_displayName: {
+        zh_cn: "淡出速度",
+        en: "Fade Out Speed",
+      },
+      t_description: {
+        zh_cn: "淡出动画的速度,单位为秒",
+        en: "The speed of the fade out animation, in seconds",
+      },
+      onChange: (value) => {
+        console.log("fadeOutSpeed changed:", value);
+        fadeOutSpeed.data = value;
+        const fadeInSpeed = iManager.getPluginData(pluginName, "fadeInSpeed");
+        const ifUse = iManager.getPluginData(pluginName, "useModCardFadeInOut");
 
-				if (ifUse) {
-					iManager.removeCssWithHash(fadeOutCss(fadeOutSpeed.data));
-					iManager.removeCssWithHash(modCardCss(fadeInSpeed));
-					iManager.addCssWithHash(fadeOutCss(value));
-					iManager.addCssWithHash(modCardCss(fadeInSpeed));
-				}
+        if (ifUse) {
+          iManager.removeCssWithHash(fadeOutCss(fadeOutSpeed.data));
+          iManager.removeCssWithHash(modCardCss(fadeInSpeed));
+          iManager.addCssWithHash(fadeOutCss(value));
+          iManager.addCssWithHash(modCardCss(fadeInSpeed));
+        }
 
-				fadeOutSpeed.data = value;
-			},
-		};
-		pluginData.push(fadeOutSpeed);
+        fadeOutSpeed.data = value;
+      },
+    };
+    pluginData.push(fadeOutSpeed);
 
-		const divider = {
-			name: "divider",
-			data: "",
-			type: "markdown",
-			displayName: "markdown divider",
-			description: "markdown divider",
-			t_displayName: {
-				zh_cn: "markdown divider",
-				en: "markdown divider",
-			},
-			t_description: {
-				zh_cn: "---",
-				en: "---",
-			},
-			onChange: (_value) => {
-				// markdown 类型的数据不会触发 onChange,它只作为展示
-			},
-		};
-		pluginData.push(divider);
+    const divider = {
+      name: "divider",
+      data: "",
+      type: "markdown",
+      displayName: "markdown divider",
+      description: "markdown divider",
+      t_displayName: {
+        zh_cn: "markdown divider",
+        en: "markdown divider",
+      },
+      t_description: {
+        zh_cn: "---",
+        en: "---",
+      },
+      onChange: (_value) => {
+        // markdown 类型的数据不会触发 onChange,它只作为展示
+      },
+    };
+    pluginData.push(divider);
 
-		//- 当卡片被 hover 时，切换 currentCard 的效果
-		const hoverSwitchCurrentCard = {
-			name: "hoverSwitchCurrentCard",
-			data: false,
-			type: "boolean",
-			displayName: "Hover Switch Current Card",
-			description:
-				"If true, the current card will be switched when hover on the mod card",
-			t_displayName: {
-				zh_cn: "鼠标悬停切换当前卡片",
-				en: "Hover Switch Current Card",
-			},
-			t_description: {
-				zh_cn: "当鼠标悬停在mod卡片上时，右侧的卡片详情会切换到当前卡片",
-				en: "If true, the details of the current card will be switched when hover on the mod card",
-			},
-			onChange: (value) => {
-				console.log("hoverSwitchCurrentCard changed:", value);
-				if (value) {
-					addHoverEffect(document, iManager);
-				} else {
-					removeHoverEffect(document, iManager);
-				}
+    //- 当卡片被 hover 时，切换 currentCard 的效果
+    const hoverSwitchCurrentCard = {
+      name: "hoverSwitchCurrentCard",
+      data: false,
+      type: "boolean",
+      displayName: "Hover Switch Current Card",
+      description:
+        "If true, the current card will be switched when hover on the mod card",
+      t_displayName: {
+        zh_cn: "鼠标悬停切换当前卡片",
+        en: "Hover Switch Current Card",
+      },
+      t_description: {
+        zh_cn: "当鼠标悬停在mod卡片上时，右侧的卡片详情会切换到当前卡片",
+        en: "If true, the details of the current card will be switched when hover on the mod card",
+      },
+      onChange: (value) => {
+        console.log("hoverSwitchCurrentCard changed:", value);
+        if (value) {
+          addHoverEffect(document, iManager);
+        } else {
+          removeHoverEffect(document, iManager);
+        }
 
-				hoverSwitchCurrentCard.data = value;
-			},
-		};
-		pluginData.push(hoverSwitchCurrentCard);
+        hoverSwitchCurrentCard.data = value;
+      },
+    };
+    pluginData.push(hoverSwitchCurrentCard);
 
-		//- 隐藏卡片下的快捷键提示
-		const hideModCardSwapKey = {
-			name: "hideModCardSwapKey",
-			data: false,
-			type: "boolean",
-			displayName: "Hide Mod Card Swap Key",
-			description: "If true, the swap key of the mod card will be hidden",
-			t_displayName: {
-				zh_cn: "隐藏卡片切换快捷键",
-				en: "Hide Mod Card Swap Key",
-			},
-			t_description: {
-				zh_cn: "隐藏卡片下的快捷键提示",
-				en: "If true, the swap key of the mod card will be hidden",
-			},
-			onChange: (value) => {
-				console.log("hideModCardSwapKey changed:", value);
-				hideModCardSwapKey.data = value;
-				if (value) {
-					iManager.addCssWithHash(`
+    //- 隐藏卡片下的快捷键提示
+    const hideModCardSwapKey = {
+      name: "hideModCardSwapKey",
+      data: false,
+      type: "boolean",
+      displayName: "Hide Mod Card Swap Key",
+      description: "If true, the swap key of the mod card will be hidden",
+      t_displayName: {
+        zh_cn: "隐藏卡片切换快捷键",
+        en: "Hide Mod Card Swap Key",
+      },
+      t_description: {
+        zh_cn: "隐藏卡片下的快捷键提示",
+        en: "If true, the swap key of the mod card will be hidden",
+      },
+      onChange: (value) => {
+        console.log("hideModCardSwapKey changed:", value);
+        hideModCardSwapKey.data = value;
+        if (value) {
+          iManager.addCssWithHash(`
                     .mod-item .hotkey-container {
                         display: none !important;
                     }
                     `);
-				} else {
-					iManager.removeCssWithHash(`
+        } else {
+          iManager.removeCssWithHash(`
                     .mod-item .hotkey-container {
                         display: none !important;
                     }
                     `);
-				}
-			},
-		};
-		pluginData.push(hideModCardSwapKey);
+        }
+      },
+    };
+    pluginData.push(hideModCardSwapKey);
 
-		iManager.registerPluginConfig(pluginName, pluginData);
-	},
+    iManager.registerPluginConfig(pluginName, pluginData);
+  },
 };

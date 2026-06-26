@@ -32,182 +32,182 @@ const pluginName = "refreshAfterApply";
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const refreshInGame = async (iManager) => {
-	// Refresh in ZZZ success flag
-	// 0: Failed
-	// 1: Success
-	// 2: Cannot find the process
-	// 3: Cannot find the zenless zone zero window
-	// 4: Cannot find the mod manager window
-	// Only availabe in windows
-	const HMC = iManager.HMC;
-	const isWindows = process.platform === "win32";
-	if (!isWindows) return 0;
-	const processName = iManager.getPluginData(pluginName, "processName");
-	const VisualKey = iManager.getPluginData(pluginName, "VisualKey");
-	if (!processName || !VisualKey) return 0;
-	if (isWindows) {
-		// Process name. Should be set as a config value for
-		// this to work while managing other games.
-		const process = HMC.getProcessNameList(processName);
-		if (process.length <= 0) return 2;
-		// Get the Zenless Zone Zero Hwnd handle
-		const window = HMC.getProcessWindow(process[0].pid);
-		if (!window) return 3;
-		// Get the Mod manager Hwnd handle
-		const manager = HMC.getForegroundWindow();
-		if (!manager) return 4;
-		// ZZZ wont accept any keys if the manager is not run as admin.
-		// ZZZ wont accept virtual keys, only accepts direct input keys.
-		// Here is the trick to get ZZZ to register the VK input without admin:
-		// 1. Press the F10 Key down on the manager
-		HMC.sendKeyboard(VisualKey, true);
-		// 2. Set focus on ZZZ window
-		window.setFocus(true);
-		// 3. Wait a reasonable amount of time for the key to register
-		await sleep(75);
-		// 4. Set focus on the Manager window
-		manager.setFocus(true);
-		// 5. Wait again for the window
-		await sleep(50);
-		// 6. Release the F10 Key
-		HMC.sendKeyboard(VisualKey, false);
-		// 7. Set focus on ZZZ window again
-		window.setFocus(true);
-		return 1;
-	}
-	return 0;
+  // Refresh in ZZZ success flag
+  // 0: Failed
+  // 1: Success
+  // 2: Cannot find the process
+  // 3: Cannot find the zenless zone zero window
+  // 4: Cannot find the mod manager window
+  // Only availabe in windows
+  const HMC = iManager.HMC;
+  const isWindows = process.platform === "win32";
+  if (!isWindows) return 0;
+  const processName = iManager.getPluginData(pluginName, "processName");
+  const VisualKey = iManager.getPluginData(pluginName, "VisualKey");
+  if (!processName || !VisualKey) return 0;
+  if (isWindows) {
+    // Process name. Should be set as a config value for
+    // this to work while managing other games.
+    const process = HMC.getProcessNameList(processName);
+    if (process.length <= 0) return 2;
+    // Get the Zenless Zone Zero Hwnd handle
+    const window = HMC.getProcessWindow(process[0].pid);
+    if (!window) return 3;
+    // Get the Mod manager Hwnd handle
+    const manager = HMC.getForegroundWindow();
+    if (!manager) return 4;
+    // ZZZ wont accept any keys if the manager is not run as admin.
+    // ZZZ wont accept virtual keys, only accepts direct input keys.
+    // Here is the trick to get ZZZ to register the VK input without admin:
+    // 1. Press the F10 Key down on the manager
+    HMC.sendKeyboard(VisualKey, true);
+    // 2. Set focus on ZZZ window
+    window.setFocus(true);
+    // 3. Wait a reasonable amount of time for the key to register
+    await sleep(75);
+    // 4. Set focus on the Manager window
+    manager.setFocus(true);
+    // 5. Wait again for the window
+    await sleep(50);
+    // 6. Release the F10 Key
+    HMC.sendKeyboard(VisualKey, false);
+    // 7. Set focus on ZZZ window again
+    window.setFocus(true);
+    return 1;
+  }
+  return 0;
 };
 
 module.exports = {
-	name: pluginName,
-	t_displayName: {
-		zh_cn: "游戏内刷新",
-		en: "Refresh After Apply",
-	},
-	init(iManager) {
-		iManager.on("modsApplied", async () => {
-			//debug
-			console.log("modsApplied");
-			if (iManager.getPluginData(pluginName, "ifRefreshAfterApply")) {
-				const result = await refreshInGame(iManager);
-				// Refresh in ZZZ success flag
-				// 0: Failed
-				// 1: Success
-				// 2: Cannot find the process
-				// 3: Cannot find the zenless zone zero window
-				// 4: Cannot find the mod manager window
-				// Only availabe in windows
-				const snackMessage =
-					iManager.config.language === "zh_cn"
-						? [
-								"刷新失败",
-								"刷新成功",
-								"找不到进程",
-								"找不到窗口",
-								"找不到mod管理器",
-							][result]
-						: [
-								"Refresh Failed",
-								"Refresh Success",
-								"Cannot find the process",
-								"Cannot find the window",
-								"Cannot find the mod manager",
-							][result];
-				iManager.snack(
-					ifRefreshAfterApply.t_displayName[iManager.config.language] +
-						" : " +
-						snackMessage,
-					result === 1 ? "success" : "error",
-				);
-			}
-		});
+  name: pluginName,
+  t_displayName: {
+    zh_cn: "游戏内刷新",
+    en: "Refresh After Apply",
+  },
+  init(iManager) {
+    iManager.on("modsApplied", async () => {
+      //debug
+      console.log("modsApplied");
+      if (iManager.getPluginData(pluginName, "ifRefreshAfterApply")) {
+        const result = await refreshInGame(iManager);
+        // Refresh in ZZZ success flag
+        // 0: Failed
+        // 1: Success
+        // 2: Cannot find the process
+        // 3: Cannot find the zenless zone zero window
+        // 4: Cannot find the mod manager window
+        // Only availabe in windows
+        const snackMessage =
+          iManager.config.language === "zh_cn"
+            ? [
+                "刷新失败",
+                "刷新成功",
+                "找不到进程",
+                "找不到窗口",
+                "找不到mod管理器",
+              ][result]
+            : [
+                "Refresh Failed",
+                "Refresh Success",
+                "Cannot find the process",
+                "Cannot find the window",
+                "Cannot find the mod manager",
+              ][result];
+        iManager.snack(
+          ifRefreshAfterApply.t_displayName[iManager.config.language] +
+            " : " +
+            snackMessage,
+          result === 1 ? "success" : "error",
+        );
+      }
+    });
 
-		const pluginData = [];
+    const pluginData = [];
 
-		//-MD介绍
-		const markdown = {
-			name: "markdown",
-			data: "",
-			type: "markdown",
-			displayName: "Refresh After Apply",
-			description: "Refresh the game after applying the mod",
-			t_displayName: {
-				zh_cn: "应用后刷新",
-				en: "Refresh After Apply",
-			},
-			t_description: {
-				zh_cn:
-					"# 在应用mod之后自动在游戏中应用mod\n通常在变更mod之后，需要手动按F10或者别的快捷键来使得Mod生效\n这个插件可以自动帮你刷新游戏\n_\n点击应用时，程序会自动刷新游戏",
-				en: "# Refresh the game after applying the mod\nUsually after changing the mod, you need to manually press F10 or other shortcut keys to make the Mod take effect\nThis plugin can automatically help you refresh the game\n\nWhen you click Apply, the program will automatically refresh the game",
-			},
-			onChange: (_value) => {
-				// markdown 类型的数据不会触发 onChange,它只作为展示
-			},
-		};
-		pluginData.push(markdown);
+    //-MD介绍
+    const markdown = {
+      name: "markdown",
+      data: "",
+      type: "markdown",
+      displayName: "Refresh After Apply",
+      description: "Refresh the game after applying the mod",
+      t_displayName: {
+        zh_cn: "应用后刷新",
+        en: "Refresh After Apply",
+      },
+      t_description: {
+        zh_cn:
+          "# 在应用mod之后自动在游戏中应用mod\n通常在变更mod之后，需要手动按F10或者别的快捷键来使得Mod生效\n这个插件可以自动帮你刷新游戏\n_\n点击应用时，程序会自动刷新游戏",
+        en: "# Refresh the game after applying the mod\nUsually after changing the mod, you need to manually press F10 or other shortcut keys to make the Mod take effect\nThis plugin can automatically help you refresh the game\n\nWhen you click Apply, the program will automatically refresh the game",
+      },
+      onChange: (_value) => {
+        // markdown 类型的数据不会触发 onChange,它只作为展示
+      },
+    };
+    pluginData.push(markdown);
 
-		//-是否启用
-		const ifRefreshAfterApply = {
-			name: "ifRefreshAfterApply",
-			data: false,
-			type: "boolean",
-			displayName: "Refresh After Apply",
-			t_displayName: {
-				zh_cn: "启用 应用后刷新",
-				en: "Refresh After Apply",
-			},
-			onChange: (value) => {
-				console.log("ifRefreshAfterApply changed:", value);
-				ifRefreshAfterApply.data = value;
-				// 直接赋值可能会导致插件的数据不同步，所以需要手动更新
-			},
-		};
-		pluginData.push(ifRefreshAfterApply);
+    //-是否启用
+    const ifRefreshAfterApply = {
+      name: "ifRefreshAfterApply",
+      data: false,
+      type: "boolean",
+      displayName: "Refresh After Apply",
+      t_displayName: {
+        zh_cn: "启用 应用后刷新",
+        en: "Refresh After Apply",
+      },
+      onChange: (value) => {
+        console.log("ifRefreshAfterApply changed:", value);
+        ifRefreshAfterApply.data = value;
+        // 直接赋值可能会导致插件的数据不同步，所以需要手动更新
+      },
+    };
+    pluginData.push(ifRefreshAfterApply);
 
-		//- 游戏进程名
-		const processName = {
-			name: "processName",
-			data: "ZenlessZoneZero.exe",
-			type: "string",
-			displayName: "Process Name",
-			description: "The process name of the game",
-			t_displayName: {
-				zh_cn: "进程名",
-				en: "Process Name",
-			},
-			t_description: {
-				zh_cn: "游戏的进程名",
-				en: "The process name of the game",
-			},
-			onChange: (value) => {
-				console.log("processName changed:", value);
-				processName.data = value;
-			},
-		};
-		pluginData.push(processName);
+    //- 游戏进程名
+    const processName = {
+      name: "processName",
+      data: "ZenlessZoneZero.exe",
+      type: "string",
+      displayName: "Process Name",
+      description: "The process name of the game",
+      t_displayName: {
+        zh_cn: "进程名",
+        en: "Process Name",
+      },
+      t_description: {
+        zh_cn: "游戏的进程名",
+        en: "The process name of the game",
+      },
+      onChange: (value) => {
+        console.log("processName changed:", value);
+        processName.data = value;
+      },
+    };
+    pluginData.push(processName);
 
-		//- F10键值
-		const VisualKey = {
-			name: "VisualKey",
-			data: 0x79,
-			type: "number",
-			displayName: "VisualKey",
-			description: "The virtual key code for F10",
-			t_displayName: {
-				zh_cn: "虚拟键值",
-				en: "VisualKey",
-			},
-			t_description: {
-				zh_cn: "刷新的虚拟键值(3dmiggoto中默认为F10,也就是121)",
-				en: "The virtual key code for refresh(3dmiggoto default is F10, which is 121)",
-			},
-			onChange: (value) => {
-				console.log("VisualKey changed:", value);
-				VisualKey.data = value;
-			},
-		};
-		pluginData.push(VisualKey);
+    //- F10键值
+    const VisualKey = {
+      name: "VisualKey",
+      data: 0x79,
+      type: "number",
+      displayName: "VisualKey",
+      description: "The virtual key code for F10",
+      t_displayName: {
+        zh_cn: "虚拟键值",
+        en: "VisualKey",
+      },
+      t_description: {
+        zh_cn: "刷新的虚拟键值(3dmiggoto中默认为F10,也就是121)",
+        en: "The virtual key code for refresh(3dmiggoto default is F10, which is 121)",
+      },
+      onChange: (value) => {
+        console.log("VisualKey changed:", value);
+        VisualKey.data = value;
+      },
+    };
+    pluginData.push(VisualKey);
 
-		iManager.registerPluginConfig(pluginName, pluginData);
-	},
+    iManager.registerPluginConfig(pluginName, pluginData);
+  },
 };

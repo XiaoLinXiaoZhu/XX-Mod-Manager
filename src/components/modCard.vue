@@ -53,22 +53,22 @@ import { ModData } from "../../core/ModHelper";
 import { DialogHelper, DialogID } from "../../helper/DialogHelper";
 
 const _displayHotKeysModes = {
-	none: 0,
-	inline: 1,
-	scrollbar: 2,
+  none: 0,
+  inline: 1,
+  scrollbar: 2,
 };
 
 const props = defineProps({
-	modRef: {
-		type: ModData,
-		required: true,
-	},
-	lazyLoad: Boolean,
-	compactMode: Boolean,
-	displayHotKeysMode: {
-		type: Number,
-		default: 1,
-	},
+  modRef: {
+    type: ModData,
+    required: true,
+  },
+  lazyLoad: Boolean,
+  compactMode: Boolean,
+  displayHotKeysMode: {
+    type: Number,
+    default: 1,
+  },
 });
 const enteredWindow = ref(false);
 
@@ -77,30 +77,30 @@ const ifDisplayImage = ref(true);
 const img = ref(null);
 
 const getImage = async () => {
-	// return 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
-	// 直到需要时才加载图片，加载后保存到 img.value
-	// 检查 props.modRef 是否存在
-	if (props.lazyLoad) {
-		if (props.modRef.preview == null) {
-			//如果没有预览图片，则不显示图片
-			ifDisplayImage.value = false;
-			return "";
-		}
-		ifDisplayImage.value = true;
-		return await props.modRef.getPreviewBase64(true);
-	} else {
-		return await props.modRef.getPreviewBase64(true);
-	}
+  // return 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
+  // 直到需要时才加载图片，加载后保存到 img.value
+  // 检查 props.modRef 是否存在
+  if (props.lazyLoad) {
+    if (props.modRef.preview == null) {
+      //如果没有预览图片，则不显示图片
+      ifDisplayImage.value = false;
+      return "";
+    }
+    ifDisplayImage.value = true;
+    return await props.modRef.getPreviewBase64(true);
+  } else {
+    return await props.modRef.getPreviewBase64(true);
+  }
 };
 
 //==================== init ====================//
 
 const enterWindow = async () => {
-	// console.log(`modItem ${props.mod} enterWindow: lazyLoad, img loaded`);
-	enteredWindow.value = true;
-	if (props.lazyLoad && img.value == null) {
-		img.value = await getImage();
-	}
+  // console.log(`modItem ${props.mod} enterWindow: lazyLoad, img loaded`);
+  enteredWindow.value = true;
+  if (props.lazyLoad && img.value == null) {
+    img.value = await getImage();
+  }
 };
 
 //===================== 动画效果 =====================//
@@ -109,243 +109,243 @@ const modItemRef = useTemplateRef("modItemRef");
 const _emit = defineEmits(["click"]);
 
 const click = (event) => {
-	const clickedAttr = modItemRef.value.getAttribute("clicked");
-	clicked.value = clickedAttr !== "true";
-	modItemRef.value.setAttribute("clicked", clicked.value);
-	if (event != null) {
-		playClickAnim(
-			modItemRef.value,
-			event,
-			modItemRef.value.getBoundingClientRect(),
-		);
-		//debug
-		console.log(
-			`click: ${props.mod},current clicked: ${clicked.value},attribute: ${modItemRef.value.getAttribute("clicked")}`,
-		);
-		//emit('click', props.mod);
-		// iManager.setLastClickedMod_ByName(props.mod);
-		iManager.setCurrentMod(props.modRef);
-		iManager.toggledModByName(props.modRef.name);
-	} else {
-		playClickAnim(modItemRef.value);
-	}
+  const clickedAttr = modItemRef.value.getAttribute("clicked");
+  clicked.value = clickedAttr !== "true";
+  modItemRef.value.setAttribute("clicked", clicked.value);
+  if (event != null) {
+    playClickAnim(
+      modItemRef.value,
+      event,
+      modItemRef.value.getBoundingClientRect(),
+    );
+    //debug
+    console.log(
+      `click: ${props.mod},current clicked: ${clicked.value},attribute: ${modItemRef.value.getAttribute("clicked")}`,
+    );
+    //emit('click', props.mod);
+    // iManager.setLastClickedMod_ByName(props.mod);
+    iManager.setCurrentMod(props.modRef);
+    iManager.toggledModByName(props.modRef.name);
+  } else {
+    playClickAnim(modItemRef.value);
+  }
 };
 
 const _openEditModDialog = () => {
-	iManager.setCurrentMod(props.modRef);
-	// iManager.showDialog('edit-mod-dialog');
-	DialogHelper.showDialog(DialogID.editModDialog);
+  iManager.setCurrentMod(props.modRef);
+  // iManager.showDialog('edit-mod-dialog');
+  DialogHelper.showDialog(DialogID.editModDialog);
 };
 
 function playClickAnim(modItem, event = null, rect = null) {
-	//获取鼠标相对于卡片的位置（百分比）
-	let x, y, rotateX, rotateY;
-	let rotateLevel = -20;
-	const clicked = modItem.getAttribute("clicked") === "true";
-	if (event != null && rect != null) {
-		//如果传入了event，则使用event的位置
-		//获取鼠标相对于卡片的位置（百分比）
-		x = (event.clientX - rect.left) / rect.width;
-		y = (event.clientY - rect.top) / rect.height;
-	} else {
-		//如果没有传入event，且modItem.clicked为true，则设置为0，0.7，否则设置为0.7，0 偏移0.2*random
-		x = !modItem.clicked ? 0 : Math.random() / 5 + 0.7;
-		y = !modItem.clicked ? 0.7 : Math.random() / 5;
-	}
-	//根据鼠标相对于卡片的位置设置反转程度
-	rotateX = 2 * (y - 0.5);
-	rotateY = -2 * (x - 0.5);
+  //获取鼠标相对于卡片的位置（百分比）
+  let x, y, rotateX, rotateY;
+  let rotateLevel = -20;
+  const clicked = modItem.getAttribute("clicked") === "true";
+  if (event != null && rect != null) {
+    //如果传入了event，则使用event的位置
+    //获取鼠标相对于卡片的位置（百分比）
+    x = (event.clientX - rect.left) / rect.width;
+    y = (event.clientY - rect.top) / rect.height;
+  } else {
+    //如果没有传入event，且modItem.clicked为true，则设置为0，0.7，否则设置为0.7，0 偏移0.2*random
+    x = !modItem.clicked ? 0 : Math.random() / 5 + 0.7;
+    y = !modItem.clicked ? 0.7 : Math.random() / 5;
+  }
+  //根据鼠标相对于卡片的位置设置反转程度
+  rotateX = 2 * (y - 0.5);
+  rotateY = -2 * (x - 0.5);
 
-	if (modItem.inWindow === undefined) {
-		//如果modItem.inWindow未定义，则设置为true
-		modItem.inWindow = true;
-	}
-	if (!modItem.inWindow) {
-		//如果modItem不在视窗内，则不进行动画
-		console.log(
-			`${modItem.name} | ${modItem.id} is not in window: prop inWindow is ${modItem.inWindow}`,
-		);
-		return;
-	}
+  if (modItem.inWindow === undefined) {
+    //如果modItem.inWindow未定义，则设置为true
+    modItem.inWindow = true;
+  }
+  if (!modItem.inWindow) {
+    //如果modItem不在视窗内，则不进行动画
+    console.log(
+      `${modItem.name} | ${modItem.id} is not in window: prop inWindow is ${modItem.inWindow}`,
+    );
+    return;
+  }
 
-	if (modItem.inWindow === undefined) {
-		//如果modItem.inWindow未定义，则设置为true
-		modItem.inWindow = true;
-	}
+  if (modItem.inWindow === undefined) {
+    //如果modItem.inWindow未定义，则设置为true
+    modItem.inWindow = true;
+  }
 
-	if (modItem.inWindow === false) {
-		//如果modItem不在视窗内，则不进行动画
-		console.log(
-			`${modItem.name} | ${modItem.id} is not in window: prop inWindow is ${modItem.inWindow}`,
-		);
-		return;
-	}
+  if (modItem.inWindow === false) {
+    //如果modItem不在视窗内，则不进行动画
+    console.log(
+      `${modItem.name} | ${modItem.id} is not in window: prop inWindow is ${modItem.inWindow}`,
+    );
+    return;
+  }
 
-	//添加动画
-	if (clicked) {
-		modItem.animate(
-			[
-				{ transform: `perspective( 500px ) rotate3d(1,1,0,0deg)` },
-				{
-					transform: `perspective( 500px ) translate(${-rotateY * 15}px,${rotateX * 15}px) rotateX(${rotateX * rotateLevel}deg) rotateY(${rotateY * rotateLevel}deg) scale(1.05)`,
-				},
-				//缩小一点
-				{
-					transform: `perspective( 500px ) translate(${-rotateY * 15}px,${rotateX * 15}px) rotateX(${rotateX * rotateLevel}deg) rotateY(${rotateY * rotateLevel}deg) scale(1)`,
-				},
-				{ transform: `perspective( 500px ) rotate3d(1,1,0,0deg) scale(0.95)` },
-			],
-			{
-				duration: 600,
-				easing: "cubic-bezier(0.25, 0.1, 0.25, 1)",
-				iterations: 1,
-			},
-		);
-	} else {
-		modItem.animate(
-			[
-				{ transform: `perspective( 500px ) rotate3d(1,1,0,0deg) scale(0.95)` },
+  //添加动画
+  if (clicked) {
+    modItem.animate(
+      [
+        { transform: `perspective( 500px ) rotate3d(1,1,0,0deg)` },
+        {
+          transform: `perspective( 500px ) translate(${-rotateY * 15}px,${rotateX * 15}px) rotateX(${rotateX * rotateLevel}deg) rotateY(${rotateY * rotateLevel}deg) scale(1.05)`,
+        },
+        //缩小一点
+        {
+          transform: `perspective( 500px ) translate(${-rotateY * 15}px,${rotateX * 15}px) rotateX(${rotateX * rotateLevel}deg) rotateY(${rotateY * rotateLevel}deg) scale(1)`,
+        },
+        { transform: `perspective( 500px ) rotate3d(1,1,0,0deg) scale(0.95)` },
+      ],
+      {
+        duration: 600,
+        easing: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+        iterations: 1,
+      },
+    );
+  } else {
+    modItem.animate(
+      [
+        { transform: `perspective( 500px ) rotate3d(1,1,0,0deg) scale(0.95)` },
 
-				{
-					transform: `perspective( 500px ) translate(${-rotateY * 5}px,${rotateX * 5}px) rotateX(${rotateX * rotateLevel}deg) rotateY(${rotateY * rotateLevel * 0.2}deg) scale(0.88)`,
-				},
-				//缩小一点
-				{
-					transform: `perspective( 500px ) translate(${-rotateY * 5}px,${rotateX * 5}px) rotateX(${rotateX * rotateLevel}deg) rotateY(${rotateY * rotateLevel * 0.2}deg) scale(1)`,
-				},
-				{ transform: `perspective( 500px ) rotate3d(1,1,0,0deg)` },
-			],
-			{
-				duration: 800,
-				easing: "cubic-bezier(0.25, 0.1, 0.25, 1)",
-				iterations: 1,
-			},
-		);
-	}
+        {
+          transform: `perspective( 500px ) translate(${-rotateY * 5}px,${rotateX * 5}px) rotateX(${rotateX * rotateLevel}deg) rotateY(${rotateY * rotateLevel * 0.2}deg) scale(0.88)`,
+        },
+        //缩小一点
+        {
+          transform: `perspective( 500px ) translate(${-rotateY * 5}px,${rotateX * 5}px) rotateX(${rotateX * rotateLevel}deg) rotateY(${rotateY * rotateLevel * 0.2}deg) scale(1)`,
+        },
+        { transform: `perspective( 500px ) rotate3d(1,1,0,0deg)` },
+      ],
+      {
+        duration: 800,
+        easing: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+        iterations: 1,
+      },
+    );
+  }
 
-	//todo: 使用tween.js
+  //todo: 使用tween.js
 }
 
 //-==================== compact mode ====================-//
 const enterCompactMode = (item) => {
-	item.animate([{ height: "350px" }, { height: "150px" }], {
-		duration: 300,
-		easing: "ease-in-out",
-		iterations: 1,
-	});
-	//item下的slot=headline，slot=text，slot=subhead的div元素会缓缓上移
-	//获取这些元素
-	//遍历子元素，匹配slot属性
-	item.childNodes.forEach((child) => {
-		if (
-			child.slot === "headline" ||
-			child.slot === "subhead" ||
-			child.slot === "text"
-		) {
-			child.animate(
-				[{ transform: "translateY(200px)" }, { transform: "translateY(0px)" }],
-				{
-					duration: 300,
-					easing: "ease-in-out",
-					iterations: 1,
-				},
-			);
-		}
-		if (child.slot === "image") {
-			//获取slot下的img元素
-			const img = child.querySelector("img");
-			if (img)
-				img.animate(
-					[
-						{ opacity: 1, filter: "blur(0px)" },
-						{ opacity: 0.2, filter: "blur(5px)" },
-					],
-					{
-						duration: 300,
-						easing: "ease-in-out",
-						iterations: 1,
-					},
-				);
-		}
-	});
+  item.animate([{ height: "350px" }, { height: "150px" }], {
+    duration: 300,
+    easing: "ease-in-out",
+    iterations: 1,
+  });
+  //item下的slot=headline，slot=text，slot=subhead的div元素会缓缓上移
+  //获取这些元素
+  //遍历子元素，匹配slot属性
+  item.childNodes.forEach((child) => {
+    if (
+      child.slot === "headline" ||
+      child.slot === "subhead" ||
+      child.slot === "text"
+    ) {
+      child.animate(
+        [{ transform: "translateY(200px)" }, { transform: "translateY(0px)" }],
+        {
+          duration: 300,
+          easing: "ease-in-out",
+          iterations: 1,
+        },
+      );
+    }
+    if (child.slot === "image") {
+      //获取slot下的img元素
+      const img = child.querySelector("img");
+      if (img)
+        img.animate(
+          [
+            { opacity: 1, filter: "blur(0px)" },
+            { opacity: 0.2, filter: "blur(5px)" },
+          ],
+          {
+            duration: 300,
+            easing: "ease-in-out",
+            iterations: 1,
+          },
+        );
+    }
+  });
 };
 const exitCompactMod = (item) => {
-	item.animate([{ height: "150px" }, { height: "350px" }], {
-		duration: 300,
-		easing: "ease-in-out",
-		iterations: 1,
-	});
+  item.animate([{ height: "150px" }, { height: "350px" }], {
+    duration: 300,
+    easing: "ease-in-out",
+    iterations: 1,
+  });
 
-	//item下的slot=headline，slot=text，slot=subhead的div元素会缓缓下移
-	//获取这些元素
-	//遍历子元素，匹配slot属性
+  //item下的slot=headline，slot=text，slot=subhead的div元素会缓缓下移
+  //获取这些元素
+  //遍历子元素，匹配slot属性
 
-	item.childNodes.forEach((child) => {
-		if (
-			child.slot === "headline" ||
-			child.slot === "subhead" ||
-			child.slot === "text"
-		) {
-			child.animate(
-				[{ transform: "translateY(-200px)" }, { transform: "translateY(0px)" }],
-				{
-					duration: 300,
-					easing: "ease-in-out",
-					iterations: 1,
-				},
-			);
-		}
-		if (child.slot === "image") {
-			//获取slot下的img元素
-			const img = child.querySelector("img");
-			if (img)
-				img.animate(
-					[
-						{ opacity: 0.2, filter: "blur(5px)" },
-						{ opacity: 1, filter: "blur(0px)" },
-					],
-					{
-						duration: 300,
-						easing: "ease-in-out",
-						iterations: 1,
-					},
-				);
-		}
-	});
+  item.childNodes.forEach((child) => {
+    if (
+      child.slot === "headline" ||
+      child.slot === "subhead" ||
+      child.slot === "text"
+    ) {
+      child.animate(
+        [{ transform: "translateY(-200px)" }, { transform: "translateY(0px)" }],
+        {
+          duration: 300,
+          easing: "ease-in-out",
+          iterations: 1,
+        },
+      );
+    }
+    if (child.slot === "image") {
+      //获取slot下的img元素
+      const img = child.querySelector("img");
+      if (img)
+        img.animate(
+          [
+            { opacity: 0.2, filter: "blur(5px)" },
+            { opacity: 1, filter: "blur(0px)" },
+          ],
+          {
+            duration: 300,
+            easing: "ease-in-out",
+            iterations: 1,
+          },
+        );
+    }
+  });
 };
 
 watch(
-	() => props.compactMode,
-	(newVal, _oldVal) => {
-		//debug
-		// console.log(`modItem ${props.mod} compactMode changed from ${oldVal} to ${newVal}`);
+  () => props.compactMode,
+  (newVal, _oldVal) => {
+    //debug
+    // console.log(`modItem ${props.mod} compactMode changed from ${oldVal} to ${newVal}`);
 
-		const modItem = modItemRef.value;
-		//debug
-		// console.log(`modItem ${modItem.id} inWindow:${modItem.getAttribute('inWindow')}`);
-		// 如果 为 hidden，则不进行动画
-		if (modItem.classList.contains("hidden")) {
-			return;
-		}
-		if (modItem.getAttribute("inWindow") !== "true") {
-			//如果modItem不在视窗内，则不进行动画
-			console.log(
-				`${modItem.name} | ${modItem.id} is not in window: prop inWindow is ${modItem.getAttribute("inWindow")}`,
-			);
-			return;
-		}
-		if (newVal) {
-			enterCompactMode(modItemRef.value);
-		} else {
-			exitCompactMod(modItemRef.value);
-		}
-	},
+    const modItem = modItemRef.value;
+    //debug
+    // console.log(`modItem ${modItem.id} inWindow:${modItem.getAttribute('inWindow')}`);
+    // 如果 为 hidden，则不进行动画
+    if (modItem.classList.contains("hidden")) {
+      return;
+    }
+    if (modItem.getAttribute("inWindow") !== "true") {
+      //如果modItem不在视窗内，则不进行动画
+      console.log(
+        `${modItem.name} | ${modItem.id} is not in window: prop inWindow is ${modItem.getAttribute("inWindow")}`,
+      );
+      return;
+    }
+    if (newVal) {
+      enterCompactMode(modItemRef.value);
+    } else {
+      exitCompactMod(modItemRef.value);
+    }
+  },
 );
 
 defineExpose({
-	click,
-	playClickAnim,
-	enterWindow,
+  click,
+  playClickAnim,
+  enterWindow,
 });
 </script>
 

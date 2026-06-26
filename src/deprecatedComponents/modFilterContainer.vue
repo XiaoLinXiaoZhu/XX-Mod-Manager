@@ -21,28 +21,28 @@ const iManager = new IManager();
 import { EventSystem } from "../../helper/EventSystem";
 
 const props = defineProps({
-	filterItems: Array,
-	currentCharacter: String,
+  filterItems: Array,
+  currentCharacter: String,
 });
 
 const currentCharacter = ref("all");
 const _computedFilterItems = computed(() => {
-	return getFilterItems().map((item) => {
-		const transLatedText =
-			item === "all" || item === "selected"
-				? t(`element.filter.${item}`)
-				: item;
-		return {
-			text: item,
-			transLatedText: transLatedText,
-			checked: item === currentCharacter.value,
-		};
-	});
+  return getFilterItems().map((item) => {
+    const transLatedText =
+      item === "all" || item === "selected"
+        ? t(`element.filter.${item}`)
+        : item;
+    return {
+      text: item,
+      transLatedText: transLatedText,
+      checked: item === currentCharacter.value,
+    };
+  });
 });
 
 const sliderStyle = reactive({
-	width: "0px",
-	left: "0px",
+  width: "0px",
+  left: "0px",
 });
 const containerRef = useTemplateRef("containerRef");
 const isDragging = ref(false);
@@ -50,85 +50,85 @@ const startX = ref(0);
 const scrollLeft = ref(0);
 
 const _selectItem = (item, index) => {
-	//debug
-	console.log(`selected ${item.text}`);
-	if (item.text === currentCharacter.value) return;
+  //debug
+  console.log(`selected ${item.text}`);
+  if (item.text === currentCharacter.value) return;
 
-	currentCharacter.value = item.text;
-	iManager.setCurrentCharacter(item.text);
-	updateSlider(index);
-	emitCurrentCharacter();
+  currentCharacter.value = item.text;
+  iManager.setCurrentCharacter(item.text);
+  updateSlider(index);
+  emitCurrentCharacter();
 };
 
 const updateSlider = (index) => {
-	//debug
-	//console.log(containerRef.value)
-	const chipButtons = containerRef.value.querySelectorAll("s-chip");
-	const selectedChip = chipButtons[index];
-	//debug
-	//console.log(`updateSlider: ${selectedChip}`)
-	sliderStyle.width = `${selectedChip.offsetWidth}px`;
-	sliderStyle.left = `${selectedChip.offsetLeft}px`;
+  //debug
+  //console.log(containerRef.value)
+  const chipButtons = containerRef.value.querySelectorAll("s-chip");
+  const selectedChip = chipButtons[index];
+  //debug
+  //console.log(`updateSlider: ${selectedChip}`)
+  sliderStyle.width = `${selectedChip.offsetWidth}px`;
+  sliderStyle.left = `${selectedChip.offsetLeft}px`;
 };
 
 const _onWheel = (event) => {
-	const container = containerRef.value;
-	container.scrollLeft += event.deltaY;
+  const container = containerRef.value;
+  container.scrollLeft += event.deltaY;
 };
 
 const _onMouseDown = (event) => {
-	isDragging.value = true;
-	startX.value = event.pageX - containerRef.value.offsetLeft;
-	scrollLeft.value = containerRef.value.scrollLeft;
+  isDragging.value = true;
+  startX.value = event.pageX - containerRef.value.offsetLeft;
+  scrollLeft.value = containerRef.value.scrollLeft;
 };
 
 const _onMouseUp = () => {
-	isDragging.value = false;
+  isDragging.value = false;
 };
 
 const _onMouseMove = (event) => {
-	if (!isDragging.value) return;
-	event.preventDefault();
-	const x = event.pageX - containerRef.value.offsetLeft;
-	const walk = (x - startX.value) * 2; // Scroll-fast
-	containerRef.value.scrollLeft = scrollLeft.value - walk;
+  if (!isDragging.value) return;
+  event.preventDefault();
+  const x = event.pageX - containerRef.value.offsetLeft;
+  const walk = (x - startX.value) * 2; // Scroll-fast
+  containerRef.value.scrollLeft = scrollLeft.value - walk;
 };
 
 EventSystem.on("currentCharacterChanged", (character) => {
-	if (character === currentCharacter.value) return;
-	//debug
-	console.log(`get currentCharacterChanged: ${character}`);
-	currentCharacter.value = character;
-	const index = getFilterItems().indexOf(character);
-	console.log(`get index: ${index}`);
-	updateSlider(index);
+  if (character === currentCharacter.value) return;
+  //debug
+  console.log(`get currentCharacterChanged: ${character}`);
+  currentCharacter.value = character;
+  const index = getFilterItems().indexOf(character);
+  console.log(`get index: ${index}`);
+  updateSlider(index);
 });
 
 onMounted(async () => {
-	console.log(
-		`✅✅✅✅✅✅✅ get currentCharacter.value: ${currentCharacter.value}`,
-	);
+  console.log(
+    `✅✅✅✅✅✅✅ get currentCharacter.value: ${currentCharacter.value}`,
+  );
 }, 1);
 
 watch(currentCharacter, (newVal, _oldVal) => {
-	const filterItems = getFilterItems();
-	//debug
-	//console.log(`watch: ${filterItems}`)
-	const index = filterItems.indexOf(newVal);
-	updateSlider(index);
+  const filterItems = getFilterItems();
+  //debug
+  //console.log(`watch: ${filterItems}`)
+  const index = filterItems.indexOf(newVal);
+  updateSlider(index);
 });
 
 function getFilterItems() {
-	if (!props.filterItems) {
-		props.filterItems = ["全部", "已选择", "1"];
-	}
-	return props.filterItems;
+  if (!props.filterItems) {
+    props.filterItems = ["全部", "已选择", "1"];
+  }
+  return props.filterItems;
 }
 
 //-============对外的接口================
 const emit = defineEmits(["changeFilter"]);
 const emitCurrentCharacter = () => {
-	emit("changeFilter", currentCharacter.value);
+  emit("changeFilter", currentCharacter.value);
 };
 </script>
 

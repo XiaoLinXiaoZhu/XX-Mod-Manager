@@ -1,0 +1,26 @@
+# EditorConfig顶级配置文件
+root = true
+
+# 所有文件通用规则
+[*]
+charset = utf-8
+end_of_line = lf
+trim_trailing_whitespace = true
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+
+# Markdown文件特定规则
+[*.md]
+trim_trailing_whitespace = false   # 某些Markdown语法需要尾部空格
+
+# 特定语言规则
+[*.py]
+indent_size = 4
+
+[Makefile]
+indent_style = tab
+
+# 特定目录规则
+[db/**]
+charset = latin1

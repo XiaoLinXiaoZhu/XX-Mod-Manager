@@ -1,41 +1,41 @@
 {
-	"name": "xx-mod-manager",
-	"private": true,
-	"description": "xx-mod-manager",
-	"main": "./electron/main.js",
-	"author": "XLXZ",
-	"license": "GPL-3.0-only",
-	"version": "1.4.0",
-	"type": "commonjs",
-	"scripts": {
-		"dev": "vite",
-		"build": "vite build && electron-builder --win --linux",
-		"preview": "vite preview",
-		"vite": "concurrently \"npm run dev\" \"electron . --dev --devTools\"",
-		"vite0": "concurrently \"npm run dev\" \"electron . --dev --devTools --customConfig D:\\GameResource\\ZZMI\\customConfig\"",
-		"vite-firstpage": "concurrently \"npm run dev\" \"electron . --dev --devTools --firstpage\"",
-		"vite-config": "concurrently \"npm run dev\" \"electron . --dev --devTools --switchConfig\"",
-		"start": "electron .",
-		"publish": "electron-builder --publish always",
-		"typecheck": "tsgo --noEmit",
-		"check": "bunx biome check --write ."
-	},
-	"dependencies": {
-		"@tweenjs/tween.js": "^25.0.0",
-		"concurrently": "^10.0.3",
-		"hmc-win32": "^1.4.92",
-		"sober": "^1.1.10",
-		"three": "^0.185.0",
-		"vite": "^8.1.0",
-		"vue": "^3.5.39",
-		"vue-i18n": "^11.4.6"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "^2.5.1",
-		"@types/three": "^0.185.0",
-		"@typescript/native-preview": "^7.0.0-dev.20260626.1",
-		"@vitejs/plugin-vue": "^6.0.7",
-		"electron": "^42.5.0",
-		"electron-builder": "^26.15.3"
-	}
+  "name": "xx-mod-manager",
+  "private": true,
+  "description": "xx-mod-manager",
+  "main": "./electron/main.js",
+  "author": "XLXZ",
+  "license": "GPL-3.0-only",
+  "version": "1.4.0",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && electron-builder --win --linux",
+    "preview": "vite preview",
+    "vite": "concurrently \"npm run dev\" \"electron . --dev --devTools\"",
+    "vite0": "concurrently \"npm run dev\" \"electron . --dev --devTools --customConfig D:\\GameResource\\ZZMI\\customConfig\"",
+    "vite-firstpage": "concurrently \"npm run dev\" \"electron . --dev --devTools --firstpage\"",
+    "vite-config": "concurrently \"npm run dev\" \"electron . --dev --devTools --switchConfig\"",
+    "start": "electron .",
+    "publish": "electron-builder --publish always",
+    "typecheck": "tsgo --noEmit",
+    "check": "bunx biome check --write ."
+  },
+  "dependencies": {
+    "@tweenjs/tween.js": "^25.0.0",
+    "concurrently": "^10.0.3",
+    "hmc-win32": "^1.4.92",
+    "sober": "^1.1.10",
+    "three": "^0.185.0",
+    "vite": "^8.1.0",
+    "vue": "^3.5.39",
+    "vue-i18n": "^11.4.6"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.1",
+    "@types/three": "^0.185.0",
+    "@typescript/native-preview": "^7.0.0-dev.20260626.1",
+    "@vitejs/plugin-vue": "^6.0.7",
+    "electron": "^42.5.0",
+    "electron-builder": "^26.15.3"
+  }
 }

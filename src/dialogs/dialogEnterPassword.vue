@@ -38,28 +38,28 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
 function _handleCancel() {
-	iManager.dismissDialog("dialog-enter-password");
-	iManager.dismissDialog("loading-dialog");
-	iManager.snack(t("dialogEnterPassword.cancel"), "error");
+  iManager.dismissDialog("dialog-enter-password");
+  iManager.dismissDialog("loading-dialog");
+  iManager.snack(t("dialogEnterPassword.cancel"), "error");
 
-	getPassword.value = "";
+  getPassword.value = "";
 }
 
 function _handleConfirm() {
-	console.log("confirm password:", getPassword.value);
-	iManager.dismissDialog("dialog-enter-password");
-	iManager.snack(t("dialogEnterPassword.confirm") + getPassword.value, "info");
-	iManager.archivePassword = getPassword.value;
+  console.log("confirm password:", getPassword.value);
+  iManager.dismissDialog("dialog-enter-password");
+  iManager.snack(t("dialogEnterPassword.confirm") + getPassword.value, "info");
+  iManager.archivePassword = getPassword.value;
 
-	getPassword.value = "";
+  getPassword.value = "";
 }
 
 //测试用
 onMounted(() => {
-	console.log("dialog-enter-password mounted");
-	// iManager.waitInit().then(() => {
-	//     iManager.showDialog('dialog-enter-password');
-	// });
+  console.log("dialog-enter-password mounted");
+  // iManager.waitInit().then(() => {
+  //     iManager.showDialog('dialog-enter-password');
+  // });
 });
 </script>
 

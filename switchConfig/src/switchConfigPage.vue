@@ -53,11 +53,11 @@
 import { onMounted, ref, useTemplateRef } from "vue";
 
 function _handleBackButtomClick() {
-	console.log("back button clicked");
+  console.log("back button clicked");
 }
 
 function _handleSectionChange(newSection) {
-	console.log("Section changed to:", newSection);
+  console.log("Section changed to:", newSection);
 }
 
 import IManager from "../../electron/IManager";
@@ -74,56 +74,56 @@ const plainConfigRefs = useTemplateRef("plainConfigRefs");
 import XXMMCore from "../../core/XXMMCore";
 
 function _selectTape(e, tape) {
-	console.log("selectTape", tape);
-	currentTape.value = tape;
-	currentTapeIndex.value = allConfig.value.indexOf(tape);
-	console.log("currentTapeIndex:", currentTapeIndex.value);
+  console.log("selectTape", tape);
+  currentTape.value = tape;
+  currentTapeIndex.value = allConfig.value.indexOf(tape);
+  console.log("currentTapeIndex:", currentTapeIndex.value);
 
-	// 取消其他卡片的选中状态
-	plainConfigRefs.value?.forEach((config) => {
-		// debug
-		console.log(
-			"config:",
-			config,
-			config?.$props.configRef,
-			tape,
-			config?.$props.configRef === tape,
-			config?.clicked,
-		);
-		if (config && config.$props.configRef !== tape && config.clicked) {
-			//debug
-			console.log("cancle click:", config);
-			config?.click(null as any);
-		}
-		if (config && config.$props.configRef === tape && !config.clicked) {
-			config?.click(e);
-		}
-		if (config && config.$props.configRef === tape && config.clicked) {
-			config?.click(e, false);
-		}
-	});
+  // 取消其他卡片的选中状态
+  plainConfigRefs.value?.forEach((config) => {
+    // debug
+    console.log(
+      "config:",
+      config,
+      config?.$props.configRef,
+      tape,
+      config?.$props.configRef === tape,
+      config?.clicked,
+    );
+    if (config && config.$props.configRef !== tape && config.clicked) {
+      //debug
+      console.log("cancle click:", config);
+      config?.click(null as any);
+    }
+    if (config && config.$props.configRef === tape && !config.clicked) {
+      config?.click(e);
+    }
+    if (config && config.$props.configRef === tape && config.clicked) {
+      config?.click(e, false);
+    }
+  });
 }
 
 function _handleRefreshButtonClicked() {
-	console.log("handleRefreshButtonClicked");
-	TapeConfig.loadAllConfig();
+  console.log("handleRefreshButtonClicked");
+  TapeConfig.loadAllConfig();
 }
 
 function _handleApplyButtonClicked() {
-	console.log("handleApplyButtonClicked");
-	// TapeConfig.applyConfig(currentTape.value);
-	iManager.temp.ifDontSaveOnClose = true;
-	// ipcRenderer.invoke('set-custom-config-folder', currentTape.value._dir);
-	XXMMCore.setCustomConfigFolder(currentTape.value._dir);
-	// 页面重载为 mainPage
-	// ipcRenderer.send('switch-page', 'mainPage');
-	// 5s后重载
-	iManager.changeUrl("");
+  console.log("handleApplyButtonClicked");
+  // TapeConfig.applyConfig(currentTape.value);
+  iManager.temp.ifDontSaveOnClose = true;
+  // ipcRenderer.invoke('set-custom-config-folder', currentTape.value._dir);
+  XXMMCore.setCustomConfigFolder(currentTape.value._dir);
+  // 页面重载为 mainPage
+  // ipcRenderer.send('switch-page', 'mainPage');
+  // 5s后重载
+  iManager.changeUrl("");
 }
 
 onMounted(() => {
-	TapeConfig.loadAllConfig();
-	console.log("currentTape:", currentTape.value);
+  TapeConfig.loadAllConfig();
+  console.log("currentTape:", currentTape.value);
 });
 
 //每0.5s打印一次allConfig

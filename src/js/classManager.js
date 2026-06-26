@@ -13,77 +13,77 @@ let isSleep = false;
 import { EventSystem, EventType } from "../../helper/EventSystem";
 
 EventSystem.on("windowFocus", () => {
-	isSleep = false;
+  isSleep = false;
 });
 EventSystem.on("windowSleep", () => {
-	isSleep = true;
+  isSleep = true;
 });
 
 class ClassManagerService {
-	items = [];
-	constructor() {
-		this.items = [];
-	}
-	static instance = null;
-	// static Instance = {
-	//     get prop(){
-	//         return ClassManagerService.instance;
-	//     },
-	//     set prop(value){
-	//         throw new Error('Cannot set instance');
-	//     }
-	// }
+  items = [];
+  constructor() {
+    this.items = [];
+  }
+  static instance = null;
+  // static Instance = {
+  //     get prop(){
+  //         return ClassManagerService.instance;
+  //     },
+  //     set prop(value){
+  //         throw new Error('Cannot set instance');
+  //     }
+  // }
 
-	add(item) {
-		this.items.push(item);
-	}
+  add(item) {
+    this.items.push(item);
+  }
 
-	remove(item) {
-		const index = this.items.indexOf(item);
-		if (index > -1) {
-			this.items.splice(index, 1);
-		}
-	}
+  remove(item) {
+    const index = this.items.indexOf(item);
+    if (index > -1) {
+      this.items.splice(index, 1);
+    }
+  }
 
-	update() {
-		requestAnimationFrame(this.update.bind(this));
-		//debug
+  update() {
+    requestAnimationFrame(this.update.bind(this));
+    //debug
 
-		// refresh items
-		if (this.items.length === 0 || isSleep) {
-			return;
-		}
-		this.items.forEach((item) => {
-			if (!item.hasBuild) {
-				item.build();
-			}
-			if (item.needRefresh) {
-				item.refresh();
-			}
-			item.onUpdate();
-		});
-	}
+    // refresh items
+    if (this.items.length === 0 || isSleep) {
+      return;
+    }
+    this.items.forEach((item) => {
+      if (!item.hasBuild) {
+        item.build();
+      }
+      if (item.needRefresh) {
+        item.refresh();
+      }
+      item.onUpdate();
+    });
+  }
 
-	onPageInit() {
-		this.items.forEach((item) => {
-			item.onPageInit();
-		});
-	}
+  onPageInit() {
+    this.items.forEach((item) => {
+      item.onPageInit();
+    });
+  }
 }
 
 ClassManagerService.instance = new ClassManagerService();
 document.addEventListener("DOMContentLoaded", () => {
-	const instance = ClassManagerService.instance;
-	//debug
-	console.log(instance);
-	// instance.onPageInit();
-	// instance.update();
+  const instance = ClassManagerService.instance;
+  //debug
+  console.log(instance);
+  // instance.onPageInit();
+  // instance.update();
 });
 
 EventSystem.on(EventType.pluginLoaded, () => {
-	const instance = ClassManagerService.instance;
-	instance.onPageInit();
-	instance.update();
+  const instance = ClassManagerService.instance;
+  instance.onPageInit();
+  instance.update();
 });
 
 // ClassManager 是一个抽象类， 用于管理 class 对应的 items, 他提供下列功能：
@@ -92,74 +92,74 @@ EventSystem.on(EventType.pluginLoaded, () => {
 // 3. 提供一个 onPageInit 方法， 用于执行 页面初始化方法
 
 class ClassManager {
-	items = [];
-	classType = "";
-	classManagerService = ClassManagerService.instance;
+  items = [];
+  classType = "";
+  classManagerService = ClassManagerService.instance;
 
-	disableOnSleep = true;
+  disableOnSleep = true;
 
-	constructor(classType) {
-		this.classType = classType;
-		this.classManagerService = ClassManagerService.instance;
-		this.classManagerService.add(this);
-	}
+  constructor(classType) {
+    this.classType = classType;
+    this.classManagerService = ClassManagerService.instance;
+    this.classManagerService.add(this);
+  }
 
-	init = (element) => {
-		//debug
-		console.log(`init ${element}`);
-	};
+  init = (element) => {
+    //debug
+    console.log(`init ${element}`);
+  };
 
-	destroy = (element) => {
-		//debug
-		console.log(`destroy ${element}`);
-	};
+  destroy = (element) => {
+    //debug
+    console.log(`destroy ${element}`);
+  };
 
-	onUpdate = () => {
-		return;
-	};
+  onUpdate = () => {
+    return;
+  };
 
-	onPageInit = () => {
-		return;
-	};
+  onPageInit = () => {
+    return;
+  };
 
-	needRefresh = false;
-	refresh() {
-		// 重新扫描 items
-		const newItems = document.querySelectorAll(`.${this.classType}`);
-		const removeItems = [];
-		const addItems = [];
-		this.items.forEach((item) => {
-			if (!item.classList.contains(this.classType)) {
-				removeItems.push(item);
-				return;
-			}
-		});
-		//debug
-		newItems.forEach((item) => {
-			if (!this.items.includes(item)) {
-				addItems.push(item);
-			}
-		});
+  needRefresh = false;
+  refresh() {
+    // 重新扫描 items
+    const newItems = document.querySelectorAll(`.${this.classType}`);
+    const removeItems = [];
+    const addItems = [];
+    this.items.forEach((item) => {
+      if (!item.classList.contains(this.classType)) {
+        removeItems.push(item);
+        return;
+      }
+    });
+    //debug
+    newItems.forEach((item) => {
+      if (!this.items.includes(item)) {
+        addItems.push(item);
+      }
+    });
 
-		if (removeItems.length > 0) {
-			this.items = this.items.filter((item) => !removeItems.includes(item));
-			removeItems.forEach((item) => {
-				this.destroy(item);
-			});
-		}
+    if (removeItems.length > 0) {
+      this.items = this.items.filter((item) => !removeItems.includes(item));
+      removeItems.forEach((item) => {
+        this.destroy(item);
+      });
+    }
 
-		if (addItems.length > 0) {
-			this.items = this.items.concat(addItems);
-			addItems.forEach((item) => {
-				this.init(item);
-			});
-		}
-	}
+    if (addItems.length > 0) {
+      this.items = this.items.concat(addItems);
+      addItems.forEach((item) => {
+        this.init(item);
+      });
+    }
+  }
 
-	hasBuild = false;
-	build() {
-		this.hasBuild = true;
-	}
+  hasBuild = false;
+  build() {
+    this.hasBuild = true;
+  }
 }
 
 export { ClassManager, ClassManagerService }

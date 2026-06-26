@@ -7,65 +7,65 @@ import { EventSystem } from '../../helper/EventSystem';
 
 // 创建一个Color类，用于表示颜色
 class Color {
-	constructor(hex) {
-		this.hex = hex;
-		this.r = hex >> 16;
-		this.g = (hex >> 8) & 0xff;
-		this.b = hex & 0xff;
-	}
+  constructor(hex) {
+    this.hex = hex;
+    this.r = hex >> 16;
+    this.g = (hex >> 8) & 0xff;
+    this.b = hex & 0xff;
+  }
 
-	r = this.hex >> 16;
-	g = (this.hex >> 8) & 0xff;
-	b = this.hex & 0xff;
+  r = this.hex >> 16;
+  g = (this.hex >> 8) & 0xff;
+  b = this.hex & 0xff;
 
-	clone() {
-		return new Color(this.hex);
-	}
+  clone() {
+    return new Color(this.hex);
+  }
 
-	lerp(color, alpha) {
-		// 通过lerp函数，计算两个颜色之间的插值
-		const hex = this.hex;
-		const hex2 = color.hex;
-		const r = hex >> 16;
-		const g = (hex >> 8) & 0xff;
-		const b = hex & 0xff;
-		const r2 = hex2 >> 16;
-		const g2 = (hex2 >> 8) & 0xff;
-		const b2 = hex2 & 0xff;
-		const r3 = r + (r2 - r) * alpha;
-		const g3 = g + (g2 - g) * alpha;
-		const b3 = b + (b2 - b) * alpha;
-		const _hex3 = ((r3 && 0xff) << (16 + (g3 && 0xff))) << (8 + (b3 && 0xff));
-		return new Color(
-			((r3 && 0xff) << (16 + (g3 && 0xff))) << (8 + (b3 && 0xff)),
-		);
-	}
+  lerp(color, alpha) {
+    // 通过lerp函数，计算两个颜色之间的插值
+    const hex = this.hex;
+    const hex2 = color.hex;
+    const r = hex >> 16;
+    const g = (hex >> 8) & 0xff;
+    const b = hex & 0xff;
+    const r2 = hex2 >> 16;
+    const g2 = (hex2 >> 8) & 0xff;
+    const b2 = hex2 & 0xff;
+    const r3 = r + (r2 - r) * alpha;
+    const g3 = g + (g2 - g) * alpha;
+    const b3 = b + (b2 - b) * alpha;
+    const _hex3 = ((r3 && 0xff) << (16 + (g3 && 0xff))) << (8 + (b3 && 0xff));
+    return new Color(
+      ((r3 && 0xff) << (16 + (g3 && 0xff))) << (8 + (b3 && 0xff)),
+    );
+  }
 
-	getHexString() {
-		//debg
-		return this.hex.toString(16);
-	}
+  getHexString() {
+    //debg
+    return this.hex.toString(16);
+  }
 
-	setColor(r, g, b) {
-		// 设置颜色
-		// 需要过滤掉小数部分
-		this.r = Math.floor(r);
-		this.g = Math.floor(g);
-		this.b = Math.floor(b);
-		this.hex = (this.r << 16) + (this.g << 8) + this.b;
-	}
+  setColor(r, g, b) {
+    // 设置颜色
+    // 需要过滤掉小数部分
+    this.r = Math.floor(r);
+    this.g = Math.floor(g);
+    this.b = Math.floor(b);
+    this.hex = (this.r << 16) + (this.g << 8) + this.b;
+  }
 }
 
 // 将上述代码 改为 使用 ClassManager 来管理
 let currentTheme = "dark";
 const lightColor = {
-	startColor: new Color(0x53727e),
-	endColor: new Color(0x0e3f3c),
+  startColor: new Color(0x53727e),
+  endColor: new Color(0x0e3f3c),
 };
 
 const darkColor = {
-	startColor: new Color(0x9fb900),
-	endColor: new Color(0xf2d900),
+  startColor: new Color(0x9fb900),
+  endColor: new Color(0xf2d900),
 };
 
 let startColor = new Color(0x94ad00);
@@ -80,53 +80,53 @@ const colorChangeTime = 2000; // 颜色变化的时间
 
 // 根据 theme 的变化，改变颜色
 const startColorTweenByTheme = (theme) => {
-	if (theme === "dark") {
-		startColor = darkColor.startColor;
-		endColor = darkColor.endColor;
-	} else {
-		startColor = lightColor.startColor;
-		endColor = lightColor.endColor;
-	}
+  if (theme === "dark") {
+    startColor = darkColor.startColor;
+    endColor = darkColor.endColor;
+  } else {
+    startColor = lightColor.startColor;
+    endColor = lightColor.endColor;
+  }
 
-	//debug
-	console.log("theme change", theme, startColor, endColor);
+  //debug
+  console.log("theme change", theme, startColor, endColor);
 
-	// 重新创建一个tween对象
-	ColorTween = new Tween({ r: startColor.r, g: startColor.g, b: startColor.b }); // 创建一个tween对象
-	ColorTween.to(
-		{ r: endColor.r, g: endColor.g, b: endColor.b },
-		colorChangeTime,
-	)
-		.easing(Easing.Quadratic.InOut)
-		.onUpdate((object) => {
-			currentColor.setColor(object.r, object.g, object.b);
-			// console.log(`currentColor: ${currentColor.getHexString()}`);
-		})
-		.yoyo(true)
-		.repeat(Infinity)
-		.repeatDelay(500)
-		.start();
-	//清空group
-	group.removeAll();
-	group.add(ColorTween);
+  // 重新创建一个tween对象
+  ColorTween = new Tween({ r: startColor.r, g: startColor.g, b: startColor.b }); // 创建一个tween对象
+  ColorTween.to(
+    { r: endColor.r, g: endColor.g, b: endColor.b },
+    colorChangeTime,
+  )
+    .easing(Easing.Quadratic.InOut)
+    .onUpdate((object) => {
+      currentColor.setColor(object.r, object.g, object.b);
+      // console.log(`currentColor: ${currentColor.getHexString()}`);
+    })
+    .yoyo(true)
+    .repeat(Infinity)
+    .repeatDelay(500)
+    .start();
+  //清空group
+  group.removeAll();
+  group.add(ColorTween);
 };
 const startColorTween = () => startColorTweenByTheme(currentTheme);
 
 const stopColorTween = () => {
-	group.removeAll();
+  group.removeAll();
 };
 
 EventSystem.on("themeChange", (theme) => {
-	currentTheme = theme;
-	startColorTweenByTheme(currentTheme);
+  currentTheme = theme;
+  startColorTweenByTheme(currentTheme);
 });
 EventSystem.on("windowFocus", startColorTween);
 EventSystem.on("windowSleep", stopColorTween);
 
 let ColorTween = new Tween({
-	r: startColor.r,
-	g: startColor.g,
-	b: startColor.b,
+  r: startColor.r,
+  g: startColor.g,
+  b: startColor.b,
 });
 //tween 在这两个颜色之间使用 pingPong 模式 ， easing函数为 Easing.Quadratic.InOut
 
@@ -134,7 +134,7 @@ const group = new Group();
 group.add(ColorTween);
 
 function getColor() {
-	return currentColor.getHexString();
+  return currentColor.getHexString();
 }
 
 //-======================== OO-color-gradient ========================
@@ -142,21 +142,21 @@ function getColor() {
 const colorManager = new ClassManager("OO-color-gradient");
 
 colorManager.onUpdate = function () {
-	//debug
-	group.update();
-	const currentColor = getColor();
-	this.items.forEach((item) => {
-		item.style.backgroundColor = `#${currentColor}`;
-	});
+  //debug
+  group.update();
+  const currentColor = getColor();
+  this.items.forEach((item) => {
+    item.style.backgroundColor = `#${currentColor}`;
+  });
 };
 
 colorManager.needRefresh = true;
 colorManager.onPageInit = () => {
-	colorManager.refresh();
+  colorManager.refresh();
 };
 colorManager.init = (_element) => {};
 colorManager.destroy = (element) => {
-	element.style.backgroundColor = "";
+  element.style.backgroundColor = "";
 };
 
 //-======================== OO-color-gradient-word ========================
@@ -164,42 +164,42 @@ colorManager.destroy = (element) => {
 const colorManager2 = new ClassManager("OO-color-gradient-word");
 
 colorManager2.onUpdate = function () {
-	//debug
-	// group.update();
-	const currentColor = getColor();
-	this.items.forEach((item) => {
-		item.style.color = `#${currentColor}`;
-	});
+  //debug
+  // group.update();
+  const currentColor = getColor();
+  this.items.forEach((item) => {
+    item.style.color = `#${currentColor}`;
+  });
 };
 
 // colorManager2.needRefresh = true;
 colorManager2.onPageInit = () => {
-	colorManager2.refresh();
+  colorManager2.refresh();
 };
 colorManager2.init = (_element) => {};
 colorManager2.destroy = (element) => {
-	element.style.color = "";
+  element.style.color = "";
 };
 
 //-========================= OO-color-gradient-border ========================
 // 定义 classManager
 const colorManager3 = new ClassManager("OO-color-gradient-border");
 colorManager3.onUpdate = function () {
-	//debug
-	group.update();
-	const currentColor = getColor();
-	this.items.forEach((item) => {
-		item.style.borderColor = `#${currentColor}`;
-	});
+  //debug
+  group.update();
+  const currentColor = getColor();
+  this.items.forEach((item) => {
+    item.style.borderColor = `#${currentColor}`;
+  });
 };
 
 // colorManager3.needRefresh = true;
 colorManager3.onPageInit = () => {
-	colorManager3.refresh();
+  colorManager3.refresh();
 };
 colorManager3.init = (_element) => {};
 colorManager3.destroy = (element) => {
-	element.style.borderColor = "";
+  element.style.borderColor = "";
 };
 
 //-========================= OO-OO-capering ========================

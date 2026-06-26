@@ -8,67 +8,67 @@
 import { defineProps, onMounted, ref } from "vue";
 
 const props = defineProps({
-	showScrollbar: {
-		type: Boolean,
-		default: false,
-	},
-	scrollSpeed: {
-		default: 1,
-	},
-	dragSpeed: {
-		default: 1,
-	},
+  showScrollbar: {
+    type: Boolean,
+    default: false,
+  },
+  scrollSpeed: {
+    default: 1,
+  },
+  dragSpeed: {
+    default: 1,
+  },
 });
 
 const scrollBar = ref(null);
 
 onMounted(() => {
-	const scrollBarEl = scrollBar.value;
+  const scrollBarEl = scrollBar.value;
 
-	let isDown = false;
-	let startX;
-	let scrollLeft;
+  let isDown = false;
+  let startX;
+  let scrollLeft;
 
-	let scrollSpeed = 1;
-	let dragSpeed = 1;
-	// scrollSpeed 和 dragSpeed 因为 html 有可能会被转化为字符串，所以这里检测类型并转换
-	if (typeof props.scrollSpeed === "string") {
-		scrollSpeed = parseFloat(props.scrollSpeed);
-	}
-	if (typeof props.dragSpeed === "string") {
-		dragSpeed = parseFloat(props.dragSpeed);
-	}
+  let scrollSpeed = 1;
+  let dragSpeed = 1;
+  // scrollSpeed 和 dragSpeed 因为 html 有可能会被转化为字符串，所以这里检测类型并转换
+  if (typeof props.scrollSpeed === "string") {
+    scrollSpeed = parseFloat(props.scrollSpeed);
+  }
+  if (typeof props.dragSpeed === "string") {
+    dragSpeed = parseFloat(props.dragSpeed);
+  }
 
-	scrollBarEl.addEventListener("mousedown", (e) => {
-		isDown = true;
-		startX = e.pageX - scrollBarEl.offsetLeft;
-		scrollLeft = scrollBarEl.scrollLeft;
-	});
+  scrollBarEl.addEventListener("mousedown", (e) => {
+    isDown = true;
+    startX = e.pageX - scrollBarEl.offsetLeft;
+    scrollLeft = scrollBarEl.scrollLeft;
+  });
 
-	scrollBarEl.addEventListener("mouseleave", () => {
-		isDown = false;
-	});
+  scrollBarEl.addEventListener("mouseleave", () => {
+    isDown = false;
+  });
 
-	scrollBarEl.addEventListener("mouseup", () => {
-		isDown = false;
-	});
+  scrollBarEl.addEventListener("mouseup", () => {
+    isDown = false;
+  });
 
-	scrollBarEl.addEventListener("mousemove", (e) => {
-		if (!isDown) return;
-		e.preventDefault();
-		const x = e.pageX - scrollBarEl.offsetLeft;
-		const walk = (x - startX) * dragSpeed;
-		scrollBarEl.scrollLeft = scrollLeft - walk;
-	});
+  scrollBarEl.addEventListener("mousemove", (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - scrollBarEl.offsetLeft;
+    const walk = (x - startX) * dragSpeed;
+    scrollBarEl.scrollLeft = scrollLeft - walk;
+  });
 
-	scrollBarEl.addEventListener(
-		"wheel",
-		(e) => {
-			e.preventDefault();
-			scrollBarEl.scrollLeft += e.deltaY * scrollSpeed;
-		},
-		{ passive: false },
-	);
+  scrollBarEl.addEventListener(
+    "wheel",
+    (e) => {
+      e.preventDefault();
+      scrollBarEl.scrollLeft += e.deltaY * scrollSpeed;
+    },
+    { passive: false },
+  );
 });
 </script>
 

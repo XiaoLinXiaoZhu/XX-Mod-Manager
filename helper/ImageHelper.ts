@@ -5,38 +5,38 @@ const _path = require("node:path");
 const { ipcRenderer } = require("electron");
 
 class ImageHelper {
-	private static imageCache: { [key: string]: string } = {};
-	public static async getImageBase64(imagePath: string) {
-		return (
-			"data:image/png;base64," +
-			(await ipcRenderer.invoke("get-image", imagePath))
-		);
-	}
-	public static async getImageUrlFromLocalPath(
-		imagePath: string,
-		ifCache: boolean = true,
-	) {
-		if (ifCache && ImageHelper.imageCache[imagePath]) {
-			return ImageHelper.imageCache[imagePath];
-		} else {
-			const bufffer = fs.readFileSync(imagePath);
-			const blob = new Blob([bufffer], { type: "image/png" });
-			const tempUrl = URL.createObjectURL(blob);
-			ImageHelper.imageCache[imagePath] = tempUrl;
-			return tempUrl;
-		}
-	}
-	public static async clearImageCache() {
-		// 清空 创建的临时url
-		for (const key in ImageHelper.imageCache) {
-			URL.revokeObjectURL(ImageHelper.imageCache[key]);
-		}
-		ImageHelper.imageCache = {};
-	}
+  private static imageCache: { [key: string]: string } = {};
+  public static async getImageBase64(imagePath: string) {
+    return (
+      "data:image/png;base64," +
+      (await ipcRenderer.invoke("get-image", imagePath))
+    );
+  }
+  public static async getImageUrlFromLocalPath(
+    imagePath: string,
+    ifCache: boolean = true,
+  ) {
+    if (ifCache && ImageHelper.imageCache[imagePath]) {
+      return ImageHelper.imageCache[imagePath];
+    } else {
+      const bufffer = fs.readFileSync(imagePath);
+      const blob = new Blob([bufffer], { type: "image/png" });
+      const tempUrl = URL.createObjectURL(blob);
+      ImageHelper.imageCache[imagePath] = tempUrl;
+      return tempUrl;
+    }
+  }
+  public static async clearImageCache() {
+    // 清空 创建的临时url
+    for (const key in ImageHelper.imageCache) {
+      URL.revokeObjectURL(ImageHelper.imageCache[key]);
+    }
+    ImageHelper.imageCache = {};
+  }
 }
 
 EventSystem.on(EventType.windowSleep, async () => {
-	ImageHelper.clearImageCache();
+  ImageHelper.clearImageCache();
 });
 
 export { ImageHelper };

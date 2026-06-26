@@ -117,7 +117,7 @@ const iManager = new IManager();
 import { EventSystem } from "../../helper/EventSystem";
 
 const props = defineProps({
-	data: Object,
+  data: Object,
 });
 
 const data = ref(props.data);
@@ -128,39 +128,39 @@ const display = ref(true);
 const _defaultIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="m256-240-56-56 384-384H240v-80h480v480h-80v-344L256-240Z"></path></svg>`;
 
 EventSystem.on("languageChange", (lang) => {
-	local.value = lang;
+  local.value = lang;
 });
 
 // 重新代理 onChange 方法
 const emit = defineEmits(["change"]);
 const _onChange = (value) => {
-	emit("change", value, data.value.type, data.value);
-	const result = data.value.onChange(value);
+  emit("change", value, data.value.type, data.value);
+  const result = data.value.onChange(value);
 
-	// 如果 result 不为 undefined 则说明， 显示的值需要更新
-	if (result !== undefined) {
-		//debug
-		console.log("☝️🤓", result);
-		data.value.data = result;
-		// 强制更新
-		refresh();
-	}
-	// 如果是 select 类型的，需要 更新一下以应用 颜色
-	if (data.value.type === "select") {
-		data.value.data = value;
-	}
+  // 如果 result 不为 undefined 则说明， 显示的值需要更新
+  if (result !== undefined) {
+    //debug
+    console.log("☝️🤓", result);
+    data.value.data = result;
+    // 强制更新
+    refresh();
+  }
+  // 如果是 select 类型的，需要 更新一下以应用 颜色
+  if (data.value.type === "select") {
+    data.value.data = value;
+  }
 };
 
 function refresh() {
-	display.value = false;
-	setTimeout(() => {
-		display.value = true;
-	}, 1);
+  display.value = false;
+  setTimeout(() => {
+    display.value = true;
+  }, 1);
 }
 
 onMounted(() => {
-	// console.log(data.value);
-	// 有的设置项是从 iManager 中获取的，所以需要 刷新一下
-	data.value.data = data.value.data;
+  // console.log(data.value);
+  // 有的设置项是从 iManager 中获取的，所以需要 刷新一下
+  data.value.data = data.value.data;
 });
 </script>

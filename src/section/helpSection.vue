@@ -518,7 +518,7 @@ import { g_config_vue } from "../../electron/IManager";
 
 const language = g_config_vue.language;
 watch(language, (newVal, _oldVal) => {
-	setTranslatedTabs(newVal);
+  setTranslatedTabs(newVal);
 });
 
 // 重新编排tab内容和顺序
@@ -532,63 +532,63 @@ watch(language, (newVal, _oldVal) => {
 // 8. 适配多个游戏
 // 9. 故障排除
 const tabs = [
-	"help-explain",
-	"help-import",
-	"help-config-mod-loader",
-	"help-load",
-	"help-config",
-	"help-preset",
-	"help-auto",
-	"help-multiple-games",
-	"help-trouble",
+  "help-explain",
+  "help-import",
+  "help-config-mod-loader",
+  "help-load",
+  "help-config",
+  "help-preset",
+  "help-auto",
+  "help-multiple-games",
+  "help-trouble",
 ];
 
 const currentTab = ref(tabs[0]);
 const _handleTabChange = (tab) => {
-	currentTab.value = tab;
+  currentTab.value = tab;
 };
 
 const translatedTabs = ref([
-	"Overview",
-	"Importing Mods",
-	"Loader Config",
-	"Load Mods",
-	"Mods Config",
-	"Presets",
-	"Automation",
-	"Multi-Game Support",
-	"Troubleshooting",
+  "Overview",
+  "Importing Mods",
+  "Loader Config",
+  "Load Mods",
+  "Mods Config",
+  "Presets",
+  "Automation",
+  "Multi-Game Support",
+  "Troubleshooting",
 ]);
 const setTranslatedTabs = (language) => {
-	if (language === "zh_cn") {
-		translatedTabs.value = [
-			"名词解释",
-			"导入mod",
-			"配置mod加载器",
-			"加载mod",
-			"配置mod",
-			"预设",
-			"自动化",
-			"适配多个游戏",
-			"故障排除",
-		];
-	} else {
-		translatedTabs.value = [
-			"Overview",
-			"Importing Mods",
-			"Loader Config",
-			"Load Mods",
-			"Mods Config",
-			"Presets",
-			"Automation",
-			"Multi-Game Support",
-			"Troubleshooting",
-		];
-	}
+  if (language === "zh_cn") {
+    translatedTabs.value = [
+      "名词解释",
+      "导入mod",
+      "配置mod加载器",
+      "加载mod",
+      "配置mod",
+      "预设",
+      "自动化",
+      "适配多个游戏",
+      "故障排除",
+    ];
+  } else {
+    translatedTabs.value = [
+      "Overview",
+      "Importing Mods",
+      "Loader Config",
+      "Load Mods",
+      "Mods Config",
+      "Presets",
+      "Automation",
+      "Multi-Game Support",
+      "Troubleshooting",
+    ];
+  }
 };
 
 onMounted(() => {
-	setTranslatedTabs(language.value);
+  setTranslatedTabs(language.value);
 });
 </script>
 

@@ -16,8 +16,8 @@
 const { ipcRenderer } = require("electron");
 
 const _refresh = () => {
-	//debug
-	console.log("refresh");
-	ipcRenderer.send("refresh-main-window");
+  //debug
+  console.log("refresh");
+  ipcRenderer.send("refresh-main-window");
 };
 </script>

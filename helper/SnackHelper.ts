@@ -6,8 +6,8 @@ import { TranslatedText } from "./Language";
  * @desc 用于标记 Snack 的类型
  */
 enum SnackType {
-	info = "info",
-	error = "error",
+  info = "info",
+  error = "error",
 }
 
 /** @function
@@ -16,7 +16,7 @@ enum SnackType {
  * @param {SnackType} type
  */
 async function snack(message: string, type: SnackType = SnackType.info) {
-	ipcRenderer.send("snack", message, type);
+  ipcRenderer.send("snack", message, type);
 }
 
 /** @function
@@ -25,14 +25,14 @@ async function snack(message: string, type: SnackType = SnackType.info) {
  * @param {SnackType} type
  */
 async function t_snack(
-	message: TranslatedText,
-	type: SnackType = SnackType.info,
+  message: TranslatedText,
+  type: SnackType = SnackType.info,
 ) {
-	// 检查是否为 TranslatedText
-	if (!message || typeof message !== "object" || !message.get) {
-		message = TranslatedText.fromObject(message);
-	}
-	snack(message.get(), type);
+  // 检查是否为 TranslatedText
+  if (!message || typeof message !== "object" || !message.get) {
+    message = TranslatedText.fromObject(message);
+  }
+  snack(message.get(), type);
 }
 
 export { SnackType, snack, t_snack };

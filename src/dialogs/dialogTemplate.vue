@@ -21,18 +21,18 @@
 import { onMounted, useTemplateRef } from "vue";
 
 const props = defineProps({
-	id: String,
-	type: String,
-	maxWidth: String,
+  id: String,
+  type: String,
+  maxWidth: String,
 });
 
 const componentRef = useTemplateRef("componentRef");
 
 onMounted(() => {
-	const canClick = props.type !== "block";
+  const canClick = props.type !== "block";
 
-	const editModInfoDialogStyle = document.createElement("style");
-	editModInfoDialogStyle.innerHTML = `
+  const editModInfoDialogStyle = document.createElement("style");
+  editModInfoDialogStyle.innerHTML = `
     .wrapper.show .scrim {
         opacity: 1 !important;
         filter: blur(0px) !important;
@@ -97,9 +97,9 @@ onMounted(() => {
       display: none;
     }    
         `;
-	// editModInfoDialog.shadowRoot.appendChild(editModInfoDialogStyle);
-	// console.log(componentRef.value);
-	componentRef.value.shadowRoot.appendChild(editModInfoDialogStyle);
+  // editModInfoDialog.shadowRoot.appendChild(editModInfoDialogStyle);
+  // console.log(componentRef.value);
+  componentRef.value.shadowRoot.appendChild(editModInfoDialogStyle);
 });
 </script>
 

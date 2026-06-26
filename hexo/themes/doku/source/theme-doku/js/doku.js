@@ -1,25 +1,25 @@
 !((e, t) => {
-	function d() {
-		var e = t.scrollingElement.scrollTop;
-		s < e ? a.classList.add("doku-fixed") : a.classList.remove("doku-fixed");
-	}
-	var n, i, o, l, s, a;
-	(n = "doku-sidebar"),
-		(i = "doku-navbar"),
-		(s = t.getElementById(i).clientHeight),
-		(a = t.getElementById(n)),
-		o && ((l = t.getElementById(o).clientHeight), (s += l)),
-		e.addEventListener("scroll", () => {
-			e.requestAnimationFrame(d);
-		}),
-		d(),
-		t.getElementById("doku-sidebar-toggle").addEventListener("click", () => {
-			t.body.classList.toggle("doku-sidebar-visible");
-		}),
-		t.getElementById("doku-main").addEventListener("click", () => {
-			t.body.classList.remove("doku-sidebar-visible");
-		}),
-		(t.getElementById("doku-copyrght-year").textContent =
-			new Date().getFullYear()),
-		Stickyfill.add(t.getElementsByClassName("doku-document-toc"));
+  function d() {
+    var e = t.scrollingElement.scrollTop;
+    s < e ? a.classList.add("doku-fixed") : a.classList.remove("doku-fixed");
+  }
+  var n, i, o, l, s, a;
+  (n = "doku-sidebar"),
+    (i = "doku-navbar"),
+    (s = t.getElementById(i).clientHeight),
+    (a = t.getElementById(n)),
+    o && ((l = t.getElementById(o).clientHeight), (s += l)),
+    e.addEventListener("scroll", () => {
+      e.requestAnimationFrame(d);
+    }),
+    d(),
+    t.getElementById("doku-sidebar-toggle").addEventListener("click", () => {
+      t.body.classList.toggle("doku-sidebar-visible");
+    }),
+    t.getElementById("doku-main").addEventListener("click", () => {
+      t.body.classList.remove("doku-sidebar-visible");
+    }),
+    (t.getElementById("doku-copyrght-year").textContent =
+      new Date().getFullYear()),
+    Stickyfill.add(t.getElementsByClassName("doku-document-toc"));
 })(window, document);

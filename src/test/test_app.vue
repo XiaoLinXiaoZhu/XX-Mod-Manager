@@ -51,22 +51,22 @@ const _sections = ref(["mod", "help", "settings"]);
 const currentSection = ref("mod");
 
 const _handleSectionChange = (section) => {
-	currentSection.value = section;
-	//debug
-	console.log("handleSectionChange", section);
+  currentSection.value = section;
+  //debug
+  console.log("handleSectionChange", section);
 };
 
 const closeApp = () => {
-	//关闭当前窗口
-	window.close();
+  //关闭当前窗口
+  window.close();
 };
 
 const _handleBackButtomClick = () => {
-	closeApp();
+  closeApp();
 };
 
 waitInitIManager().then((_iManager) => {
-	loaded.value = true;
+  loaded.value = true;
 });
 </script>
 

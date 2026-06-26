@@ -14,14 +14,14 @@ const isFlashing = ref(false);
 const flashingSpeed = 100;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const _handleClick = async () => {
-	isFlashing.value = true;
-	await sleep(flashingSpeed);
-	isFlashing.value = false;
-	await sleep(flashingSpeed);
-	isFlashing.value = true;
-	emit("backButtonClicked");
-	await sleep(flashingSpeed);
-	isFlashing.value = false;
+  isFlashing.value = true;
+  await sleep(flashingSpeed);
+  isFlashing.value = false;
+  await sleep(flashingSpeed);
+  isFlashing.value = true;
+  emit("backButtonClicked");
+  await sleep(flashingSpeed);
+  isFlashing.value = false;
 };
 </script>
 

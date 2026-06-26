@@ -9,7 +9,7 @@
 import { defineProps } from "vue";
 
 const _props = defineProps({
-	title: String,
-	description: String,
+  title: String,
+  description: String,
 });
 </script>

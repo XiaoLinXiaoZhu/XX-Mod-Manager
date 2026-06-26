@@ -70,52 +70,52 @@ import { snack } from "../../helper/SnackHelper";
 const { t } = useI18n();
 
 const props = defineProps({
-	mod: {
-		type: ModData,
-		default: null,
-	},
+  mod: {
+    type: ModData,
+    default: null,
+  },
 });
 const img = ref("data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D");
 watch(
-	() => props.mod,
-	(newMod) => {
-		if (newMod == null) {
-			img.value = null;
-			return;
-		}
-		newMod.getPreviewBase64(true).then((base64) => {
-			img.value = base64;
-		});
-	},
+  () => props.mod,
+  (newMod) => {
+    if (newMod == null) {
+      img.value = null;
+      return;
+    }
+    newMod.getPreviewBase64(true).then((base64) => {
+      img.value = base64;
+    });
+  },
 );
 
 EventSystem.on(EventType.modInfoChanged, (mod) => {
-	if (mod.name === props.mod.name) {
-		setTimeout(() => {
-			props.mod.getPreviewBase64(true).then((base64) => {
-				img.value = base64;
-			});
-		}, 1);
-	}
+  if (mod.name === props.mod.name) {
+    setTimeout(() => {
+      props.mod.getPreviewBase64(true).then((base64) => {
+        img.value = base64;
+      });
+    }, 1);
+  }
 });
 
 // const emit = defineEmits(['clickEditButton']);
 
 const _editMod = () => {
-	if (props.mod == null) {
-		snack(t("no-mod-selected"), "error");
-		return;
-	}
-	DialogHelper.showDialog(DialogID.editModDialog);
+  if (props.mod == null) {
+    snack(t("no-mod-selected"), "error");
+    return;
+  }
+  DialogHelper.showDialog(DialogID.editModDialog);
 };
 
 const _openModFolder = async () => {
-	//ipcRenderer.send('open-url', props.mod?.url);
-	if (props.mod == null) {
-		snack(t("no-mod-selected"), "error");
-		return;
-	}
-	fsProxy.openDir(await props.mod.getModPath());
+  //ipcRenderer.send('open-url', props.mod?.url);
+  if (props.mod == null) {
+    snack(t("no-mod-selected"), "error");
+    return;
+  }
+  fsProxy.openDir(await props.mod.getModPath());
 };
 </script>
 

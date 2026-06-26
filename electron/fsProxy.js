@@ -3,37 +3,37 @@
 const { ipcRenderer } = require("electron");
 
 class fsProxy {
-	static instance = null;
-	constructor() {
-		if (fsProxy.instance) {
-			return fsProxy.instance;
-		}
-		fsProxy.instance = this;
-	}
+  static instance = null;
+  constructor() {
+    if (fsProxy.instance) {
+      return fsProxy.instance;
+    }
+    fsProxy.instance = this;
+  }
 
-	static async readFile(path) {
-		return await ipcRenderer.invoke("fs-read-file", path);
-	}
+  static async readFile(path) {
+    return await ipcRenderer.invoke("fs-read-file", path);
+  }
 
-	static async writeFile(path, data) {
-		return await ipcRenderer.invoke("fs-write-file", path, data);
-	}
+  static async writeFile(path, data) {
+    return await ipcRenderer.invoke("fs-write-file", path, data);
+  }
 
-	static async createFile(path) {
-		return await ipcRenderer.invoke("fs-create-file", path);
-	}
+  static async createFile(path) {
+    return await ipcRenderer.invoke("fs-create-file", path);
+  }
 
-	static async readDir(path) {
-		return await ipcRenderer.invoke("fs-read-dir", path);
-	}
+  static async readDir(path) {
+    return await ipcRenderer.invoke("fs-read-dir", path);
+  }
 
-	static async isDir(path) {
-		return await ipcRenderer.invoke("fs-is-dir", path);
-	}
+  static async isDir(path) {
+    return await ipcRenderer.invoke("fs-is-dir", path);
+  }
 
-	static async openDir(path) {
-		return await ipcRenderer.invoke("fs-open-dir", path);
-	}
+  static async openDir(path) {
+    return await ipcRenderer.invoke("fs-open-dir", path);
+  }
 }
 
 export default fsProxy;
