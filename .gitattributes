@@ -35,7 +35,8 @@
 # Windows相关文件保持CRLF（如果需要）
 *.bat text eol=crlf
 *.cmd text eol=crlf
-*.ps1 text eol=lf   PowerShell推荐使用LF
+*.ps1 text eol=lf
+# PowerShell推荐使用LF
 
 # 明确指定二进制文件
 *.png binary
@@ -47,5 +48,7 @@
 *.tar.gz binary
 
 # 特殊处理某些生成的文件
-package-lock.json -text   # npm锁文件，不进行行尾符转换
-bun.lock -text   # bun锁文件，不进行行尾符转换
+package-lock.json -text
+# npm锁文件，不进行行尾符转换
+bun.lock -text
+# bun锁文件，不进行行尾符转换
