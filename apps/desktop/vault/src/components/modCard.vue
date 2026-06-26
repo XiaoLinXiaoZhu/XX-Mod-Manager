@@ -45,7 +45,7 @@
 <script setup>
 import "sober";
 import { defineProps, ref, useTemplateRef, watch } from "vue";
-import IManager from "../../../electron/IManager";
+import IManager from "../../../electron/src/IManager";
 
 const iManager = new IManager();
 

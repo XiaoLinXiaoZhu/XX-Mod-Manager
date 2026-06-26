@@ -2,7 +2,7 @@
   "name": "xx-mod-manager",
   "private": true,
   "description": "xx-mod-manager",
-  "main": "./apps/electron/main.js",
+  "main": "./apps/electron/src/main.js",
   "author": "XLXZ",
   "license": "GPL-3.0-only",
   "version": "1.4.0",

@@ -14,7 +14,7 @@ import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 
-import IManager from "../../../electron/IManager";
+import IManager from "../../../electron/src/IManager";
 
 const iManager = new IManager();
 

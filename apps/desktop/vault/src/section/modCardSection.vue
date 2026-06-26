@@ -96,12 +96,12 @@
 
 <script setup>
 import { computed, ref, useTemplateRef, watch } from "vue";
-import fsProxy from "../../../electron/fsProxy";
+import fsProxy from "../../../electron/src/fsProxy";
 import IManager, {
   g_config_vue,
   g_data_vue,
   g_temp_vue,
-} from "../../../electron/IManager";
+} from "../../../electron/src/IManager";
 
 const iManager = new IManager();
 

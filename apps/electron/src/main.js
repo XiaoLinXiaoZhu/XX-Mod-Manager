@@ -250,7 +250,7 @@ ipcMain.on("open-new-window", (_event, arg) => {
     newWindow.loadURL(`http://localhost:3000/${pagePath}/index.html`);
   } else {
     const path = require("node:path");
-    const filePath = path.join(__dirname, `../../dist/${pagePath}/index.html`);
+    const filePath = path.join(__dirname, `../../../dist/${pagePath}/index.html`);
     console.log("filePath", filePath);
 
     newWindow.loadFile(filePath);

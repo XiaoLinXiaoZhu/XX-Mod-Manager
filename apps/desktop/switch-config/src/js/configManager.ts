@@ -5,7 +5,7 @@ const path = require("node:path");
 const { ipcRenderer } = require("electron");
 
 import { ref } from "vue";
-import fsProxy from "../../../../electron/fsProxy";
+import fsProxy from "../../../../electron/src/fsProxy";
 import { TranslatedText } from "@xxmm/helper/Language";
 import { SnackType, t_snack } from "@xxmm/helper/SnackHelper";
 

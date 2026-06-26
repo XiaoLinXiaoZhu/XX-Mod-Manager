@@ -26,7 +26,7 @@
 
 <script setup>
 import { onMounted, ref } from "vue";
-import IManager from "../../../electron/IManager";
+import IManager from "../../../electron/src/IManager";
 
 const iManager = new IManager();
 

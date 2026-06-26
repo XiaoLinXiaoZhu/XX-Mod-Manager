@@ -23,7 +23,7 @@ import IManager, {
   g_config_vue,
   g_data_vue,
   g_temp_vue,
-} from "../../../electron/IManager";
+} from "../../../electron/src/IManager";
 import { EventSystem, EventType } from "@xxmm/helper/EventSystem";
 
 const iManager = new IManager();

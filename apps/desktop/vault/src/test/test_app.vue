@@ -39,11 +39,11 @@ import { ref } from "vue";
 
 const loaded = ref(false);
 
-// import IManager from '../../../electron/IManager';
+// import IManager from '../../../electron/src/IManager';
 // const iManager = new IManager();
 // 这里不需要 iManager 实例，直接通过waitInit 获取
 
-import { g_temp_vue, waitInitIManager } from "../../../electron/IManager";
+import { g_temp_vue, waitInitIManager } from "../../../electron/src/IManager";
 
 const _currentMod = g_temp_vue.currentMod;
 

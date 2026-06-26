@@ -173,11 +173,11 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
-import IManager from "../../../electron/IManager";
+import IManager from "../../../electron/src/IManager";
 
 const iManager = new IManager();
 
-import fsProxy from "../../../electron/fsProxy";
+import fsProxy from "../../../electron/src/fsProxy";
 import TapeConfig from "../../switchConfig/src/js/configManager.ts";
 import getData from "./settingSectionData.js";
 
