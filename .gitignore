@@ -26,3 +26,6 @@ build
 
 # doc
 docs/
+_n0n_*
+.temp/
+n0n-*
