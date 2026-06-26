@@ -45,12 +45,12 @@
 <script setup>
 import "sober";
 import { defineProps, ref, useTemplateRef, watch } from "vue";
-import IManager from "../../electron/IManager";
+import IManager from "../../../electron/IManager";
 
 const iManager = new IManager();
 
-import { ModData } from "../../core/ModHelper";
-import { DialogHelper, DialogID } from "../../helper/DialogHelper";
+import { ModData } from "@xxmm/core/ModHelper";
+import { DialogHelper, DialogID } from "@xxmm/helper/DialogHelper";
 
 const _displayHotKeysModes = {
   none: 0,

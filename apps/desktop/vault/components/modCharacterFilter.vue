@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { type Ref, reactive, ref, watch } from "vue";
-import { g_config_vue, g_data_vue } from "../../electron/IManager";
+import { g_config_vue, g_data_vue } from "../../../electron/IManager";
 
 const lastClickedElement = ref<HTMLElement | null>(null);
 const searchInput = ref<string>("");

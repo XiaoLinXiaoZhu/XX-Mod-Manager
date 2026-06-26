@@ -6,11 +6,11 @@ import 'sober'
 import 'sober/style/scroll-view.css'
 import { Snackbar } from 'sober'
 const { ipcRenderer } = require("electron");
-import IManager from '../electron/IManager'
+import IManager from '../../electron/IManager'
 const iManager = new IManager();
-import { g_config_vue } from '../electron/IManager'
+import { g_config_vue } from '../../electron/IManager'
 
-import { EventSystem } from '../helper/EventSystem'
+import { EventSystem } from '@xxmm/helper/EventSystem'
 
 //-====================入口文件====================-//
 const vue_app = createApp(test_app);

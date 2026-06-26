@@ -39,6 +39,14 @@
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    // Monorepo workspace package resolution
+    "paths": {
+      "@xxmm/core": ["./packages/core/index.ts"],
+      "@xxmm/core/*": ["./packages/core/*"],
+      "@xxmm/helper": ["./packages/helper/index.ts"],
+      "@xxmm/helper/*": ["./packages/helper/*"]
+    }
   }
 }

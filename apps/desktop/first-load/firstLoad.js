@@ -9,9 +9,9 @@ import firstLoadPage from './firstLoadPage.vue'
 
 const { ipcRenderer } = require("electron");
 
-import IManager from '../electron/IManager'
+import IManager from '../../electron/IManager'
 const iManager = new IManager();
-import { g_config_vue } from '../electron/IManager'
+import { g_config_vue } from '../../electron/IManager'
 
 //-=================== 旧的导入 ===================-//
 const _path = require("node:path");

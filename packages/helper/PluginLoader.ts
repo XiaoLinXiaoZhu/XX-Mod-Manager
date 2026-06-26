@@ -1,7 +1,7 @@
 //-===================== 插件 =====================
 const { ipcRenderer } = require("electron");
 
-import XXMMCore from "../core/XXMMCore";
+import XXMMCore from "@xxmm/core/XXMMCore";
 import { EventSystem, EventType } from "./EventSystem";
 import { TranslatedText } from "./Language";
 import { PathHelper } from "./PathHelper";

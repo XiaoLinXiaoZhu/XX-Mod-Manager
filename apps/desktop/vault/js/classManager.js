@@ -10,7 +10,7 @@
 
 //-============ 优化：如果窗口睡眠就停止刷新 ==========
 let isSleep = false;
-import { EventSystem, EventType } from "../../helper/EventSystem";
+import { EventSystem, EventType } from "@xxmm/helper/EventSystem";
 
 EventSystem.on("windowFocus", () => {
   isSleep = false;

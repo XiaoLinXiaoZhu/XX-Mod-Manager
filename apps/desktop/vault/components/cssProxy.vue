@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { EventSystem } from "../../helper/EventSystem";
+import { EventSystem } from "@xxmm/helper/EventSystem";
 import backgroundImage from "../assets/background.png";
 
 let currentTheme = "";

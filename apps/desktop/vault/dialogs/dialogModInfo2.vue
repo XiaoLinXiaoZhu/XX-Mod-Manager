@@ -202,9 +202,9 @@
 
 <script setup>
 import { defineProps, onMounted, ref, useTemplateRef, watch } from "vue";
-import { ModData } from "../../core/ModHelper";
-import IManager from "../../electron/IManager";
-import { TranslatedText } from "../../helper/Language";
+import { ModData } from "@xxmm/core/ModHelper";
+import IManager from "../../../electron/IManager";
+import { TranslatedText } from "@xxmm/helper/Language";
 
 const iManager = new IManager();
 

@@ -27,7 +27,7 @@
 //         console.log('ifAblePlugin changed:', value);
 //     }
 // }
-import IManager from "../../electron/IManager";
+import IManager from "../../../electron/IManager";
 const iManager = new IManager();
 
 //- ========================== 常规设置 ========================== -//

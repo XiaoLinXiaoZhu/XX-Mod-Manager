@@ -96,17 +96,17 @@
 
 <script setup>
 import { computed, ref, useTemplateRef, watch } from "vue";
-import fsProxy from "../../electron/fsProxy";
+import fsProxy from "../../../electron/fsProxy";
 import IManager, {
   g_config_vue,
   g_data_vue,
   g_temp_vue,
-} from "../../electron/IManager";
+} from "../../../electron/IManager";
 
 const iManager = new IManager();
 
-import { EventSystem } from "../../helper/EventSystem";
-import { SnackType, t_snack } from "../../helper/SnackHelper";
+import { EventSystem } from "@xxmm/helper/EventSystem";
+import { SnackType, t_snack } from "@xxmm/helper/SnackHelper";
 
 const _displayModRef = g_temp_vue.currentMod;
 

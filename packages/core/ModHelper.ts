@@ -2,9 +2,9 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { ipcRenderer } = require("electron");
 
-import { EventSystem, EventType } from "../helper/EventSystem";
-import { ImageHelper } from "../helper/ImageHelper";
-import { SnackType, snack } from "../helper/SnackHelper";
+import { EventSystem, EventType } from "@xxmm/helper/EventSystem";
+import { ImageHelper } from "@xxmm/helper/ImageHelper";
+import { SnackType, snack } from "@xxmm/helper/SnackHelper";
 import type { ModInfo } from "./ModInfo";
 import ModLoader from "./ModLoader";
 

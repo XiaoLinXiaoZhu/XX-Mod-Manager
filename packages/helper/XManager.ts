@@ -19,7 +19,7 @@ const HMC_Name = "hmc-win32";
 const HMC = require(HMC_Name);
 
 // 导入 ModHelper
-import type { ModData } from "../core/ModHelper";
+import type { ModData } from "@xxmm/core/ModHelper";
 // 导入 EventSystem
 import { EventSystem, EventType } from "./EventSystem";
 // 导入 Language

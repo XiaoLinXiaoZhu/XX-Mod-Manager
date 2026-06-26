@@ -1,6 +1,6 @@
 import { Tween, Easing, Group } from '@tweenjs/tween.js'; // 引入Tween.js库
 import { ClassManager, } from './classManager.js'; // 引入ClassManager类和ClassManagerService类
-import { EventSystem } from '../../helper/EventSystem';
+import { EventSystem } from '@xxmm/helper/EventSystem';
 // 这个js的功能是能够在任意时刻获取当前颜色。
 // 当前颜色 是一个 从 荧光绿 94ad00 到 荧光黄 ffd300 的渐变色。
 // 通过调用getColor()方法，可以获取当前颜色。

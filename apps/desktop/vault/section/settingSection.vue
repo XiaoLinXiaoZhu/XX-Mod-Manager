@@ -173,11 +173,11 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
-import IManager from "../../electron/IManager";
+import IManager from "../../../electron/IManager";
 
 const iManager = new IManager();
 
-import fsProxy from "../../electron/fsProxy";
+import fsProxy from "../../../electron/fsProxy";
 import TapeConfig from "../../switchConfig/src/js/configManager.ts";
 import getData from "./settingSectionData.js";
 
@@ -196,9 +196,9 @@ import { useI18n } from "vue-i18n";
 
 const { t, locale } = useI18n();
 
-import { EventSystem, EventType } from "../../helper/EventSystem.ts";
-import { IPluginLoader } from "../../helper/PluginLoader.ts";
-import { SnackType, t_snack } from "../../helper/SnackHelper.ts";
+import { EventSystem, EventType } from "@xxmm/helper/EventSystem.ts";
+import { IPluginLoader } from "@xxmm/helper/PluginLoader.ts";
+import { SnackType, t_snack } from "@xxmm/helper/SnackHelper.ts";
 
 const tabs = ref(["normal", "advanced", "switch-config", "about", "plugin"]);
 const _translatedTabs = computed(() => {

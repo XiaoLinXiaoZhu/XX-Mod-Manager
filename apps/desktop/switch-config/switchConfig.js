@@ -9,7 +9,7 @@ import switchConfigPage from './src/switchConfigPage.vue'
 
 const { ipcRenderer } = require("electron");
 
-import IManager from '../electron/IManager'
+import IManager from '../../electron/IManager'
 const iManager = new IManager();
 
 //-=================== 旧的导入 ===================-//

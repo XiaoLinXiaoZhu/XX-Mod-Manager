@@ -60,7 +60,7 @@ function _handleSectionChange(newSection) {
   console.log("Section changed to:", newSection);
 }
 
-import IManager from "../../electron/IManager";
+import IManager from "../../../electron/IManager";
 import TapeConfig, { g_allConfig_vue } from "./js/configManager";
 
 const iManager = new IManager();
@@ -71,7 +71,7 @@ const currentTapeIndex = ref(0);
 
 const plainConfigRefs = useTemplateRef("plainConfigRefs");
 
-import XXMMCore from "../../core/XXMMCore";
+import XXMMCore from "@xxmm/core/XXMMCore";
 
 function _selectTape(e, tape) {
   console.log("selectTape", tape);

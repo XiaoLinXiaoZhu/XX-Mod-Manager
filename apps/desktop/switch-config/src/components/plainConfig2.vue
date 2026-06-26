@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { defineProps, onMounted, ref, useTemplateRef, watch } from "vue";
-import { ImageHelper } from "../../../helper/ImageHelper";
+import { ImageHelper } from "@xxmm/helper/ImageHelper";
 import type clickableCard from "../../../src/components/clickableCard.vue";
 import TapeConfig from "../js/configManager";
 

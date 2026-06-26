@@ -1,5 +1,5 @@
-import { TranslatedText } from "../helper/Language";
-import { SnackType, t_snack } from "../helper/SnackHelper";
+import { TranslatedText } from "@xxmm/helper/Language";
+import { SnackType, t_snack } from "@xxmm/helper/SnackHelper";
 import { ModInfo } from "./ModInfo";
 import ModLoader from "./ModLoader";
 

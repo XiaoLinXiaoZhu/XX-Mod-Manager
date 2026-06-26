@@ -14,11 +14,11 @@ import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 
-import IManager from "../../electron/IManager";
+import IManager from "../../../electron/IManager";
 
 const iManager = new IManager();
 
-import { EventSystem } from "../../helper/EventSystem";
+import { EventSystem } from "@xxmm/helper/EventSystem";
 
 const props = defineProps({
   filterItems: Array,

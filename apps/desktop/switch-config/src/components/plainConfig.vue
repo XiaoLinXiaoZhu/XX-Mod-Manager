@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { defineProps, onMounted, ref, useTemplateRef } from "vue";
-import { ImageHelper } from "../../../helper/ImageHelper";
+import { ImageHelper } from "@xxmm/helper/ImageHelper";
 import TapeConfig from "../js/configManager";
 
 const props = defineProps({

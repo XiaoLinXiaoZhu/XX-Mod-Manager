@@ -13,24 +13,24 @@ const fs = require("node:fs");
 
 // 导入 libarchivejs
 let Archive = window.Archive;
-import { ModInfo, } from '../core/ModInfo';
-import XXMMCore from '../core/XXMMCore';
-import LogHandler from '../core/LogHandler';
-import ModLoader from '../core/ModLoader';
-import PresetHelper from '../core/PresetHelper';
+import { ModInfo, } from '@xxmm/core/ModInfo';
+import XXMMCore from '@xxmm/core/XXMMCore';
+import LogHandler from '@xxmm/core/LogHandler';
+import ModLoader from '@xxmm/core/ModLoader';
+import PresetHelper from '@xxmm/core/PresetHelper';
 
 // 导入 Language
-import { TranslatedText, setCurrentLanguage } from '../helper/Language';
+import { TranslatedText, setCurrentLanguage } from '@xxmm/helper/Language';
 // 导入 SnackHelper
-import { t_snack, SnackType, snack } from '../helper/SnackHelper';
+import { t_snack, SnackType, snack } from '@xxmm/helper/SnackHelper';
 // 导入 EventSystem
-import { EventType, EventSystem } from '../helper/EventSystem';
+import { EventType, EventSystem } from '@xxmm/helper/EventSystem';
 // 导入 PluginLoader
-import { IPluginLoader } from '../helper/PluginLoader';
+import { IPluginLoader } from '@xxmm/helper/PluginLoader';
 // 导入 ModHelper
-import { ModData } from '../core/ModHelper';
+import { ModData } from '@xxmm/core/ModHelper';
 // 导入 DialogHelper
-import { DialogHelper } from '../helper/DialogHelper';
+import { DialogHelper } from '@xxmm/helper/DialogHelper';
 
 // // 导入 hmc-win32
 const HMC_Name = "hmc-win32";
@@ -72,7 +72,7 @@ const g_data = {
 
 //-==================== vue 版本的全局变量 ====================//
 import { ref, watch } from 'vue';
-import { applyMods, applyModsTranditional } from '../core/ApplyMods';
+import { applyMods, applyModsTranditional } from '@xxmm/core/ApplyMods';
 const g_temp_vue = {
   lastClickedMod: ref(null),
   currentMod: ref(null),

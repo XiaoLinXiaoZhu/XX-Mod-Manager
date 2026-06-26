@@ -514,7 +514,7 @@ If you know some front-end development, you can try pressing Ctrl+Shift+I to ope
 If you cannot solve the problem, please contact me.
 `;
 
-import { g_config_vue } from "../../electron/IManager";
+import { g_config_vue } from "../../../electron/IManager";
 
 const language = g_config_vue.language;
 watch(language, (newVal, _oldVal) => {
