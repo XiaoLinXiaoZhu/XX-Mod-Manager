@@ -22,63 +22,80 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, onMounted, useTemplateRef, Ref, watch } from 'vue'
-import TapeConfig from '../js/configManager';
-import clickableCard from '../../../src/components/clickableCard.vue';
-import { ImageHelper } from '../../../helper/ImageHelper';
+import { defineProps, onMounted, ref, useTemplateRef, watch } from "vue";
+import { ImageHelper } from "../../../helper/ImageHelper";
+import type clickableCard from "../../../src/components/clickableCard.vue";
+import TapeConfig from "../js/configManager";
 
 const props = defineProps({
-    configRef: {
-        type: TapeConfig,
-        required: true
-    }
-})
-const img = ref('');
+	configRef: {
+		type: TapeConfig,
+		required: true,
+	},
+});
+const img = ref("");
 
 const cardRef = useTemplateRef<InstanceType<typeof clickableCard>>("cardRef");
 
 const clicked = ref(false);
 
-watch(() => cardRef.value?.clicked, (value) => {
-    if (value !== undefined) {
-        clicked.value = value;
-    }
-})
+watch(
+	() => cardRef.value?.clicked,
+	(value) => {
+		if (value !== undefined) {
+			clicked.value = value;
+		}
+	},
+);
 // let handleClick: ((event: MouseEvent, ifToggle?: boolean) => void) | null = null;
 // let playFlipAnim: ((cardElement: HTMLElement, event: MouseEvent | null, rect: DOMRect | null) => void) | null = null;
 // let playSelectedAnim: ((cardElement: HTMLElement, event: MouseEvent | null, rect: DOMRect | null) => void) | null = null;
 // let playUnselectedAnim: ((cardElement: HTMLElement, event: MouseEvent | null, rect: DOMRect | null) => void) | null = null;
 const getClickedRef = () => {
-    return cardRef.value?.getClickedRef();
-}
+	return cardRef.value?.getClickedRef();
+};
 const handleClick = (event: MouseEvent, ifToggle: boolean = true) => {
-    cardRef.value?.click(event, ifToggle);
-}
-const playFlipAnim = (cardElement: HTMLElement, event: MouseEvent | null = null, rect: DOMRect | null = null) => {
-    cardRef.value?.playFlipAnim(cardElement, event, rect);
-}
-const playSelectedAnim = (cardElement: HTMLElement, event: MouseEvent | null = null, rect: DOMRect | null = null) => {
-    cardRef.value?.playSelectedAnim(cardElement, event, rect);
-}
-const playUnselectedAnim = (cardElement: HTMLElement, event: MouseEvent | null = null, rect: DOMRect | null = null) => {
-    cardRef.value?.playUnselectedAnim(cardElement, event, rect);
-}
+	cardRef.value?.click(event, ifToggle);
+};
+const playFlipAnim = (
+	cardElement: HTMLElement,
+	event: MouseEvent | null = null,
+	rect: DOMRect | null = null,
+) => {
+	cardRef.value?.playFlipAnim(cardElement, event, rect);
+};
+const playSelectedAnim = (
+	cardElement: HTMLElement,
+	event: MouseEvent | null = null,
+	rect: DOMRect | null = null,
+) => {
+	cardRef.value?.playSelectedAnim(cardElement, event, rect);
+};
+const playUnselectedAnim = (
+	cardElement: HTMLElement,
+	event: MouseEvent | null = null,
+	rect: DOMRect | null = null,
+) => {
+	cardRef.value?.playUnselectedAnim(cardElement, event, rect);
+};
 
 onMounted(async () => {
-    console.log('configRef:', props.configRef);
-    if (props.configRef.tape_front) {
-        img.value = await ImageHelper.getImageUrlFromLocalPath(props.configRef.tape_front);
-    }
-})
+	console.log("configRef:", props.configRef);
+	if (props.configRef.tape_front) {
+		img.value = await ImageHelper.getImageUrlFromLocalPath(
+			props.configRef.tape_front,
+		);
+	}
+});
 
 defineExpose({
-    clicked: clicked,
-    getClickedRef,
-    click: handleClick,
-    playSelectedAnim,
-    playUnselectedAnim,
-    playFlipAnim
-})
+	clicked: clicked,
+	getClickedRef,
+	click: handleClick,
+	playSelectedAnim,
+	playUnselectedAnim,
+	playFlipAnim,
+});
 </script>
 
 <style scoped>

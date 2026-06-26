@@ -50,85 +50,83 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { onMounted, reactive, ref } from "vue";
+
 const props = defineProps({
-    tabs: {
-        type: Array,
-        required: true
-    },
-    translatedTabs: {
-        type: Array,
-        required: false,
-        default: () => []
-    }
+	tabs: {
+		type: Array,
+		required: true,
+	},
+	translatedTabs: {
+		type: Array,
+		required: false,
+		default: () => [],
+	},
 });
 
-const emit = defineEmits(['tabChange']);
+const emit = defineEmits(["tabChange"]);
 const currentTab = ref(props.tabs[0]);
 
 //-=============== 按钮引用 ===============
 const tabRefs = ref({});
-const setTabRef = (tab) => (el) => {
-    tabRefs.value[tab] = el;
-}
+const _setTabRef = (tab) => (el) => {
+	tabRefs.value[tab] = el;
+};
 
 //-=============== 浮动滑块 ===============
 const sliderStyle = reactive({
-    top: '0px',
-    height: '0px',
-    width: '0px',
+	top: "0px",
+	height: "0px",
+	width: "0px",
 });
 
 const updateSlider = (index) => {
-    const selectedTab = tabRefs.value[props.tabs[index]];
-    if (!selectedTab) {
-        console.log(`tab not found: ${index}`);
-        return;
-    }
-    //debug
-    // console.log(`updateSlider: `, index, selectedTab, props.tabs[index])
-    sliderStyle.top = `${selectedTab.offsetTop}px`;
-    sliderStyle.height = `${selectedTab.offsetHeight}px`;
-    sliderStyle.width = `${selectedTab.offsetWidth}px`;
+	const selectedTab = tabRefs.value[props.tabs[index]];
+	if (!selectedTab) {
+		console.log(`tab not found: ${index}`);
+		return;
+	}
+	//debug
+	// console.log(`updateSlider: `, index, selectedTab, props.tabs[index])
+	sliderStyle.top = `${selectedTab.offsetTop}px`;
+	sliderStyle.height = `${selectedTab.offsetHeight}px`;
+	sliderStyle.width = `${selectedTab.offsetWidth}px`;
 };
-
 
 //-=============== 选项切换 ===============
 const selectTab = (tab, index) => {
-    updateSlider(index);
-    if (tab === currentTab.value) return;
-    currentTab.value = tab;
-    emit('tabChange', tab);
+	updateSlider(index);
+	if (tab === currentTab.value) return;
+	currentTab.value = tab;
+	emit("tabChange", tab);
 };
 
 const selectTabByName = (tab) => {
-    if (tab === currentTab.value) return;
-    currentTab.value = tab;
-    
-    setTimeout(() => {
-        const index = props.tabs.indexOf(tab);
-        if (index === -1) {
-            console.log(`tab not found: ${tab}`);
-            return;
-        }
-        updateSlider(index);
-        
-    }, 0);
+	if (tab === currentTab.value) return;
+	currentTab.value = tab;
 
-    emit('tabChange', tab);
+	setTimeout(() => {
+		const index = props.tabs.indexOf(tab);
+		if (index === -1) {
+			console.log(`tab not found: ${tab}`);
+			return;
+		}
+		updateSlider(index);
+	}, 0);
+
+	emit("tabChange", tab);
 };
 
 onMounted(() => {
-    // 尝试使得 当前 滑块为第一个选项卡
-    updateSlider(0);
+	// 尝试使得 当前 滑块为第一个选项卡
+	updateSlider(0);
 });
 
 defineExpose({
-    currentTab, // 当前选中的选项卡,一般不使用，而是通过监听 tabChange 事件来获取
-    selectTab,
-    selectTabByName
+	currentTab, // 当前选中的选项卡,一般不使用，而是通过监听 tabChange 事件来获取
+	selectTab,
+	selectTabByName,
 });
-
 </script>
 
 <style scoped>

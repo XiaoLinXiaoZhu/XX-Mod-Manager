@@ -36,59 +36,55 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
-import chipButton from './chipButton.vue';
-import horizontalScrollBar from './horizontalScrollBar.vue';
+import { reactive, ref } from "vue";
 
 const props = defineProps({
-    items: {
-        type: Array
-    },
-    translatedItems: {
-        type: Array,
-        default: () => []
-    }
+	items: {
+		type: Array,
+	},
+	translatedItems: {
+		type: Array,
+		default: () => [],
+	},
 });
-const emit = defineEmits(['itemChange']);
-
+const emit = defineEmits(["itemChange"]);
 
 //-=============== 按钮引用 ===============
 const chipButtonRefs = ref({});
-const setChipButtonRef = (index) => (el) => {
-    chipButtonRefs.value[index] = el;
-}
+const _setChipButtonRef = (index) => (el) => {
+	chipButtonRefs.value[index] = el;
+};
 
 const currentItem = ref(props.items[0]);
 
 //-=============== 滑块 ===============
 const sliderStyle = reactive({
-    width: '0px',
-    left: '0px'
+	width: "0px",
+	left: "0px",
 });
 const updateSlider = (index) => {
-    const selectedChip = chipButtonRefs.value[props.items[index]];
-    //debug
-    // console.log(`updateSlider: `, selectedChip)
+	const selectedChip = chipButtonRefs.value[props.items[index]];
+	//debug
+	// console.log(`updateSlider: `, selectedChip)
 
-    if (!selectedChip) return;
-    sliderStyle.width = `${selectedChip.$el.offsetWidth}px`;
-    sliderStyle.left = `${selectedChip.$el.offsetLeft}px`;
+	if (!selectedChip) return;
+	sliderStyle.width = `${selectedChip.$el.offsetWidth}px`;
+	sliderStyle.left = `${selectedChip.$el.offsetLeft}px`;
 };
-
 
 //-=============== 浮动滑块 ===============
 const selectItem = (item, index) => {
-    updateSlider(index);
-    if (item === currentItem.value) return;
-    currentItem.value = item;
+	updateSlider(index);
+	if (item === currentItem.value) return;
+	currentItem.value = item;
 
-    emit('itemChange', item);
+	emit("itemChange", item);
 };
 
 const selectItemByName = (name) => {
-    const index = props.items.indexOf(name);
-    if (index === -1) return;
-    selectItem(name, index);
+	const index = props.items.indexOf(name);
+	if (index === -1) return;
+	selectItem(name, index);
 };
 
 // onMounted(() => {
@@ -101,11 +97,10 @@ const selectItemByName = (name) => {
 
 //-============对外的接口================
 defineExpose({
-    currentItem,
-    selectItem,
-    selectItemByName
+	currentItem,
+	selectItem,
+	selectItemByName,
 });
-
 </script>
 
 <style scoped>

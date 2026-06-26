@@ -6,24 +6,23 @@
 </template>
 
 <script setup>
-import {defineEmits, ref} from 'vue';
-import backButtonImage from '../assets/backButton.png';
-const emit = defineEmits(['backButtonClicked']);
+import { defineEmits, ref } from "vue";
+
+const emit = defineEmits(["backButtonClicked"]);
 
 const isFlashing = ref(false);
 const flashingSpeed = 100;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const handleClick = async () => {
-    isFlashing.value = true;
-    await sleep(flashingSpeed);
-    isFlashing.value = false;
-    await sleep(flashingSpeed);
-    isFlashing.value = true;
-    emit('backButtonClicked');
-    await sleep(flashingSpeed);
-    isFlashing.value = false;
+const _handleClick = async () => {
+	isFlashing.value = true;
+	await sleep(flashingSpeed);
+	isFlashing.value = false;
+	await sleep(flashingSpeed);
+	isFlashing.value = true;
+	emit("backButtonClicked");
+	await sleep(flashingSpeed);
+	isFlashing.value = false;
 };
-
 </script>
 
 <style scoped>

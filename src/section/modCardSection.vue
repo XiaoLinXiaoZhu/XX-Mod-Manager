@@ -95,84 +95,90 @@
 </template>
 
 <script setup>
-import modCardManager from '../components/modCardManager.vue';
-import modCardManager2 from '../components/modCardManager2.vue';
-import leftMenu from '../components/leftMenu.vue';
-import modInfo from '../components/modInfo.vue';
-import { ref, onMounted, useTemplateRef, watch, computed } from 'vue';
-import IManager from '../../electron/IManager';
-import { g_temp_vue, g_config_vue, g_data_vue } from '../../electron/IManager';
-import fsProxy from '../../electron/fsProxy';
-const iManager = new IManager();
-import settingBar from '../components/settingBar.vue';
-import { EventType, EventSystem } from '../../helper/EventSystem';
-import { SnackType, t_snack } from '../../helper/SnackHelper';
+import { computed, ref, useTemplateRef, watch } from "vue";
+import fsProxy from "../../electron/fsProxy";
+import IManager, {
+	g_config_vue,
+	g_data_vue,
+	g_temp_vue,
+} from "../../electron/IManager";
 
-const displayModRef = g_temp_vue.currentMod;
+const iManager = new IManager();
+
+import { EventSystem } from "../../helper/EventSystem";
+import { SnackType, t_snack } from "../../helper/SnackHelper";
+
+const _displayModRef = g_temp_vue.currentMod;
 
 //-============================== 事件处理 ==============================
 
-function handlePresetManageButtonClicked() {
-    console.log('preset manage button clicked');
-    fsProxy.openDir(iManager.config.presetPath);
-    iManager.showDialog('dialog-need-refresh');
+function _handlePresetManageButtonClicked() {
+	console.log("preset manage button clicked");
+	fsProxy.openDir(iManager.config.presetPath);
+	iManager.showDialog("dialog-need-refresh");
 }
 
-function handlePresetAddButtonClicked() {
-    console.log('preset add button clicked');
-    // const addPresetDialog = document.getElementById('add-preset-dialog');
-    // addPresetDialog.show();
-    iManager.showDialog('add-preset-dialog');
+function _handlePresetAddButtonClicked() {
+	console.log("preset add button clicked");
+	// const addPresetDialog = document.getElementById('add-preset-dialog');
+	// addPresetDialog.show();
+	iManager.showDialog("add-preset-dialog");
 }
 
-function handleRefreshButtonClicked() {
-    const { ipcRenderer } = require('electron');
-    ipcRenderer.send('refresh-main-window');
+function _handleRefreshButtonClicked() {
+	const { ipcRenderer } = require("electron");
+	ipcRenderer.send("refresh-main-window");
 }
 
-const targetCharacter = ref('');
-function handleBatchSetCharacterButtonClicked(){
-    console.log('batch set character button clicked', targetCharacter.value);
-    const ModIds = selectedModIds();
+const targetCharacter = ref("");
+function _handleBatchSetCharacterButtonClicked() {
+	console.log("batch set character button clicked", targetCharacter.value);
+	const ModIds = selectedModIds();
 
-    if (!targetCharacter.value) {
-        t_snack({
-            zh_cn: '请输入角色名',
-            en: 'Please enter the character name',
-        },SnackType.error);
-        console.error('targetCharacter is empty');
-        return;
-    }
-    if (ModIds.length == 0) {
-        t_snack({
-            zh_cn: '请至少选择一个mod',
-            en: 'Please select at least one mod',
-        },SnackType.error);
-        console.error('selectedModIds is empty');
-        return;
-    }
-    ModIds.forEach(async modId => {
-        const ModData = await iManager.getModInfoById(modId);
-        //debug
-        console.log('ModData', ModData, targetCharacter.value);
-        console.log('TargetCharacter', targetCharacter.value);
-        if (ModData && targetCharacter.value) {
-            ModData.character = targetCharacter.value;
-            ModData.saveModInfo();
-            ModData.triggerChanged();
-        }
-    });
+	if (!targetCharacter.value) {
+		t_snack(
+			{
+				zh_cn: "请输入角色名",
+				en: "Please enter the character name",
+			},
+			SnackType.error,
+		);
+		console.error("targetCharacter is empty");
+		return;
+	}
+	if (ModIds.length === 0) {
+		t_snack(
+			{
+				zh_cn: "请至少选择一个mod",
+				en: "Please select at least one mod",
+			},
+			SnackType.error,
+		);
+		console.error("selectedModIds is empty");
+		return;
+	}
+	ModIds.forEach(async (modId) => {
+		const ModData = await iManager.getModInfoById(modId);
+		//debug
+		console.log("ModData", ModData, targetCharacter.value);
+		console.log("TargetCharacter", targetCharacter.value);
+		if (ModData && targetCharacter.value) {
+			ModData.character = targetCharacter.value;
+			ModData.saveModInfo();
+			ModData.triggerChanged();
+		}
+	});
 }
 
 //-============================== Compact Mode ==============================
 //#region Compact Mode
 const compactMode = ref(false);
 
-function handleCompactButtonClicked() {
-    console.log('compact button clicked');
-    compactMode.value = !compactMode.value;
-    //切换compactMode
-    return;
+function _handleCompactButtonClicked() {
+	console.log("compact button clicked");
+	compactMode.value = !compactMode.value;
+	//切换compactMode
+	return;
 }
 //#endregion
 
@@ -180,59 +186,64 @@ function handleCompactButtonClicked() {
 //#region presets
 // const presets = ref([]);
 const language = g_config_vue.language;
-const presets = computed(() => {
-    return ['default', ...g_data_vue.presetList.value];
+const _presets = computed(() => {
+	return ["default", ...g_data_vue.presetList.value];
 });
-const translatedPresets = computed(() => {
-    // 根据语言翻译 default
-    //debug
-    console.log('presets changed', language.value);
-    if (language.value === 'zh_cn') {
-        return ['默认预设', ...g_data_vue.presetList.value];
-    } else {
-        return ['default', ...g_data_vue.presetList.value];
-    }
+const _translatedPresets = computed(() => {
+	// 根据语言翻译 default
+	//debug
+	console.log("presets changed", language.value);
+	if (language.value === "zh_cn") {
+		return ["默认预设", ...g_data_vue.presetList.value];
+	} else {
+		return ["default", ...g_data_vue.presetList.value];
+	}
 });
 
 // 这里只做显示切换，真正的功能通过 eventsystem.on('currentPresetChanged') 来实现
 const currentPreset = g_temp_vue.currentPreset;
-watch(currentPreset, (newVal, oldVal) => {
-    presetSelectorRef.value.selectTabByName(newVal);
+watch(currentPreset, (newVal, _oldVal) => {
+	presetSelectorRef.value.selectTabByName(newVal);
 });
 
-function handlePresetChange(tab) {
-    iManager.setCurrentPreset(tab);
+function _handlePresetChange(tab) {
+	iManager.setCurrentPreset(tab);
 }
 
-const selectedModIds = () => Array.from(document.querySelectorAll('.mod-item')).filter(item => item.getAttribute('clicked') == 'true').map(item => item.id);
-const selectedModNames = () => Array.from(document.querySelectorAll('.mod-item')).filter(item => item.getAttribute('clicked') == 'true').map(item => item.name);
-
+const selectedModIds = () =>
+	Array.from(document.querySelectorAll(".mod-item"))
+		.filter((item) => item.getAttribute("clicked") === "true")
+		.map((item) => item.id);
+const _selectedModNames = () =>
+	Array.from(document.querySelectorAll(".mod-item"))
+		.filter((item) => item.getAttribute("clicked") === "true")
+		.map((item) => item.name);
 
 function savePreset() {
-    if (currentPreset.value == 'default') return;
-    //debug
-    console.log('save preset', currentPreset.value, selectedModIds());
-    iManager.savePresetByModIds(currentPreset.value, selectedModIds());
+	if (currentPreset.value === "default") return;
+	//debug
+	console.log("save preset", currentPreset.value, selectedModIds());
+	iManager.savePresetByModIds(currentPreset.value, selectedModIds());
 }
 
-const presetSelectorRef = useTemplateRef('presetSelectorRef');
+const presetSelectorRef = useTemplateRef("presetSelectorRef");
 
 //#endregion
 
 //-=========================== apply button ===========================
-function handleApplyButtonClicked() {
-    // debug
-    const mods = Array.from(document.querySelectorAll('.mod-item'));
+function _handleApplyButtonClicked() {
+	// debug
+	const _mods = Array.from(document.querySelectorAll(".mod-item"));
 
-    iManager.applyMods(selectedModIds()).then(() => {
-        console.log('apply success', selectedModIds());
-    });
+	iManager.applyMods(selectedModIds()).then(() => {
+		console.log("apply success", selectedModIds());
+	});
 }
 
-EventSystem.on('toggledMod', (mod) => {
-    //debug
-    console.log('toggled mod', mod.name);
-    savePreset();
+EventSystem.on("toggledMod", (mod) => {
+	//debug
+	console.log("toggled mod", mod.name);
+	savePreset();
 });
 </script>
 

@@ -1,2 +1,2 @@
-require('../includes/helpers/tags')(hexo);
-require('../includes/tags')(hexo);
+require("../includes/helpers/tags")(hexo);
+require("../includes/tags")(hexo);

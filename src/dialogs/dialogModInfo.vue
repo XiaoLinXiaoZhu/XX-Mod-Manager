@@ -191,116 +191,119 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { defineProps, defineEmits, onMounted, computed, watch, useTemplateRef } from 'vue';
-import dialogTemplate from './dialogTemplate.vue';
-import IManager from '../../electron/IManager';
-import DialogTemplate from './dialogTemplate.vue';
+import { defineProps, onMounted, ref, useTemplateRef, watch } from "vue";
+import IManager from "../../electron/IManager";
+
 const iManager = new IManager();
 
 // 参数为 字符串类型的 mod，之后通过 iManager.getModInfo(mod) 获取 mod 信息
 const props = defineProps({
-  mod: Object
+	mod: Object,
 });
 
 let saved = false;
 
 // modInfo 为 mod 信息，用于储存临时修改的 mod 信息，最后保存时再将其赋值给 props.mod
 const modInfo = ref({
-  name: 'Unknown',
-  character: '',
-  preview: '',
-  url: '',
-  description: '',
+	name: "Unknown",
+	character: "",
+	preview: "",
+	url: "",
+	description: "",
 });
-const editModInfoDialog = useTemplateRef('edit-mod-dialog');
+const editModInfoDialog = useTemplateRef("edit-mod-dialog");
 const img = ref(null);
-watch(() => props.mod, async (newVal) => {
-  //debug
-  console.log('mod changed', newVal);
-  if (newVal) {
-    const imgBase64 = await iManager.getImageBase64(newVal.preview);
-    // modInfo.value = newVal;
-    // 将其转化为 json 再 转化为对象，防止引用传递
-    modInfo.value = JSON.parse(JSON.stringify(newVal));
-    img.value = "data:image/png;base64," + imgBase64;
-  }
-});
+watch(
+	() => props.mod,
+	async (newVal) => {
+		//debug
+		console.log("mod changed", newVal);
+		if (newVal) {
+			const imgBase64 = await iManager.getImageBase64(newVal.preview);
+			// modInfo.value = newVal;
+			// 将其转化为 json 再 转化为对象，防止引用传递
+			modInfo.value = JSON.parse(JSON.stringify(newVal));
+			img.value = `data:image/png;base64,${imgBase64}`;
+		}
+	},
+);
 
-const handleHotkeyInput = (hotkey, value) => {
-  if (value === '') {
-    // 删除快捷键
-    const index = modInfo.value.hotkeys.indexOf(hotkey);
-    modInfo.value.hotkeys.splice(index, 1);
-    return;
-  }
-  hotkey.key = value;
-}
+const _handleHotkeyInput = (hotkey, value) => {
+	if (value === "") {
+		// 删除快捷键
+		const index = modInfo.value.hotkeys.indexOf(hotkey);
+		modInfo.value.hotkeys.splice(index, 1);
+		return;
+	}
+	hotkey.key = value;
+};
 
-const addNewHotkeyByDescription = (description) => {
-  if (description === '') {
-    return;
-  }
-  modInfo.value.hotkeys.push({
-    key: '',
-    description: description
-  });
-}
+const _addNewHotkeyByDescription = (description) => {
+	if (description === "") {
+		return;
+	}
+	modInfo.value.hotkeys.push({
+		key: "",
+		description: description,
+	});
+};
 
-const addNewHotkeyByHotkey = (key) => {
-  if (key === '') {
-    return;
-  }
-  modInfo.value.hotkeys.push({
-    key: key,
-    description: ''
-  });
-}
+const _addNewHotkeyByHotkey = (key) => {
+	if (key === "") {
+		return;
+	}
+	modInfo.value.hotkeys.push({
+		key: key,
+		description: "",
+	});
+};
 
-const handleSelectImage = async () => {
-  const imgPath = await iManager.getFilePath('preview', 'image');
-  if (imgPath) {
-    const imgBase64 = await iManager.getImageBase64(imgPath);
-    img.value = "data:image/png;base64," + imgBase64;
-    modInfo.value.preview = imgPath;
-  }
-}
+const _handleSelectImage = async () => {
+	const imgPath = await iManager.getFilePath("preview", "image");
+	if (imgPath) {
+		const imgBase64 = await iManager.getImageBase64(imgPath);
+		img.value = `data:image/png;base64,${imgBase64}`;
+		modInfo.value.preview = imgPath;
+	}
+};
 
-const handleCancel = async () => {
-  modInfo.value = JSON.parse(JSON.stringify(props.mod));
-  const imgBase64 = await iManager.getImageBase64(modInfo.value.preview);
+const _handleCancel = async () => {
+	modInfo.value = JSON.parse(JSON.stringify(props.mod));
+	const imgBase64 = await iManager.getImageBase64(modInfo.value.preview);
 
-  img.value = "data:image/png;base64," + imgBase64;
-  editModInfoDialog.value.dismiss();
-}
+	img.value = `data:image/png;base64,${imgBase64}`;
+	editModInfoDialog.value.dismiss();
+};
 
-const handleSave = () => {
-  //debug
-  console.log('modInfo.value', modInfo.value);
-  // 保存修改的 mod 信息
+const _handleSave = () => {
+	//debug
+	console.log("modInfo.value", modInfo.value);
+	// 保存修改的 mod 信息
 
-  if (props.mod == modInfo.value) {
-    editModInfoDialog.value.dismiss();
-    return;
-  }
+	if (props.mod === modInfo.value) {
+		editModInfoDialog.value.dismiss();
+		return;
+	}
 
-  // 处理 图片 更改
-  if (props.mod.preview !== modInfo.value.preview) {
-    // 当图片更改时，将新图片保存到本地 对应的文件夹下，并且将新的路径保存到 modInfo 中
-    //debug
-    console.log(`change preview of ${modInfo.value.name} to ${modInfo.value.preview}`);
-    iManager.changePreview(modInfo.value.name, modInfo.value.preview);
-  }
-  props.mod = modInfo.value;
-  // iManager.saveModInfo(modInfo.value);
-  props.mod.saveModInfo();
-  saved = true;
-  editModInfoDialog.value.dismiss();
-}
+	// 处理 图片 更改
+	if (props.mod.preview !== modInfo.value.preview) {
+		// 当图片更改时，将新图片保存到本地 对应的文件夹下，并且将新的路径保存到 modInfo 中
+		//debug
+		console.log(
+			`change preview of ${modInfo.value.name} to ${modInfo.value.preview}`,
+		);
+		iManager.changePreview(modInfo.value.name, modInfo.value.preview);
+	}
+	props.mod = modInfo.value;
+	// iManager.saveModInfo(modInfo.value);
+	props.mod.saveModInfo();
+	saved = true;
+	editModInfoDialog.value.dismiss();
+};
 
 onMounted(() => {
-  const editModInfoDialogStyle = document.createElement('style');
-  editModInfoDialogStyle.innerHTML = `
+	const editModInfoDialogStyle = document.createElement("style");
+	editModInfoDialogStyle.innerHTML = `
     .container {
       width: calc(30% + 400px) !important;
       min-width: calc(600px) !important;
@@ -318,24 +321,26 @@ onMounted(() => {
       display: none;
     }    
         `;
-  // editModInfoDialog.shadowRoot.appendChild(editModInfoDialogStyle);
-  editModInfoDialog.value.shadowRoot.appendChild(editModInfoDialogStyle);
+	// editModInfoDialog.shadowRoot.appendChild(editModInfoDialogStyle);
+	editModInfoDialog.value.shadowRoot.appendChild(editModInfoDialogStyle);
 
-  editModInfoDialog.value.addEventListener('dismiss', async () => {
-    // 如果 modInfo 与 props.mod 不同，则询问是否保存
-    //debug
-    if (saved) {
-      saved = false;
-      return;
-    }
-    console.log('dismiss', JSON.stringify(modInfo.value), JSON.stringify(props.mod));
-    if (JSON.stringify(modInfo.value) !== JSON.stringify(props.mod)) {
-      iManager.showDialog('save-change-dialog');
-    }
-  });
+	editModInfoDialog.value.addEventListener("dismiss", async () => {
+		// 如果 modInfo 与 props.mod 不同，则询问是否保存
+		//debug
+		if (saved) {
+			saved = false;
+			return;
+		}
+		console.log(
+			"dismiss",
+			JSON.stringify(modInfo.value),
+			JSON.stringify(props.mod),
+		);
+		if (JSON.stringify(modInfo.value) !== JSON.stringify(props.mod)) {
+			iManager.showDialog("save-change-dialog");
+		}
+	});
 });
-
-
 </script>
 
 

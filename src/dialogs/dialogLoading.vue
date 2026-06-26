@@ -21,7 +21,6 @@
 </template>
 
 <script setup>
-import dialogTemplate from './dialogTemplate.vue';
 </script>
 <style scoped>
     .circular-progress {

@@ -7,13 +7,12 @@
 </template>
 
 <script setup>
-import {defineProps} from 'vue';
+import { defineProps } from "vue";
 
-const props = defineProps({
-    text: String,
-    id: String
+const _props = defineProps({
+	text: String,
+	id: String,
 });
-
 </script>
 
 <style scoped>

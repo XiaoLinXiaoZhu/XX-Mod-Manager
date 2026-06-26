@@ -269,102 +269,104 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, onMounted, computed, watch, useTemplateRef } from 'vue';
+import { onMounted, ref, useTemplateRef, watch } from "vue";
+import IManager from "../electron/IManager";
+import getData from "../src/section/settingSectionData.js";
 
-import sectionSelector from '../src/components/sectionSelector.vue';
-import IManager from '../electron/IManager';
-import CssProxy from '../src/components/cssProxy.vue';
-import settingBar from '../src/components/settingBar.vue';
-import getData from '../src/section/settingSectionData.js';
+let {
+	languageData,
+	themeData,
+	modTargetPathData,
+	modSourcePathData,
+	presetPathData,
+	initAllDataButton,
+} = getData();
 
-let { languageData, themeData, modTargetPathData, modSourcePathData, presetPathData, initAllDataButton } = getData();
-
-
-
-const ipcRenderer = require('electron').ipcRenderer;
+const ipcRenderer = require("electron").ipcRenderer;
 const iManager = new IManager();
 
+const _sections = ref(["intro", "basic", "advanced", "auto", "more"]);
+const sectionSelectorRef = useTemplateRef("section-selector");
+const currentSection = ref("intro");
 
-const sections = ref(['intro', 'basic', 'advanced', 'auto', 'more']);
-const sectionSelectorRef = useTemplateRef('section-selector');
-const currentSection = ref('intro');
-
-const modTargetPath = ref('');
-const modSourcePath = ref('');
-const presetPath = ref('');
-const autoStartGame = ref(false);
-const modLoaderDir = ref('');
-const gameDir = ref('');
-const ifAutoApply = ref(false);
-const ifAutoRefreshInZZZ = ref(false);
-const ifUseAdmin = ref(false);
+const modTargetPath = ref("");
+const modSourcePath = ref("");
+const presetPath = ref("");
+const _autoStartGame = ref(false);
+const _modLoaderDir = ref("");
+const _gameDir = ref("");
+const _ifAutoApply = ref(false);
+const _ifAutoRefreshInZZZ = ref(false);
+const _ifUseAdmin = ref(false);
 
 watch(modTargetPath, (newVal) => {
-    iManager.config.modTargetPath = newVal;
-    iManager.saveConfig();
+	iManager.config.modTargetPath = newVal;
+	iManager.saveConfig();
 });
 
 watch(modSourcePath, (newVal) => {
-    iManager.config.modSourcePath = newVal;
-    iManager.saveConfig();
+	iManager.config.modSourcePath = newVal;
+	iManager.saveConfig();
 });
 watch(presetPath, (newVal) => {
-    iManager.config.presetPath = newVal;
-    iManager.saveConfig();
+	iManager.config.presetPath = newVal;
+	iManager.saveConfig();
 });
 
-
-const handleSectionChange = (section) => {
-    currentSection.value = section;
-    //debug
-    console.log('handleSectionChange', section);
+const _handleSectionChange = (section) => {
+	currentSection.value = section;
+	//debug
+	console.log("handleSectionChange", section);
 };
 
-const handleMoveAllFiles = () => {
-    //debug
-    console.log('handleMoveAllFiles', modTargetPath.value.length, modSourcePath.value.length);
-    if (modTargetPath.value.length === 0 || modSourcePath.value.length === 0) {
-        console.log('modTargetPath or modSourcePath is empty');
-        alert(t('message.alert.emptyModSourceOrTarget'));
-        return;
-    }
-    iManager.moveAllFiles(modTargetPath.value, modSourcePath.value);
+const _handleMoveAllFiles = () => {
+	//debug
+	console.log(
+		"handleMoveAllFiles",
+		modTargetPath.value.length,
+		modSourcePath.value.length,
+	);
+	if (modTargetPath.value.length === 0 || modSourcePath.value.length === 0) {
+		console.log("modTargetPath or modSourcePath is empty");
+		alert(t("message.alert.emptyModSourceOrTarget"));
+		return;
+	}
+	iManager.moveAllFiles(modTargetPath.value, modSourcePath.value);
 };
 
-const next = () => {
-    //debug
-    console.log(sectionSelectorRef.value);
-    sectionSelectorRef.value.nextSection();
+const _next = () => {
+	//debug
+	console.log(sectionSelectorRef.value);
+	sectionSelectorRef.value.nextSection();
 };
 
-const prev = () => {
-    sectionSelectorRef.value.prevSection();
+const _prev = () => {
+	sectionSelectorRef.value.prevSection();
 };
 
-function closeSettingPage() {
-    console.log('closeSettingPage');
-    iManager.config.firstLoad = false;
-    iManager.config.modTargetPath = modTargetPath.value;
-    iManager.config.modSourcePath = modSourcePath.value;
-    iManager.config.presetPath = presetPath.value;
-    iManager.saveConfig();
-    ipcRenderer.send('refresh-main-window');
+function _closeSettingPage() {
+	console.log("closeSettingPage");
+	iManager.config.firstLoad = false;
+	iManager.config.modTargetPath = modTargetPath.value;
+	iManager.config.modSourcePath = modSourcePath.value;
+	iManager.config.presetPath = presetPath.value;
+	iManager.saveConfig();
+	ipcRenderer.send("refresh-main-window");
 
-    //关闭窗口
-    window.close();
+	//关闭窗口
+	window.close();
 }
 
 onMounted(async () => {
-    await iManager.waitInit();
-    modTargetPath.value = iManager.config.modTargetPath;
-    modSourcePath.value = iManager.config.modSourcePath;
-    presetPath.value = iManager.config.presetPath;
+	await iManager.waitInit();
+	modTargetPath.value = iManager.config.modTargetPath;
+	modSourcePath.value = iManager.config.modSourcePath;
+	presetPath.value = iManager.config.presetPath;
 
-    // 不论用户是否看完了 都 取消首次加载
-    iManager.config.firstLoad = false;
-    iManager.saveConfig();
+	// 不论用户是否看完了 都 取消首次加载
+	iManager.config.firstLoad = false;
+	iManager.saveConfig();
 });
-
 </script>
 
 <style scoped>

@@ -26,42 +26,39 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import dialogTemplate from './dialogTemplate.vue';
+import { ref } from "vue";
+import IManager from "../../electron/IManager";
 
-import IManager from '../../electron/IManager';
 const iManager = new IManager();
 
-const presetName = ref('');
+const presetName = ref("");
 
 // 导入 i18n 的 t 函数
-import { useI18n } from 'vue-i18n';
+import { useI18n } from "vue-i18n";
+
 const { t } = useI18n();
 
-function handleAddPreset() {
-    console.log('add preset', presetName.value);
-    if (presetName.value) {
-        // 检查 是否 已经存在
-        const presetList = iManager.data.presetList;
-        if (presetList.includes(presetName.value)) {
-            //debug
-            console.log("presetName already exists");
-            iManager.snack(t('presetDialog.nameExist'), 'error');
-        }
-        else {
-            //debug
-            console.log("presetName is not exists");
-            iManager.addPreset(presetName.value);
-            iManager.snack(t('presetDialog.success'), 'info');
-        }
-    }
-    else {
-        //debug
-        console.log("presetName is empty");
-        iManager.snack(t('presetDialog.emptyName'), 'error');
-    }
-    //清空输入框
-    presetName.value = '';
+function _handleAddPreset() {
+	console.log("add preset", presetName.value);
+	if (presetName.value) {
+		// 检查 是否 已经存在
+		const presetList = iManager.data.presetList;
+		if (presetList.includes(presetName.value)) {
+			//debug
+			console.log("presetName already exists");
+			iManager.snack(t("presetDialog.nameExist"), "error");
+		} else {
+			//debug
+			console.log("presetName is not exists");
+			iManager.addPreset(presetName.value);
+			iManager.snack(t("presetDialog.success"), "info");
+		}
+	} else {
+		//debug
+		console.log("presetName is empty");
+		iManager.snack(t("presetDialog.emptyName"), "error");
+	}
+	//清空输入框
+	presetName.value = "";
 }
-
 </script>
