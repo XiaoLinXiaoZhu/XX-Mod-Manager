@@ -1,0 +1,11 @@
+{
+  "name": "@xxmm/ipc",
+  "version": "1.0.0",
+  "description": "Type-safe IPC layer for Electron main ↔ renderer communication",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "type": "module",
+  "peerDependencies": {
+    "electron": "*"
+  }
+}

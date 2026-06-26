@@ -1,0 +1,11 @@
+{
+  "name": "@xxmm/types",
+  "version": "1.0.0",
+  "description": "Shared type definitions with Zod schemas for XX Mod Manager",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "type": "module",
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
+}

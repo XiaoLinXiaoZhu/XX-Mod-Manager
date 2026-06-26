@@ -1,9 +1,23 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // https://vite.dev/config/
 export default defineConfig({
   base: './',
+  resolve: {
+    alias: {
+      '@xxmm/core': path.resolve(__dirname, 'packages/core/src'),
+      '@xxmm/helper': path.resolve(__dirname, 'packages/helper/src'),
+      '@xxmm-apps/electron': path.resolve(__dirname, 'apps/electron/src'),
+      '@xxmm-apps/vault': path.resolve(__dirname, 'apps/desktop/vault/src'),
+      '@xxmm-apps/first-load': path.resolve(__dirname, 'apps/desktop/first-load/src'),
+      '@xxmm-apps/switch-config': path.resolve(__dirname, 'apps/desktop/switch-config/src'),
+    }
+  },
   plugins: [
     vue({
       template: {
@@ -23,8 +37,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: 'index.html',
-        firstLoad: 'firstLoad/index.html',
-        switchConfig: 'switchConfig/index.html',
+        firstLoad: 'apps/desktop/first-load/index.html',
+        switchConfig: 'apps/desktop/switch-config/index.html',
       },
       output: {
         assetFileNames: (assetInfo) => {
