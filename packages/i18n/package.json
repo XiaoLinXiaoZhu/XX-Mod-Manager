@@ -1,0 +1,8 @@
+{
+  "name": "@xxmm/i18n",
+  "version": "1.0.0",
+  "description": "Scoped i18n with tagged template support — Chinese-as-key, auto-extractable",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "type": "module"
+}

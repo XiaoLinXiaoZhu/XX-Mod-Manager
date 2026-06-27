@@ -52,6 +52,7 @@ export {
   asBoundsStr,
 } from "./config";
 
+// ---- Plugin（新版协议） ----
 export {
   PluginName,
   PluginConfig,
@@ -59,6 +60,28 @@ export {
   parsePluginName,
   parsePluginConfig,
   asPluginName,
+} from "./plugin";
+export type {
+  PluginManifest,
+  Plugin,
+  PluginContext,
+  PluginConfigSchema,
+  PluginConfigField,
+  PluginBooleanField,
+  PluginStringField,
+  PluginNumberField,
+  PluginPathField,
+  PluginSelectField,
+  PluginSelectOption,
+  PluginButtonField,
+  PluginMarkdownField,
+  PluginI18n,
+  PluginIPC,
+  PluginEvents,
+  PluginFS,
+  PluginConfigStore,
+  PluginUIRegistry,
+  PluginLogger,
 } from "./plugin";
 
 export {

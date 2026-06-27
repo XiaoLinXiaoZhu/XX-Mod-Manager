@@ -1,0 +1,8 @@
+{
+  "name": "@xxmm/events",
+  "version": "1.0.0",
+  "description": "Type-safe in-process event bus with the same channel pattern as @xxmm/ipc",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "type": "module"
+}
