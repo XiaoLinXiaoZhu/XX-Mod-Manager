@@ -1,8 +1,4 @@
 // @xxmm/types — 共享类型定义（Parse, Don't Validate）
-//
-// 每种类型同时导出 zod schema 和 TS 类型（同名，利用 TS 值/类型双命名空间）：
-//   import { FilePath, parseFilePath, asFilePath } from "@xxmm/types";
-//   const p: FilePath = FilePath.parse("hello");  // 左值=类型，右值=schema
 
 export type { Branded } from "./brand";
 
@@ -52,7 +48,6 @@ export {
   asBoundsStr,
 } from "./config";
 
-// ---- Plugin（新版协议） ----
 export {
   PluginName,
   PluginConfig,
@@ -64,7 +59,6 @@ export {
 export type {
   PluginManifest,
   Plugin,
-  PluginContext,
   PluginConfigSchema,
   PluginConfigField,
   PluginBooleanField,
@@ -75,13 +69,6 @@ export type {
   PluginSelectOption,
   PluginButtonField,
   PluginMarkdownField,
-  PluginI18n,
-  PluginIPC,
-  PluginEvents,
-  PluginFS,
-  PluginConfigStore,
-  PluginUIRegistry,
-  PluginLogger,
 } from "./plugin";
 
 export {

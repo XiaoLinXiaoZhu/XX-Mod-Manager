@@ -1,0 +1,14 @@
+{
+  "name": "@xxmm/plugin",
+  "version": "1.0.0",
+  "description": "Plugin host — loading, context construction, config management",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "type": "module",
+  "dependencies": {
+    "@xxmm/types": "workspace:*",
+    "@xxmm/ipc": "workspace:*",
+    "@xxmm/events": "workspace:*",
+    "@xxmm/i18n": "workspace:*"
+  }
+}
