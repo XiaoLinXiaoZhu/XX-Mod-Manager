@@ -44,15 +44,43 @@
       "name": "@xxmm/core",
       "version": "1.0.0",
     },
+    "packages/events": {
+      "name": "@xxmm/events",
+      "version": "1.0.0",
+    },
     "packages/helper": {
       "name": "@xxmm/helper",
       "version": "1.0.0",
+    },
+    "packages/i18n": {
+      "name": "@xxmm/i18n",
+      "version": "1.0.0",
+    },
+    "packages/i18n-vue": {
+      "name": "@xxmm/i18n-vue",
+      "version": "1.0.0",
+      "dependencies": {
+        "@xxmm/i18n": "workspace:*",
+      },
+      "peerDependencies": {
+        "vue": "^3.0.0",
+      },
     },
     "packages/ipc": {
       "name": "@xxmm/ipc",
       "version": "1.0.0",
       "peerDependencies": {
         "electron": "*",
+      },
+    },
+    "packages/plugin": {
+      "name": "@xxmm/plugin",
+      "version": "1.0.0",
+      "dependencies": {
+        "@xxmm/events": "workspace:*",
+        "@xxmm/i18n": "workspace:*",
+        "@xxmm/ipc": "workspace:*",
+        "@xxmm/types": "workspace:*",
       },
     },
     "packages/types": {
@@ -278,9 +306,17 @@
 
     "@xxmm/core": ["@xxmm/core@workspace:packages/core"],
 
+    "@xxmm/events": ["@xxmm/events@workspace:packages/events"],
+
     "@xxmm/helper": ["@xxmm/helper@workspace:packages/helper"],
 
+    "@xxmm/i18n": ["@xxmm/i18n@workspace:packages/i18n"],
+
+    "@xxmm/i18n-vue": ["@xxmm/i18n-vue@workspace:packages/i18n-vue"],
+
     "@xxmm/ipc": ["@xxmm/ipc@workspace:packages/ipc"],
+
+    "@xxmm/plugin": ["@xxmm/plugin@workspace:packages/plugin"],
 
     "@xxmm/types": ["@xxmm/types@workspace:packages/types"],
 
