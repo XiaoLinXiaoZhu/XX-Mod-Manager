@@ -23,14 +23,23 @@ export type SlotValue = string | number | boolean | null | undefined;
 
 const SLOT_MARKER = "{{}}";
 
-/** 将模板字符串数组和插槽值还原为最终字符串 */
+/**
+ * 将模板字符串数组和插槽值还原为最终字符串。
+ *
+ * 接受两种输入：
+ *   - TemplateStringsArray：tagged template 的原始片段
+ *   - string：已带 {{}} 标记的 key（来自 fallback 或 defaultLanguage 路径）
+ *
+ * 当传入 string 且有 slots 时，委托 interpolateTemplate 替换 {{}} 占位符；
+ * 当 slots 为空时原样返回（尊重翻译文本中可能含有的字面 {{}}）。
+ */
 export function interpolate(
   strings: Readonly<TemplateStringsArray> | string,
   slots: Readonly<SlotValue[]>,
 ): string {
   if (typeof strings === "string") {
-    // 无插槽：翻译文本中可能有 {{}}，但这里没有 slots
-    return strings;
+    if (slots.length === 0) return strings;
+    return interpolateTemplate(strings, slots);
   }
   let result = "";
   for (let i = 0; i < strings.length; i++) {
@@ -95,7 +104,7 @@ export function createI18nScope(config: I18nScopeConfig): I18nScope {
       if (translation !== undefined) {
         return interpolateTemplate(translation, slots);
       }
-      // fallback
+      // fallback：key 中可能含 {{}}，交由 interpolate 处理
       return interpolate(key, slots);
     },
   };

@@ -46,6 +46,12 @@ describe("interpolate", () => {
     const strings = ["a", "b", "c"] as unknown as TemplateStringsArray;
     expect(interpolate(strings, [null, undefined])).toBe("abc");
   });
+
+  test("字符串 + slots：委托 interpolateTemplate 替换 {{}}", () => {
+    // 修复：fallback 路径 key="你好 {{}}" + slots=["Alice"] 应正确渲染
+    expect(interpolate("你好 {{}}，你有 {{}} 条消息", ["Alice", 5]))
+      .toBe("你好 Alice，你有 5 条消息");
+  });
 });
 
 describe("interpolateTemplate", () => {
@@ -94,6 +100,17 @@ describe("createI18nScope", () => {
   test("翻译 + 插槽", () => {
     const scope = zhScope({ en: { "你好 {{}}": "Hello {{}}" } });
     expect(scope.translate("你好 {{}}", "en", ["Alice"])).toBe("Hello Alice");
+  });
+
+  test("defaultLanguage + 插槽：key 中的 {{}} 被替换", () => {
+    const scope = zhScope();
+    expect(scope.translate("你好 {{}}，你有 {{}} 条消息", "zh_cn", ["Alice", 5]))
+      .toBe("你好 Alice，你有 5 条消息");
+  });
+
+  test("fallback + 插槽：翻译未命中时 key 中的 {{}} 仍被替换", () => {
+    const scope = zhScope({ en: {} });
+    expect(scope.translate("你好 {{}}", "en", ["Alice"])).toBe("你好 Alice");
   });
 
   test("keyFromTemplate 用 {{}} 连接模板", () => {

@@ -1,0 +1,14 @@
+{
+  "name": "@xxmm/i18n-vue",
+  "version": "1.0.0",
+  "description": "Vue reactive adapters for @xxmm/i18n — useScopedI18n composable + global $t plugin",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "type": "module",
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
+  "dependencies": {
+    "@xxmm/i18n": "workspace:*"
+  }
+}
