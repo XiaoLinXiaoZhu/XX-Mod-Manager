@@ -22,7 +22,7 @@
     "noImplicitOverride": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "types": ["node"],
+    "types": ["node","bun"],
     "paths": {
       "@xxmm/types": ["./packages/types/src/index.ts"],
       "@xxmm/types/*": ["./packages/types/src/*"],
