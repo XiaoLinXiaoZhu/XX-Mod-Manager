@@ -580,6 +580,7 @@ class IManager {
     return mod;
   }
 
+  // @deprecated 纯 IPC 二次转接，下游应直接使用 ipc.mod.getImage(imagePath)
   async getImageBase64(imagePath) {
     //debug
     // console.log(`get-image: ${imagePath}`);
@@ -767,6 +768,7 @@ class IManager {
     this.trigger("toggledMod", mod);
   }
 
+  // @deprecated 纯 IPC 二次转接，下游应直接使用 ipc.window.setBounds(JSON.stringify(bounds))
   async setWindowBounds() {
     const bounds = this.config.bounds;
     //debug
@@ -805,6 +807,7 @@ class IManager {
     location.reload();
   }
 
+  // @deprecated 纯 IPC 二次转接，下游应直接使用 ipc.app.openUrl(url)
   async openUrl(url) {
     //debug
     console.log("open url:", url);
@@ -1393,6 +1396,7 @@ class IManager {
   }
 
   //-==================== 对外接口 ====================
+  // @deprecated 纯 IPC 二次转接，下游应直接使用 ipc.mod.openNewWindow(windowPath)
   async openNewWindow(windowPath) {
     ipc.mod.openNewWindow(windowPath);
   }
@@ -1503,6 +1507,7 @@ class IManager {
     XXMMCore.saveCurrentConfigSync(this._config);
   }
 
+  // @deprecated 纯 IPC 二次转接，下游应直接使用 ipc.fs.getFilePath(fileName, fileType, defaultPath)
   async getFilePath(fileName, fileType, defaultPath) {
     const filePath = await ipc.fs.getFilePath(
       fileName,

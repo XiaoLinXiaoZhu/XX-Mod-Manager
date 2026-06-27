@@ -6,6 +6,7 @@ const { ipcRenderer } = require("electron");
 
 class ImageHelper {
   private static imageCache: { [key: string]: string } = {};
+  /** @deprecated 纯 IPC 二次转接，下游应直接使用 createClient(IPC).mod.getImage(imagePath) */
   public static async getImageBase64(imagePath: string) {
     return (
       "data:image/png;base64," +

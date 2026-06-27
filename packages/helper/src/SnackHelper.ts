@@ -15,6 +15,7 @@ enum SnackType {
  * @param {string} message
  * @param {SnackType} type
  */
+/** @deprecated 纯 IPC 二次转接（send 方向），下游应直接使用 createClient(IPC).app.snack(message, type) */
 async function snack(message: string, type: SnackType = SnackType.info) {
   ipcRenderer.send("snack", message, type);
 }
