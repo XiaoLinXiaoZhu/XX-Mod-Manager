@@ -1,4 +1,8 @@
 // channels.ts — 所有 IPC channel 集中定义（使用 @xxmm/types 精准类型）
+//
+// NOTE: hmc.* channels 仅在 Windows 上可用。
+// 非 Windows 平台 handler 返回空值/无操作，插件需自行处理降级。
+// 这是设计选择——不在类型层面表达平台差异，保持 channel 定义简洁。
 
 import { h, s, p } from "./channel";
 import type {
@@ -109,8 +113,12 @@ export const IPC = {
     setIManager: h<[ref: IManagerRef], void>("set-imanager"),
   },
 
-  /** HMC（Hardware Mouse Control）— Windows 原生输入 API。
-   *  hmc-win32 原生模块仅在 Windows 上可用；其他平台调用返回 null/无操作。 */
+  /**
+   * HMC（Hardware Mouse Control）— Windows 原生输入 API。
+   * NOTE: 仅在 Windows 上可用（依赖 hmc-win32 原生模块）。
+   * 暴露低层 API 而非高层封装——插件自行组合刷新逻辑。
+   * 详见 apps/electron/src/hmcHandler.js 的注释。
+   */
   hmc: {
     getProcessList: h<[name: string], HmcProcess[]>("hmc-get-process-list"),
     getProcessWindow: h<[pid: number], number | null>("hmc-get-process-window"),

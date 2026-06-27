@@ -1,7 +1,17 @@
 // fsWatchHandler.js — 文件系统监听 IPC handler 注册
 //
-// 使用 Node.js 内置 fs.watch，支持 recursive 选项。
-// 变更通过 lifecycle.fileChanged push channel 通知渲染进程。
+// NOTE: 使用 Node.js 内置 fs.watch，而非 chokidar。
+// 选择理由：
+// - 零外部依赖，不需要额外安装
+// - 对于本项目的使用场景（监听 INI 文件变更），Node 内置 fs.watch 足够
+// - chokidar 的主要优势（跨平台一致性、轮询回退）在当前 Electron 42 + Windows 11
+//   环境下不是必需的
+// - 如果未来遇到 fs.watch 的跨平台问题，可以替换为 chokidar——IPC 接口
+//   (fs.watch → watcherId, fs.unwatch, fileChanged push) 保持不变
+//
+// ISSUE: Node.js fs.watch 的 recursive 选项在 Linux 上可能不可靠。
+// 当前应用主要面向 Windows，此问题暂时不处理。如果在 Linux 上遇到问题，
+// 可将底层实现替换为 chokidar，上层不变。
 
 const fs = require("node:fs");
 const path = require("node:path");
@@ -16,6 +26,7 @@ function register(ipc, getWinIPC) {
   const watchers = new Map();
 
   // 累积变更事件，debounce 后批量推送（避免高频事件淹没渲染进程）
+  // NOTE: 100ms debounce 是经验值，对于 INI 文件变更的 modStatusKeeper 场景足够。
   const pendingChanges = new Map(); // watcherId → FsWatchEvent[]
 
   function flushChanges(watcherId) {

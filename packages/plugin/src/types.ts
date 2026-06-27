@@ -2,6 +2,26 @@
 //
 // PluginContext 在此定义（而非 @xxmm/types），因为需要依赖
 // @xxmm/ipc、@xxmm/events、@xxmm/i18n 的真实类型。
+//
+// === 架构决策 ===
+//
+// PluginUIRegistry 极简设计：只有 addCss / removeCss / showDialog / dismissDialog。
+// 不提供 addToolbarButton、addDialogAction、addEventListener 等高层封装。
+//
+// 理由：
+// 1. Electron 的 nodeIntegration + contextIsolation=false 下，插件已有 document 访问权。
+//    额外封装只是增加维护负担和限制灵活性。
+// 2. 旧架构（IManager god object）的问题不是"插件操作 DOM"，
+//    而是 require('fs')、require('electron') 等系统访问没有类型安全边界。
+//    ctx.ipc、ctx.events、ctx.config、ctx.snack 已经解决了这些问题。
+// 3. 每多一层 UI 封装，就需要维护一个新的 API 表面。
+//    插件作者自己 document.createElement + querySelector 更灵活，不需要学新 API。
+//
+// 否决的替代方案：
+// - addToolbarButton / removeToolbarButton：插件直接用 document 在工具栏注入按钮
+// - addDialogAction：插件用 document.querySelector + insertBefore 在对话框中注入按钮
+// - addEventListener 封装：插件用 document.querySelectorAll + addEventListener 绑定事件
+// - patchSchema 通用方法：用更简单的 refreshSchema() 替代
 
 import type { IPC } from "@xxmm/ipc";
 import type { IPCClient } from "@xxmm/ipc";
@@ -57,9 +77,14 @@ export interface PluginConfigStore {
   /** 监听配置变更，返回 unsubscribe */
   onChange(key: string, fn: (value: unknown) => void): () => void;
 
-  /** 通知 UI 层重新读取 configSchema。
-   *  插件自行修改 configSchema 对象后调用此方法触发 UI 重渲染。
-   *  典型场景：动态更新 select 的 options。 */
+  /**
+   * 通知 UI 层重新读取 configSchema。
+   * 插件自行修改 configSchema 对象后调用此方法触发 UI 重渲染。
+   * 典型场景：动态更新 select 的 options（如 changCharacterPlugin）。
+   *
+   * 实现：emit(AppEvents.pluginSchemaChanged, pluginId)。
+   * WIP: UI 层（settingSection.vue）的监听尚未实现。
+   */
   refreshSchema(): void;
 }
 

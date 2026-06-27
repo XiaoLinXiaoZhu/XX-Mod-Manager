@@ -1,6 +1,10 @@
 // context.ts — PluginContext 构造工厂
 //
 // 为每个已加载插件构造其运行时 PluginContext。
+//
+// WIP: refreshSchema() → emit(pluginSchemaChanged) 的事件发送方已就绪，
+// 但 UI 层（settingSection.vue）的监听尚未实现。
+// 当前 refreshSchema() 调用会发出事件但无人接收，不产生可见效果。
 
 import type { I18nScope, I18nFn } from "@xxmm/i18n";
 import { createI18nFn } from "@xxmm/i18n";
@@ -46,7 +50,8 @@ export async function createPluginContext(
     async (data) => {
       await services.saveConfig(plugin.manifest.id, data);
     },
-    // refreshSchema → emit 事件，UI 层监听后重新渲染
+    // WIP: refreshSchema → emit 事件，UI 层（settingSection.vue）尚未监听此事件。
+    // 当 UI 层实现监听后，调用 refreshSchema() 即可触发重新渲染。
     () => {
       services.events.emit(AppEvents.pluginSchemaChanged, plugin.manifest.id);
     },
