@@ -746,6 +746,12 @@ ipc.handle(IPC.fs.symlink, async (_event, srcStr, destStr, type) => {
   const symlinkType = type ?? "junction";
   fs.symlinkSync(safeSrc, safeDest, symlinkType);
 });
+// copyFile
+ipc.handle(IPC.fs.copyFile, async (_event, srcStr, destStr) => {
+  const safeSrc = parseFilePath(srcStr);
+  const safeDest = parseFilePath(destStr);
+  fs.copyFileSync(safeSrc, safeDest);
+});
 // 打开文件夹路径
 ipc.handle(IPC.fs.openDir, async (_event, pathStr) => {
   const safe = parseDirPath(pathStr);

@@ -1,11 +1,12 @@
-const fs = require("node:fs");
-const path = require("node:path");
-const { ipcRenderer } = require("electron");
+// ModHelper.ts — Mod 数据模型
 
+import { ipcRenderer } from "electron";
 import { createClient, IPC } from "@xxmm/ipc";
+import { asFilePath, asDirPath } from "@xxmm/types";
 import { AppEvents } from "@xxmm/events";
 import type { EventBus } from "@xxmm/events";
 import { ImageHelper } from "@xxmm/helper/ImageHelper";
+import { joinPath, basename } from "@xxmm/helper/PathUtil";
 import type { ModInfo } from "./ModInfo";
 import ModLoader from "./ModLoader";
 
@@ -20,8 +21,8 @@ class ImageBase64 {
     _count++;
   };
 
-  public withoutHeader = () => this.base64WithHeader.split(",")[1];
-  public getExt = () => this.base64WithHeader.split(";")[0].split("/")[1];
+  public withoutHeader = () => this.base64WithHeader.split(",")[1] ?? "";
+  public getExt = () => this.base64WithHeader.split(";")[0]?.split("/")[1] ?? "png";
   public clear = () => (this.base64WithHeader = "");
   public isEmpty = () => this.base64WithHeader === "";
 
@@ -120,60 +121,39 @@ class ModData {
 
     modData.id = modInfo.id;
 
-    ModData.handlePreview(modData, modInfo);
+    // preview is resolved lazily by getModPreviewPath / getPreviewBase64
+    const previewName = String(modInfo.metaData.get("preview") ?? "");
+    if (previewName) {
+      modData.preview = previewName;
+    }
+
     return modData;
   }
 
-  static calcPreviewPath(modPath: string, previewName: string) {
-    let previewPath = "";
+  static async calcPreviewPath(modPath: string, previewName: string): Promise<string> {
     if (previewName) {
-      previewPath = path.join(modPath, previewName);
-    }
-    if (!previewPath || !fs.existsSync(previewPath) || !previewName) {
-      const previewFiles = fs.readdirSync(modPath);
-      const previewFile = previewFiles.find((file: string) =>
-        file.startsWith("preview"),
-      );
-      if (previewFile) {
-        previewPath = path.join(modPath, previewFile);
-      } else {
-        const imageFiles = previewFiles.filter(
-          (file: string) =>
-            file.endsWith(".png") ||
-            file.endsWith(".jpg") ||
-            file.endsWith(".jpeg") ||
-            file.endsWith(".gif") ||
-            file.endsWith(".bmp") ||
-            file.endsWith(".webp"),
-        );
-        if (imageFiles.length > 0) {
-          previewPath = path.join(modPath, imageFiles[0]!);
-        }
+      const candidate = joinPath(modPath, previewName);
+      if (await ipc.fs.exists(asFilePath(candidate))) {
+        return candidate;
       }
     }
-    if (!previewPath || !fs.existsSync(previewPath)) {
-      previewPath = path.resolve("./src/assets/default.png");
+
+    const files = await ipc.fs.readDir(asDirPath(modPath));
+    const previewFile = files.find((f: string) => f.startsWith("preview"));
+    if (previewFile) {
+      return joinPath(modPath, previewFile);
     }
 
-    return previewPath;
-  }
-
-  static handlePreview(modData: ModData, modInfo: ModInfo) {
-    const previewName = modInfo.metaData.get("preview") || "";
-    const modPath =
-      ModLoader.getModByID(modData.id)?.location ||
-      modData.getModPathSync() ||
-      "";
-    if (!modPath) {
-      throw new Error(
-        "ModData.handlePreview: modPath is required, please call setModSourcePath() first",
-      );
+    const imageExts = [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"];
+    const imageFile = files.find((f: string) =>
+      imageExts.some((ext) => f.toLowerCase().endsWith(ext)),
+    );
+    if (imageFile) {
+      return joinPath(modPath, imageFile);
     }
-    const previewPath = ModData.calcPreviewPath(modPath, previewName);
 
-    if (!modData.preview || !fs.existsSync(modData.preview)) {
-      modData.preview = previewPath;
-    }
+    // fallback
+    return "./src/assets/default.png";
   }
 
   public copy(): ModData {
@@ -187,19 +167,10 @@ class ModData {
     ).setModSourcePath(this.modSourcePath);
     newModData.id = this.id;
     newModData.index = this.index;
-
     return newModData;
   }
 
   public equals(modData: ModData): boolean {
-    console.log(
-      `comparing......`,
-      new Error(),
-      this.index,
-      this.toJson(),
-      modData.index,
-      modData.toJson(),
-    );
     return JSON.stringify(this.toJson()) === JSON.stringify(modData.toJson());
   }
 
@@ -208,54 +179,43 @@ class ModData {
     this.hotkeys.forEach((hotkey) => {
       hotkeysString += `${hotkey.key} - ${hotkey.description}\n`;
     });
-    return `🉑Name: ${this.name}\nCharacter: ${this.character}\nDescription: ${this.description}\nURL: ${this.url}\nPreview: ${this.preview}\nHotkeys:\n${hotkeysString}`;
+    return `Name: ${this.name}\nCharacter: ${this.character}\nDescription: ${this.description}\nURL: ${this.url}\nPreview: ${this.preview}\nHotkeys:\n${hotkeysString}`;
   }
 
   private async checkModSourcePath() {
     if (!this.modSourcePath) {
-      throw new Error(
-        "ModData.checkModSourcePath: modSourcePath is required, please call setModSourcePath() first",
-      );
-    } else if (!fs.existsSync(this.modSourcePath)) {
-      throw new Error(
-        "ModData.checkModSourcePath: modSourcePath does not exist",
-      );
+      throw new Error("modSourcePath is required");
+    }
+    if (!(await ipc.fs.exists(asFilePath(this.modSourcePath)))) {
+      throw new Error("modSourcePath does not exist");
     }
   }
 
   public async setPreviewByPath(previewPath: string) {
     await this.checkModSourcePath();
-
-    const previeFileName = path.basename(previewPath);
-    const previewDest = path.join(this.getModPathSync(), previeFileName);
-    fs.copyFileSync(previewPath, previewDest);
+    const previeFileName = basename(previewPath);
+    const previewDest = joinPath(await this.getModPath(), previeFileName);
+    await ipc.fs.copyFile(asFilePath(previewPath), asFilePath(previewDest));
     this.preview = previewDest;
-
     this.oldPreview = "";
     this.modPreviewBase64WithHeader.clear();
   }
 
   public async setPreviewByBase64(previewBase64: string) {
     await this.checkModSourcePath();
-
     this.modPreviewBase64WithHeader.set(previewBase64);
 
-    const imageDest = path.join(
-      this.getModPathSync(),
+    const imageDest = joinPath(
+      await this.getModPath(),
       `preview.${this.modPreviewBase64WithHeader.getExt()}`,
     );
 
-    fs.writeFileSync(
-      imageDest,
-      this.modPreviewBase64WithHeader.withoutHeader(),
-      "base64",
-    );
+    // NOTE: writeFile with base64 requires raw buffer support; using IPC writeFile with base64 string
+    await ipc.fs.writeFile(asFilePath(imageDest), this.modPreviewBase64WithHeader.withoutHeader());
 
     this.preview = imageDest;
     this.oldPreview = imageDest;
-
     ipc.app.snack(`Updated cover for ${this.name}`, "info");
-
     return imageDest;
   }
 
@@ -266,72 +226,37 @@ class ModData {
     this.url = newModData.url;
     this.preview = newModData.preview;
     this.hotkeys = newModData.hotkeys;
-
     this.oldPreview = "";
     this.modPreviewBase64WithHeader.clear();
-
     return this;
   }
 
   public async addHotkey(key: string, description: string) {
-    if (!key && !description) {
-      console.log("ModData.addHotkey: key and description are required");
-      return;
-    }
+    if (!key && !description) return;
     this.hotkeys.push({ key, description });
   }
 
   public async removeHotkey(key: string) {
-    if (key === undefined) {
-      console.log("ModData.removeHotkey: key is required");
-      return;
-    }
-    const index = this.hotkeys.findIndex((hotkey) => hotkey.key === key);
-    if (index !== -1) {
-      this.hotkeys.splice(index, 1);
-    }
-  }
-
-  public async saveModInfoOld() {
-    await this.checkModSourcePath();
-    const modSourcePath = this.modSourcePath;
-
-    const jsonModInfo = JSON.stringify(this.toJson(), null, 4);
-    console.log(`ModData.saveModInfo: ${this.name}`, this, jsonModInfo);
-    await ipcRenderer.invoke("save-mod-info", modSourcePath, jsonModInfo);
+    const index = this.hotkeys.findIndex((h) => h.key === key);
+    if (index !== -1) this.hotkeys.splice(index, 1);
   }
 
   public async saveModInfo() {
     await this.checkModSourcePath();
+    if (!this.id) throw new Error("id is required");
 
-    if (!this.id) {
-      throw new Error(
-        "ModData.saveModInfo: id is required, please check if the mod is loaded",
-      );
-    }
     const modInfo = ModLoader.getModByID(this.id);
-
-    if (!modInfo) {
-      throw new Error(
-        "ModData.saveModInfo: modInfo is not found, please check if the mod is loaded",
-      );
-    }
-
-    console.log(`ModData.saveModInfo: ${this.name}`, this, this.toJson());
+    if (!modInfo) throw new Error("modInfo not found");
 
     const modInfoJson = JSON.parse(JSON.stringify(this.toJson()));
-    const previewName = path.basename(this.preview);
-    modInfoJson.preview = previewName;
+    modInfoJson.preview = basename(this.preview);
 
-    console.log(`ModData.saveModInfo: ${this.name}`, this, modInfoJson);
     modInfo.setMetaDataFromJson(modInfoJson);
     modInfo.saveMetaData();
   }
 
   public async getPreviewBase64(ifWithHeader: boolean = false) {
-    if (!this.preview) {
-      return "";
-    }
+    if (!this.preview) return "";
     if (
       this.preview === this.oldPreview &&
       !this.modPreviewBase64WithHeader.isEmpty()
@@ -343,64 +268,36 @@ class ModData {
     this.oldPreview = this.preview;
     if (ifWithHeader) {
       return ImageHelper.getImageUrlFromLocalPath(
-        this.getModPreviewPath(),
+        await this.getModPreviewPath(),
         true,
       );
     }
 
-    this.modPreviewBase64WithHeader.set(
-      "data:image/png;base64," +
-        (await ipcRenderer.invoke("get-image", this.preview)),
-    );
+    const img = await ipcRenderer.invoke("get-image", this.preview);
+    this.modPreviewBase64WithHeader.set(`data:image/png;base64,${img}`);
     return ifWithHeader
       ? this.modPreviewBase64WithHeader.get()
       : this.modPreviewBase64WithHeader.withoutHeader();
   }
 
-  public getModPathSync() {
-    if (!this.modSourcePath) {
-      throw new Error(
-        "ModData.getModPathSync: modSourcePath is required, please call setModSourcePath() first",
-      );
-    } else if (!fs.existsSync(this.modSourcePath)) {
-      throw new Error("ModData.getModPathSync: modSourcePath does not exist");
-    }
-
-    return (
-      ModLoader.getModByID(this.id)?.location ||
-      path.join(this.modSourcePath, this.name)
-    );
-  }
-
   public async getModPath() {
     await this.checkModSourcePath();
     const modData = ModLoader.getModByID(this.id);
-    if (modData) {
-      if (modData.location) {
-        return modData.location;
-      } else {
-        console.warn(`Didn't find location of modData ${this.id}`);
-        return path.join(this.modSourcePath, this.name);
-      }
-    } else {
-      console.warn(`Can't get modData of ${this.id}`);
-      return path.join(this.modSourcePath, this.name);
+    if (modData?.location) {
+      return modData.location;
     }
+    return joinPath(this.modSourcePath, this.name);
   }
 
-  public getModPreviewPath() {
-    if (!this.preview || !fs.existsSync(this.preview)) {
-      this.preview = ModData.calcPreviewPath(
-        this.getModPathSync(),
-        this.preview,
-      );
-      console.log(`Recalculating preview path: ${this.preview}`);
+  public async getModPreviewPath() {
+    const modPath = await this.getModPath();
+    if (!this.preview || !(await ipc.fs.exists(asFilePath(this.preview)))) {
+      this.preview = await ModData.calcPreviewPath(modPath, this.preview);
     }
     return this.preview;
   }
 
-  //-========== 触发事件 ===========
-  // NOTE: bus 由调用方通过依赖注入传入
+  //-========== 触发事件（EventBus 由调用方注入）==========
   public triggerChanged(bus?: EventBus) {
     bus?.emit(AppEvents.modInfoChanged, this);
   }
