@@ -2,7 +2,7 @@
   "name": "xx-mod-manager",
   "private": true,
   "description": "xx-mod-manager",
-  "main": "./apps/electron/src/main.js",
+  "main": "./apps/electron/dist/main.mjs",
   "author": "XLXZ",
   "license": "GPL-3.0-only",
   "version": "1.4.0",
@@ -18,10 +18,10 @@
     "typecheck": "tsgo --noEmit",
     "check": "bunx biome check --write .",
     "dev:frontend": "bun run --bun vite",
-    "dev:electron": "bun run --bun electron . --dev --devTools",
-    "dev:electron:customConfig": "bun run --bun electron . --dev --devTools --customConfig D:\\GameResource\\ZZMI\\customConfig",
-    "dev:electron:firstpage": "bun run --bun electron . --dev --devTools --firstpage",
-    "dev:electron:switchConfig": "bun run --bun electron . --dev --devTools --switchConfig",
+    "dev:electron": "bun run build:electron-main && electron . --dev --devTools",
+    "dev:electron:customConfig": "bun run build:electron-main && electron . --dev --devTools --customConfig D:\\GameResource\\ZZMI\\customConfig",
+    "dev:electron:firstpage": "bun run build:electron-main && electron . --dev --devTools --firstpage",
+    "dev:electron:switchConfig": "bun run build:electron-main && electron . --dev --devTools --switchConfig",
     "dev": "bun run --parallel dev:frontend dev:electron",
     "dev:customConfig": "bun run --parallel dev:frontend dev:electron:customConfig",
     "dev:firstpage": "bun run --parallel dev:frontend dev:electron:firstpage",
@@ -31,7 +31,8 @@
     "build": "bun run --sequential build:frontend build:electron",
     "preview": "vite preview",
     "start": "electron .",
-    "publish": "electron-builder --publish always"
+    "publish": "electron-builder --publish always",
+    "build:electron-main": "bun build apps/electron/src/main.ts --outfile=apps/electron/dist/main.mjs --target=node --format=esm --external=electron --external=hmc-win32"
   },
   "dependencies": {
     "@tweenjs/tween.js": "^25.0.0",

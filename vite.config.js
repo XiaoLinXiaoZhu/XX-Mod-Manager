@@ -31,6 +31,10 @@ export default defineConfig({
     port: 3000
   },
   assetsInclude: ['**/*.png', '**/*.jpg', '**/*.ttf','**/*.wasm'],
+  // 排除无法打包的原生模块
+  optimizeDeps: {
+    exclude: ['hmc-win32'],
+  },
   build: {
     outDir: 'dist',
     emptyOutDir: true,
@@ -43,7 +47,7 @@ export default defineConfig({
       output: {
         assetFileNames: (assetInfo) => {
           if (assetInfo.name?.endsWith('.wasm')) {
-            return 'assets/[name].[ext]'; // 保持文件名不变
+            return 'assets/[name].[ext]';
           }
           return 'assets/[name]-[hash].[ext]';
         },

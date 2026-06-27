@@ -1,6 +1,6 @@
 {
   "name": "@xxmm-apps/electron",
   "version": "1.0.0",
-  "main": "./src/main.js",
+  "main": "./dist/main.mjs",
   "type": "commonjs"
 }
