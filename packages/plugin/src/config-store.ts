@@ -23,6 +23,8 @@ export function createConfigStore(
   schema: PluginConfigSchema,
   saved: Record<string, unknown>,
   saveToDisk: (data: Record<string, unknown>) => Promise<void>,
+  /** 插件调用 refreshSchema() 时触发。通常实现为 emit(pluginSchemaChanged, pluginId) */
+  onRefreshSchema?: () => void,
 ): PluginConfigStore {
   // 合并：defaults ← saved（saved 覆盖 defaults）
   const defaults = extractDefaults(schema);
@@ -73,6 +75,10 @@ export function createConfigStore(
       }
       set.add(fn);
       return () => set.delete(fn);
+    },
+
+    refreshSchema(): void {
+      onRefreshSchema?.();
     },
   };
 }

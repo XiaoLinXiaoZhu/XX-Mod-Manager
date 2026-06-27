@@ -35,4 +35,6 @@ export const AppEvents = {
   windowFocus: e("windowFocus"),
   windowSleep: e("windowSleep"),
   windowWake: e("windowWake"),
+  /** 插件调用了 ctx.config.refreshSchema()，payload 为 pluginId */
+  pluginSchemaChanged: e<string>("pluginSchemaChanged"),
 } as const;

@@ -4,6 +4,7 @@
 
 import type { I18nScope, I18nFn } from "@xxmm/i18n";
 import { createI18nFn } from "@xxmm/i18n";
+import { AppEvents } from "@xxmm/events";
 import type { LoadedPlugin, PluginContext, PluginServices, PluginLogger } from "./types";
 import { createConfigStore } from "./config-store";
 
@@ -45,6 +46,10 @@ export async function createPluginContext(
     async (data) => {
       await services.saveConfig(plugin.manifest.id, data);
     },
+    // refreshSchema → emit 事件，UI 层监听后重新渲染
+    () => {
+      services.events.emit(AppEvents.pluginSchemaChanged, plugin.manifest.id);
+    },
   );
 
   const log = createLogger(plugin.manifest.id);
@@ -60,12 +65,7 @@ export async function createPluginContext(
     ipc: services.ipc,
     events: services.events,
     config,
-    ui: {
-      addToolbarButton(_options) {
-        // TODO: 实现 UI 注册
-        log.warn("ui.addToolbarButton not yet implemented");
-      },
-    },
+    ui: services.ui,
     log,
     snack,
   };

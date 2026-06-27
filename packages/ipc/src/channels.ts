@@ -23,6 +23,8 @@ import type {
   WindowArg,
   SnackType,
   IManagerRef,
+  HmcProcess,
+  FsWatchEvent,
 } from "@xxmm/types";
 
 export const IPC = {
@@ -52,6 +54,10 @@ export const IPC = {
       [fileName: string, fileType: string, defaultPath: string],
       string
     >("get-file-path"),
+    /** 开始监听目录变更，返回 watcherId（用于 unwatch）。变更通过 fileChanged push channel 通知 */
+    watch: h<[dirPath: DirPath, recursive?: boolean], string>("fs-watch"),
+    /** 停止监听 */
+    unwatch: h<[watcherId: string], void>("fs-unwatch"),
   },
 
   app: {
@@ -103,9 +109,21 @@ export const IPC = {
     setIManager: h<[ref: IManagerRef], void>("set-imanager"),
   },
 
+  /** HMC（Hardware Mouse Control）— Windows 原生输入 API。
+   *  hmc-win32 原生模块仅在 Windows 上可用；其他平台调用返回 null/无操作。 */
+  hmc: {
+    getProcessList: h<[name: string], HmcProcess[]>("hmc-get-process-list"),
+    getProcessWindow: h<[pid: number], number | null>("hmc-get-process-window"),
+    getForegroundWindow: h<[], number>("hmc-get-foreground-window"),
+    sendKey: h<[vk: number, down: boolean], void>("hmc-send-key"),
+    setFocus: h<[hwnd: number], void>("hmc-set-focus"),
+  },
+
   lifecycle: {
     wakeUp: p("wakeUp"),
     windowBlur: p("windowBlur"),
     windowFocus: p("windowFocus"),
+    /** 文件监听变更推送（主→渲染）。payload: [watcherId, events[]] */
+    fileChanged: p<[watcherId: string, changes: FsWatchEvent[]]>("fs-file-changed"),
   },
 } as const;

@@ -8,6 +8,7 @@ const { parseBoundsStr, parseWindowBounds } = require("@xxmm/types");
 const ipc = createIPCMain();
 
 require("./fileSystem.js");
+require("./hmcHandler.js").register(ipc);
 const setMainWindow = require("./fileSystem.js").setMainWindow;
 const setCustomConfigFolder =
   require("./fileSystem.js").setCustomConfigFolder;
@@ -341,6 +342,8 @@ ipc.handle(IPC.window.setBounds, async (event, boundsStr) => {
 ipc.on(IPC.app.snack, (_event, message, type = "info") => {
   currentMainWindow.webContents.send("snack", message, type);
 });
+
+require("./fsWatchHandler.js").register(ipc, () => winIPC);
 
 module.exports = {
   currentMainWindow,

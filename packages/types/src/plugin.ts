@@ -83,7 +83,8 @@ export interface PluginSelectOption {
 
 export interface PluginButtonField extends PluginFieldBase {
   type: "button";
-  /** 点击回调（接收 PluginContext，类型在 @xxmm/plugin 中定义） */
+  /** 点击回调（接收 PluginContext，类型在 @xxmm/plugin 中定义）。
+   *  UI 层在渲染时调用 field.onClick(pluginContext)。 */
   onClick: (ctx: unknown) => void;
 }
 
@@ -114,3 +115,17 @@ export const parsePluginConfig = (input: unknown): PluginConfig =>
 
 export const DisabledPlugins = z.array(z.string());
 export type DisabledPlugins = z.infer<typeof DisabledPlugins>;
+
+// ---- HMC（Hardware Mouse Control）类型 ----
+
+export interface HmcProcess {
+  pid: number;
+  name: string;
+}
+
+// ---- 文件监听类型 ----
+
+export interface FsWatchEvent {
+  event: "add" | "change" | "unlink";
+  path: string;
+}

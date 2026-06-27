@@ -69,6 +69,8 @@ export type {
   PluginSelectOption,
   PluginButtonField,
   PluginMarkdownField,
+  HmcProcess,
+  FsWatchEvent,
 } from "./plugin";
 
 export {

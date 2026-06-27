@@ -11,6 +11,7 @@ import type {
   PluginManifest,
   Plugin,
   PluginConfigSchema,
+  PluginConfigField,
 } from "@xxmm/types";
 
 // ---- re-export for plugin authors ----
@@ -31,7 +32,7 @@ export interface PluginContext {
   /** 插件配置读写 */
   config: PluginConfigStore;
 
-  /** UI 注册 */
+  /** UI 薄封装（CSS、对话框）—— DOM 操作请直接用 document */
   ui: PluginUIRegistry;
 
   /** 结构化日志 */
@@ -47,25 +48,38 @@ export interface PluginConfigStore {
   /** 读取配置值 */
   get<T = unknown>(key: string): T;
 
-  /** 写入配置值（仅内存，需调用 save() 持久化） */
+  /** 写入配置值（自动 debounce 持久化） */
   set<T = unknown>(key: string, value: T): void;
 
-  /** 持久化到磁盘 */
+  /** 立即持久化到磁盘 */
   save(): Promise<void>;
 
   /** 监听配置变更，返回 unsubscribe */
   onChange(key: string, fn: (value: unknown) => void): () => void;
+
+  /** 通知 UI 层重新读取 configSchema。
+   *  插件自行修改 configSchema 对象后调用此方法触发 UI 重渲染。
+   *  典型场景：动态更新 select 的 options。 */
+  refreshSchema(): void;
 }
 
 // ---- PluginUIRegistry ----
+//
+// 极简设计：只封装纯 DOM 做起来难受的操作。
+// 工具栏按钮、对话框内注入、事件绑定——直接用 document。
 
 export interface PluginUIRegistry {
-  /** 在工具栏添加按钮（SVG icon + label + click handler） */
-  addToolbarButton(options: {
-    icon: string;
-    label: string;
-    onClick: () => void;
-  }): void;
+  /** 注入 CSS（基于内容哈希自动去重），返回 id 用于后续移除 */
+  addCss(css: string): string;
+
+  /** 移除之前注入的 CSS */
+  removeCss(id: string): void;
+
+  /** 显示对话框（document.getElementById(id).show() 的薄封装） */
+  showDialog(dialogId: string): void;
+
+  /** 关闭对话框 */
+  dismissDialog(dialogId: string): void;
 }
 
 // ---- PluginLogger ----
@@ -113,4 +127,6 @@ export interface PluginServices {
   loadConfig(pluginId: string): Promise<Record<string, unknown>>;
   /** 保存配置到磁盘 */
   saveConfig(pluginId: string, data: Record<string, unknown>): Promise<void>;
+  /** 渲染进程提供的 UI 注册实现 */
+  ui: PluginUIRegistry;
 }
