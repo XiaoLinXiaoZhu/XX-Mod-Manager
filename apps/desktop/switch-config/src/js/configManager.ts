@@ -2,7 +2,8 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
-const { ipcRenderer } = require("electron");
+const { createClient, IPC } = require("@xxmm/ipc");
+const _ipc = createClient(IPC);
 
 import { TranslatedText } from "@xxmm/helper/Language";
 import { SnackType, t_snack } from "@xxmm/helper/SnackHelper";
@@ -18,7 +19,7 @@ class TapeConfig {
   private static _configRootPath: string = "";
   public static async getConfigRootPath() {
     // 默认为用户数据路径
-    TapeConfig._userConfigPath = await ipcRenderer.invoke("get-user-data-path");
+    TapeConfig._userConfigPath = await _ipc.app.getUserDataPath();
     TapeConfig._configRootPath = path.join(
       TapeConfig._userConfigPath,
       "config",

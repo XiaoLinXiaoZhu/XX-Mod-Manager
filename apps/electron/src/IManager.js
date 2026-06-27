@@ -3,7 +3,8 @@
 // 这样的话，方便将所有非核心功能 转化为 插件，方便管理和拓展
 
 // 这个类应该 被划分到 渲染进程底下，但是 主进程也应该能够访问到这个类
-const { ipcRenderer } = require("electron");
+const { createClient, IPC } = require("@xxmm/ipc");
+const ipc = createClient(IPC);
 
 const pathOsName = "path";
 const path = require(pathOsName);
@@ -336,7 +337,7 @@ class IManager {
     const modSourcePath = this.config.modSourcePath;
     //debug
     console.log(`loadMods from ${modSourcePath}`);
-    const loadMods = await ipcRenderer.invoke("get-mods", modSourcePath);
+    const loadMods = await ipc.mod.list(modSourcePath);
 
     if (loadMods === []) {
       snack("mod路径不存在");
@@ -538,8 +539,7 @@ class IManager {
   }
 
   async loadModInfoOld(modName) {
-    const data = await ipcRenderer.invoke(
-      "get-mod-info",
+    const data = await ipc.mod.getInfo(
       this.config.modSourcePath,
       modName,
     );
@@ -583,7 +583,7 @@ class IManager {
   async getImageBase64(imagePath) {
     //debug
     // console.log(`get-image: ${imagePath}`);
-    const data = await ipcRenderer.invoke("get-image", imagePath);
+    const data = await ipc.mod.getImage(imagePath);
     return data;
   }
 
@@ -771,7 +771,7 @@ class IManager {
     const bounds = this.config.bounds;
     //debug
     console.log("setWindowBounds:", bounds);
-    ipcRenderer.invoke("set-bounds", JSON.stringify(bounds));
+    ipc.window.setBounds(JSON.stringify(bounds));
   }
 
   //-==================== 对外接口 - 数据处理 ====================
@@ -800,7 +800,7 @@ class IManager {
   }
 
   async initAllData() {
-    await ipcRenderer.invoke("init-all-data");
+    await ipc.app.initAllData();
     // 刷新页面
     location.reload();
   }
@@ -812,7 +812,7 @@ class IManager {
       snack("链接为空");
       return;
     }
-    ipcRenderer.invoke("open-url", url);
+    ipc.app.openUrl(url);
   }
 
   async changeUrl(url) {
@@ -842,7 +842,7 @@ class IManager {
 
     const exePath = process.execPath;
     const exeDir = path.dirname(exePath);
-    const desktopPath = await ipcRenderer.invoke("get-desktop-path");
+    const desktopPath = await ipc.app.getDesktopPath();
     const command = `start "" "${exeDir}" --customConfig "${configPath}"`;
     console.log(
       `createAppShortCut from ${exeDir} to ${desktopPath} with command: ${command}`,
@@ -1394,7 +1394,7 @@ class IManager {
 
   //-==================== 对外接口 ====================
   async openNewWindow(windowPath) {
-    await ipcRenderer.send("open-new-window", windowPath);
+    ipc.mod.openNewWindow(windowPath);
   }
 
   async savePresetByModNames(presetName, modNames) {
@@ -1504,8 +1504,7 @@ class IManager {
   }
 
   async getFilePath(fileName, fileType, defaultPath) {
-    const filePath = await ipcRenderer.invoke(
-      "get-file-path",
+    const filePath = await ipc.fs.getFilePath(
       fileName,
       fileType,
       defaultPath,
@@ -1678,7 +1677,7 @@ function waitInitIManager() {
 const wakeUpConditionCount = 2;
 let wakeUpCondition = 0;
 // 只有同时满足 主进程那边确认这次是 初次加载 以及 这里 插件加载完成（也就是startdone）之后，才会触发 wakeUp 事件
-ipcRenderer.on("wakeUp", () => {
+ipc.on(IPC.lifecycle.wakeUp, (_event) => {
   wakeUpCondition++;
   if (wakeUpCondition === wakeUpConditionCount) {
     IManager.triggerWakeUp();
@@ -1693,14 +1692,14 @@ EventSystem.on(EventType.startDone, () => {
 });
 
 // send a ready event to main process
-ipcRenderer.send("main-window-ready");
+ipc.app.mainWindowReady();
 
 let sleepTimer = "";
 let isSleeping = false;
 // 失去焦点10s后进入睡眠模式
 const sleepTimeOutTime = 10000;
 
-ipcRenderer.on("windowBlur", () => {
+ipc.on(IPC.lifecycle.windowBlur, (_event) => {
   const tt = new TranslatedText("☁️windowBlur", "☁️窗口失去焦点");
   console.log(tt.get());
   t_snack(tt);
@@ -1716,7 +1715,7 @@ ipcRenderer.on("windowBlur", () => {
   }, sleepTimeOutTime);
 });
 
-ipcRenderer.on("windowFocus", () => {
+ipc.on(IPC.lifecycle.windowFocus, (_event) => {
   const tt = new TranslatedText("👀windowFocus", "👀窗口获得焦点");
   console.log(tt.get());
   if (isSleeping) {

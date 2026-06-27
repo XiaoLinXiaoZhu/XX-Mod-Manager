@@ -263,8 +263,9 @@ const _refreshDuleToPlugin = {
                             </path>
                         </svg>`,
   onChange: (_value) => {
-    const { ipcRenderer } = require("electron");
-    ipcRenderer.send("refresh-main-window");
+    const { createClient, IPC } = require("@xxmm/ipc");
+const _ipc = createClient(IPC);
+    _ipc.mod.refresh();
   },
 };
 

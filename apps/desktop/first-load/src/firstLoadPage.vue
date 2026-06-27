@@ -282,7 +282,8 @@ let {
   initAllDataButton,
 } = getData();
 
-const ipcRenderer = require("electron").ipcRenderer;
+const { createClient, IPC } = require("@xxmm/ipc");
+const ipc = createClient(IPC);
 const iManager = new IManager();
 
 const _sections = ref(["intro", "basic", "advanced", "auto", "more"]);
@@ -351,7 +352,7 @@ function _closeSettingPage() {
   iManager.config.modSourcePath = modSourcePath.value;
   iManager.config.presetPath = presetPath.value;
   iManager.saveConfig();
-  ipcRenderer.send("refresh-main-window");
+  ipc.mod.refresh();
 
   //关闭窗口
   window.close();

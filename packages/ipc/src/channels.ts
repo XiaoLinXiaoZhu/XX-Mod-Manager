@@ -69,6 +69,11 @@ export const IPC = {
     readDir: h<[path: DirPath], string[]>("fs-read-dir"),
     isDir: h<[path: DirPath], boolean>("fs-is-dir"),
     openDir: h<[path: DirPath], void>("fs-open-dir"),
+    /** 打开文件选择对话框，返回选中路径 */
+    getFilePath: h<
+      [fileName: string, fileType: string, defaultPath: string],
+      string
+    >("get-file-path"),
   },
 
   // ---- 应用级 ----
@@ -85,6 +90,11 @@ export const IPC = {
     mainWindowReady: s("main-window-ready"),
     getUserDataPathSync: s("get-user-data-path-sync"),
     snack: s<[message: string, type?: SnackType]>("snack"),
+
+    // push 模式（主→渲染广播）
+    // NOTE: snack 同时有 send（渲染→主）和 push（主→渲染）两个方向，
+    // 使用同一 channel 名 "snack"，由主进程 snack handler 转发。
+    snackPush: p<[message: string, type?: SnackType]>("snack"),
   },
 
   // ---- 配置管理 ----
@@ -101,8 +111,9 @@ export const IPC = {
 
   // ---- Mod 管理 ----
   mod: {
-    list: h<[source: ModSourcePath], ModName[]>("get-mods"),
-    listFromCurrentConfig: h<[], ModName[]>("get-mods-from-current-config"),
+    /** 返回完整的 ModInfo 列表（含 preview、character 等） */
+    list: h<[source: ModSourcePath], ModInfo[]>("get-mods"),
+    listFromCurrentConfig: h<[], ModInfo[]>("get-mods-from-current-config"),
     getInfo: h<
       [source: ModSourcePath, name: ModName],
       ModInfo

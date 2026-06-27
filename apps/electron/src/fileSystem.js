@@ -1,7 +1,24 @@
-const { app, BrowserWindow, ipcMain, dialog, screen } = require("electron");
+// fileSystem.js — 类型安全 IPC 迁移版
+// 使用 @xxmm/ipc 的 createIPCMain 替代裸 ipcMain.handle
+const { app, BrowserWindow, dialog, screen } = require("electron");
 const path = require("node:path");
 const fs = require("node:fs");
 const os = require("node:os");
+const { createIPCMain, IPC } = require("@xxmm/ipc");
+const {
+  parseFilePath,
+  parseDirPath,
+  parseModSourcePath,
+  parseModTargetPath,
+  parseImagePath,
+  parseModName,
+  parseModField,
+  parsePluginName,
+  parseCustomConfigFolder,
+} = require("@xxmm/types");
+
+const ipc = createIPCMain();
+
 //-==================== 核心变量 =====================
 
 //----------------- 状态 -----------------
@@ -37,7 +54,6 @@ const disabledPluginsPath = () => {
 
 function snack(message, type = "info") {
   const mainWindow = currentMainWindow;
-  //console.log(mainWindow);
   console.log(`snack:${message} type:${type}`);
   mainWindow.webContents.send("snack", message, type);
 }
@@ -48,13 +64,10 @@ function t_snack(message_ch, message_en, type = "info") {
   });
 }
 
-// 这里为渲染进程提供 读取文件的功能。
-
 // 核心数据
 // 接受 send 的消息，设置 iManager
 const _iManager = null;
-// ipcRenderer.send('set-imanager', this.waitInit());
-ipcMain.handle("set-imanager", async (_event, iManager) => {
+ipc.handle(IPC.plugin.setIManager, async (_event, iManager) => {
   //debug
   console.log("===============set-imanager");
   console.log(iManager);
@@ -109,27 +122,25 @@ function testPath(name, path, tryfix = false) {
 }
 
 function t_testPath(name_ch, name_en, path, tryfix = false) {
-  // return (getConfig(configPath()).language == 'zh_cn') ? testPath(name_ch,path,tryfix) : testPath(name_en,path,tryfix);
   const language = currentLanguage;
-  // snack(`testPath:${language} ${name_ch} ${name_en} ${path} ${tryfix}`);
   return testPath(language === "zh_cn" ? name_ch : name_en, path, tryfix);
 }
 
 //-========================== 对外接口 ==========================
 //----------------- 获取变量 -----------------
-ipcMain.handle("get-user-data-path", async (_event) => {
+ipc.handle(IPC.app.getUserDataPath, async (_event) => {
   return app.getPath("userData");
 });
 
-ipcMain.on("get-user-data-path-sync", (event, _data) => {
+ipc.on(IPC.app.getUserDataPathSync, (event, _data) => {
   event.returnValue = app.getPath("userData");
 });
 
-ipcMain.handle("get-app-path", async (_event) => {
+ipc.handle(IPC.app.getAppPath, async (_event) => {
   return app.getAppPath();
 });
 
-ipcMain.handle("get-desktop-path", async (_event) => {
+ipc.handle(IPC.app.getDesktopPath, async (_event) => {
   return app.getPath("desktop");
 });
 
@@ -176,13 +187,13 @@ async function _setCurrentConfig(config) {
   await setConfig(configPath(), config);
 }
 
-ipcMain.handle("get-current-config", async (_event) => {
+ipc.handle(IPC.config.get, async (_event) => {
   const currentConfigPath = configPath();
   console.log(`get-current-config:${currentConfigPath}`);
   return await getConfig(currentConfigPath);
 });
 
-ipcMain.handle("set-current-config", async (_event, config) => {
+ipc.handle(IPC.config.set, async (_event, config) => {
   const currentConfigPath = configPath();
   console.log(`set-current-config:${currentConfigPath}`, config);
   await setConfig(configPath(), config);
@@ -190,14 +201,15 @@ ipcMain.handle("set-current-config", async (_event, config) => {
 
 //-========================== 对外接口 - 能力 ==========================
 // 读取文件
-ipcMain.handle("getFiles", async (_event, dirPath) => {
-  if (!fs.existsSync(dirPath)) {
+ipc.handle(IPC.mod.getFiles, async (_event, dirPath) => {
+  const safePath = parseDirPath(dirPath);
+  if (!fs.existsSync(safePath)) {
     return {
       state: 0,
       ret: [],
     };
   }
-  const files = fs.readdirSync(dirPath);
+  const files = fs.readdirSync(safePath);
   return {
     state: 1,
     ret: files,
@@ -229,9 +241,6 @@ function tryGetModPreview(modPath, modConfigPreviewName) {
   if (modPreviewName !== "") {
     // 如果找到了图片文件，说明mod文件夹下有preview图片，但是没有在modInfo中设置imagePath，所以需要将其保存到modInfo中
     setModInfoFiled(modPath, "preview", modPreviewName);
-    // 使用snack提示用户自动保存了图片
-    // snack(`Original image is ${modPreviewName},but not found, find ${modPreviewPath} instead, auto saved to mod.json`);
-
     return {
       previewPath: path.join(modPath, modPreviewName),
       previewName: modPreviewName,
@@ -251,16 +260,13 @@ function tryGetModPreview(modPath, modConfigPreviewName) {
   );
   //如果没有图片文件，则使用默认图片,之后直接跳出程序
   if (imageFiles.length <= 0) {
-    // snack('No image file found in mod folder, use default image instead');
     return {
       previewPath: path.resolve("./src/assets/default.png"),
       previewName: "default.png",
     };
   }
 
-  modPreviewPath = imageFiles[0];
-  //debug
-  //console.log(`modImageName:${modImageName}`);
+  const modPreviewPath = imageFiles[0];
   setModInfoFiled(modPath, "preview", modPreviewPath);
   return {
     previewPath: path.join(modPath, modPreviewPath),
@@ -292,7 +298,6 @@ function creatMod(modPath) {
     mod.description = modConfig.description;
     mod.url = modConfig.url;
 
-    // mod.hotkeys = modConfig.hotkeys;
     if (modConfig.hotkeys !== undefined) {
       mod.hotkeys = modConfig.hotkeys;
     }
@@ -314,6 +319,7 @@ function creatMod(modPath) {
 
   return mod;
 }
+
 function getMods(modSourcePath) {
   const mods = [];
 
@@ -333,9 +339,10 @@ function getMods(modSourcePath) {
   return mods;
 }
 
-ipcMain.handle("get-mods", async (_event, modSourcePath) => {
+ipc.handle(IPC.mod.list, async (_event, modSourcePath) => {
+  const safe = parseModSourcePath(modSourcePath);
   const startTime = Date.now();
-  const mods = getMods(modSourcePath);
+  const mods = getMods(safe);
   const endTime = Date.now();
   console.log(`get ${mods.length} mods in ${endTime - startTime}ms`);
   snack(`get ${mods.length} mods in ${endTime - startTime}ms`);
@@ -343,27 +350,24 @@ ipcMain.handle("get-mods", async (_event, modSourcePath) => {
 });
 
 // 因为 渲染进程 无法获取 本地文件，所以需要通过 主进程 来获取图片文件
-ipcMain.handle("get-image", async (_event, imagePath) => {
+ipc.handle(IPC.mod.getImage, async (_event, imagePath) => {
+  const safe = parseImagePath(imagePath);
   // 传递一个 buffer 对象给渲染进程
-  //debug
-  // console.log(`get-image:${imagePath}`);
-  return fs.readFileSync(imagePath).toString("base64");
+  return fs.readFileSync(safe).toString("base64");
 });
 
 // 这里应该解构设计，渲染进程不再需要操心 当前的配置，mod的img等等
-ipcMain.handle("get-mods-from-current-config", async (_event) => {
+ipc.handle(IPC.mod.listFromCurrentConfig, async (_event) => {
   const currentConfig = await getConfig(configPath());
   const modSourcePath = currentConfig.modSourcePath;
 
   return fs.existsSync(modSourcePath) ? getMods(modSourcePath) : [];
 });
 
-ipcMain.handle("get-mod-info", async (_event, modSourcePath, modName) => {
-  if (!modSourcePath) {
-    const currentConfig = await getCurrentConfig();
-    modSourcePath = currentConfig.modSourcePath;
-  }
-  const modPath = path.join(modSourcePath, modName);
+ipc.handle(IPC.mod.getInfo, async (_event, modSourcePath, modName) => {
+  const safeSource = parseModSourcePath(modSourcePath);
+  const safeName = parseModName(modName);
+  const modPath = path.join(safeSource, safeName);
   return fs.existsSync(modPath) ? creatMod(modPath) : null;
 });
 
@@ -376,8 +380,10 @@ function setModInfoFiled(modPath, field, value) {
     fs.writeFileSync(modConfigPath, JSON.stringify(modConfig), "utf-8");
   }
 }
-ipcMain.handle("set-mod-info", async (modPath, field, value) => {
-  setModInfoFiled(modPath, field, value);
+ipc.handle(IPC.mod.setInfo, async (_event, modPath, field, value) => {
+  const safePath = parseDirPath(modPath);
+  const safeField = parseModField(field);
+  setModInfoFiled(safePath, safeField, value);
 });
 
 //-===========================预设===========================
@@ -415,32 +421,31 @@ async function savePreset(presetPath, presetName, mods) {
   if (!t_testPath("预设", "preset", presetPath, true)) return;
 
   fs.writeFileSync(presetFilePath, JSON.stringify(mods));
-  // snack(`Preset ${presetName} saved`);
 }
 
-ipcMain.handle("get-preset-list", async (_event) => {
+ipc.handle(IPC.preset.list, async (_event) => {
   const modConfig = await getCurrentConfig();
   const presetPath = modConfig.presetPath;
 
   return getPresetList(presetPath);
 });
 
-ipcMain.handle("load-preset", async (_event, presetName) => {
+ipc.handle(IPC.preset.load, async (_event, presetName) => {
   const modConfig = await getCurrentConfig();
   const presetPath = modConfig.presetPath;
   return loadPreset(presetPath, presetName);
 });
 
-ipcMain.handle("save-preset", async (_event, presetName, mods) => {
+ipc.handle(IPC.preset.save, async (_event, presetName, mods) => {
   const modConfig = await getCurrentConfig();
   const presetPath = modConfig.presetPath;
   //debug
-  // console.log(`save-preset:${presetPath} ${presetName}`, mods);
   savePreset(presetPath, presetName, mods);
 });
 
-ipcMain.handle(
-  "get-file-path",
+//-========================== 文件对话框 ==========================
+ipc.handle(
+  IPC.fs.getFilePath,
   async (_event, fileName, fileType, defaultPath) => {
     //通过文件选择对话框选择文件
     let result;
@@ -554,36 +559,41 @@ async function getDisabledPlugins() {
   return [];
 }
 
-ipcMain.handle("save-plugin-config", async (_event, pluginName, config) => {
-  savePluginConfig(pluginName, config);
+ipc.handle(IPC.plugin.saveConfig, async (_event, pluginName, config) => {
+  const safeName = parsePluginName(pluginName);
+  savePluginConfig(safeName, config);
 });
 
-ipcMain.handle("get-plugin-config", async (_event, pluginName) => {
-  return getPluginConfig(pluginName);
+ipc.handle(IPC.plugin.getConfig, async (_event, pluginName) => {
+  const safeName = parsePluginName(pluginName);
+  return getPluginConfig(safeName);
 });
 
 // 保存插件启用状态
-ipcMain.handle("save-disabled-plugins", async (_event, disabledPlugins) => {
+ipc.handle(IPC.plugin.saveDisabled, async (_event, disabledPlugins) => {
   saveDisabledPlugins(disabledPlugins);
 });
 
 // 获取插件启用状态
-ipcMain.handle("get-disabled-plugins", async (_event) => {
+ipc.handle(IPC.plugin.getDisabled, async (_event) => {
   return await getDisabledPlugins();
 });
 
 //-=========================== apply ===========================
-ipcMain.handle(
-  "apply-mods",
+ipc.handle(
+  IPC.mod.apply,
   async (_event, mods, modSourcePath, modTargetPath) => {
-    fs.readdirSync(modTargetPath).forEach((file) => {
+    const safeSrc = parseModSourcePath(modSourcePath);
+    const safeDest = parseModTargetPath(modTargetPath);
+
+    fs.readdirSync(safeDest).forEach((file) => {
       if (
         !mods.includes(file) &&
-        fs.existsSync(path.join(modSourcePath, file))
+        fs.existsSync(path.join(safeSrc, file))
       ) {
         // 删除文件夹,包括文件夹内的文件，使用异步方法
         fs.rm(
-          path.join(modTargetPath, file),
+          path.join(safeDest, file),
           { recursive: true, force: true },
           (err) => {
             if (err) {
@@ -597,8 +607,8 @@ ipcMain.handle(
 
     // 为选中的mod创建链接
     mods.forEach((mod) => {
-      const src = path.join(modSourcePath, mod);
-      const dest = path.join(modTargetPath, mod);
+      const src = path.join(safeSrc, mod);
+      const dest = path.join(safeDest, mod);
       if (!fs.existsSync(dest)) {
         fs.symlinkSync(src, dest, "junction", (err) => {
           if (err) console.log(err);
@@ -608,30 +618,12 @@ ipcMain.handle(
   },
 );
 
-ipcMain.handle("save-mod-info", async (_event, modSourcePath, jsonModInfo) => {
-  saveModInfo(modSourcePath, jsonModInfo);
+ipc.handle(IPC.mod.saveInfo, async (_event, modSourcePath, jsonModInfo) => {
+  const safeSource = parseModSourcePath(modSourcePath);
+  saveModInfo(safeSource, jsonModInfo);
 });
 
 function saveModInfo(modSourcePath, jsonModInfo) {
-  //- mod的格式
-  // const mod = {
-  //     name: path.basename(modPath),
-  //     character: 'Unknown',
-  //     preview: '',
-  //     description: '',
-  //     url: '',
-  //     hotkeys: [],
-  // }
-
-  // 需要保存为：
-  // const saveInfo = {
-  //     character: mod.character,
-  //     preview: mod.preview为图片路径,这里只需要截取文件名,
-  //     description: mod.description,
-  //     url: mod.url,
-  //     hotkeys: mod.hotkeys,
-  // }
-
   const modInfo = JSON.parse(jsonModInfo);
 
   const saveInfo = {
@@ -682,13 +674,15 @@ function moveAllFiles(srcDir, destDir) {
   });
 }
 
-ipcMain.handle("move-all-files", async (_event, srcDir, destDir) => {
-  moveAllFiles(srcDir, destDir);
+ipc.handle(IPC.mod.moveAllFiles, async (_event, srcDir, destDir) => {
+  const safeSrc = parseDirPath(srcDir);
+  const safeDest = parseDirPath(destDir);
+  moveAllFiles(safeSrc, safeDest);
 });
 
 //-========================== 初始化所有数据 ==========================
 // init-all-data
-ipcMain.handle("init-all-data", async (_event) => {
+ipc.handle(IPC.app.initAllData, async (_event) => {
   // 获取 配置路径
   const dataPath = app.getPath("userData");
   const configPath = path.join(dataPath, "config.json");
@@ -709,66 +703,38 @@ ipcMain.handle("init-all-data", async (_event) => {
 
 //-========================== fsProxy ==========================
 // fsProxy 用于渲染进程调用主进程的文件系统功能
-// class fsProxy {
-//     static instance = null;
-//     constructor() {
-//         if (fsProxy.instance) {
-//             return fsProxy.instance;
-//         }
-//         fsProxy.instance = this;
-//     }
 
-//     async readFile(path) {
-//         return await ipcRenderer.invoke('fs-read-file', path);
-//     }
-
-//     async writeFile(path, data) {
-//         return await ipcRenderer.invoke('fs-write-file', path, data);
-//     }
-
-//     async createFile(path) {
-//         return await ipcRenderer.invoke('fs-create-file', path);
-//     }
-
-//     async readDir(path) {
-//         return await ipcRenderer.invoke('fs-read-dir', path);
-//     }
-
-//     async isDir(path) {
-//         return await ipcRenderer.invoke('fs-is-dir', path);
-//     }
-
-//     async openDir(path) {
-//         return await ipcRenderer.invoke('fs-open-dir', path);
-//     }
-// }
-
-// 这里需要实现 fsProxy 的功能
-ipcMain.handle("fs-read-file", async (_event, path) => {
-  return fs.readFileSync(path, "utf-8");
+ipc.handle(IPC.fs.readFile, async (_event, pathStr) => {
+  const safe = parseFilePath(pathStr);
+  return fs.readFileSync(safe, "utf-8");
 });
-ipcMain.handle("fs-write-file", async (_event, path, data) => {
-  fs.writeFileSync(path, data, "utf-8");
+ipc.handle(IPC.fs.writeFile, async (_event, pathStr, data) => {
+  const safe = parseFilePath(pathStr);
+  fs.writeFileSync(safe, data, "utf-8");
 });
-ipcMain.handle("fs-create-file", async (_event, path) => {
-  fs.writeFileSync(path, "", "utf-8");
+ipc.handle(IPC.fs.createFile, async (_event, pathStr) => {
+  const safe = parseFilePath(pathStr);
+  fs.writeFileSync(safe, "", "utf-8");
 });
-ipcMain.handle("fs-read-dir", async (_event, path) => {
-  return fs.readdirSync(path);
+ipc.handle(IPC.fs.readDir, async (_event, pathStr) => {
+  const safe = parseDirPath(pathStr);
+  return fs.readdirSync(safe);
 });
-ipcMain.handle("fs-is-dir", async (_event, path) => {
-  return fs.statSync(path).isDirectory();
+ipc.handle(IPC.fs.isDir, async (_event, pathStr) => {
+  const safe = parseDirPath(pathStr);
+  return fs.statSync(safe).isDirectory();
 });
 // 打开文件夹路径
-ipcMain.handle("fs-open-dir", async (_event, path) => {
+ipc.handle(IPC.fs.openDir, async (_event, pathStr) => {
+  const safe = parseDirPath(pathStr);
   //debug
-  console.log(`fs-open-dir:${path}`);
+  console.log(`fs-open-dir:${safe}`);
   const { shell } = require("electron");
-  shell.openPath(path);
+  shell.openPath(safe);
 });
 
 // 在外部打开链接
-ipcMain.handle("open-url", async (_event, url) => {
+ipc.handle(IPC.app.openUrl, async (_event, url) => {
   const { shell } = require("electron");
   shell.openExternal(url);
 });
@@ -782,8 +748,9 @@ function setCustomConfigFolder(path) {
   customConfigFolder = path;
 }
 
-ipcMain.handle("set-custom-config-folder", async (_event, path) => {
-  setCustomConfigFolder(path);
+ipc.handle(IPC.config.setCustomFolder, async (_event, folder) => {
+  const safe = parseCustomConfigFolder(folder);
+  setCustomConfigFolder(safe);
 });
 
 module.exports = {

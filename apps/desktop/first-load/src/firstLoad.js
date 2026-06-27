@@ -7,7 +7,8 @@ import '../src/style.css'
 import { createApp, watch } from 'vue'
 import firstLoadPage from './firstLoadPage.vue'
 
-const { ipcRenderer } = require("electron");
+const { createClient, IPC } = require("@xxmm/ipc");
+const _ipc = createClient(IPC);
 
 import IManager from '@xxmm-apps/electron/IManager'
 const iManager = new IManager();
@@ -83,11 +84,11 @@ document.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("beforeunload", () => {
   iManager.config.firstLoad = false;
   iManager.saveConfig();
-  ipcRenderer.send("refresh-main-window");
+  _ipc.mod.refresh();
 });
 
 //-======================== snackbar ========================-//
-ipcRenderer.on("snack", (_event, message, type = "info") => {
+_ipc.on(IPC.app.snackPush, (_event, message, type = "info") => {
   snack(message, type);
 });
 

@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { Tween, Easing, } from '@tweenjs/tween.js';
 
-const { ipcRenderer } = require("electron");
 const fs = require("node:fs");
 const _path = require("node:path");
 

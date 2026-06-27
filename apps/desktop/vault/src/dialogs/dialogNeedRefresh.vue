@@ -13,11 +13,12 @@
 </template>
 
 <script setup>
-const { ipcRenderer } = require("electron");
+const { createClient, IPC } = require("@xxmm/ipc");
+const _ipc = createClient(IPC);
 
 const _refresh = () => {
   //debug
   console.log("refresh");
-  ipcRenderer.send("refresh-main-window");
+  _ipc.mod.refresh();
 };
 </script>

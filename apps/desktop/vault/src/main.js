@@ -5,7 +5,8 @@ import 'sober'
 //npm
 import 'sober/style/scroll-view.css'
 import { Snackbar } from 'sober'
-const { ipcRenderer } = require("electron");
+const { createClient, IPC } = require("@xxmm/ipc");
+const _ipc = createClient(IPC);
 import IManager from '@xxmm-apps/electron/IManager'
 const iManager = new IManager();
 import { g_config_vue } from '@xxmm-apps/electron/IManager'
@@ -99,7 +100,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 //-======================== snack ========================-//
-ipcRenderer.on("snack", (_event, message, type = "info") => {
+_ipc.on(IPC.app.snackPush, (_event, message, type = "info") => {
   console.log(`snack:${message} type:${type}`);
   switch (type) {
     case "info":

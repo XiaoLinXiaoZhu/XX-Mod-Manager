@@ -1,6 +1,9 @@
-// 因为 渲染进程 无法使用 fs 模块，所以这里需要通过 主进程 来获取数据
-// 但是那样很麻烦，这里 写一个 代理 的 fs 模块，通过 ipcRenderer 来获取数据
-const { ipcRenderer } = require("electron");
+// fsProxy.js — 类型安全 IPC 迁移版
+// 使用 @xxmm/ipc 的 createClient(IPC) 替代裸 ipcRenderer.invoke
+// 对外 API 保持不变
+const { createClient, IPC } = require("@xxmm/ipc");
+
+const ipc = createClient(IPC);
 
 class fsProxy {
   static instance = null;
@@ -12,27 +15,27 @@ class fsProxy {
   }
 
   static async readFile(path) {
-    return await ipcRenderer.invoke("fs-read-file", path);
+    return await ipc.fs.readFile(path);
   }
 
   static async writeFile(path, data) {
-    return await ipcRenderer.invoke("fs-write-file", path, data);
+    return await ipc.fs.writeFile(path, data);
   }
 
   static async createFile(path) {
-    return await ipcRenderer.invoke("fs-create-file", path);
+    return await ipc.fs.createFile(path);
   }
 
   static async readDir(path) {
-    return await ipcRenderer.invoke("fs-read-dir", path);
+    return await ipc.fs.readDir(path);
   }
 
   static async isDir(path) {
-    return await ipcRenderer.invoke("fs-is-dir", path);
+    return await ipc.fs.isDir(path);
   }
 
   static async openDir(path) {
-    return await ipcRenderer.invoke("fs-open-dir", path);
+    return await ipc.fs.openDir(path);
   }
 }
 
