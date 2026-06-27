@@ -2,11 +2,14 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { ipcRenderer } = require("electron");
 
-import { EventSystem, EventType } from "@xxmm/helper/EventSystem";
+import { createClient, IPC } from "@xxmm/ipc";
+import { AppEvents } from "@xxmm/events";
+import type { EventBus } from "@xxmm/events";
 import { ImageHelper } from "@xxmm/helper/ImageHelper";
-import { SnackType, snack } from "@xxmm/helper/SnackHelper";
 import type { ModInfo } from "./ModInfo";
 import ModLoader from "./ModLoader";
+
+const ipc = createClient(IPC);
 
 let _count = 0;
 class ImageBase64 {
@@ -27,11 +30,6 @@ class ImageBase64 {
   }
 }
 
-// 每1s打印一次count
-// setInterval(() => {
-//     console.log(`imageBase64 count: ${count}`);
-// }, 1000);
-
 class ModData {
   public name: string;
   public character: string;
@@ -40,15 +38,15 @@ class ModData {
   public preview: string;
   public hotkeys: { key: string; description: string }[];
 
-  private index = 0; // mod的id
-  private static indexCount = 0; // mod的id计数器
+  private index = 0;
+  private static indexCount = 0;
 
-  public id: string = ""; // mod的id
+  public id: string = "";
 
-  private modSourcePath: string = ""; // mod的源路径
-  private oldPreview = ""; // 旧的预览图的路径
-  // public modPreviewBase64: string = ""; // mod的预览图的base64，不包含头部
-  public modPreviewBase64WithHeader: ImageBase64 = new ImageBase64(""); // mod的预览图的base64，包含头部
+  private modSourcePath: string = "";
+  private oldPreview = "";
+  public modPreviewBase64WithHeader: ImageBase64 = new ImageBase64("");
+
   constructor(
     name: string,
     character: string,
@@ -66,32 +64,15 @@ class ModData {
 
     this.modSourcePath = "";
     this.oldPreview = "";
-    // this.modPreviewBase64 = "";
     this.modPreviewBase64WithHeader = new ImageBase64("");
 
-    // 为每个mod生成一个id
     this.index = ModData.indexCount;
     ModData.indexCount++;
-    //debug
-    // const stackTrace = new Error();
-    // console.log(`ℹ️ℹ️ℹ️ModData ${this.name} is being created`,this.id,stackTrace)
-
-    // 当进入休眠状态时，清空缓存
-    EventSystem.on(EventType.windowSleep, async () => {
-      this.oldPreview = "";
-      // this.modPreviewBase64 = "";
-      this.modPreviewBase64WithHeader.clear();
-    });
   }
-  // 析构函数
+
   public destroy() {
     this.modPreviewBase64WithHeader.clear();
-    // this.modPreviewBase64 = "";
-
-    // 释放资源
     ImageHelper.clearImageCache();
-
-    // console.log(`🗑️🗑️🗑️ModData ${this.name} is being destroyed`,this.id);
   }
 
   setModSourcePath(modSourcePath: string) {
@@ -103,7 +84,6 @@ class ModData {
   }
 
   public static fromJson(json: any): ModData {
-    // mod 一定要有 name
     if (!json.name) {
       throw new Error("ModData.fromJson: name is required");
     }
@@ -116,6 +96,7 @@ class ModData {
       json.hotkeys || [],
     );
   }
+
   public toJson(): any {
     return {
       name: this.name,
@@ -126,19 +107,14 @@ class ModData {
       hotkeys: this.hotkeys,
     };
   }
+
   public static fromModInfo(modInfo: ModInfo): ModData {
     const modData = new ModData(
-      JSON.parse(
-        JSON.stringify(modInfo.metaData.get("name") || modInfo.modName),
-      ),
-      JSON.parse(
-        JSON.stringify(modInfo.metaData.get("character") || "Unknown"),
-      ),
-      JSON.parse(
-        JSON.stringify(modInfo.metaData.get("description") || "no description"),
-      ),
+      JSON.parse(JSON.stringify(modInfo.metaData.get("name") || modInfo.modName)),
+      JSON.parse(JSON.stringify(modInfo.metaData.get("character") || "Unknown")),
+      JSON.parse(JSON.stringify(modInfo.metaData.get("description") || "no description")),
       JSON.parse(JSON.stringify(modInfo.metaData.get("url") || "no url")),
-      "", // preview will be handled below
+      "",
       JSON.parse(JSON.stringify(modInfo.metaData.get("hotkeys") || [])),
     );
 
@@ -148,24 +124,21 @@ class ModData {
     return modData;
   }
 
-  static calcPreviewPath(modPath, previewName) {
+  static calcPreviewPath(modPath: string, previewName: string) {
     let previewPath = "";
     if (previewName) {
-      // If there is a preview name, construct the path
       previewPath = path.join(modPath, previewName);
     }
     if (!previewPath || !fs.existsSync(previewPath) || !previewName) {
-      // If no preview exists, search for a preview image in the mod folder
       const previewFiles = fs.readdirSync(modPath);
-      const previewFile = previewFiles.find((file) =>
+      const previewFile = previewFiles.find((file: string) =>
         file.startsWith("preview"),
       );
       if (previewFile) {
         previewPath = path.join(modPath, previewFile);
       } else {
-        // If no preview image is found, look for the first image file
         const imageFiles = previewFiles.filter(
-          (file) =>
+          (file: string) =>
             file.endsWith(".png") ||
             file.endsWith(".jpg") ||
             file.endsWith(".jpeg") ||
@@ -174,11 +147,10 @@ class ModData {
             file.endsWith(".webp"),
         );
         if (imageFiles.length > 0) {
-          previewPath = path.join(modPath, imageFiles[0]);
+          previewPath = path.join(modPath, imageFiles[0]!);
         }
       }
     }
-    // If no preview is found after all attempts, set a default image
     if (!previewPath || !fs.existsSync(previewPath)) {
       previewPath = path.resolve("./src/assets/default.png");
     }
@@ -211,7 +183,6 @@ class ModData {
       this.description,
       this.url,
       this.preview,
-      // 这里需要深拷贝,不然传递的是一个引用
       JSON.parse(JSON.stringify(this.hotkeys)),
     ).setModSourcePath(this.modSourcePath);
     newModData.id = this.id;
@@ -219,8 +190,8 @@ class ModData {
 
     return newModData;
   }
+
   public equals(modData: ModData): boolean {
-    //debug
     console.log(
       `comparing......`,
       new Error(),
@@ -240,7 +211,6 @@ class ModData {
     return `🉑Name: ${this.name}\nCharacter: ${this.character}\nDescription: ${this.description}\nURL: ${this.url}\nPreview: ${this.preview}\nHotkeys:\n${hotkeysString}`;
   }
 
-  //-========== 编辑预览图 ===========
   private async checkModSourcePath() {
     if (!this.modSourcePath) {
       throw new Error(
@@ -255,29 +225,21 @@ class ModData {
 
   public async setPreviewByPath(previewPath: string) {
     await this.checkModSourcePath();
-    const _modSourcePath = this.modSourcePath;
 
-    // 将 previewPath 的 文件 复制到 modSourcePath 的 preview 文件夹下，并且将 mod 的 preview 属性设置为 previewPath，然后保存
     const previeFileName = path.basename(previewPath);
-    // const previewDest = path.join(modSourcePath, this.name, previeFileName);
     const previewDest = path.join(this.getModPathSync(), previeFileName);
     fs.copyFileSync(previewPath, previewDest);
     this.preview = previewDest;
 
-    // 清除旧的预览图
     this.oldPreview = "";
-    // this.modPreviewBase64 = "";
     this.modPreviewBase64WithHeader.clear();
   }
 
   public async setPreviewByBase64(previewBase64: string) {
-    // 检查是否有 modSourcePath
     await this.checkModSourcePath();
 
-    const _modSourcePath = this.modSourcePath;
     this.modPreviewBase64WithHeader.set(previewBase64);
 
-    // const imageDest = path.join(modSourcePath, this.name, `preview.${this.modPreviewBase64WithHeader.getExt()}`);
     const imageDest = path.join(
       this.getModPathSync(),
       `preview.${this.modPreviewBase64WithHeader.getExt()}`,
@@ -289,20 +251,14 @@ class ModData {
       "base64",
     );
 
-    //debug
     this.preview = imageDest;
-
-    // 下次获取预览图时，直接返回这个base64
     this.oldPreview = imageDest;
 
-    // snack提示
-    snack(`Updated cover for ${this.name}`, SnackType.info);
+    ipc.app.snack(`Updated cover for ${this.name}`, "info");
 
-    // 返回 图片的路径
     return imageDest;
   }
 
-  //-========== 编辑mod信息 ===========
   public editModInfo(newModData: ModData) {
     this.name = newModData.name;
     this.character = newModData.character;
@@ -324,6 +280,7 @@ class ModData {
     }
     this.hotkeys.push({ key, description });
   }
+
   public async removeHotkey(key: string) {
     if (key === undefined) {
       console.log("ModData.removeHotkey: key is required");
@@ -335,21 +292,16 @@ class ModData {
     }
   }
 
-  //-========== 保存mod信息 ===========
   public async saveModInfoOld() {
     await this.checkModSourcePath();
     const modSourcePath = this.modSourcePath;
 
-    //这里的 modInfo 是一个对象，不能直接传递给主进程
-    //所以需要将 modInfo 转化为 json
     const jsonModInfo = JSON.stringify(this.toJson(), null, 4);
-    //debug
     console.log(`ModData.saveModInfo: ${this.name}`, this, jsonModInfo);
     await ipcRenderer.invoke("save-mod-info", modSourcePath, jsonModInfo);
   }
 
   public async saveModInfo() {
-    // 改用 modInfo 的 saveMetaData 方法来保存 mod 信息
     await this.checkModSourcePath();
 
     if (!this.id) {
@@ -365,26 +317,18 @@ class ModData {
       );
     }
 
-    //debug
     console.log(`ModData.saveModInfo: ${this.name}`, this, this.toJson());
 
-    // 保存 mod 信息，将this上所有的属性保存到 modInfo 上
-    // 这里需要深拷贝，不然会传递引用
     const modInfoJson = JSON.parse(JSON.stringify(this.toJson()));
-    // preview 不保存具体的路径，只保存文件名
     const previewName = path.basename(this.preview);
     modInfoJson.preview = previewName;
 
-    //debug
     console.log(`ModData.saveModInfo: ${this.name}`, this, modInfoJson);
-    // 保存 mod 信息
     modInfo.setMetaDataFromJson(modInfoJson);
     modInfo.saveMetaData();
   }
 
-  //-========== 获取mod信息 ===========
   public async getPreviewBase64(ifWithHeader: boolean = false) {
-    // 优化,改为使用ImageBase64类
     if (!this.preview) {
       return "";
     }
@@ -398,11 +342,6 @@ class ModData {
     }
     this.oldPreview = this.preview;
     if (ifWithHeader) {
-      // 1s 后 清理缓存
-      // setTimeout(() => {
-      //     ImageHelper.clearImageCache();
-      // }, 1000);
-      //debug
       return ImageHelper.getImageUrlFromLocalPath(
         this.getModPreviewPath(),
         true,
@@ -427,8 +366,6 @@ class ModData {
       throw new Error("ModData.getModPathSync: modSourcePath does not exist");
     }
 
-    // return path.join(this.modSourcePath, this.name);
-    // 因为 name 不一定 是文件夹，所以这里需要使用ModInfo的location
     return (
       ModLoader.getModByID(this.id)?.location ||
       path.join(this.modSourcePath, this.name)
@@ -437,8 +374,6 @@ class ModData {
 
   public async getModPath() {
     await this.checkModSourcePath();
-    // return path.join(this.modSourcePath, this.name);
-    // 因为 name 不一定 是文件夹，所以这里需要使用ModInfo的location
     const modData = ModLoader.getModByID(this.id);
     if (modData) {
       if (modData.location) {
@@ -454,25 +389,23 @@ class ModData {
   }
 
   public getModPreviewPath() {
-    // 检查 this.preview 是否存在
     if (!this.preview || !fs.existsSync(this.preview)) {
-      // 重新计算 preview
       this.preview = ModData.calcPreviewPath(
         this.getModPathSync(),
         this.preview,
       );
-      //debug
       console.log(`Recalculating preview path: ${this.preview}`);
     }
     return this.preview;
   }
 
   //-========== 触发事件 ===========
-  public async triggerChanged() {
-    EventSystem.trigger(EventType.modInfoChanged, this);
+  // NOTE: bus 由调用方通过依赖注入传入
+  public triggerChanged(bus?: EventBus) {
+    bus?.emit(AppEvents.modInfoChanged, this);
   }
-  public async triggerCurrentModChanged() {
-    EventSystem.trigger(EventType.currentModChanged, this);
+  public triggerCurrentModChanged(bus?: EventBus) {
+    bus?.emit(AppEvents.currentModChanged, this);
   }
 }
 

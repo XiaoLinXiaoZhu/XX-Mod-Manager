@@ -3,10 +3,10 @@
 import { ipcRenderer } from "electron";
 import { createClient, IPC } from "@xxmm/ipc";
 import { asFilePath, asDirPath } from "@xxmm/types";
+import { AppEvents } from "@xxmm/events";
+import type { EventBus } from "@xxmm/events";
 import { appI18n, langState } from "./I18nConfig";
 import { joinPath } from "./PathUtil";
-import { EventSystem, EventType } from "./EventSystem";
-import { IPluginLoader } from "./PluginLoader";
 import type { ModData } from "@xxmm/core/ModHelper";
 
 const ipc = createClient(IPC);
@@ -27,14 +27,21 @@ const HMC = (() => {
 
 class XManager {
   private static instance: XManager;
-  public static async getInstance() {
+  private bus: EventBus;
+
+  public static async getInstance(bus?: EventBus) {
     if (!XManager.instance) {
-      XManager.instance = new XManager();
+      if (!bus) {
+        throw new Error("XManager.getInstance() requires an EventBus on first call");
+      }
+      XManager.instance = new XManager(bus);
     }
     return XManager.instance;
   }
 
-  constructor() {
+  constructor(bus: EventBus) {
+    this.bus = bus;
+
     Archive = (window as any).Archive;
     if (!Archive) {
       console.error("Archive is not defined");
@@ -107,9 +114,6 @@ class XManager {
       presetList: [],
       characterList: [],
     };
-
-    EventSystem.clearAllEvents();
-    IPluginLoader.clearAllPlugins();
   }
 
   async init() {
@@ -122,11 +126,11 @@ class XManager {
     await this.setWindowBounds();
     console.log("✅>> setWindowBounds done");
 
-    EventSystem.trigger(EventType.languageChange, this.config.language);
+    this.bus.emit(AppEvents.languageChange, this.config.language);
     langState.set(this.config.language);
     console.log("✅>> languageChange to", this.config.language);
 
-    EventSystem.trigger(EventType.themeChange, this.config.theme);
+    this.bus.emit(AppEvents.themeChange, this.config.theme);
     console.log("✅>> themeChange to", this.config.theme);
 
     await this.loadMods();
@@ -135,22 +139,22 @@ class XManager {
     await this.loadPresets();
     console.log("✅>> loadPresets done");
 
-    await IPluginLoader.Init(this);
-    console.log("✅>> loadPlugins done");
+    // TODO: 插件加载迁移到 @xxmm/plugin PluginHost
+    console.log("✅>> loadPlugins (pending @xxmm/plugin migration)");
 
     console.log("✅>> init IManager done");
     this.inited = true;
 
     setTimeout(() => {
-      EventSystem.trigger(EventType.initDone, this);
+      this.bus.emit(AppEvents.initDone, this);
       this.start();
     }, 200);
   }
 
   async start() {
-    EventSystem.trigger(EventType.languageChange, this.config.language);
+    this.bus.emit(AppEvents.languageChange, this.config.language);
     langState.set(this.config.language);
-    EventSystem.trigger(EventType.themeChange, this.config.theme);
+    this.bus.emit(AppEvents.themeChange, this.config.theme);
 
     if (this.data.modList.length > 0) {
       this.setCurrentMod(this.data.modList[0]!);
@@ -159,10 +163,7 @@ class XManager {
 
     if (this.config.ifStartWithLastPreset) {
       if (this.config.lastUsedPreset !== null) {
-        console.log(
-          "✅>> start with last preset:",
-          this.config.lastUsedPreset,
-        );
+        console.log("✅>> start with last preset:", this.config.lastUsedPreset);
         this.setCurrentPreset(this.config.lastUsedPreset);
       } else {
         console.log("✅>> start with default preset");
@@ -188,24 +189,24 @@ class XManager {
 
   async setCurrentCharacter(character: string) {
     this.temp.currentCharacter = character;
-    EventSystem.trigger(EventType.currentCharacterChanged, character);
+    this.bus.emit(AppEvents.currentCharacterChanged, character);
     console.log(`currentCharacterChanged: ${character}`);
   }
 
   async setCurrentTab(tab: string) {
     this.temp.currentTab = tab;
-    EventSystem.trigger(EventType.currentTabChanged, tab);
+    this.bus.emit(AppEvents.currentTabChanged, tab);
     console.log(`currentTabChanged: ${tab}`);
   }
 
   async setCurrentPreset(presetName: string) {
     this.temp.currentPreset = presetName;
-    EventSystem.trigger(EventType.currentPresetChanged, presetName);
+    this.bus.emit(AppEvents.currentPresetChanged, presetName);
   }
 
   async setCurrentMod(mod: ModData) {
     this.temp.currentMod = mod;
-    EventSystem.trigger(EventType.currentModChanged, mod);
+    this.bus.emit(AppEvents.currentModChanged, mod);
   }
 
   async setCurrentModByName(modName: string) {
@@ -215,12 +216,12 @@ class XManager {
     }
     this.temp.currentMod = modInfo;
     console.log(`setCurrentModByName: ${modName}`, this.temp.currentMod);
-    EventSystem.trigger(EventType.currentModChanged, this.temp.currentMod);
+    this.bus.emit(AppEvents.currentModChanged, this.temp.currentMod);
   }
 
   async toggledModByName(modName: string) {
     const mod = await this.getModInfo(modName);
-    EventSystem.trigger(EventType.toggledMod, mod);
+    this.bus.emit(AppEvents.toggledMod, mod);
   }
 
   // ===================== 加载配置 =====================
