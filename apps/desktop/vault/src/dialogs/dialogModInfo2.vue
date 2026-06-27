@@ -202,20 +202,20 @@
 
 <script setup>
 import { ModData } from "@xxmm/core/ModHelper";
-import { TranslatedText } from "@xxmm/helper/Language";
+import { createClient, IPC } from "@xxmm/ipc";
+import { appI18n } from "@xxmm/helper/I18nConfig";
 import { defineProps, onMounted, ref, useTemplateRef, watch } from "vue";
 import IManager from "@xxmm-apps/electron/IManager";
 
+const ipc = createClient(IPC);
 const iManager = new IManager();
 
-// 参数为 字符串类型的 mod，之后通过 iManager.getModInfo(mod) 获取 mod 信息
 const props = defineProps({
   mod: ModData,
 });
 
 let saved = false;
 
-// modInfo 为 mod 信息，用于储存临时修改的 mod 信息，最后保存时再将其赋值给 props.mod
 const tempModInfo = ref(
   ModData.fromJson({
     name: "Unknown",
@@ -230,18 +230,15 @@ const tempModInfo = ref(
 const editModInfoDialog = useTemplateRef("edit-mod-dialog");
 const img = ref(null);
 
-// 需要显示的mod发生变化时，更新 临时mod信息
 watch(
   () => props.mod,
   async (newVal) => {
     console.log("[dialogModInfo2] watch props.mod changed", newVal.name);
-    // 检查newVal 的类型，应当为 ModData 类型，如果不是则尝试转化为 ModData 类型
     if (!(newVal instanceof ModData)) {
       console.error("mod is not a ModData instance");
       return;
     }
     if (newVal) {
-      // 显式销毁之前的 tempModInfo
       tempModInfo?.value?.destroy();
       tempModInfo.value = newVal.copy();
       img.value = await newVal.getPreviewBase64(true);
@@ -250,40 +247,27 @@ watch(
 );
 
 const _handleModNameChange = (event) => {
-  //debug
   console.log(`input mod name`, event.target.value, `of`, tempModInfo.value.id);
   tempModInfo.value.name = event.target.value;
 
-  // 检查 mod 名称是否为空，如果为空则设置为默认值
   if (tempModInfo.value.name === "") {
     tempModInfo.value.name = props.mod.name;
-    const tt = new TranslatedText(
-      `Cannot set mod name to empty`,
-      `无法将 mod 名称设置为空`,
-    );
-    iManager.t_snack(tt, `error`);
+    ipc.app.snack(appI18n("无法将 mod 名称设置为空"), "error");
   }
 
-  // 检查 mod 名称是否重复，如果重复则设置为默认值
   if (tempModInfo.value.name !== props.mod.name) {
     const modList = iManager.data.modList;
     const modNameList = modList.map((mod) => mod.name);
     if (modNameList.includes(tempModInfo.value.name)) {
       tempModInfo.value.name = props.mod.name;
-      const tt = new TranslatedText(
-        `Mod name already exists`,
-        `mod 名称已存在`,
-      );
-      iManager.t_snack(tt, `error`);
+      ipc.app.snack(appI18n("mod 名称已存在"), "error");
     }
   }
 };
 
 const _handleHotkeyInput = (hotkey, value) => {
-  //debug
   console.log(`input hot key`, hotkey, value, `to`, tempModInfo.value.id);
   if (value === "") {
-    // 删除快捷键
     const index = tempModInfo.value.hotkeys.indexOf(hotkey);
     tempModInfo.value.hotkeys.splice(index, 1);
     return;
@@ -320,31 +304,24 @@ const _handleCancel = async () => {
 };
 
 const _handleSave = () => {
-  //debug
   const ifEqual = props.mod.equals(tempModInfo.value);
   console.log("saved", saved, `equals`, ifEqual);
-  // 保存修改的 mod 信息
 
   if (ifEqual && !changdPreviewByPaste) {
-    // editModInfoDialog.value.$el.dismiss();
-    // 点击按钮自动会关闭dialog，这里如果手动关闭会导致再次触发dismiss事件，导致不必要的性能消耗
     return;
   }
 
-  // 处理 图片 更改
   let needChangePreview = false;
   if (props.mod.preview !== tempModInfo.value.preview) {
     needChangePreview = true;
   }
 
-  // 保存修改的 mod 信息
   props.mod.editModInfo(tempModInfo.value);
 
   if (needChangePreview) {
     props.mod.setPreviewByPath(tempModInfo.value.preview);
   }
 
-  // 如果是通过粘贴操作更改的预览图片，则保存到本地
   if (changdPreviewByPaste) {
     props.mod.setPreviewByBase64(img.value);
   }
@@ -353,14 +330,12 @@ const _handleSave = () => {
   saved = true;
 
   props.mod.saveModInfo();
-
   props.mod.triggerChanged();
   props.mod.triggerCurrentModChanged();
 };
 
 let changdPreviewByPaste = false;
 onMounted(() => {
-  // 监听 dialog 的 dismiss 事件，如果未保存则弹出保存更改的 dialog
   editModInfoDialog.value.$el.addEventListener("dismiss", () => {
     console.log(
       "dismiss",
@@ -376,15 +351,12 @@ onMounted(() => {
     saved = false;
   });
 
-  // 监听 dialog 的 show 事件，再同步一次 tempModInfo
   editModInfoDialog.value.$el.addEventListener("show", async () => {
     tempModInfo.value = props.mod.copy();
     img.value = await props.mod.getPreviewBase64(true);
   });
 
-  // 监听粘贴操作，如果粘贴的是图片则将其设置为 mod 的预览图片
   window.addEventListener("paste", async (event) => {
-    //debug
     console.log("paste", event.clipboardData);
     const items = (event.clipboardData || event.originalEvent.clipboardData)
       .items;
@@ -395,7 +367,6 @@ onMounted(() => {
         reader.onload = async (e) => {
           const imgBase64 = e.target.result;
           img.value = imgBase64;
-          // tempModInfo.value.preview = imgBase64;
           changdPreviewByPaste = true;
         };
         reader.readAsDataURL(blob);

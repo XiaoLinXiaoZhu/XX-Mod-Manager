@@ -1,80 +1,61 @@
-import { TranslatedText } from "@xxmm/helper/Language";
-import { SnackType, t_snack } from "@xxmm/helper/SnackHelper";
+// XXMMCore.ts — 核心配置管理（IPC 迁移版）
+
+import { ipcRenderer } from "electron";
+import { createClient, IPC } from "@xxmm/ipc";
+import { asFilePath, asDirPath } from "@xxmm/types";
+import { appI18n } from "@xxmm/helper/I18nConfig";
+import { joinPath } from "@xxmm/helper/PathUtil";
 import ErrorHandler from "./ErrorHandler";
 
-const fs = require("node:fs");
-const path = require("node:path");
+const ipc = createClient(IPC);
 
 let dataPath = "";
-const { ipcRenderer } = require("electron");
 
 class XXMMCore {
-  // 核心的四个文件夹
   static modSourceFolder: string = "modSource";
   static modTargetFolder: string = "modTarget";
   static modArchiveFolder: string = "modArchive";
 
-  // 是否使用默认配置文件
   static ifCustomConfig: boolean = false;
   static customConfigFolder: string = "config";
-  // dataPath 就是默认的 configFolder
-  public static setCustomConfigFolder = (path: string) => {
-    // 检查路径是否存在
-    if (!fs.existsSync(path)) {
-      t_snack(
-        new TranslatedText(
-          "Custom config folder not exist",
-          "自定义配置文件夹不存在",
-        ),
-        SnackType.error,
-      );
-      console.error(`Custom config folder not exist: ${path}`);
+
+  public static setCustomConfigFolder = async (folderPath: string) => {
+    if (!(await ipc.fs.exists(asFilePath(folderPath)))) {
+      ipc.app.snack(appI18n("自定义配置文件夹不存在"), "error");
+      console.error(`Custom config folder not exist: ${folderPath}`);
       return;
     }
-    // 设置自定义配置文件夹
-    XXMMCore.customConfigFolder = path;
+    XXMMCore.customConfigFolder = folderPath;
     XXMMCore.ifCustomConfig = true;
 
-    // when reload，these two lines will be clear
-    // so we need send it back to main process
-    ipcRenderer.send("set-custom-config-folder", path);
+    ipcRenderer.send("set-custom-config-folder", folderPath);
   };
 
-  static setDataPath(path: string) {
-    dataPath = path;
+  static setDataPath(p: string) {
+    dataPath = p;
   }
-  //- dataPath
+
   public static async getDataPath() {
     if (dataPath === "") {
       dataPath = await ipcRenderer.invoke("get-user-data-path");
     }
     return dataPath;
   }
+
   public static getDataPathSync() {
     if (dataPath === "") {
-      // 获取一下参数，检查是否有传入自定义路径
-      // debug
-      console.log(`data path is empty, get args`);
+      console.log("data path is empty, get args");
       const args = ipcRenderer.sendSync("get-args-sync");
-      //debug
-      console.log(`args: `, args);
+      console.log("args: ", args);
       if (args.ifCustomConfig) {
         XXMMCore.ifCustomConfig = true;
-        // XXMMCore.customConfigFolder = args.customConfigFolder;
-        // 检查路径是否存在
-        if (fs.existsSync(args.customConfigFolder)) {
-          XXMMCore.customConfigFolder = args.customConfigFolder;
-        } else {
-          t_snack(
-            new TranslatedText(
-              "Custom config folder not exist",
-              "自定义配置文件夹不存在",
-            ),
-            SnackType.error,
-          );
+        if (!ipcRenderer.sendSync("fs-exists-sync", args.customConfigFolder)) {
+          ipc.app.snack(appI18n("自定义配置文件夹不存在"), "error");
           console.error(
             `Custom config folder not exist: ${args.customConfigFolder}`,
           );
+        } else {
+          XXMMCore.customConfigFolder = args.customConfigFolder;
         }
       }
       dataPath = ipcRenderer.sendSync("get-user-data-path-sync");
@@ -87,169 +68,152 @@ class XXMMCore {
       dataPath = XXMMCore.getDataPathSync();
     }
     if (XXMMCore.ifCustomConfig) {
-      //debug
       console.log(
         `Using custom config folder: ${XXMMCore.customConfigFolder} instead of ${dataPath}`,
       );
     }
   }
 
-  //- 获取配置文件路径
-
   static readonly getPluginConfigPath = () => {
     this.checkDataPath();
-
     return XXMMCore.ifCustomConfig
-      ? path.join(XXMMCore.customConfigFolder, "pluginConfig.json")
-      : path.join(dataPath, "pluginConfig.json");
+      ? joinPath(XXMMCore.customConfigFolder, "pluginConfig.json")
+      : joinPath(dataPath, "pluginConfig.json");
   };
+
   static readonly getDisabledPluginsPath = () => {
     this.checkDataPath();
     return XXMMCore.ifCustomConfig
-      ? path.join(XXMMCore.customConfigFolder, "disabledPlugins.json")
-      : path.join(dataPath, "disabledPlugins.json");
+      ? joinPath(XXMMCore.customConfigFolder, "disabledPlugins.json")
+      : joinPath(dataPath, "disabledPlugins.json");
   };
 
-  //---------------- current config ------------------
-  // 获取当前配置文件路径
-  static readonly getConfigFilePath: () => string = () => {
+  static readonly getConfigFilePath = () => {
     this.checkDataPath();
     return XXMMCore.ifCustomConfig
-      ? path.join(XXMMCore.customConfigFolder, "config.json")
-      : path.join(dataPath, "config.json");
+      ? joinPath(XXMMCore.customConfigFolder, "config.json")
+      : joinPath(dataPath, "config.json");
   };
-  public static getCurrentConfig() {
-    //debug
+
+  public static async getCurrentConfig() {
     const configFilePath = XXMMCore.getConfigFilePath();
-    if (!fs.existsSync(configFilePath)) {
-      fs.writeFileSync(configFilePath, JSON.stringify({}, null, 4), "utf8");
+
+    if (!(await ipc.fs.exists(asFilePath(configFilePath)))) {
+      await ipc.fs.writeFile(
+        asFilePath(configFilePath),
+        JSON.stringify({}, null, 4),
+      );
       console.log(`Config file not exist, create a new one: ${configFilePath}`);
     }
-    //debug
-    console.log(
-      `getConfigFilePath: ${XXMMCore.getConfigFilePath()}，content: ${fs.readFileSync(XXMMCore.getConfigFilePath(), "utf8")}`,
-    );
-    // return JSON.parse(fs.readFileSync(XXMMCore.getConfigFilePath(), 'utf8'));
+
+    const raw = await ipc.fs.readFile(asFilePath(configFilePath));
+    console.log(`getConfigFilePath: ${configFilePath}, content: ${raw}`);
+
     return ErrorHandler.create(() => {
-      if (!fs.existsSync(XXMMCore.getConfigFilePath())) {
-        // 如果配置文件不存在，则创建一个
-        fs.writeFileSync(
-          XXMMCore.getConfigFilePath(),
-          JSON.stringify({}, null, 4),
-          "utf8",
-        );
-      }
-      return JSON.parse(fs.readFileSync(XXMMCore.getConfigFilePath(), "utf8"));
+      return JSON.parse(raw);
     })
-      .onErr((e) => {
+      .onErr((e: unknown) => {
         console.error(`getCurrentConfig error: ${e}`);
         return {};
       })
       .exec();
   }
 
-  public static saveCurrentConfig(config: any) {
+  public static async saveCurrentConfig(config: unknown) {
     try {
-      // debug
       console.log(`saveCurrentConfig: ${JSON.stringify(config, null, 4)}`);
-      fs.writeFileSync(
-        XXMMCore.getConfigFilePath(),
+      await ipc.fs.writeFile(
+        asFilePath(XXMMCore.getConfigFilePath()),
         JSON.stringify(config, null, 4),
-        "utf8",
       );
     } catch (e) {
       console.error(`saveCurrentConfig error: ${e}`);
     }
   }
 
-  public static saveCurrentConfigSync(config: any) {
-    // 同步的保存配置文件
+  public static saveCurrentConfigSync(config: unknown) {
     try {
-      // debug
       console.log(`saveCurrentConfigSync: ${JSON.stringify(config, null, 4)}`);
-      fs.writeFileSync(
-        XXMMCore.getConfigFilePath(),
+      ipc.fs.writeFile(
+        asFilePath(XXMMCore.getConfigFilePath()),
         JSON.stringify(config, null, 4),
-        "utf8",
       );
     } catch (e) {
       console.error(`saveCurrentConfigSync error: ${e}`);
     }
   }
 
-  //----------------- plugin config ------------------
-  public static getAllPluginConfig() {
-    return JSON.parse(fs.readFileSync(XXMMCore.getPluginConfigPath(), "utf8"));
-  }
-
-  public static getPluginConfig(pluginName) {
-    const pluginConfigPath = XXMMCore.getPluginConfigPath();
-    if (!fs.existsSync(pluginConfigPath)) {
-      fs.writeFileSync(pluginConfigPath, JSON.stringify({}, null, 4), "utf8");
-      console.log(
-        `Plugin config file not exist, create a new one: ${pluginConfigPath}`,
-      );
-    }
-    // 读取文件，找到对应的插件配置，返回
-    const pluginConfig = JSON.parse(fs.readFileSync(pluginConfigPath, "utf8"));
-    // 如果没有这个插件的配置，则返回空对象
-    if (pluginConfig[pluginName] === undefined) {
-      return {};
-    }
-    // 返回插件配置
-    return pluginConfig[pluginName];
-  }
-
-  public static savePluginConfig(pluginName, pluginDataToSave) {
-    const pluginConfigPath = XXMMCore.getPluginConfigPath();
-    if (!fs.existsSync(pluginConfigPath)) {
-      fs.writeFileSync(pluginConfigPath, JSON.stringify({}, null, 4), "utf8");
-      console.log(
-        `Plugin config file not exist, create a new one: ${pluginConfigPath}`,
-      );
-    }
-    // 读取文件，插入新的数据，保存文件
-    const pluginConfig = JSON.parse(fs.readFileSync(pluginConfigPath, "utf8"));
-    // 插入新的数据
-    pluginConfig[pluginName] = pluginDataToSave;
-    // 保存文件
-    fs.writeFileSync(
-      pluginConfigPath,
-      JSON.stringify(pluginConfig, null, 4),
-      "utf8",
+  public static async getAllPluginConfig() {
+    const raw = await ipc.fs.readFile(
+      asFilePath(XXMMCore.getPluginConfigPath()),
     );
-    // debug
+    return JSON.parse(raw);
+  }
+
+  public static async getPluginConfig(pluginName: string) {
+    const pluginConfigPath = XXMMCore.getPluginConfigPath();
+    if (!(await ipc.fs.exists(asFilePath(pluginConfigPath)))) {
+      await ipc.fs.writeFile(
+        asFilePath(pluginConfigPath),
+        JSON.stringify({}, null, 4),
+      );
+      console.log(
+        `Plugin config file not exist, create: ${pluginConfigPath}`,
+      );
+    }
+    const raw = await ipc.fs.readFile(asFilePath(pluginConfigPath));
+    const pluginConfig = JSON.parse(raw);
+    return pluginConfig[pluginName] ?? {};
+  }
+
+  public static async savePluginConfig(
+    pluginName: string,
+    pluginDataToSave: unknown,
+  ) {
+    const pluginConfigPath = XXMMCore.getPluginConfigPath();
+    if (!(await ipc.fs.exists(asFilePath(pluginConfigPath)))) {
+      await ipc.fs.writeFile(
+        asFilePath(pluginConfigPath),
+        JSON.stringify({}, null, 4),
+      );
+      console.log(
+        `Plugin config file not exist, create: ${pluginConfigPath}`,
+      );
+    }
+    const raw = await ipc.fs.readFile(asFilePath(pluginConfigPath));
+    const pluginConfig = JSON.parse(raw);
+    pluginConfig[pluginName] = pluginDataToSave;
+    await ipc.fs.writeFile(
+      asFilePath(pluginConfigPath),
+      JSON.stringify(pluginConfig, null, 4),
+    );
     console.log(`Plugin config file saved: ${pluginConfigPath}`);
   }
 
-  //----------------- disabled plugins ------------------
-  public static getDisabledPlugins() {
+  public static async getDisabledPlugins() {
     const disabledPluginsPath = XXMMCore.getDisabledPluginsPath();
-    if (!fs.existsSync(disabledPluginsPath)) {
-      fs.writeFileSync(
-        disabledPluginsPath,
+    if (!(await ipc.fs.exists(asFilePath(disabledPluginsPath)))) {
+      await ipc.fs.writeFile(
+        asFilePath(disabledPluginsPath),
         JSON.stringify([], null, 4),
-        "utf8",
       );
       console.log(
-        `Disabled plugins file not exist, create a new one: ${disabledPluginsPath}`,
+        `Disabled plugins file not exist, create: ${disabledPluginsPath}`,
       );
       return [];
     }
-    return JSON.parse(fs.readFileSync(disabledPluginsPath, "utf8"));
+    const raw = await ipc.fs.readFile(asFilePath(disabledPluginsPath));
+    return JSON.parse(raw);
   }
 
-  public static saveDisabledPlugins(disabledPlugins: string[]) {
-    fs.writeFileSync(
-      XXMMCore.getDisabledPluginsPath(),
+  public static async saveDisabledPlugins(disabledPlugins: string[]) {
+    await ipc.fs.writeFile(
+      asFilePath(XXMMCore.getDisabledPluginsPath()),
       JSON.stringify(disabledPlugins, null, 4),
-      "utf8",
     );
   }
 
-  // 初始化
   static async init() {
-    // 获取数据路径
     dataPath = await ipcRenderer.invoke("get-user-data-path");
 
     const args = await ipcRenderer.invoke("get-args");
@@ -258,11 +222,10 @@ class XXMMCore {
       XXMMCore.customConfigFolder = args.customConfigFolder;
     }
 
-    // 读取配置文件
-    if (fs.existsSync(XXMMCore.getConfigFilePath())) {
-      const config = JSON.parse(
-        fs.readFileSync(XXMMCore.getConfigFilePath(), "utf8"),
-      );
+    const configFilePath = XXMMCore.getConfigFilePath();
+    if (await ipc.fs.exists(asFilePath(configFilePath))) {
+      const raw = await ipc.fs.readFile(asFilePath(configFilePath));
+      const config = JSON.parse(raw);
       XXMMCore.modSourceFolder = config.modSourceFolder;
       XXMMCore.modTargetFolder = config.modTargetFolder;
       XXMMCore.modArchiveFolder = config.modArchiveFolder;

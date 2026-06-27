@@ -5,8 +5,7 @@ const path = require("node:path");
 const { createClient, IPC } = require("@xxmm/ipc");
 const _ipc = createClient(IPC);
 
-import { TranslatedText } from "@xxmm/helper/Language";
-import { SnackType, t_snack } from "@xxmm/helper/SnackHelper";
+import { appI18n } from "@xxmm/helper/I18nConfig";
 import { ref } from "vue";
 import fsProxy from "@xxmm-apps/electron/fsProxy";
 
@@ -57,7 +56,7 @@ class TapeConfig {
     const descriptionPath = path.join(this._dir, "description.txt");
     this.desc = fs.existsSync(descriptionPath)
       ? fs.readFileSync(descriptionPath, "utf-8")
-      : new TranslatedText("No Description", "没有描述").get();
+      : appI18n("没有描述");
 
     // debug
     console.log(this);
@@ -68,13 +67,7 @@ class TapeConfig {
     const configRootDir = await TapeConfig.getConfigRootPath();
     // 如果不存在config文件夹，创建一个
     if (!fs.existsSync(configRootDir)) {
-      t_snack(
-        new TranslatedText(
-          "Config folder not found, creating a new one",
-          "未找到配置文件夹，正在创建一个",
-        ),
-        SnackType.info,
-      );
+      _ipc.app.snack(appI18n("未找到配置文件夹，正在创建一个"), "info");
       fs.mkdirSync(configRootDir);
       // 打开文件夹
       fsProxy.openDir(configRootDir);
@@ -87,10 +80,7 @@ class TapeConfig {
       );
     // 如果没有配置文件夹，创建一个
     if (configDirs.length === 0) {
-      t_snack(
-        new TranslatedText("No config found", "未找到配置文件"),
-        SnackType.error,
-      );
+      _ipc.app.snack(appI18n("未找到配置文件"), "error");
       return [];
     }
     const configList: TapeConfig[] = configDirs.map(
@@ -130,24 +120,18 @@ class TapeConfig {
 
   static async createConfig(name: string) {
     if (name === "") {
-      t_snack(
-        new TranslatedText("Name cannot be empty", "名称不能为空"),
-        SnackType.error,
-      );
+      _ipc.app.snack(appI18n("名称不能为空"), "error");
       return;
     }
     const configRootDir = await TapeConfig.getConfigRootPath();
     const newConfigDir = path.join(configRootDir, name);
     console.log(newConfigDir);
     if (fs.existsSync(newConfigDir)) {
-      t_snack(
-        new TranslatedText("Config already exists", "配置已存在"),
-        SnackType.error,
-      );
+      _ipc.app.snack(appI18n("配置已存在"), "error");
       return;
     }
     fs.mkdirSync(newConfigDir);
-    t_snack(new TranslatedText("Config created", "配置已创建"), SnackType.info);
+    _ipc.app.snack(appI18n("配置已创建"), "info");
     TapeConfig.reloadAllConfig();
   }
 }

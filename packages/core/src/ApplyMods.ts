@@ -1,304 +1,220 @@
-import { TranslatedText } from "@xxmm/helper/Language";
-import { SnackType, t_snack } from "@xxmm/helper/SnackHelper";
+// ApplyMods.ts — Mod 应用逻辑（IPC 迁移版）
+//
+// 所有文件系统操作通过 @xxmm/ipc fs channels，路径操作使用 PathUtil。
+
+import { createClient, IPC } from "@xxmm/ipc";
+import { asFilePath, asDirPath } from "@xxmm/types";
+import { appI18n } from "@xxmm/helper/I18nConfig";
+import {
+  joinPath,
+  basename,
+  startsWith,
+  stripPrefix,
+  addPrefix,
+} from "@xxmm/helper/PathUtil";
 import { ModInfo } from "./ModInfo";
 import ModLoader from "./ModLoader";
+
+const ipc = createClient(IPC);
 
 async function applyMods(
   modIds: string[],
   modSourcePath: string,
   modTargetPath: string,
 ) {
-  const fs = require("node:fs");
-  const path = require("node:path");
-
-  // 检查一下modSourcePath和modTargetPath是否存在，且不能为同一个文件夹
-  if (
-    modSourcePath === undefined ||
-    modSourcePath === null ||
-    modSourcePath === ""
-  ) {
-    const errorMessage =
-      "modSourcePath is empty. Please check your configuration in Settings/Advanced Settings.";
-    console.error(errorMessage);
-    t_snack(
-      new TranslatedText(
-        errorMessage,
-        "modSourcePath 为空，请在 设置/高级设置 检查你的配置",
-      ),
-      SnackType.error,
+  // 检查 modSourcePath 和 modTargetPath
+  if (!modSourcePath) {
+    console.error("modSourcePath is empty.");
+    ipc.app.snack(
+      appI18n("modSourcePath 为空，请在 设置/高级设置 检查你的配置"),
+      "error",
     );
     return;
   }
-  if (
-    modTargetPath === undefined ||
-    modTargetPath === null ||
-    modTargetPath === ""
-  ) {
-    const errorMessage =
-      "modTargetPath is empty. Please check your configuration in Settings/Advanced Settings.";
-    console.error(errorMessage);
-    t_snack(
-      new TranslatedText(
-        errorMessage,
-        "modTargetPath 为空，请在 设置/高级设置 检查你的配置",
-      ),
-      SnackType.error,
+  if (!modTargetPath) {
+    console.error("modTargetPath is empty.");
+    ipc.app.snack(
+      appI18n("modTargetPath 为空，请在 设置/高级设置 检查你的配置"),
+      "error",
     );
     return;
   }
   if (modSourcePath === modTargetPath) {
-    const errorMessage =
-      "modSourcePath and modTargetPath are the same. Please check your configuration in Settings/Advanced Settings.";
-    console.error(errorMessage);
-    t_snack(
-      new TranslatedText(
-        errorMessage,
+    console.error("modSourcePath and modTargetPath are the same.");
+    ipc.app.snack(
+      appI18n(
         "在非传统模式下，modSourcePath 和 modTargetPath 不能是相同的，请在 设置/高级设置 检查你的配置，或者选择使用传统模式",
       ),
-      SnackType.error,
+      "error",
     );
     return;
   }
-  if (!fs.existsSync(modSourcePath)) {
-    const errorMessage = `modSourcePath does not exist: ${modSourcePath}. Please check your configuration in Settings/Advanced Settings.`;
-    console.error(errorMessage);
-    t_snack(
-      new TranslatedText(
-        errorMessage,
-        `modSourcePath 不存在: ${modSourcePath}，请在 设置/高级设置 检查你的配置`,
-      ),
-      SnackType.error,
+  if (!(await ipc.fs.exists(asFilePath(modSourcePath)))) {
+    console.error(`modSourcePath does not exist: ${modSourcePath}`);
+    ipc.app.snack(
+      appI18n`modSourcePath 不存在: ${modSourcePath}，请在 设置/高级设置 检查你的配置`,
+      "error",
     );
     return;
   }
-  if (!fs.existsSync(modTargetPath)) {
-    const errorMessage = `modTargetPath does not exist: ${modTargetPath}. Please check your configuration in Settings/Advanced Settings.`;
-    console.error(errorMessage);
-    t_snack(
-      new TranslatedText(
-        errorMessage,
-        `modTargetPath 不存在: ${modTargetPath}，请在 设置/高级设置 检查你的配置`,
-      ),
-      SnackType.error,
+  if (!(await ipc.fs.exists(asFilePath(modTargetPath)))) {
+    console.error(`modTargetPath does not exist: ${modTargetPath}`);
+    ipc.app.snack(
+      appI18n`modTargetPath 不存在: ${modTargetPath}，请在 设置/高级设置 检查你的配置`,
+      "error",
     );
     return;
   }
-  if (!fs.statSync(modSourcePath).isDirectory()) {
-    const errorMessage = `modSourcePath is not a directory: ${modSourcePath}. Please check your configuration in Settings/Advanced Settings.`;
-    console.error(errorMessage);
-    t_snack(
-      new TranslatedText(
-        errorMessage,
-        `modSourcePath 不是一个目录: ${modSourcePath}，请在 设置/高级设置 检查你的配置`,
-      ),
-      SnackType.error,
+  if (!(await ipc.fs.isDir(asDirPath(modSourcePath)))) {
+    console.error(`modSourcePath is not a directory: ${modSourcePath}`);
+    ipc.app.snack(
+      appI18n`modSourcePath 不是一个目录: ${modSourcePath}，请在 设置/高级设置 检查你的配置`,
+      "error",
     );
     return;
   }
-  if (!fs.statSync(modTargetPath).isDirectory()) {
-    const errorMessage = `modTargetPath is not a directory: ${modTargetPath}. Please check your configuration in Settings/Advanced Settings.`;
-    console.error(errorMessage);
-    t_snack(
-      new TranslatedText(
-        errorMessage,
-        `modTargetPath 不是一个目录: ${modTargetPath}，请在 设置/高级设置 检查你的配置`,
-      ),
-      SnackType.error,
+  if (!(await ipc.fs.isDir(asDirPath(modTargetPath)))) {
+    console.error(`modTargetPath is not a directory: ${modTargetPath}`);
+    ipc.app.snack(
+      appI18n`modTargetPath 不是一个目录: ${modTargetPath}，请在 设置/高级设置 检查你的配置`,
+      "error",
     );
     return;
   }
 
-  //debug
   console.log("modIds", modIds);
 
-  // await ModLoader.loadMods();
   const allMod = ModLoader.modsRaw;
 
   const selectedMods = modIds
-    .map((modId) => {
-      const mod = ModLoader.getModByID(modId);
-      return mod ? mod : null;
-    })
-    .filter((mod) => mod !== null) as ModInfo[];
+    .map((modId) => ModLoader.getModByID(modId))
+    .filter((mod): mod is ModInfo => mod !== null);
 
   console.log("selectedMods", selectedMods);
 
-  // 计算三个值：
-  // 1. 在allMod中没有但是存在于selectedMods中的mod
-  // 2. 在allMod中存在但是不存在于selectedMods中的mod
-  // 3. 在allMod中和selectedMods中都存在的mod
   const notInAllMod = selectedMods.filter((mod) => !allMod.includes(mod));
   const notInSelectedMods = allMod.filter((mod) => !selectedMods.includes(mod));
   const inBoth = selectedMods.filter((mod) => allMod.includes(mod));
 
-  // debug
   console.log("notInAllMod", notInAllMod);
   console.log("notInSelectedMods", notInSelectedMods);
   console.log("inBoth", inBoth);
 
-  // 如果有不在allMod中的mod，抛出错误
   if (notInAllMod.length > 0) {
     throw new Error(
-      `The following mods are not in allMod: ${notInAllMod.map((mod) => mod.modName).join(", ")}`,
+      `The following mods are not in allMod: ${notInAllMod
+        .map((mod) => mod.modName)
+        .join(", ")}`,
     );
   }
 
-  // 移除不在selectedMods中的mod
-  notInSelectedMods.forEach((mod) => {
-    const modPath = path.join(modTargetPath, mod.modName);
-    if (fs.existsSync(modPath)) {
-      fs.rmdirSync(modPath, { recursive: true });
+  // 移除不在 selectedMods 中的 mod 的链接
+  for (const mod of notInSelectedMods) {
+    const modPath = joinPath(modTargetPath, mod.modName);
+    if (await ipc.fs.exists(asFilePath(modPath))) {
+      await ipc.fs.remove(asFilePath(modPath));
     }
-  });
+  }
 
-  // 为inBoth中的mod创建链接
-  let isError = false;
-  inBoth.forEach((mod) => {
-    const src = path.join(modSourcePath, mod.modName);
-    const dest = path.join(modTargetPath, mod.modName);
-    if (!fs.existsSync(dest)) {
-      fs.symlinkSync(src, dest, "junction", (err) => {
-        if (err) {
-          console.log(err);
-          isError = true;
-        }
-      });
+  // 为 inBoth 中的 mod 创建链接
+  let hasError = false;
+  for (const mod of inBoth) {
+    const src = joinPath(modSourcePath, mod.modName);
+    const dest = joinPath(modTargetPath, mod.modName);
+    if (!(await ipc.fs.exists(asFilePath(dest)))) {
+      try {
+        await ipc.fs.symlink(asFilePath(src), asFilePath(dest), "junction");
+      } catch (err) {
+        console.error(err);
+        hasError = true;
+      }
     }
-  });
+  }
 
-  // 如果有错误，抛出错误
-  if (isError) {
-    t_snack(
-      new TranslatedText(
-        `Failed to create link in ${modTargetPath}, please check permissions or confirm if your disk type supports creating links. Or you can use the traditional way to apply mod.`,
-        `无法在 ${modTargetPath} 中创建链接，请检查权限或是确认您的磁盘类型是否支持创建链接。或者您可以换用使用传统方式应用mod。`,
-      ),
-      SnackType.error,
+  if (hasError) {
+    ipc.app.snack(
+      appI18n`无法在 ${modTargetPath} 中创建链接，请检查权限或是确认您的磁盘类型是否支持创建链接。或者您可以换用使用传统方式应用mod。`,
+      "error",
     );
   }
 }
 
 async function applyModsTranditional(modIds: string[]) {
-  // 这个功能不需要SourcePath，只有一个TargetPath
-  // 通过改变mod的文件夹的名字来实现
-  // 当mod文件夹的名称前为”disabled_“时，表示该mod被禁用
-  // 当mod文件夹的名称前部位为”disabled_“时，表示该mod被启用
-
-  const fs = require("node:fs");
-  const path = require("node:path");
-
-  // 如果 开启了 mod名称和mod文件夹名称一致，将无法使用该功能，因为这里会需要修改文件夹名称
   if (ModInfo.ifKeepModNameAsModFolderName) {
-    t_snack(
-      new TranslatedText(
-        `Mod name and mod folder name are the same, unable to use the traditional way to apply mod.`,
-        `mod名称和mod文件夹名称一致，无法使用传统方式应用mod。`,
-      ),
-      SnackType.error,
+    ipc.app.snack(
+      appI18n("mod名称和mod文件夹名称一致，无法使用传统方式应用mod。"),
+      "error",
     );
     return;
   }
 
-  // await ModLoader.loadMods();
   const allMod = ModLoader.modsRaw;
 
   const selectedMods = modIds
-    .map((modId) => {
-      const mod = ModLoader.getModByID(modId);
-      return mod ? mod : null;
-    })
-    .filter((mod) => mod !== null) as ModInfo[];
+    .map((modId) => ModLoader.getModByID(modId))
+    .filter((mod): mod is ModInfo => mod !== null);
 
   console.log("selectedMods", selectedMods);
 
-  // 计算三个值：
-  // 1. 在allMod中没有但是存在于selectedMods中的mod
-  // 2. 在allMod中存在但是不存在于selectedMods中的mod
-  // 3. 在allMod中和selectedMods中都存在的mod
   const notInAllMod = selectedMods.filter((mod) => !allMod.includes(mod));
   const notInSelectedMods = allMod.filter((mod) => !selectedMods.includes(mod));
   const inBoth = selectedMods.filter((mod) => allMod.includes(mod));
 
-  // debug
-  console.log("notInAllMod", notInAllMod);
-  console.log("notInSelectedMods", notInSelectedMods);
-  console.log("inBoth", inBoth);
-
-  // 如果有不在allMod中的mod，抛出错误
   if (notInAllMod.length > 0) {
     throw new Error(
-      `The following mods are not in allMod: ${notInAllMod.map((mod) => mod.modName).join(", ")}`,
+      `The following mods are not in allMod: ${notInAllMod
+        .map((mod) => mod.modName)
+        .join(", ")}`,
     );
   }
 
-  // 为不在selectedMods中的mod的文件夹名称添加前缀”disabled_“
-  notInSelectedMods.forEach((mod) => {
+  // 禁用未选中的 mod：添加 "disabled_" 前缀
+  for (const mod of notInSelectedMods) {
     const modPath = mod.location;
-    if (fs.existsSync(modPath)) {
-      // 如果文件夹名称前缀已经是”disabled_“，则不需要修改
-      if (path.basename(modPath).startsWith("disabled_")) {
-        return;
-      }
-      const newModName = `disabled_${mod.modName}`;
-      // fs.renameSync(modPath, newModPath);
-      mod.rename(newModName, (err: any) => {
-        if (err) {
-          console.log(err);
-          t_snack(
-            new TranslatedText(
-              `Failed to rename mod folder ${modPath}, please check permissions.`,
-              `重命名mod文件夹 ${modPath} 失败，请检查权限。`,
-            ),
-            SnackType.error,
-          );
-        } else {
-          t_snack(
-            new TranslatedText(
-              `Renamed mod folder ${modPath} to ${newModName}`,
-              `将mod文件夹 ${modPath} 重命名为 ${newModName}`,
-            ),
-            SnackType.info,
-          );
-        }
-      });
-    }
-  });
+    if (!(await ipc.fs.exists(asFilePath(modPath)))) continue;
+    if (startsWith(modPath, "disabled_")) continue;
 
-  // 为inBoth中的mod的文件夹名称添加移除前缀”disabled_“
-  inBoth.forEach((mod) => {
+    const newModName = `disabled_${mod.modName}`;
+
+    mod.rename(newModName, (err: any) => {
+      if (err) {
+        console.error(err);
+        ipc.app.snack(
+          appI18n`重命名mod文件夹 ${modPath} 失败，请检查权限。`,
+          "error",
+        );
+      } else {
+        ipc.app.snack(
+          appI18n`将mod文件夹 ${modPath} 重命名为 ${addPrefix(modPath, "disabled_")}`,
+          "info",
+        );
+      }
+    });
+  }
+
+  // 启用选中的 mod：移除 "disabled_" 前缀
+  for (const mod of inBoth) {
     const modPath = mod.location;
-    if (fs.existsSync(modPath)) {
-      // 如果文件夹名称前缀已经不是”disabled_“，则不需要修改
-      if (!path.basename(modPath).startsWith("disabled_")) {
-        return;
-      }
-      const newModName = path.basename(modPath).replace("disabled_", "");
-      // fs.renameSync(modPath, newModPath);
-      mod.rename(newModName, (err: any) => {
-        if (err) {
-          console.log(err);
-          t_snack(
-            new TranslatedText(
-              `Failed to rename mod folder ${modPath}, please check permissions.`,
-              `重命名mod文件夹 ${modPath} 失败，请检查权限。`,
-            ),
-            SnackType.error,
-          );
-        } else {
-          t_snack(
-            new TranslatedText(
-              `Renamed mod folder ${modPath} to ${newModName}`,
-              `将mod文件夹 ${modPath} 重命名为 ${newModName}`,
-            ),
-            SnackType.info,
-          );
-        }
-      });
-    }
-  });
+    if (!(await ipc.fs.exists(asFilePath(modPath)))) continue;
+    if (!startsWith(modPath, "disabled_")) continue;
 
-  // 重命名完成之后，文件位置可能会发生变化，所以需要重新加载mod
-  // ModLoader.loadMods()
+    const newModName = basename(modPath).replace("disabled_", "");
+
+    mod.rename(newModName, (err: any) => {
+      if (err) {
+        console.error(err);
+        ipc.app.snack(
+          appI18n`重命名mod文件夹 ${modPath} 失败，请检查权限。`,
+          "error",
+        );
+      } else {
+        ipc.app.snack(
+          appI18n`将mod文件夹 ${modPath} 重命名为 ${stripPrefix(modPath, "disabled_")}`,
+          "info",
+        );
+      }
+    });
+  }
 }
 
 export { applyMods, applyModsTranditional };

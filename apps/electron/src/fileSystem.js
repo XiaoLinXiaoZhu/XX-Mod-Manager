@@ -724,6 +724,28 @@ ipc.handle(IPC.fs.isDir, async (_event, pathStr) => {
   const safe = parseDirPath(pathStr);
   return fs.statSync(safe).isDirectory();
 });
+// exists
+ipc.handle(IPC.fs.exists, async (_event, pathStr) => {
+  const safe = parseFilePath(pathStr);
+  return fs.existsSync(safe);
+});
+// mkdir (recursive)
+ipc.handle(IPC.fs.mkdir, async (_event, pathStr) => {
+  const safe = parseDirPath(pathStr);
+  fs.mkdirSync(safe, { recursive: true });
+});
+// remove (recursive, force)
+ipc.handle(IPC.fs.remove, async (_event, pathStr) => {
+  const safe = parseFilePath(pathStr);
+  fs.rmSync(safe, { recursive: true, force: true });
+});
+// symlink
+ipc.handle(IPC.fs.symlink, async (_event, srcStr, destStr, type) => {
+  const safeSrc = parseFilePath(srcStr);
+  const safeDest = parseFilePath(destStr);
+  const symlinkType = type ?? "junction";
+  fs.symlinkSync(safeSrc, safeDest, symlinkType);
+});
 // 打开文件夹路径
 ipc.handle(IPC.fs.openDir, async (_event, pathStr) => {
   const safe = parseDirPath(pathStr);

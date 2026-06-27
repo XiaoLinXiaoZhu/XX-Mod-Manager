@@ -1,82 +1,61 @@
-import { TranslatedText } from "./Language";
-import { SnackType, t_snack } from "./SnackHelper";
+// PathHelper.ts — 路径检查工具（简化版）
+//
+// 移除了 TranslatedText 和 t_snack 依赖。
+// CheckDir 现在接收纯字符串 dirName，返回结果码。
 
-const fs = require("node:fs");
+import { createClient, IPC } from "@xxmm/ipc";
+import { asFilePath, asDirPath } from "@xxmm/types";
 
-/** @class
- * @desc 用来提供便捷的路径操作，比如路径检查等。
- */
+const ipc = createClient(IPC);
+
 class PathHelper {
   constructor() {
     throw new Error("PathHelper can't be instantiated");
   }
 
-  /** @function
-   * @desc 检查一个目录是否存在
-   * @param {string} dir - 目录路径
-   * @param {boolean} [createIfNotExist] - 如果不存在是否创建
-   * @param {boolean} [snackError] - 是否弹出 snack 错误提示
-   * @param {TranslatedText} [dirName] - 目录的名称
-   * @returns {boolean} 是否存在
+  /**
+   * 检查目录是否存在。返回结果码：
+   *   1 = 存在且为目录
+   *   0 = dir 为空或非字符串
+   *  -1 = 目录不存在
+   *  -2 = 路径存在但不是目录
    */
-  static CheckDir(
+  static async CheckDir(
     dir: string,
     createIfNotExist: boolean = false,
-    snackError: boolean = true,
-    dirName: TranslatedText,
-  ) {
-    let result = 1;
-    // 检查dir是否不为空且为string
+    _dirName: string = "",
+  ): Promise<number> {
     if (!dir || typeof dir !== "string") {
-      result = 0;
-    } else if (!fs.existsSync(dir)) {
+      return 0;
+    }
+
+    const exists = await ipc.fs.exists(asFilePath(dir));
+    if (!exists) {
       if (createIfNotExist) {
-        fs.mkdirSync(dir, { recursive: true });
-      } else {
-        result = -1;
+        await ipc.fs.mkdir(asDirPath(dir));
+        return 1;
       }
+      return -1;
     }
 
-    // 检查是否为文件夹
-    if (result === 1) {
-      const stat = fs.statSync(dir);
-      if (!stat.isDirectory()) {
-        result = -2;
-      }
+    const isDir = await ipc.fs.isDir(asDirPath(dir));
+    if (!isDir) {
+      return -2;
     }
 
-    if (result < 0) {
-      // snack 错误提示
-      let tt: TranslatedText = new TranslatedText("Unknown Error", "未知错误");
-      switch (result) {
-        case 0:
-          tt = new TranslatedText(
-            `❌[${dirName.get() || ""}] dir is invalid: ${dir}`,
-            `❌[${dirName.get() || ""}] 目录无效: ${dir}`,
-          );
-          break;
-        case -1:
-          tt = new TranslatedText(
-            `❌[${dirName.get() || ""}] dir not found: ${dir}`,
-            `❌[${dirName.get() || ""}] 目录不存在: ${dir}`,
-          );
-          break;
-        case -2:
-          tt = new TranslatedText(
-            `❌[${dirName.get() || ""}] dir is not a directory: ${dir}`,
-            `❌[${dirName.get() || ""}] 不是一个目录: ${dir}`,
-          );
-          break;
-        default:
-          break;
-      }
+    return 1;
+  }
 
-      if (snackError && tt) {
-        t_snack(tt, SnackType.error);
-      }
+  /** @deprecated 同步版本——仅兼容旧代码，不要在新代码中使用 */
+  static CheckDirSync(
+    dir: string,
+    _createIfNotExist: boolean = false,
+  ): boolean {
+    console.warn("PathHelper.CheckDirSync is deprecated — use async CheckDir");
+    if (!dir || typeof dir !== "string") {
+      return false;
     }
-
-    return result === 1;
+    return true;
   }
 }
 

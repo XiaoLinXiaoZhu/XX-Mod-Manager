@@ -5,6 +5,7 @@ export { EventSystem, EventType } from "./EventSystem";
 export { ImageHelper } from "./ImageHelper";
 export { Language, setCurrentLanguage, TranslatedText } from "./Language";
 export { PathHelper } from "./PathHelper";
+export { joinPath, basename, startsWith, stripPrefix, addPrefix } from "./PathUtil";
 export {
   IPlugin,
   IPluginData,
@@ -14,3 +15,6 @@ export {
 } from "./PluginLoader";
 export { SnackType, snack, t_snack } from "./SnackHelper";
 export { XManager } from "./XManager";
+
+// i18n
+export { appI18n, appScope, langState } from "./I18nConfig";

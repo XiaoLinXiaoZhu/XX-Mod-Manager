@@ -68,6 +68,15 @@ export const IPC = {
     createFile: h<[path: FilePath], void>("fs-create-file"),
     readDir: h<[path: DirPath], string[]>("fs-read-dir"),
     isDir: h<[path: DirPath], boolean>("fs-is-dir"),
+    /** 检查路径是否存在（文件或目录均可） */
+    exists: h<[path: FilePath], boolean>("fs-exists"),
+    /** 递归创建目录 */
+    mkdir: h<[path: DirPath], void>("fs-mkdir"),
+    /** 删除文件或目录（递归） */
+    remove: h<[path: FilePath], void>("fs-remove"),
+    /** 创建符号链接（junction） */
+    symlink: h<[src: FilePath, dest: FilePath, type?: string], void>("fs-symlink"),
+    /** 打开文件夹 */
     openDir: h<[path: DirPath], void>("fs-open-dir"),
     /** 打开文件选择对话框，返回选中路径 */
     getFilePath: h<
