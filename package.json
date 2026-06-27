@@ -32,7 +32,7 @@
     "preview": "vite preview",
     "start": "electron .",
     "publish": "electron-builder --publish always",
-    "build:electron-main": "bun build apps/electron/src/main.ts --outfile=apps/electron/dist/main.mjs --target=node --format=esm --external=electron --external=hmc-win32"
+    "build:electron-main": "bun build apps/electron/src/main.ts --outfile=apps/electron/dist/main.mjs --target=node --format=esm --external=electron --external=hmc-win32 && bun build apps/electron/src/preload.ts --outfile=apps/electron/dist/preload.mjs --target=node --format=esm --external=electron"
   },
   "dependencies": {
     "@tweenjs/tween.js": "^25.0.0",

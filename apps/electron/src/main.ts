@@ -14,6 +14,13 @@ import { parseBoundsStr, parseWindowBounds } from "@xxmm/types";
 import "./hmcHandler.ts";
 import "./fsWatchHandler.ts";
 
+// preload 脚本路径
+import { fileURLToPath as _fileURLToPath } from "node:url";
+const __filename = _fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PRELOAD_PATH = path.join(__dirname, "preload.mjs");
+
+
 // fileSystem.js 仍是 CJS——bun build 处理 CJS/ESM 互操作
 import {
   setMainWindow,
@@ -109,8 +116,9 @@ const createWindow = () => {
     height: 600,
     webPreferences: {
       sandbox: false,
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: PRELOAD_PATH,
     },
   });
 
@@ -226,8 +234,9 @@ ipc.on(IPC.mod.openNewWindow, (_event, arg) => {
     height: 600,
     webPreferences: {
       sandbox: false,
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: PRELOAD_PATH,
     },
   });
 
