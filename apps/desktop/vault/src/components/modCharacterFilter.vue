@@ -26,19 +26,19 @@
 
 <script setup lang="ts">
 import { type Ref, reactive, ref, watch } from "vue";
-import { g_config_vue, g_data_vue } from "@xxmm-apps/electron/IManager";
+import { store } from "@xxmm-apps/electron/IManager";
 
 const lastClickedElement = ref<HTMLElement | null>(null);
 const searchInput = ref<string>("");
 
-const language = g_config_vue.language;
-const characterList = g_data_vue.characterList as Ref<string[]>;
+const language = store.config.language;
+const characterList = store.data.characterList as Ref<string[]>;
 watch(
   language,
   (newValue) => {
     // 刷新一下滑块，因为不同语言的长度不一样
     //debug
-    console.log(`g_config_vue.language changed: `, newValue);
+    console.log(`store.config.language changed: `, newValue);
     const elment = lastClickedElement.value;
     if (!elment) return;
     updateSlider(elment);
@@ -211,7 +211,7 @@ const selectItemByName = (name) => {
   updateSliderByEvent({ currentTarget: elment });
 };
 
-// EventSystem.on(EventType.currentCharacterChanged, (character) => {
+// bus.on(AppEvents.currentCharacterChanged, (character) => {
 //     // 对于all-filter-chip和selected-filter-chip的处理
 //     if (character === 'all') {
 //         const allFilterChip = document.getElementById('all-filter-chip');

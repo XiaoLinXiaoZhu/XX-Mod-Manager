@@ -18,7 +18,7 @@ import IManager from "@xxmm-apps/electron/IManager";
 
 const iManager = new IManager();
 
-import { EventSystem } from "@xxmm/helper/EventSystem";
+import { bus } from "@xxmm-apps/electron/eventBus";
 
 const props = defineProps({
   filterItems: Array,
@@ -94,7 +94,7 @@ const _onMouseMove = (event) => {
   containerRef.value.scrollLeft = scrollLeft.value - walk;
 };
 
-EventSystem.on("currentCharacterChanged", (character) => {
+bus.on("currentCharacterChanged", (character) => {
   if (character === currentCharacter.value) return;
   //debug
   console.log(`get currentCharacterChanged: ${character}`);

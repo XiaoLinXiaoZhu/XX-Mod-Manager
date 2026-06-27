@@ -11,6 +11,8 @@ const { createClient, IPC } = require("@xxmm/ipc");
 const _ipc = createClient(IPC);
 
 import IManager from '@xxmm-apps/electron/IManager'
+import { AppEvents } from '@xxmm/events'
+import '@xxmm-apps/electron/stylesInit'
 const iManager = new IManager();
 
 //-=================== 旧的导入 ===================-//
@@ -45,7 +47,7 @@ vue_app.use(i18n);
 //-==================== 挂载 ====================-//
 
 vue_app.mount("#app-container");
-iManager.on("languageChange", (language) => {
+iManager.on(AppEvents.languageChange, (language) => {
   // 将语言设置为 imanager 中的语言
   vue_app.config.globalProperties.$i18n.locale = language;
   //debug
@@ -54,7 +56,7 @@ iManager.on("languageChange", (language) => {
 
 iManager.waitInit().then((iManager) => {
   // ------------------ 语言切换 ------------------ //
-  iManager.trigger("languageChange", iManager.config.language);
+  iManager.trigger(AppEvents.languageChange, iManager.config.language);
 
   // ------------------ first load ------------------ //
   // 首次打开时打开 初始化窗口

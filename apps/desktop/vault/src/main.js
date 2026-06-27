@@ -9,9 +9,10 @@ const { createClient, IPC } = require("@xxmm/ipc");
 const _ipc = createClient(IPC);
 import IManager from '@xxmm-apps/electron/IManager'
 const iManager = new IManager();
-import { g_config_vue } from '@xxmm-apps/electron/IManager'
+import { store } from "@xxmm-apps/electron/IManager";
 
-import { EventSystem } from '@xxmm/helper/EventSystem'
+import { AppEvents } from '@xxmm/events'
+import '@xxmm-apps/electron/stylesInit';
 
 //-====================入口文件====================-//
 const vue_app = createApp(test_app);
@@ -43,7 +44,7 @@ vue_app.mount("#app");
 
 // ------------------ 语言切换 ------------------ //
 vue_app.config.globalProperties.$i18n.locale = `zh_cn`;
-const language = g_config_vue.language;
+const language = store.config.language;
 watch(language, (newVal) => {
   vue_app.config.globalProperties.$i18n.locale = newVal;
   console.log("languageChange to:", newVal);
@@ -59,7 +60,7 @@ iManager.on("initDone", () => {
 // ------------------ first load ------------------ //
 // 首次打开时打开 初始化窗口
 // iManager.snack('first load : '+iManager.config.firstLoad);
-EventSystem.on("wakeUp", () => {
+iManager.on(AppEvents.wakeUp, () => {
   iManager.snack(`first load : ${iManager.config.firstLoad}`);
   console.log("❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️\nfist load:", iManager.config.firstLoad);
   if (iManager.config.firstLoad) {
@@ -73,7 +74,7 @@ EventSystem.on("wakeUp", () => {
 // ------------------ 初始化 ------------------ //
 // iManager.waitInit().then((iManager) => {
 //     // 手动触发一次语言切换事件
-//     EventSystem.trigger('languageChange', iManager.config.language);
+//     iManager.trigger(AppEvents.languageChange, iManager.config.language);
 // })
 
 //-=====================事件监听====================-//

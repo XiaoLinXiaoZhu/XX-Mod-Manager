@@ -196,7 +196,8 @@ import { useI18n } from "vue-i18n";
 
 const { t, locale } = useI18n();
 
-import { EventSystem, EventType } from "@xxmm/helper/EventSystem.ts";
+import { bus } from "@xxmm-apps/electron/eventBus";
+import { AppEvents } from "@xxmm/events";
 import { IPluginLoader } from "@xxmm/helper/PluginLoader.ts";
 import { SnackType, t_snack } from "@xxmm/helper/SnackHelper.ts";
 
@@ -502,7 +503,7 @@ onMounted(async () => {
   currentTab.value = tabs.value[0];
 
   // 挂载插件的额外设置
-  EventSystem.on(EventType.pluginLoaded, () => {
+  bus.on(AppEvents.pluginLoaded, () => {
     plugins.value = IPluginLoader.plugins;
     pluginConfig.value = IPluginLoader.pluginConfig;
 

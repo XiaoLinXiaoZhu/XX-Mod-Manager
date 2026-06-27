@@ -12,6 +12,9 @@ export default defineConfig({
     alias: {
       '@xxmm/core': path.resolve(__dirname, 'packages/core/src'),
       '@xxmm/helper': path.resolve(__dirname, 'packages/helper/src'),
+      '@xxmm/events': path.resolve(__dirname, 'packages/events/src'),
+      '@xxmm/store': path.resolve(__dirname, 'packages/store/src'),
+      '@xxmm/styles': path.resolve(__dirname, 'packages/styles/src'),
       '@xxmm-apps/electron': path.resolve(__dirname, 'apps/electron/src'),
       '@xxmm-apps/vault': path.resolve(__dirname, 'apps/desktop/vault/src'),
       '@xxmm-apps/first-load': path.resolve(__dirname, 'apps/desktop/first-load/src'),

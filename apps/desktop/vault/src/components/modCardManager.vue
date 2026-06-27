@@ -18,13 +18,10 @@
 <script setup>
 import "sober";
 import { Group, Tween } from "@tweenjs/tween.js";
-import { EventSystem, EventType } from "@xxmm/helper/EventSystem";
+import { bus } from "@xxmm-apps/electron/eventBus";
+import { AppEvents } from "@xxmm/events";
 import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
-import IManager, {
-  g_config_vue,
-  g_data_vue,
-  g_temp_vue,
-} from "@xxmm-apps/electron/IManager";
+import IManager, { store } from "@xxmm-apps/electron/IManager";
 
 const iManager = new IManager();
 
@@ -37,7 +34,7 @@ const props = defineProps({
 const mods = ref([]);
 
 const characterFilterRef = useTemplateRef("characterFilterRef");
-const currentCharacter = g_temp_vue.currentCharacter;
+const currentCharacter = store.temp.currentCharacter;
 
 watch(currentCharacter, (newVal) => {
   if (newVal) {
@@ -49,22 +46,22 @@ watch(currentCharacter, (newVal) => {
 });
 
 // 切换语言的时候，all 和 全部 的长度不一样，所以需要切换
-watch(g_config_vue.language, (_newVal) => {
+watch(() => store.config.language, (_newVal) => {
   setTimeout(() => {
-    characterFilterRef.value.selectItemByName(currentCharacter.value);
+    characterFilterRef.value.selectItemByName(currentCharacter);
   }, 0);
 });
 
 const characters = computed(() => {
-  const characterList = g_data_vue.characterList;
+  const characterList = store.data.characterList;
   if (!characterList) return [];
   //debug
-  console.log("get characterList", characterList.value);
-  return ["all", "selected", ...characterList.value];
+  console.log("get characterList", characterList);
+  return ["all", "selected", ...characterList];
 });
 
 const _translateCharacters = computed(() => {
-  if (g_config_vue.language.value === "zh_cn") {
+  if (store.config.language === "zh_cn") {
     return ["全部", "已选择"];
   } else {
     return ["All", "Selected"];
@@ -86,10 +83,10 @@ const loadMods = async () => {
   // 检查是否选择了角色，如果选择了角色，则筛选角色
   // 这里再刷新一次的原因是，因为 mod卡片全部重新加载了之后，之前的筛选就失效了
   // debug
-  console.log("changeFilter to currentCharacter:", currentCharacter.value);
-  if (currentCharacter.value) {
+  console.log("changeFilter to currentCharacter:", currentCharacter);
+  if (currentCharacter) {
     setTimeout(() => {
-      changeFilter(currentCharacter.value);
+      changeFilter(currentCharacter);
     }, 0);
   }
 
@@ -239,7 +236,7 @@ async function loadPreset(presetName) {
   // handleFilterChange('已选择');
 }
 
-EventSystem.on("modInfoChanged", (modInfo) => {
+bus.on("modInfoChanged", (modInfo) => {
   //debug
   console.log("get modInfoChanged, reload display mods");
   mods.value = null;
@@ -252,7 +249,7 @@ EventSystem.on("modInfoChanged", (modInfo) => {
   }, 1);
 });
 
-EventSystem.on(EventType.modListChanged, () => {
+bus.on(AppEvents.modListChanged, () => {
   //debug
   console.log("get modListChanged, reload display mods");
   mods.value = null;
@@ -262,7 +259,7 @@ EventSystem.on(EventType.modListChanged, () => {
   }, 1);
 });
 
-EventSystem.on(EventType.addMod, (_mod) => {
+bus.on(AppEvents.addMod, (_mod) => {
   //debug
   console.log("get addMod, reload display mods", mods.value);
   mods.value = null;
@@ -272,7 +269,7 @@ EventSystem.on(EventType.addMod, (_mod) => {
   }, 1);
 });
 
-EventSystem.on("currentPresetChanged", (preset) => {
+bus.on("currentPresetChanged", (preset) => {
   loadPreset(preset);
 });
 

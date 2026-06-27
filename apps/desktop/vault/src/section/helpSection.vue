@@ -514,9 +514,9 @@ If you know some front-end development, you can try pressing Ctrl+Shift+I to ope
 If you cannot solve the problem, please contact me.
 `;
 
-import { g_config_vue } from "@xxmm-apps/electron/IManager";
+import { store } from "@xxmm-apps/electron/IManager";
 
-const language = g_config_vue.language;
+const language = store.config.language;
 watch(language, (newVal, _oldVal) => {
   setTranslatedTabs(newVal);
 });

@@ -11,8 +11,10 @@ const { createClient, IPC } = require("@xxmm/ipc");
 const _ipc = createClient(IPC);
 
 import IManager from '@xxmm-apps/electron/IManager'
+import { AppEvents } from '@xxmm/events'
+import '@xxmm-apps/electron/stylesInit'
 const iManager = new IManager();
-import { g_config_vue } from '@xxmm-apps/electron/IManager'
+import { store } from "@xxmm-apps/electron/IManager";
 
 //-=================== 旧的导入 ===================-//
 const _path = require("node:path");
@@ -47,14 +49,14 @@ vue_app.use(i18n);
 
 vue_app.mount("#app-container");
 
-const language = g_config_vue.language;
+const language = store.config.language;
 watch(language, (language) => {
   // 将语言设置为 imanager 中的语言
   vue_app.config.globalProperties.$i18n.locale = language;
   console.log("set language to:", language);
 });
 
-iManager.on("initDone", () => {
+iManager.on(AppEvents.initDone, () => {
   // 手动触发一次语言切换事件
   vue_app.config.globalProperties.$i18n.locale = iManager.config.language;
   console.log("languageChange:", iManager.config.language);
@@ -62,7 +64,7 @@ iManager.on("initDone", () => {
 
 // 每1s打印一次语言
 setInterval(() => {
-  console.log("language:", g_config_vue.language.value);
+  console.log("language:", store.config.language);
 }, 1000);
 
 //-=====================事件监听====================-//

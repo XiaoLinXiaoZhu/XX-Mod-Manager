@@ -1,0 +1,11 @@
+{
+  "name": "@xxmm/styles",
+  "version": "1.0.0",
+  "description": "Browser DOM style effects and CSS class lifecycle management",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "type": "module",
+  "dependencies": {
+    "@tweenjs/tween.js": "^25.0.0"
+  }
+}

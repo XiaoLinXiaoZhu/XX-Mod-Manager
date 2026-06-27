@@ -97,18 +97,14 @@
 <script setup>
 import { computed, ref, useTemplateRef, watch } from "vue";
 import fsProxy from "@xxmm-apps/electron/fsProxy";
-import IManager, {
-  g_config_vue,
-  g_data_vue,
-  g_temp_vue,
-} from "@xxmm-apps/electron/IManager";
+import IManager, { store } from "@xxmm-apps/electron/IManager";
 
 const iManager = new IManager();
 
-import { EventSystem } from "@xxmm/helper/EventSystem";
+import { bus } from "@xxmm-apps/electron/eventBus";
 import { SnackType, t_snack } from "@xxmm/helper/SnackHelper";
 
-const _displayModRef = g_temp_vue.currentMod;
+const _displayModRef = store.temp.currentMod;
 
 //-============================== 事件处理 ==============================
 
@@ -186,23 +182,23 @@ function _handleCompactButtonClicked() {
 //-============================= presets ==============================
 //#region presets
 // const presets = ref([]);
-const language = g_config_vue.language;
+const language = store.config.language;
 const _presets = computed(() => {
-  return ["default", ...g_data_vue.presetList.value];
+  return ["default", ...store.data.presetList];
 });
 const _translatedPresets = computed(() => {
   // 根据语言翻译 default
   //debug
   console.log("presets changed", language.value);
   if (language.value === "zh_cn") {
-    return ["默认预设", ...g_data_vue.presetList.value];
+    return ["默认预设", ...store.data.presetList];
   } else {
-    return ["default", ...g_data_vue.presetList.value];
+    return ["default", ...store.data.presetList];
   }
 });
 
 // 这里只做显示切换，真正的功能通过 eventsystem.on('currentPresetChanged') 来实现
-const currentPreset = g_temp_vue.currentPreset;
+const currentPreset = store.temp.currentPreset;
 watch(currentPreset, (newVal, _oldVal) => {
   presetSelectorRef.value.selectTabByName(newVal);
 });
@@ -241,7 +237,7 @@ function _handleApplyButtonClicked() {
   });
 }
 
-EventSystem.on("toggledMod", (mod) => {
+bus.on("toggledMod", (mod) => {
   //debug
   console.log("toggled mod", mod.name);
   savePreset();

@@ -1,0 +1,11 @@
+{
+  "name": "@xxmm/store",
+  "version": "1.0.0",
+  "description": "Single reactive application state store",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "type": "module",
+  "dependencies": {
+    "@vue/reactivity": "^3.5.39"
+  }
+}

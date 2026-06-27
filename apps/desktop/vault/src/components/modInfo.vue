@@ -60,7 +60,8 @@
 <script setup>
 import { ModData } from "@xxmm/core/ModHelper";
 import { DialogHelper, DialogID } from "@xxmm/helper/DialogHelper";
-import { EventSystem, EventType } from "@xxmm/helper/EventSystem";
+import { bus } from "@xxmm-apps/electron/eventBus";
+import { AppEvents } from "@xxmm/events";
 import { snack } from "@xxmm/helper/SnackHelper";
 import { defineProps, ref, watch } from "vue";
 // 导入 i18n 的 t 函数
@@ -89,7 +90,7 @@ watch(
   },
 );
 
-EventSystem.on(EventType.modInfoChanged, (mod) => {
+bus.on(AppEvents.modInfoChanged, (mod) => {
   if (mod.name === props.mod.name) {
     setTimeout(() => {
       props.mod.getPreviewBase64(true).then((base64) => {

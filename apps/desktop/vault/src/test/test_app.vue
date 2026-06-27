@@ -43,9 +43,9 @@ const loaded = ref(false);
 // const iManager = new IManager();
 // 这里不需要 iManager 实例，直接通过waitInit 获取
 
-import { g_temp_vue, waitInitIManager } from "@xxmm-apps/electron/IManager";
+import { store, waitInitIManager } from "@xxmm-apps/electron/IManager";
 
-const _currentMod = g_temp_vue.currentMod;
+const _currentMod = store.temp.currentMod;
 
 const _sections = ref(["mod", "help", "settings"]);
 const currentSection = ref("mod");

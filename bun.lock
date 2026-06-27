@@ -83,6 +83,20 @@
         "@xxmm/types": "workspace:*",
       },
     },
+    "packages/store": {
+      "name": "@xxmm/store",
+      "version": "1.0.0",
+      "dependencies": {
+        "@vue/reactivity": "^3.5.39",
+      },
+    },
+    "packages/styles": {
+      "name": "@xxmm/styles",
+      "version": "1.0.0",
+      "dependencies": {
+        "@tweenjs/tween.js": "^25.0.0",
+      },
+    },
     "packages/types": {
       "name": "@xxmm/types",
       "version": "1.0.0",
@@ -317,6 +331,10 @@
     "@xxmm/ipc": ["@xxmm/ipc@workspace:packages/ipc"],
 
     "@xxmm/plugin": ["@xxmm/plugin@workspace:packages/plugin"],
+
+    "@xxmm/store": ["@xxmm/store@workspace:packages/store"],
+
+    "@xxmm/styles": ["@xxmm/styles@workspace:packages/styles"],
 
     "@xxmm/types": ["@xxmm/types@workspace:packages/types"],
 

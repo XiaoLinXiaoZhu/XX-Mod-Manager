@@ -1,3 +1,8 @@
+// WIP: 数据层已迁移到 @xxmm/store（store.config / store.data / store.temp）。
+//      事件系统已迁移到 @xxmm/events（this.#bus）。
+//      样式效果已迁移到 @xxmm/styles（stylesInit.ts）。
+//      其余职责（初始化编排、Mod 操作、预设管理、IPC 封装）待拆分到独立 @xxmm/* 包。
+//
 // 这是一个单例式 Manager 类，用于 保存 管理 所有的 数据
 // 所有的数据都从 这里 获取，包括 各种页面的样式，事件的触发，数据的获取等等
 // 这样的话，方便将所有非核心功能 转化为 插件，方便管理和拓展
@@ -24,8 +29,9 @@ import PresetHelper from '@xxmm/core/PresetHelper';
 import { TranslatedText, setCurrentLanguage } from '@xxmm/helper/Language';
 // 导入 SnackHelper
 import { t_snack, SnackType, snack } from '@xxmm/helper/SnackHelper';
-// 导入 EventSystem
-import { EventType, EventSystem } from '@xxmm/helper/EventSystem';
+// 导入 EventBus (@xxmm/events)
+import { bus } from './eventBus.js';
+import { AppEvents } from '@xxmm/events';
 // 导入 PluginLoader
 import { IPluginLoader } from '@xxmm/helper/PluginLoader';
 // 导入 ModHelper
@@ -35,79 +41,27 @@ import { DialogHelper } from '@xxmm/helper/DialogHelper';
 
 // // 导入 hmc-win32
 const HMC_Name = "hmc-win32";
+// TODO: HMC 应通过 IPC 调用主进程，而非在渲染进程 require 原生模块
 const HMC = require(HMC_Name);
 
-//-=================== 全局变量 ===================-//
-const g_temp = {
-  lastClickedMod: null,
-  currentMod: null,
-  currentCharacter: null,
-  currentTab: "mod",
-  currentPreset: "default",
-  wakeUped: false,
-  ifDontSaveOnClose: false,
-};
-const g_config = {
-  firstLoad: true,
-  language: "zh_cn",
-  theme: "dark",
-  modSourcePath: null,
-  modTargetPath: null,
-  presetPath: null,
-  ifStartWithLastPreset: true,
-  lastUsedPreset: null,
-  bounds: {
-    width: 800,
-    height: 600,
-    x: -1,
-    y: -1,
-  },
-  ifKeepModNameAsModFolderName: false,
-  ifUseTraditionalApply: false,
-};
-const g_data = {
-  modList: [],
-  presetList: [],
-  characterList: [],
-};
+//-=================== 全局状态（@xxmm/store） ===================-//
+import { createAppStore } from "@xxmm/store";
+
+/** 应用级单一响应式数据源 */
+export const store = createAppStore();
+
+// g_temp → store.temp
+// g_config → store.config
+// g_data → store.data
 
 //-==================== vue 版本的全局变量 ====================//
-import { ref, watch } from 'vue';
+import { watch } from "@vue/reactivity";
 import { applyMods, applyModsTranditional } from '@xxmm/core/ApplyMods';
-const g_temp_vue = {
-  lastClickedMod: ref(null),
-  currentMod: ref(null),
-  currentCharacter: ref(null),
-  currentTab: ref("mod"),
-  currentPreset: ref("default"),
-  wakeUped: ref(false),
-  ifDontSaveOnClose: ref(false),
-};
+// g_temp_vue → store.temp (reactive)
 
-const g_config_vue = {
-  firstLoad: ref(true),
-  language: ref("zh_cn"),
-  theme: ref("dark"),
-  modSourcePath: ref(null),
-  modTargetPath: ref(null),
-  presetPath: ref(null),
-  ifStartWithLastPreset: ref(true),
-  lastUsedPreset: ref(null),
-  bounds: ref({
-    width: 800,
-    height: 600,
-    x: -1,
-    y: -1,
-  }),
-  ifKeepModNameAsModFolderName: ref(false),
-  ifUseTraditionalApply: ref(false),
-};
+// g_config_vue → store.config (reactive)
 
-const g_data_vue = {
-  modList: ref([]),
-  presetList: ref([]),
-  characterList: ref([]),
-};
+// g_data_vue → store.data (reactive)
 
 class IManager {
   //-==================== 单例 ====================
@@ -130,6 +84,7 @@ class IManager {
     this.plugins = {};
 
     this.HMC = HMC;
+    this.#bus = bus;
 
     // 初始化
     this.init();
@@ -167,123 +122,21 @@ class IManager {
   // };
   // 对外暴露的 hmc 对象，使得插件可以直接调用 hmc 的方法
   // 从本地加载的配置项
-  _config = {
-    firstLoad: true, // 是否第一次加载
-    language: "zh_cn", // 语言
-    theme: "dark", // 主题
-    modSourcePath: null, // mod的源路径
-    modTargetPath: null, // mod的目标路径
-    presetPath: null, // 预设路径
-    ifStartWithLastPreset: true, // 是否启动时使用上次使用的预设
-    lastUsedPreset: null, // 上次使用的预设,如果 ifStartWithLastPreset 为 true，则启动时使用这个预设
-    bounds: {
-      width: 800,
-      height: 600,
-      x: -1,
-      y: -1,
-    },
-    ifKeepModNameAsModFolderName: false, // 是否保持 mod 名称和文件夹名称一致
-    ifUseTraditionalApply: false, // 是否使用传统的应用方式
-  };
+  // _config → store.config
 
   // 程序运行时的数据
   // dataPath = ''; // 数据路径
-  _data = {
-    modList: [], // mod列表
-    presetList: [], // 预设列表
-    characterList: [], // 角色列表
-  };
+  // _data → store.data
 
   // 临时数据，用于存储一些临时的数据
-  _temp = {
-    lastClickedMod: null, // 最后点击的mod，用于显示详情
-    currentMod: null, // 当前mod
-    currentCharacter: "all", // 当前角色
-    currentTab: "mod", // 当前tab
-    currentPreset: "default", // 当前预设
-    wakeUped: false, // 是否 在唤醒状态
-    ifDontSaveOnClose: false, // 是否在关闭时不保存配置
-  };
+  // _temp → store.temp
 
   //-==================== 设置数据 ====================
-  config = new Proxy(this._config, {
-    set: (target, key, value) => {
-      if (Object.hasOwn(target, key)) {
-        target[key] = value;
-        g_config[key] = value;
-        g_config_vue[key].value = value;
-        return true;
-      } else {
-        console.error(`Invalid key: ${key}`);
-        return false;
-      }
-    },
-    get: (target, key) => {
-      if (Object.hasOwn(target, key)) {
-        return target[key];
-      } else {
-        console.error(`Invalid key: ${key}`);
-        return null;
-      }
-    },
-  });
+  config = store.config;
 
-  data = new Proxy(this._data, {
-    set: (target, key, value) => {
-      if (Object.hasOwn(target, key)) {
-        target[key] = value;
-        // console.log(`data set: ${key}`, value);
-        // 不保存 modList，因为 modList 是一个对象数组，如果 传来传去，会导致内存占用过大
-        if (key === "modList") {
-          // 打印 err
-          console.log(`data set: ${key}`, new Error());
-          // 如果 modList 变化，则 触发 modListChanged 事件
-          EventSystem.trigger(EventType.modListChanged, value);
-          return true;
-        }
-        g_data[key] = value;
-        g_data_vue[key].value = value;
-        return true;
-      } else {
-        console.error(`Invalid key: ${key}`);
-        return false;
-      }
-    },
-    get: (target, key) => {
-      if (Object.hasOwn(target, key)) {
-        return target[key];
-      } else {
-        console.error(`Invalid key: ${key}`);
-        return null;
-      }
-    },
-  });
+  data = store.data;
 
-  temp = new Proxy(this._temp, {
-    set: (target, key, value) => {
-      if (Object.hasOwn(target, key)) {
-        if (!value) {
-          //debug
-          console.error("WTF,where give me null?");
-        }
-        target[key] = value;
-        g_temp[key] = value;
-        g_temp_vue[key].value = value;
-        return true;
-      } else {
-        console.error(`Invalid key: ${key}`);
-        return false;
-      }
-    },
-    get: (target, key) => {
-      if (Object.hasOwn(target, key)) {
-        return target[key];
-      } else {
-        console.error(`Invalid key: ${key}`);
-        return null;
-      }
-    },
-  });
+  temp = store.temp;
 
   //-==================== 内部方法 ====================
   snack = snack;
@@ -319,11 +172,11 @@ class IManager {
     }
 
     //debug
-    console.log("loadConfig adjust to:", this._config);
+    console.log("loadConfig adjust to:", store.config);
 
     ModInfo.ifKeepModNameAsModFolderName =
       this.config.ifKeepModNameAsModFolderName;
-    watch(g_config_vue.ifKeepModNameAsModFolderName, (newValue) => {
+    watch(store.config.ifKeepModNameAsModFolderName, (newValue) => {
       ModInfo.ifKeepModNameAsModFolderName = newValue;
       // debug
       console.log("ifKeepModNameAsModFolderName changed to:", newValue);
@@ -514,7 +367,7 @@ class IManager {
       //debug
       console.log(`new mod ${modName}`, modInfo);
       modInfo.newMod = false;
-      EventSystem.trigger("addMod", modData);
+      this.#bus.emit(AppEvents.addMod, modData);
     }
 
     // 将其添加到 modList 中，如果已经存在，则不添加
@@ -562,7 +415,7 @@ class IManager {
     // 如果 是新的 mod，则触发 addMod 事件
     if (data.newMod) {
       data.newMod = false;
-      await EventSystem.trigger("addMod", mod);
+      await this.#bus.emit(AppEvents.addMod, mod);
     }
 
     // 延时一下，等待 addMod 事件完成
@@ -605,11 +458,11 @@ class IManager {
     this.setWindowBounds();
     console.log("✅>> setWindowBounds done");
     //------ 切换语言 -----
-    this.trigger("languageChange", this.config.language);
+    this.trigger(AppEvents.languageChange, this.config.language);
     setCurrentLanguage(this.config.language);
     console.log("✅>> languageChange to", this.config.language);
     //------ 切换主题 -----
-    this.trigger("themeChange", this.config.theme);
+    this.trigger(AppEvents.themeChange, this.config.theme);
     console.log("✅>> themeChange to", this.config.theme);
 
     // 加载mod
@@ -629,20 +482,20 @@ class IManager {
     this.inited = true;
 
     //----------------- 事件监听 -----------------
-    EventSystem.on(EventType.modInfoChanged, async (_mod) => {
+    this.#bus.on(AppEvents.modInfoChanged, async (_mod) => {
       // characterList 变化
       this.data.characterList = new Set(
         this.data.modList.map((mod) => mod.character),
       );
       this.data.characterList = Array.from(this.data.characterList).sort();
     });
-    EventSystem.on(EventType.currentModChanged, (mod) => {
+    this.#bus.on(AppEvents.currentModChanged, (mod) => {
       this.temp.currentMod = mod;
     });
 
     //调用 start 方法
     setTimeout(() => {
-      this.trigger("initDone", this);
+      this.trigger(AppEvents.initDone, this);
       this.start();
     }, 10);
   }
@@ -652,12 +505,12 @@ class IManager {
     // 加载插件
     await IPluginLoader.Init(this);
     console.log("✅>> loadPlugins done");
-    EventSystem.trigger(EventType.pluginLoaded, this);
+    this.#bus.emit(AppEvents.pluginLoaded, this);
 
     //-------- 再次切换一次 语言和主题，因为有些页面可能在 init 之后才加载，所以需要再次切换一次
-    this.trigger("languageChange", this.config.language);
+    this.trigger(AppEvents.languageChange, this.config.language);
     setCurrentLanguage(this.config.language);
-    this.trigger("themeChange", this.config.theme);
+    this.trigger(AppEvents.themeChange, this.config.theme);
 
     //-------- 如果有新添加的mod，则运行 addMod 事件
     if (this.newMods.length > 0) {
@@ -688,7 +541,7 @@ class IManager {
       this.setCurrentPreset("default");
     }
 
-    EventSystem.trigger(EventType.startDone, this);
+    this.#bus.emit(AppEvents.startDone, this);
   }
   //-==================== 对外接口 - 状态变更 ====================
   async setLastClickedMod(mod) {
@@ -696,7 +549,7 @@ class IManager {
     console.warn("setLastClickedMod is deprecated");
     throw new Error("setLastClickedMod is deprecated");
     this.temp.lastClickedMod = mod;
-    this.trigger("lastClickedMod_Changed", mod);
+    this.trigger(AppEvents.lastClickedModChanged, mod);
   }
 
   async setLastClickedModByName(_modName) {
@@ -712,14 +565,14 @@ class IManager {
       character = "all";
     }
     this.temp.currentCharacter = character;
-    this.trigger("currentCharacterChanged", character);
+    this.trigger(AppEvents.currentCharacterChanged, character);
     //debug
     console.log(`currentCharacterChanged: ${character}`);
   }
 
   async setCurrentTab(tab) {
     this.temp.currentTab = tab;
-    this.trigger("currentTabChanged", tab);
+    this.trigger(AppEvents.currentTabChanged, tab);
 
     //debug
     console.log(`currentTabChanged: ${tab}`);
@@ -727,12 +580,12 @@ class IManager {
 
   async setCurrentPreset(presetName) {
     this.temp.currentPreset = presetName;
-    this.trigger("currentPresetChanged", presetName);
+    this.trigger(AppEvents.currentPresetChanged, presetName);
   }
 
   async setCurrentMod(mod) {
     this.temp.currentMod = mod;
-    this.trigger("currentModChanged", mod);
+    this.trigger(AppEvents.currentModChanged, mod);
   }
 
   async setCurrentModByName(modName) {
@@ -744,7 +597,7 @@ class IManager {
       this.temp.currentMod,
       this.hashCode(this.temp.currentMod),
     );
-    this.trigger("currentModChanged", this.temp.currentMod);
+    this.trigger(AppEvents.currentModChanged, this.temp.currentMod);
   }
 
   async setCurrentModById(modId) {
@@ -760,12 +613,12 @@ class IManager {
       this.temp.currentMod,
       this.hashCode(this.temp.currentMod),
     );
-    this.trigger("currentModChanged", this.temp.currentMod);
+    this.trigger(AppEvents.currentModChanged, this.temp.currentMod);
   }
 
   async toggledModByName(modName) {
     const mod = await this.getModInfo(modName);
-    this.trigger("toggledMod", mod);
+    this.trigger(AppEvents.toggledMod, mod);
   }
 
   // @deprecated 纯 IPC 二次转接，下游应直接使用 ipc.window.setBounds(JSON.stringify(bounds))
@@ -1338,7 +1191,7 @@ class IManager {
     //debug
     console.log(`set filter: ${character}`);
     this.temp.currentCharacter = character;
-    this.trigger("currentCharacterChanged", character);
+    this.trigger(AppEvents.currentCharacterChanged, character);
   }
 
   // 递归复制文件夹
@@ -1443,7 +1296,7 @@ class IManager {
       await applyMods(modList, modSourcePath, modTargetPath);
     }
 
-    this.trigger("modsApplied", modList);
+    this.trigger(AppEvents.modsApplied, modList);
     // ipcRenderer.send('snack', '应用成功');
     t_snack({
       zh_cn: "应用成功",
@@ -1462,7 +1315,7 @@ class IManager {
     // 刷新预设列表
     await this.loadPresets();
 
-    this.trigger("addPreset", presetName);
+    this.trigger(AppEvents.addPreset, presetName);
 
     setTimeout(() => {
       this.setCurrentPreset(presetName);
@@ -1495,18 +1348,20 @@ class IManager {
   }
 
   async saveConfig() {
-    // await ipcRenderer.invoke('set-current-config', this._config);
-    XXMMCore.saveCurrentConfig(this._config);
+    // await ipcRenderer.invoke('set-current-config', store.config);
+    XXMMCore.saveCurrentConfig(store.config);
   }
 
   // 同步的保存配置
   saveConfigSync() {
     //debug
-    console.log("saveConfig:", this._config);
-    // ipcRenderer.invoke('set-current-config', this._config);
-    XXMMCore.saveCurrentConfigSync(this._config);
+    console.log("saveConfig:", store.config);
+    // ipcRenderer.invoke('set-current-config', store.config);
+    XXMMCore.saveCurrentConfigSync(store.config);
   }
 
+  // ISSUE: 标记 @deprecated 的 IPC 二次转接方法，下游应直接使用 @xxmm/ipc。
+  //        保留以兼容旧调用方，全部迁移后可删除。
   // @deprecated 纯 IPC 二次转接，下游应直接使用 ipc.fs.getFilePath(fileName, fileType, defaultPath)
   async getFilePath(fileName, fileType, defaultPath) {
     const filePath = await ipc.fs.getFilePath(
@@ -1570,7 +1425,7 @@ class IManager {
     }
 
     this.config.language = language;
-    this.trigger("languageChange", language);
+    this.trigger(AppEvents.languageChange, language);
     setCurrentLanguage(language);
     //debug eventList
     console.log(this.eventList);
@@ -1587,7 +1442,7 @@ class IManager {
     }
 
     this.config.theme = theme;
-    this.trigger("themeChange", theme);
+    this.trigger(AppEvents.themeChange, theme);
     this.saveConfig();
   }
 
@@ -1616,8 +1471,8 @@ class IManager {
   }
 
   //-==================== 事件管理 ====================
-  on = EventSystem.on;
-  trigger = EventSystem.trigger;
+  on = this.#bus.on;
+  trigger = this.#bus.emit;
 
   static triggerWakeUp() {
     console.log("🌞wakeUp");
@@ -1625,10 +1480,12 @@ class IManager {
       zh_cn: "🌞程序正常启动~",
       en: "🌞Program is waking up~",
     });
-    EventSystem.trigger("wakeUp", IManager.instance);
+    this.#bus.emit(AppEvents.wakeUp, IManager.instance);
   }
 
   //-===================== 插件 =====================
+  // ISSUE: 当前使用 IPluginLoader 桥接适配器（空壳），插件系统不可用。
+  //        需将 PluginLoader.ts 桥接到 @xxmm/plugin 的真实实现。
   //----------插件接口----------
   // 改为使用 IPluginLoader 的接口
   getPluginData = IPluginLoader.GetPluginData;
@@ -1689,7 +1546,7 @@ ipc.on(IPC.lifecycle.wakeUp, (_event) => {
   }
   // 这里不应该是在initdone完成之后触发，应该是在 startdone 之后触发
 });
-EventSystem.on(EventType.startDone, () => {
+this.#bus.on(AppEvents.startDone, () => {
   wakeUpCondition++;
   if (wakeUpCondition === wakeUpConditionCount) {
     IManager.triggerWakeUp();
@@ -1708,11 +1565,11 @@ ipc.on(IPC.lifecycle.windowBlur, (_event) => {
   const tt = new TranslatedText("☁️windowBlur", "☁️窗口失去焦点");
   console.log(tt.get());
   t_snack(tt);
-  EventSystem.trigger("windowBlur");
+  this.#bus.emit(AppEvents.windowBlur);
 
   sleepTimer = setTimeout(() => {
-    // EventSystem.trigger("windowSleep");
-    EventSystem.trigger("windowSleep");
+    // this.#bus.emit(AppEvents.windowSleep);
+    this.#bus.emit(AppEvents.windowSleep);
     isSleeping = true;
     const tt2 = new TranslatedText("💤windowSleep", "💤窗口休眠");
     console.log(tt2.get());
@@ -1726,9 +1583,9 @@ ipc.on(IPC.lifecycle.windowFocus, (_event) => {
   if (isSleeping) {
     t_snack(tt);
     isSleeping = false;
-    EventSystem.trigger("windowWake");
+    this.#bus.emit(AppEvents.windowWake);
   }
-  EventSystem.trigger("windowFocus");
+  this.#bus.emit(AppEvents.windowFocus);
 
   if (sleepTimer !== "") {
     clearTimeout(sleepTimer);
@@ -1736,4 +1593,4 @@ ipc.on(IPC.lifecycle.windowFocus, (_event) => {
 });
 
 export default IManager;
-export { waitInitIManager, g_temp, g_temp_vue, g_config, g_config_vue, g_data, g_data_vue };
+export { waitInitIManager, store };

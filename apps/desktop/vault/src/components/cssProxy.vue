@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { EventSystem } from "@xxmm/helper/EventSystem";
+import { bus } from "@xxmm-apps/electron/eventBus";
 import backgroundImage from "../assets/background.png";
 
 let currentTheme = "";
@@ -23,5 +23,5 @@ const changeTheme = async (theme) => {
   }
 };
 
-EventSystem.on("themeChange", changeTheme);
+bus.on("themeChange", changeTheme);
 </script>
